@@ -1,22 +1,20 @@
-FROM node:20-alpine AS development-dependencies-env
-COPY . /app
-WORKDIR /app
-RUN npm ci
+# Use the Node.js LTS image as the base
+FROM node:lts
 
-FROM node:20-alpine AS production-dependencies-env
-COPY ./package.json package-lock.json /app/
-WORKDIR /app
-RUN npm ci --omit=dev
+# Set the working directory inside the container
+WORKDIR /usr/src/frontend
 
-FROM node:20-alpine AS build-env
-COPY . /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
-WORKDIR /app
-RUN npm run build
+# Copy package.json and package-lock.json to the container
+COPY package*.json ./
 
-FROM node:20-alpine
-COPY ./package.json package-lock.json /app/
-COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
-WORKDIR /app
-CMD ["npm", "run", "start"]
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the frontend code to the container
+COPY . .
+
+# Expose the port for the frontend development server
+EXPOSE 5173
+
+# Start the development server
+CMD ["npm", "run", "dev"]
