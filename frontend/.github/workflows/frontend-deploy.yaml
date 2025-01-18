@@ -11,12 +11,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+        uses: actions/checkout@v4
 
       - name: Build and Push Docker Image
         run: |
@@ -24,6 +19,11 @@ jobs:
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username "${{ secrets.DOCKER_USERNAME }}" --password-stdin
           docker tag bloodline-frontend:latest <DOCKER_HUB_USERNAME>/bloodline-frontend:latest
           docker push onaliy/bloodline-frontend:latest
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
