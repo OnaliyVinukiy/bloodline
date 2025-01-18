@@ -11,28 +11,25 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Debug Azure Credentials
+      - name: Log in to Docker Hub
         run: |
-          echo "Subscription ID: ${{ secrets.AZURE_CREDENTIALS.subscriptionId }}"
-          echo "Tenant ID: ${{ secrets.AZURE_CREDENTIALS.tenantId }}"
-
-
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CRED }}
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build and Push Docker Image
         run: |
           docker build -t bloodline-frontend:latest ./frontend
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username "${{ secrets.DOCKER_USERNAME }}" --password-stdin
           docker tag bloodline-frontend:latest onaliy/bloodline-frontend:latest
           docker push onaliy/bloodline-frontend:latest
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}   # Ensure your secret is stored as AZURE_CREDENTIALS
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: bloodlinehealth
+          app-name: bloodlinehealth  # Your Azure Web App name
           images: onaliy/bloodline-frontend:latest
