@@ -1,4 +1,4 @@
-name: Deploy Frontend
+name: CI/CD Pipeline
 
 on:
   push:
@@ -11,7 +11,12 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Log in to Docker Hub
         run: |
@@ -23,13 +28,8 @@ jobs:
           docker tag bloodline-frontend:latest onaliy/bloodline-frontend:latest
           docker push onaliy/bloodline-frontend:latest
 
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}   # Ensure your secret is stored as AZURE_CREDENTIALS
-
-      - name: Deploy to Azure Web App
+      - name: Deploy Frontend to Azure App Service
         uses: azure/webapps-deploy@v2
         with:
-          app-name: bloodlinehealth  # Your Azure Web App name
+          app-name: bloodlinehealth
           images: onaliy/bloodline-frontend:latest
