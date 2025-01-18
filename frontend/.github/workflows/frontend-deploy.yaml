@@ -1,34 +1,32 @@
-name: Frontend CI/CD
+name: Deploy Frontend
 
 on:
   push:
     paths:
       - 'frontend/**'
-    branches:
-      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Build and push Docker image
-      run: |
-        docker build -t bloodline-frontend:latest ./frontend
-        docker tag bloodline-frontend:latest onaliy/bloodline-frontend:latest
-        docker push onaliy/bloodline-frontend:latest
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t bloodline-frontend:latest ./frontend
+          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login --username "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+          docker tag bloodline-frontend:latest <DOCKER_HUB_USERNAME>/bloodline-frontend:latest
+          docker push <DOCKER_HUB_USERNAME>/bloodline-frontend:latest
 
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: bloodlinehealth
-        images: onaliy/bloodline-frontend:latest
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: <FRONTEND_AZURE_WEB_APP_NAME>
+          images: <DOCKER_HUB_USERNAME>/bloodline-frontend:latest
