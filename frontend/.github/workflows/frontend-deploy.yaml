@@ -13,6 +13,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Debug Azure Credentials
+        run: |
+          echo "Subscription ID: ${{ secrets.AZURE_CREDENTIALS.subscriptionId }}"
+          echo "Tenant ID: ${{ secrets.AZURE_CREDENTIALS.tenantId }}"
+
+
       - name: Log in to Azure
         uses: azure/login@v1
         with:
