@@ -1,5 +1,5 @@
 # Use the Node.js LTS image as the base
-FROM node:lts
+FROM node:alpine
 
 # Set the working directory inside the container
 WORKDIR /usr/src/frontend
