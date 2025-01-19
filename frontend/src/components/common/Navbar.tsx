@@ -1,7 +1,13 @@
-"use client";
+/*!
+ * Bloodline Blood Bank Management System
+ * Copyright (c) 2025 Onaliy Jayawardana
+ * All rights reserved.
+ *
+ * Unauthorized copying, modification, or distribution of this code is prohibited.
+ */
 
+"use client";
 import { Button, Navbar } from "flowbite-react";
-import bloodlogo from "../assets/bloodlogo.png";
 export function Navigationbar() {
   return (
     <Navbar fluid rounded>
