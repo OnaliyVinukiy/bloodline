@@ -6,11 +6,13 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { CarouselSlider } from "./components/Carousel";
+import { Cards } from "./components/Cards";
 
 const Home = () => {
   return (
     <div>
       <CarouselSlider />
+      <Cards />
     </div>
   );
 };
