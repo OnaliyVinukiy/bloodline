@@ -9,7 +9,7 @@
 export function CarouselSlider() {
   return (
     <section
-      className="bg-cover bg-no-repeat bg-center h-[600px]"
+      className="bg-cover bg-no-repeat bg-center h-[700px]"
       style={{
         backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('src/assets/carousel.jpg')`,
       }}
