@@ -25,7 +25,7 @@ export function Navigationbar() {
         </span>
       </Navbar.Brand>
       <div className="flex md:order-2 md:mr-24">
-        <Button>Login</Button>
+        <Button className="bg-red-800">Login</Button>
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
