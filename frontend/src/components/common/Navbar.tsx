@@ -27,7 +27,7 @@ export function Navigationbar({ onLoginClick }: { onLoginClick: () => void }) {
         </span>
       </Navbar.Brand>
       <div className="flex md:order-2 md:mr-24">
-        <Button className="bg-red-800" onClick={onLoginClick}>
+        <Button className="bg-red-800 hover:bg-red-700 text-white" color="bg-red-800" onClick={onLoginClick}>
           Login
         </Button>
         <Navbar.Toggle />
