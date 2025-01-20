@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  frontend:
+    image: onaliy/bloodline-frontend:latest
+    ports:
+      - "80:80"
+
+  backend:
+    image: onaliy/bloodline-backend:latest
+    ports:
+      - "4000:4000"
