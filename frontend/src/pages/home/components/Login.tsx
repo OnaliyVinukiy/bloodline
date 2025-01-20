@@ -15,9 +15,15 @@ import { signInWithPopup } from "firebase/auth";
 export function Login({
   openModal,
   onCloseModal,
+  onLoginSuccess,
 }: {
   openModal: boolean;
   onCloseModal: () => void;
+  onLoginSuccess: (user: {
+    name: string;
+    email: string;
+    avatar: string;
+  }) => void;
 }) {
   const [email, setEmail] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
@@ -26,8 +32,14 @@ export function Login({
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      console.log("User Info:", user);
-      alert(`Welcome ${user.displayName}`);
+      const userData = {
+        name: user.displayName || "Anonymous",
+        email: user.email || "No email",
+        avatar: user.photoURL || "https://via.placeholder.com/150",
+      };
+      console.log("User Info:", userData);
+      alert(`Welcome ${userData.name}`);
+      onLoginSuccess(userData);
       onCloseModal();
     } catch (error) {
       console.error("Google Login Error:", error);
@@ -73,7 +85,10 @@ export function Login({
             </div>
           )}
           <div className="w-full space-y-4">
-            <Button className="w-full">
+            <Button
+              className="w-full bg-red-800 hover:bg-red-700 text-white"
+              color="bg-red-800"
+            >
               {isSignUp ? "Sign up" : "Log in"}
             </Button>
             <Button
@@ -94,7 +109,7 @@ export function Login({
             <a
               href="#"
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-cyan-700 hover:underline dark:text-cyan-500"
+              className="text-red-800 hover:underline dark:text-cyan-500 "
             >
               {isSignUp ? "Sign in" : "Create account"}
             </a>
