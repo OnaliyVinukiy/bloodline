@@ -48,9 +48,12 @@ export function CarouselSlider() {
         <h1 className="mb-6 text-3xl font-semibold tracking-tight leading-tight text-white sm:mb-8 sm:text-4xl md:text-5xl lg:text-6xl">
           Every Drop Counts, Every Life Matters!
         </h1>
-        <p className="mb-8 text-base font-normal text-white sm:text-lg md:text-xl dark:text-gray-400">
+        <p className="text-base font-normal text-white sm:text-lg md:text-xl dark:text-gray-400">
           Join us in creating a world where no life is lost due to the lack of
-          blood. Together, we save lives.
+          blood. 
+        </p>
+        <p className="mb-8 text-base font-normal text-white sm:text-lg md:text-xl dark:text-gray-400">
+        Together, we save lives.
         </p>
         <div className="flex flex-col mb-8 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
           <a
