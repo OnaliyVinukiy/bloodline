@@ -12,7 +12,7 @@ export function Cards() {
           className="w-40 h-45 object-cover mx-auto"
         />
         <h5 className="text-2xl text-center font-bold tracking-tight text-gray-900 dark:text-white">
-          Am I eligible?
+          Am I Eligible?
         </h5>
         <p className="font-normal text-center text-gray-700 dark:text-gray-400">
           Put yourself into a test and check whether you can donate blood.
@@ -21,7 +21,7 @@ export function Cards() {
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
         >
-          Check eligibility
+          Check Eligibility
           <svg
             className="-mr-1 ml-2 mt-1 h-4 w-4"
             fill="currentColor"
@@ -44,16 +44,16 @@ export function Cards() {
           className="w-40 h-45 object-cover mx-auto"
         />
         <h5 className="text-2xl text-center font-bold tracking-tight text-gray-900 dark:text-white">
-          Am I eligible?
+          Find a Blood Drive
         </h5>
         <p className="font-normal text-center text-gray-700 dark:text-gray-400">
-          Put yourself into a test and check whether you can donate blood.
+          Search for upcoming blood drives and donation events near you.
         </p>
         <Button
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
         >
-          Check eligibility
+          Find Out
           <svg
             className="-mr-1 ml-2 mt-1 h-4 w-4"
             fill="currentColor"
@@ -76,16 +76,17 @@ export function Cards() {
           className="w-40 h-45 object-cover mx-auto"
         />
         <h5 className="text-2xl text-center font-bold tracking-tight text-gray-900 dark:text-white">
-          Am I eligible?
+          Blood Donation Journey
         </h5>
         <p className="font-normal text-center text-gray-700 dark:text-gray-400">
-          Put yourself into a test and check whether you can donate blood.
+          Learn how your blood saves lives and the steps involved in the
+          process.
         </p>
         <Button
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
         >
-          Check eligibility
+          Learn More
           <svg
             className="-mr-1 ml-2 mt-1 h-4 w-4"
             fill="currentColor"
