@@ -46,7 +46,7 @@ export function Cards() {
 
       <Card className="max-w-sm">
         <img
-          src="src/assets/eligible.png"
+          src="src/assets/camp.png"
           alt="Meaningful alt text for an image that is not purely decorative"
           className="w-40 h-45 object-cover mx-auto"
         />
@@ -78,7 +78,7 @@ export function Cards() {
 
       <Card className="max-w-sm">
         <img
-          src="src/assets/eligible.png"
+          src="src/assets/journey.png"
           alt="Meaningful alt text for an image that is not purely decorative"
           className="w-40 h-45 object-cover mx-auto"
         />
