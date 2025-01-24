@@ -24,37 +24,37 @@ export function Map() {
             className="w-32 h-32 object-contain"
           />
           <img
-            src="src/assets/apositive.png"
+            src="src/assets/anegative.png"
             alt="Blood Type A"
             className="w-32 h-32 object-contain"
           />
           <img
-            src="src/assets/apositive.png"
+            src="src/assets/bpositive.png"
             alt="Blood Type A"
             className="w-32 h-32 object-contain"
           />
           <img
-            src="src/assets/apositive.png"
+            src="src/assets/bnegative.png"
             alt="Blood Type A"
             className="w-32 h-32 object-contain"
           />
           <img
-            src="src/assets/apositive.png"
+            src="src/assets/opositive.png"
             alt="Blood Type A"
             className="w-32 h-32 object-contain"
           />
           <img
-            src="src/assets/apositive.png"
+            src="src/assets/onegative.png"
             alt="Blood Type A"
             className="w-32 h-32 object-contain"
           />
           <img
-            src="src/assets/apositive.png"
+            src="src/assets/abpositive.png"
             alt="Blood Type A"
             className="w-32 h-32 object-contain"
           />
           <img
-            src="src/assets/apositive.png"
+            src="src/assets/abnegative.png"
             alt="Blood Type A"
             className="w-32 h-32 object-contain"
           />
