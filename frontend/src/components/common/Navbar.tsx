@@ -7,10 +7,17 @@
  */
 
 "use client";
+import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 
-import { Button, Navbar } from "flowbite-react";
-
-export function Navigationbar({ onLoginClick }: { onLoginClick: () => void }) {
+export function Navigationbar({
+  onLoginClick,
+  user,
+  onLogout,
+}: {
+  onLoginClick: () => void;
+  user: { name: string; email: string; avatar: string } | null;
+  onLogout: () => void;
+}) {
   return (
     <Navbar fluid rounded>
       <Navbar.Brand
@@ -27,9 +34,32 @@ export function Navigationbar({ onLoginClick }: { onLoginClick: () => void }) {
         </span>
       </Navbar.Brand>
       <div className="flex md:order-2 md:mr-24">
-        <Button className="bg-red-800" onClick={onLoginClick}>
-          Login
-        </Button>
+        {user ? (
+          <Dropdown
+            arrowIcon={false}
+            inline
+            label={<Avatar alt="User settings" img={user.avatar} rounded />}
+          >
+            <Dropdown.Header>
+              <span className="block text-sm">{user.name}</span>
+              <span className="block truncate text-sm font-medium">
+                {user.email}
+              </span>
+            </Dropdown.Header>
+            <Dropdown.Item>Dashboard</Dropdown.Item>
+            <Dropdown.Item>Settings</Dropdown.Item>
+            <Dropdown.Item>Earnings</Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item onClick={onLogout}>Sign out</Dropdown.Item>
+          </Dropdown>
+        ) : (
+          <Button
+            className="bg-red-800 hover:bg-red-700 text-white"
+            onClick={onLoginClick}
+          >
+            Login
+          </Button>
+        )}
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
