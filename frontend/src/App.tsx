@@ -7,10 +7,24 @@ import { useState } from "react";
 
 function App() {
   const [openModal, setOpenModal] = useState(false);
+  const [user, setUser] = useState<{
+    name: string;
+    email: string;
+    avatar: string;
+  } | null>(null);
+
   return (
     <Router>
-      <Navigationbar onLoginClick={() => setOpenModal(true)} />
-      <Login openModal={openModal} onCloseModal={() => setOpenModal(false)} />
+      <Navigationbar
+        onLoginClick={() => setOpenModal(true)}
+        user={user}
+        onLogout={() => setUser(null)}
+      />
+      <Login
+        openModal={openModal}
+        onCloseModal={() => setOpenModal(false)}
+        onLoginSuccess={(userData) => setUser(userData)}
+      />
       <Routes>
         <Route path="/" element={<Home />} />
       </Routes>
