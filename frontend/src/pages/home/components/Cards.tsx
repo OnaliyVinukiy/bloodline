@@ -8,11 +8,10 @@
 "use client";
 import React from "react";
 import { Button, Card } from "flowbite-react";
-
 const Cards: React.FC = () => {
   return (
-    <div className="flex justify-center space-x-40 mt-20">
-      <Card className="max-w-sm">
+    <div className="flex flex-wrap justify-center gap-8 lg:space-x-40 lg:mt-20 mt-10">
+      <Card className="max-w-sm md:w-full sm:w-72">
         <img
           src="src/assets/eligible.png"
           alt="Meaningful alt text for an image that is not purely decorative"
@@ -45,7 +44,7 @@ const Cards: React.FC = () => {
         </Button>
       </Card>
 
-      <Card className="max-w-sm">
+      <Card className="max-w-sm md:w-full sm:w-72">
         <img
           src="src/assets/camp.png"
           alt="Meaningful alt text for an image that is not purely decorative"
@@ -77,7 +76,7 @@ const Cards: React.FC = () => {
         </Button>
       </Card>
 
-      <Card className="max-w-sm">
+      <Card className="max-w-sm md:w-full sm:w-72">
         <img
           src="src/assets/journey.png"
           alt="Meaningful alt text for an image that is not purely decorative"
@@ -112,4 +111,5 @@ const Cards: React.FC = () => {
     </div>
   );
 };
+
 export default Cards;
