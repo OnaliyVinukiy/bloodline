@@ -6,8 +6,9 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { CarouselSlider } from "./components/Carousel";
-import { Cards } from "./components/Cards";
+import Cards from "./components/Cards";
 import { Map } from "./components/Map";
+
 const Home = () => {
   return (
     <div>
