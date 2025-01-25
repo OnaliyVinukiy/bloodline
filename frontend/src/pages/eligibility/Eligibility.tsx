@@ -90,6 +90,10 @@ const EligibilityCriteria: React.FC = () => {
             ))}
           </div>
         </div>
+        <p className="mt-12 text-center text-gray-700">
+          NBTS achieved the mighty figure of 100% voluntary non-remunerated
+          blood donor base.
+        </p>
       </div>
     </section>
   );
