@@ -5,7 +5,7 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-export function Map() {
+const Map: React.FC = () => {
   const bloodTypes = [
     {
       src: "src/assets/apositive.png",
@@ -99,3 +99,4 @@ export function Map() {
     </section>
   );
 }
+export default Map;
