@@ -6,10 +6,10 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 "use client";
-
+import React from "react";
 import { Button, Card } from "flowbite-react";
 
-export function Cards() {
+const Cards: React.FC = () => {
   return (
     <div className="flex justify-center space-x-40 mt-20">
       <Card className="max-w-sm">
@@ -27,6 +27,7 @@ export function Cards() {
         <Button
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
+          href="/eligibility"
         >
           Check Eligibility
           <svg
@@ -110,4 +111,5 @@ export function Cards() {
       </Card>
     </div>
   );
-}
+};
+export default Cards;
