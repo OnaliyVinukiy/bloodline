@@ -9,6 +9,13 @@ const EligibilityCriteria: React.FC = () => {
     "Should have a valid identity card or any other document to prove the identity.",
     "Free from 'Risk Behaviors'.",
   ];
+  const riskBehaviors = [
+    "Homosexuals.",
+    "Sex workers and their clients.",
+    "Drug addicts.",
+    "Engaging in sex with any of the above.",
+    "Having more than one sexual partner.",
+  ];
 
   return (
     <section className="bg-gray-100 py-12">
@@ -29,6 +36,16 @@ const EligibilityCriteria: React.FC = () => {
           <ul className="list-disc list-inside text-gray-700 space-y-2">
             {eligibilityCriteria.map((criteria, index) => (
               <li key={index}>{criteria}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold text-red-700 mb-4">
+            Risk Behaviors
+          </h2>
+          <ul className="list-disc list-inside text-gray-700 space-y-2">
+            {riskBehaviors.map((behavior, index) => (
+              <li key={index}>{behavior}</li>
             ))}
           </ul>
         </div>
