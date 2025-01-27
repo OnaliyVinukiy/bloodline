@@ -5,19 +5,57 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-
-"use client";
+import { useEffect, useState } from "react";
+import { useAuthContext } from "@asgardeo/auth-react";
 import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 
-export function Navigationbar({
-  onLoginClick,
-  user,
-  onLogout,
-}: {
-  onLoginClick: () => void;
-  user: { name: string; email: string; avatar: string } | null;
-  onLogout: () => void;
-}) {
+export function Navigationbar() {
+  const { state, signIn, signOut, getAccessToken } = useAuthContext();
+  const [user, setUser] = useState<{
+    name: string;
+    email: string;
+    avatar: string;
+  } | null>(null);
+
+  //Fetch and assign user info
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (state?.isAuthenticated) {
+        try {
+          const accessToken = await getAccessToken();
+          const response = await fetch(
+            `https://api.asgardeo.io/t/onaliy/oauth2/userinfo`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+
+          if (response.ok) {
+            const userInfo = await response.json();
+            console.log("User Info:", userInfo);
+
+            setUser({
+              name: userInfo.username || "User",
+              email: userInfo.email || "No Email",
+              avatar: userInfo.picture || "https://via.placeholder.com/150",
+            });
+          } else {
+            throw new Error("Failed to fetch user info");
+          }
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+        }
+      } else {
+        setUser(null);
+      }
+    };
+
+    fetchUserInfo();
+  }, [state?.isAuthenticated, getAccessToken]);
+
   return (
     <Navbar fluid rounded>
       <Navbar.Brand
@@ -50,12 +88,12 @@ export function Navigationbar({
             <Dropdown.Item>Settings</Dropdown.Item>
             <Dropdown.Item>Earnings</Dropdown.Item>
             <Dropdown.Divider />
-            <Dropdown.Item onClick={onLogout}>Sign out</Dropdown.Item>
+            <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
           </Dropdown>
         ) : (
           <Button
             className="bg-red-800 hover:bg-red-700 text-white"
-            onClick={onLoginClick}
+            onClick={() => signIn()}
           >
             Login
           </Button>
