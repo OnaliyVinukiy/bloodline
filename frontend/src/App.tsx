@@ -9,30 +9,12 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/home/Home";
 import { FooterComponent } from "./components/common/Footer";
 import { Navigationbar } from "./components/common/Navbar";
-import { Login } from "./pages/home/components/Login";
-import EligibilityCriteria  from "./pages/eligibility/Eligibility";
-import { useState } from "react";
+import EligibilityCriteria from "./pages/eligibility/Eligibility";
 
 function App() {
-  const [openModal, setOpenModal] = useState(false);
-  const [user, setUser] = useState<{
-    name: string;
-    email: string;
-    avatar: string;
-  } | null>(null);
-
   return (
     <Router>
-      <Navigationbar
-        onLoginClick={() => setOpenModal(true)}
-        user={user}
-        onLogout={() => setUser(null)}
-      />
-      <Login
-        openModal={openModal}
-        onCloseModal={() => setOpenModal(false)}
-        onLoginSuccess={(userData) => setUser(userData)}
-      />
+      <Navigationbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/eligibility" element={<EligibilityCriteria />} />
