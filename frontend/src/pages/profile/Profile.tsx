@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { Label } from "flowbite-react";
 import { UserIcon } from "@heroicons/react/24/solid";
+import { Datepicker } from "flowbite-react";
+
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function ProfileSettings() {
   const { state, signOut, getAccessToken } = useAuthContext();
@@ -9,9 +12,19 @@ export default function ProfileSettings() {
     firstName: string;
     lastName: string;
     email: string;
-    birthdate: Date;
+    birthdate: Date | null;
     avatar: string | null;
   } | null>(null);
+
+  // Editable fields state with dynamic keys
+  const [editableFields, setEditableFields] = useState<{
+    [key: string]: boolean;
+  }>({
+    firstName: false,
+    lastName: false,
+    email: false,
+    birthdate: false,
+  });
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -30,11 +43,14 @@ export default function ProfileSettings() {
 
           if (response.ok) {
             const userInfo = await response.json();
+
             setUser({
               firstName: userInfo.given_name || "Guest",
               lastName: userInfo.family_name || "",
               email: userInfo.email || "No Email",
-              birthdate: userInfo.birthdate || "",
+              birthdate: userInfo.birthdate
+                ? new Date(userInfo.birthdate)
+                : null, // Set birthdate as Date object
               avatar: userInfo.picture || null,
             });
           } else {
@@ -58,9 +74,24 @@ export default function ProfileSettings() {
       </div>
     );
   }
-  const formattedBirthdate = user.birthdate
-    ? new Date(user.birthdate).toLocaleDateString()
-    : "Not Provided";
+
+  // Handle the editing of fields
+  const handleEditClick = (field: string) => {
+    setEditableFields((prevState) => ({
+      ...prevState,
+      [field]: !prevState[field],
+    }));
+  };
+
+  // Handle input change
+  const handleInputChange = (field: string, value: string) => {
+    if (user) {
+      setUser((prevUser) => ({
+        ...prevUser!,
+        [field]: value,
+      }));
+    }
+  };
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 dark:bg-gray-900">
@@ -107,14 +138,26 @@ export default function ProfileSettings() {
                       >
                         First Name
                       </Label>
-                      <input
-                        type="text"
-                        id="first_name"
-                        className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 "
-                        placeholder="Your first name"
-                        value={user.firstName}
-                        required
-                      />
+                      <div className="flex items-center">
+                        <input
+                          type="text"
+                          id="first_name"
+                          className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                          placeholder={user.firstName}
+                          value={editableFields.firstName ? user.firstName : ""}
+                          onChange={(e) =>
+                            handleInputChange("firstName", e.target.value)
+                          }
+                          disabled={!editableFields.firstName}
+                        />
+                        <button
+                          type="button"
+                          className="ml-2"
+                          onClick={() => handleEditClick("firstName")}
+                        >
+                          ✏️
+                        </button>
+                      </div>
                     </div>
 
                     <div className="w-full">
@@ -124,14 +167,26 @@ export default function ProfileSettings() {
                       >
                         Last Name
                       </Label>
-                      <input
-                        type="text"
-                        id="last_name"
-                        className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 "
-                        placeholder="Your last name"
-                        value={user.lastName}
-                        required
-                      />
+                      <div className="flex items-center">
+                        <input
+                          type="text"
+                          id="last_name"
+                          className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                          placeholder={user.lastName}
+                          value={editableFields.lastName ? user.lastName : ""}
+                          onChange={(e) =>
+                            handleInputChange("lastName", e.target.value)
+                          }
+                          disabled={!editableFields.lastName}
+                        />
+                        <button
+                          type="button"
+                          className="ml-2"
+                          onClick={() => handleEditClick("lastName")}
+                        >
+                          ✏️
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -142,14 +197,28 @@ export default function ProfileSettings() {
                     >
                       Email
                     </Label>
-                    <input
-                      type="email"
-                      id="email"
-                      className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 "
-                      value={user.email}
-                      required
-                    />
+                    <div className="flex items-center">
+                      <input
+                        type="email"
+                        id="email"
+                        className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                        value={editableFields.email ? user.email : ""}
+                        placeholder={user.email}
+                        onChange={(e) =>
+                          handleInputChange("email", e.target.value)
+                        }
+                        disabled={!editableFields.email}
+                      />
+                      <button
+                        type="button"
+                        className="ml-2"
+                        onClick={() => handleEditClick("email")}
+                      >
+                        ✏️
+                      </button>
+                    </div>
                   </div>
+
                   <div className="mb-2 sm:mb-6">
                     <Label
                       htmlFor="birthdate"
@@ -157,19 +226,49 @@ export default function ProfileSettings() {
                     >
                       Birthdate
                     </Label>
-                    <input
-                      type="text"
-                      id="birthdate"
-                      className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 "
-                      value={formattedBirthdate}
-                      readOnly
-                    />
+                    <div className="flex items-center">
+                      {editableFields.birthdate ? (
+                        <Datepicker
+                          id="birthdate"
+                          value={user.birthdate ? user.birthdate : null}
+                          onChange={(date) => {
+                            handleInputChange(
+                              "birthdate",
+                              date ? date.toISOString().split("T")[0] : ""
+                            );
+                          }}
+                          className="w-full bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5"
+                        />
+                      ) : (
+                        <Datepicker
+                          id="birthdate"
+                          value={
+                            user.birthdate ? new Date(user.birthdate) : null
+                          }
+                          disabled
+                          onChange={(date) => {
+                            handleInputChange(
+                              "birthdate",
+                              date ? date.toISOString().split("T")[0] : "" // Store date in a string format (yyyy-mm-dd)
+                            );
+                          }}
+                          className="w-full bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5"
+                        />
+                      )}
+                      <button
+                        type="button"
+                        className="ml-2"
+                        onClick={() => handleEditClick("birthdate")}
+                      >
+                        ✏️
+                      </button>
+                    </div>
                   </div>
 
                   <div className="flex justify-end">
                     <button
                       type="submit"
-                      className="text-white bg-indigo-700  hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
+                      className="text-white bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
                     >
                       Save
                     </button>
