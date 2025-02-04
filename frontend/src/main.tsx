@@ -1,3 +1,10 @@
+/*!
+ * Bloodline Blood Bank Management System
+ * Copyright (c) 2025 Onaliy Jayawardana
+ * All rights reserved.
+ *
+ * Unauthorized copying, modification, or distribution of this code is prohibited.
+ */
 import React from "react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -18,9 +25,9 @@ createRoot(document.getElementById("root")!).render(
           "profile",
           "email",
           "roles",
-          "username",
           "picture",
-          "name",
+          "given_name",
+          "family_name",
         ],
       }}
     >
