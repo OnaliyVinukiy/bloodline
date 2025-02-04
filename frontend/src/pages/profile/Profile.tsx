@@ -146,36 +146,6 @@ export default function ProfileSettings() {
                     />
                   </div>
 
-                  <div className="mb-2 sm:mb-6">
-                    <Label
-                      htmlFor="profession"
-                      className="block mb-2 text-sm font-medium text-indigo-900 dark:text-white"
-                    >
-                      Profession
-                    </Label>
-                    <input
-                      type="text"
-                      id="profession"
-                      className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 "
-                      placeholder="your profession"
-                      required
-                    />
-                  </div>
-
-                  <div className="mb-6">
-                    <Label
-                      htmlFor="message"
-                      className="block mb-2 text-sm font-medium text-indigo-900 dark:text-white"
-                    >
-                      Bio
-                    </Label>
-                    <textarea
-                      id="message"
-                      className="block p-2.5 w-full text-sm text-indigo-900 bg-indigo-50 rounded-lg border border-indigo-300 focus:ring-indigo-500 focus:border-indigo-500 "
-                      placeholder="Write your bio here..."
-                    ></textarea>
-                  </div>
-
                   <div className="flex justify-end">
                     <button
                       type="submit"
