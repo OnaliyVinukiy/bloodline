@@ -18,9 +18,9 @@ createRoot(document.getElementById("root")!).render(
           "profile",
           "email",
           "roles",
-          "username",
           "picture",
-          "name",
+          "given_name",
+          "family_name",
         ],
       }}
     >
