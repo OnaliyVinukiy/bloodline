@@ -9,6 +9,7 @@ export default function ProfileSettings() {
     firstName: string;
     lastName: string;
     email: string;
+    birthdate: Date;
     avatar: string | null;
   } | null>(null);
 
@@ -33,6 +34,7 @@ export default function ProfileSettings() {
               firstName: userInfo.given_name || "Guest",
               lastName: userInfo.family_name || "",
               email: userInfo.email || "No Email",
+              birthdate: userInfo.birthdate || "",
               avatar: userInfo.picture || null,
             });
           } else {
@@ -56,6 +58,9 @@ export default function ProfileSettings() {
       </div>
     );
   }
+  const formattedBirthdate = user.birthdate
+    ? new Date(user.birthdate).toLocaleDateString()
+    : "Not Provided";
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 dark:bg-gray-900">
@@ -143,6 +148,21 @@ export default function ProfileSettings() {
                       className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 "
                       value={user.email}
                       required
+                    />
+                  </div>
+                  <div className="mb-2 sm:mb-6">
+                    <Label
+                      htmlFor="birthdate"
+                      className="block mb-2 text-sm font-medium text-indigo-900 dark:text-white"
+                    >
+                      Birthdate
+                    </Label>
+                    <input
+                      type="text"
+                      id="birthdate"
+                      className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 "
+                      value={formattedBirthdate}
+                      readOnly
                     />
                   </div>
 
