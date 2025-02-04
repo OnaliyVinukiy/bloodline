@@ -12,12 +12,13 @@ import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 export function Navigationbar() {
   const { state, signIn, signOut, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<{
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
     avatar: string;
   } | null>(null);
 
-  //Fetch and assign user info
+  // Fetch and assign user info
   useEffect(() => {
     const fetchUserInfo = async () => {
       if (state?.isAuthenticated) {
@@ -38,9 +39,13 @@ export function Navigationbar() {
             console.log("User Info:", userInfo);
 
             setUser({
-              name: userInfo.username || "User",
+              firstName: userInfo.given_name,
+              lastName: userInfo.family_name,
               email: userInfo.email || "No Email",
-              avatar: userInfo.picture || "https://via.placeholder.com/150",
+              avatar:
+                userInfo.picture ||
+                userInfo.profile ||
+                "https://via.placeholder.com/150",
             });
           } else {
             throw new Error("Failed to fetch user info");
@@ -79,7 +84,9 @@ export function Navigationbar() {
             label={<Avatar alt="User settings" img={user.avatar} rounded />}
           >
             <Dropdown.Header>
-              <span className="block text-sm">{user.name}</span>
+              <span className="block text-sm">
+                {user.firstName} {user.lastName}
+              </span>
               <span className="block truncate text-sm font-medium">
                 {user.email}
               </span>
