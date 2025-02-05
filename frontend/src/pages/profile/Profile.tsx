@@ -3,20 +3,12 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import { Label } from "flowbite-react";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { Datepicker } from "flowbite-react";
-
-import "react-datepicker/dist/react-datepicker.css";
+import { User } from "../../types/types";
 
 export default function Profile() {
   const { state, signOut, getAccessToken } = useAuthContext();
-  const [user, setUser] = useState<{
-    firstName: string;
-    lastName: string;
-    email: string;
-    birthdate: Date | null;
-    avatar: string | null;
-  } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  // Editable fields state with dynamic keys
   const [editableFields, setEditableFields] = useState<{
     [key: string]: boolean;
   }>({
@@ -26,36 +18,28 @@ export default function Profile() {
     birthdate: false,
   });
 
+  //Fetch and assign user info
   useEffect(() => {
     const fetchUserInfo = async () => {
       if (state?.isAuthenticated) {
         try {
           const accessToken = await getAccessToken();
-          const response = await fetch(
-            `https://api.asgardeo.io/t/onaliy/oauth2/userinfo`,
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-              },
-            }
-          );
+          console.log("acc", accessToken);
+          const response = await fetch("http://localhost:5000/api/user-info", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ accessToken }),
+          });
 
-          if (response.ok) {
-            const userInfo = await response.json();
-
-            setUser({
-              firstName: userInfo.given_name || "Guest",
-              lastName: userInfo.family_name || "",
-              email: userInfo.email || "No Email",
-              birthdate: userInfo.birthdate
-                ? new Date(userInfo.birthdate)
-                : null,
-              avatar: userInfo.picture || null,
-            });
-          } else {
+          if (!response.ok) {
             throw new Error("Failed to fetch user info");
           }
+
+          const userInfo = await response.json();
+
+          setUser(userInfo);
         } catch (error) {
           console.error("Error fetching user info:", error);
         }
@@ -90,6 +74,38 @@ export default function Profile() {
         ...prevUser!,
         [field]: value,
       }));
+    }
+  };
+
+  //Update user info
+  const handleUpdate = async () => {
+    try {
+      const accessToken = await getAccessToken();
+
+      const response = await fetch("http://localhost:5000/api/update-user", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          accessToken,
+          sub: user?.sub,
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+          email: user?.email,
+          birthdate: user?.birthdate,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update user info");
+      }
+
+      const data = await response.json();
+      alert("User info updated successfully!");
+    } catch (error) {
+      console.error("Error updating user info:", error);
+      alert("Error updating user info.");
     }
   };
 
@@ -359,6 +375,7 @@ export default function Profile() {
                 <button
                   type="submit"
                   className="text-white bg-red-900 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+                  onClick={handleUpdate}
                 >
                   Update
                 </button>
