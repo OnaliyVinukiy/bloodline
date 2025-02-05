@@ -6,6 +6,7 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 import { UserIcon } from "@heroicons/react/24/solid";
@@ -14,6 +15,7 @@ import { User } from "../../types/types";
 export function Navigationbar() {
   const { state, signIn, signOut, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
 
   // Fetch and assign user info
   useEffect(() => {
@@ -32,6 +34,7 @@ export function Navigationbar() {
           if (response.ok) {
             const userInfo = await response.json();
             setUser(userInfo);
+            console.log("user", userInfo);
           } else {
             throw new Error("Failed to fetch user info");
           }
@@ -81,7 +84,9 @@ export function Navigationbar() {
                 {user.email}
               </span>
             </Dropdown.Header>
-            <Dropdown.Item>Profile</Dropdown.Item>
+            <Dropdown.Item onClick={() => navigate("/profile")}>
+              Profile
+            </Dropdown.Item>
             <Dropdown.Item>Donations</Dropdown.Item>
             <Dropdown.Item>Appointments</Dropdown.Item>
             <Dropdown.Divider />
