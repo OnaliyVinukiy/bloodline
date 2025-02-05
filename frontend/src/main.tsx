@@ -28,6 +28,12 @@ createRoot(document.getElementById("root")!).render(
           "picture",
           "given_name",
           "family_name",
+          "birthdate",
+          "internal_user_mgt_list",
+          "internal_user_mgt_view",
+          "internal_user_mgt_delete",
+          "internal_user_mgt_update",
+          "internal_org_user_mgt_update"
         ],
       }}
     >
