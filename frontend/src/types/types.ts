@@ -3,7 +3,7 @@ export interface User {
     firstName: string;
     lastName: string;
     email: string;
-    birthdate: string | Date;
+    birthdate: Date | null;
     avatar: string | null;
     role: string;
   }
