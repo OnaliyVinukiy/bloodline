@@ -8,15 +8,12 @@
 import { useEffect, useState } from "react";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
+import { UserIcon } from "@heroicons/react/24/solid";
+import { User } from "../../types/types";
 
 export function Navigationbar() {
   const { state, signIn, signOut, getAccessToken } = useAuthContext();
-  const [user, setUser] = useState<{
-    firstName: string;
-    lastName: string;
-    email: string;
-    avatar: string;
-  } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   // Fetch and assign user info
   useEffect(() => {
@@ -24,29 +21,17 @@ export function Navigationbar() {
       if (state?.isAuthenticated) {
         try {
           const accessToken = await getAccessToken();
-          const response = await fetch(
-            `https://api.asgardeo.io/t/onaliy/oauth2/userinfo`,
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-              },
-            }
-          );
+          const response = await fetch("http://localhost:5000/api/user-info", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ accessToken }),
+          });
 
           if (response.ok) {
             const userInfo = await response.json();
-            console.log("User Info:", userInfo);
-
-            setUser({
-              firstName: userInfo.given_name,
-              lastName: userInfo.family_name,
-              email: userInfo.email || "No Email",
-              avatar:
-                userInfo.picture ||
-                userInfo.profile ||
-                "https://via.placeholder.com/150",
-            });
+            setUser(userInfo);
           } else {
             throw new Error("Failed to fetch user info");
           }
@@ -63,10 +48,7 @@ export function Navigationbar() {
 
   return (
     <Navbar fluid rounded>
-      <Navbar.Brand
-        href="https://flowbite-react.com"
-        className="md:ml-24 h-6 sm:h-9"
-      >
+      <Navbar.Brand href="/" className="md:ml-24 h-6 sm:h-9">
         <img
           src="src/assets/bloodlogo.png"
           className="mr-3 h-6 sm:h-9"
@@ -81,7 +63,15 @@ export function Navigationbar() {
           <Dropdown
             arrowIcon={false}
             inline
-            label={<Avatar alt="User settings" img={user.avatar} rounded />}
+            label={
+              user.avatar ? (
+                <Avatar alt="User settings" img={user.avatar} rounded />
+              ) : (
+                <div className="w-10 h-10 flex items-center justify-center bg-gray-300 rounded-full">
+                  <UserIcon className="w-6 h-6 text-gray-600" />
+                </div>
+              )
+            }
           >
             <Dropdown.Header>
               <span className="block text-sm">
@@ -91,9 +81,9 @@ export function Navigationbar() {
                 {user.email}
               </span>
             </Dropdown.Header>
-            <Dropdown.Item>Dashboard</Dropdown.Item>
-            <Dropdown.Item>Settings</Dropdown.Item>
-            <Dropdown.Item>Earnings</Dropdown.Item>
+            <Dropdown.Item>Profile</Dropdown.Item>
+            <Dropdown.Item>Donations</Dropdown.Item>
+            <Dropdown.Item>Appointments</Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
           </Dropdown>
