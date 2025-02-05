@@ -50,7 +50,7 @@ export default function Profile() {
               email: userInfo.email || "No Email",
               birthdate: userInfo.birthdate
                 ? new Date(userInfo.birthdate)
-                : null, // Set birthdate as Date object
+                : null,
               avatar: userInfo.picture || null,
             });
           } else {
