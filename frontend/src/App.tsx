@@ -10,6 +10,7 @@ import Home from "./pages/home/Home";
 import { FooterComponent } from "./components/common/Footer";
 import { Navigationbar } from "./components/common/Navbar";
 import EligibilityCriteria from "./pages/eligibility/Eligibility";
+import Profile from "./pages/profile/Profile";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/eligibility" element={<EligibilityCriteria />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
       <FooterComponent />
     </Router>

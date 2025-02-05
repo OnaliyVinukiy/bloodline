@@ -1,10 +1,19 @@
-const express = require('express');
+import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
+import cors from "cors";
+import userRoutes from "./src/routes/userRoutes.js";
+
 const app = express();
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-});
+app.use(cors());
+app.use(express.json());
 
-// const PORT = process.env.PORT || 3000;
-const PORT = 4000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// User routes
+app.use("/api", userRoutes);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
