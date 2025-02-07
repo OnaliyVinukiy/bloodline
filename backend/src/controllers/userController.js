@@ -5,7 +5,49 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
+import express from "express";
+import { BlobServiceClient } from "@azure/storage-blob";
 import fetch from "node-fetch";
+import dotenv from "dotenv";
+import { MongoClient } from "mongodb";
+
+dotenv.config();
+
+const app = express();
+app.use(express.json());
+
+// Azure Blob Storage Configuration
+const AZURE_STORAGE_CONNECTION_STRING =
+  process.env.AZURE_STORAGE_CONNECTION_STRING;
+const CONTAINER_NAME = "profile-pictures";
+const blobServiceClient = BlobServiceClient.fromConnectionString(
+  AZURE_STORAGE_CONNECTION_STRING
+);
+const containerClient = blobServiceClient.getContainerClient(CONTAINER_NAME);
+
+// DB Configuration
+const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
+const DATABASE_ID = "donorDB";
+const CONTAINER_ID = "donors";
+
+// Connect to DB using MongoClient
+const connectToCosmos = async () => {
+  try {
+    const client = await MongoClient.connect(COSMOS_DB_CONNECTION_STRING, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    const db = client.db(DATABASE_ID);
+    const collection = db.collection(CONTAINER_ID);
+
+    console.log("Connected to Cosmos DB");
+    return { db, collection, client };
+  } catch (error) {
+    console.error("Error connecting to Cosmos DB:", error);
+    throw error;
+  }
+};
 
 // Fetch user info from Asgardeo API
 const getUserInfo = async (req, res) => {
@@ -32,13 +74,8 @@ const getUserInfo = async (req, res) => {
       firstName: userInfo.given_name || "Guest",
       lastName: userInfo.family_name || "",
       email: userInfo.email || "No Email",
-      birthdate: userInfo.birthdate || "",
-      avatar: userInfo.picture || null,
       role: userInfo.roles || null,
     };
-
-    console.log("User info:", user);
-
     res.status(200).json(user);
   } catch (error) {
     console.error("Error fetching user info:", error);
@@ -46,136 +83,63 @@ const getUserInfo = async (req, res) => {
   }
 };
 
-// Generate admin token
-const fetchAdminToken = async () => {
-  const clientId = process.env.VITE_CLIENT_ADMIN_ID;
-  const clientSecret = process.env.VITE_CLIENT_SECRET;
-  const tokenUrl = "https://api.asgardeo.io/t/onaliy/oauth2/token";
-
-  if (!clientId || !clientSecret) {
-    throw new Error(
-      "Missing Client ID or Client Secret in environment variables"
-    );
-  }
-
-  const response = await fetch(tokenUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      grant_type: "client_credentials",
-      client_id: clientId,
-      client_secret: clientSecret,
-      scope: "internal_user_mgt_update",
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch admin token");
-  }
-
-  const data = await response.json();
-  console.log("Admin Token:", data.access_token);
-  return data.access_token;
-};
-
-// Update user info in Asgardeo
-const updateUserInfo = async (req, res) => {
-  const { sub, firstName, lastName, email, birthdate } = req.body;
-
-  if (!sub) {
-    return res.status(400).json({ message: "User ID (sub) is required" });
-  }
+// Handle avatar upload to Azure Blob Storage
+const uploadAvatar = async (req, res) => {
+  const { file, userId } = req.body;
 
   try {
-    const adminToken = await fetchAdminToken();
-
-    const response = await fetch(
-      `https://api.asgardeo.io/t/onaliy/scim2/Users/${sub}`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          schemas: ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
-          Operations: [
-            {
-              op: "replace",
-              path: "name.givenName",
-              value: firstName,
-            },
-            {
-              op: "replace",
-              path: "name.familyName",
-              value: lastName,
-            },
-            {
-              op: "replace",
-              path: "emails",
-              value: [{ value: email }],
-            },
-            {
-              op: "replace",
-              path: "urn:scim:wso2:schema:dateOfBirth",
-              value: birthdate,
-            },
-          ],
-        }),
-      }
+    const blobClient = containerClient.getBlockBlobClient(
+      `${userId}_avatar.jpg`
     );
-
-    if (!response.ok) {
-      const errorDetails = await response.text();
-      throw new Error(`Failed to update user info: ${errorDetails}`);
-    }
-
-    const updatedUserInfo = await response.json();
-    res
-      .status(200)
-      .json({ message: "User info updated successfully", updatedUserInfo });
+    await blobClient.upload(file.buffer, file.buffer.length);
+    const avatarUrl = blobClient.url;
+    res.status(200).json({ avatarUrl });
   } catch (error) {
-    console.error("Error updating user info:", error);
-    res
-      .status(500)
-      .json({ message: "Error updating user info", error: error.message });
+    console.error("Error uploading avatar:", error);
+    res.status(500).json({ message: "Error uploading avatar" });
   }
 };
 
-// const assignUserRole = async (accessToken, userId) => {
-//   try {
-//     const response = await fetch(
-//       `https://api.asgardeo.io/t/onaliy/scim2/Users/${userId}`,
-//       {
-//         method: "PATCH",
-//         headers: {
-//           Authorization: `Bearer ${accessToken}`,
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           schemas: ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
-//           Operations: [
-//             {
-//               op: "add",
-//               path: "roles",
-//               value: [{ value: "User" }],
-//             },
-//           ],
-//         }),
-//       }
-//     );
+// Create or update donor record in DB
+const upsertDonor = async (req, res) => {
+  const donor = req.body;
 
-//     if (!response.ok) {
-//       const errorDetails = await response.text();
-//       throw new Error(`Failed to assign User role: ${errorDetails}`);
-//     }
+  try {
+    const { db, collection, client } = await connectToCosmos();
+    const upsertResult = await collection.updateOne(
+      { email: donor.email },
+      { $set: donor },
+      { upsert: true }
+    );
 
-//     console.log(`User role 'User' assigned successfully to ${userId}`);
-//   } catch (error) {
-//     console.error("Error assigning user role:", error);
-//   }
-// };
+    res.status(200).json({
+      message: "Donor profile upserted successfully!",
+      donor: upsertResult,
+    });
 
-export { getUserInfo, updateUserInfo };
+    client.close();
+  } catch (error) {
+    console.error("Error upserting donor profile:", error);
+    res.status(500).json({ message: "Error upserting donor profile" });
+  }
+};
+
+const getDonorByEmail = async (req, res) => {
+  try {
+    const { db, collection, client } = await connectToCosmos();
+    const { email } = req.params;
+    const donor = await collection.findOne({ email });
+
+    if (!donor) {
+      return res.status(404).json({ message: "Donor not found" });
+    }
+
+    res.status(200).json(donor);
+    client.close();
+  } catch (error) {
+    console.error("Error fetching donor:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export { getUserInfo, uploadAvatar, upsertDonor, getDonorByEmail };
