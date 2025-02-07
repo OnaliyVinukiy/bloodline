@@ -5,17 +5,18 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-const express = require("express");
-const {
+import express from "express";
+import {
   getUserInfo,
-  updateUserInfo,
-} = require("../controllers/userController");
+  upsertDonor,
+  uploadAvatar,
+  getDonorByEmail,
+} from "../controllers/userController.js";
 
 const router = express.Router();
-
-// Route to fetch user info
 router.post("/user-info", getUserInfo);
+router.post("/upload-avatar", uploadAvatar);
+router.post("/update-donor", upsertDonor);
+router.get("/donor/:email", getDonorByEmail);
 
-// Route to update user info
-router.patch("/update-user", updateUserInfo);
-module.exports = router;
+export default router;
