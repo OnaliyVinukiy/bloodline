@@ -120,10 +120,9 @@ export default function Profile() {
     if (!user || !donor) return;
 
     try {
-      const age = calculateAge(donor.birthdate);
-      const updatedDonor = { ...donor, age, userId: user.sub };
+      const { _id, ...donorData } = donor;
 
-      await axios.post("http://localhost:5000/api/update-donor", updatedDonor);
+      await axios.post("http://localhost:5000/api/update-donor", donorData);
       setIsProfileComplete(true);
       alert("Profile updated successfully!");
     } catch (error) {
@@ -253,7 +252,21 @@ export default function Profile() {
                 />
               </div>
             </div>
-
+            <div className="w-full">
+              <Label
+                htmlFor="fullName"
+                className="block mb-2 text-sm font-medium text-indigo-900"
+              >
+                {" "}
+                Full Name (As in NIC)
+              </Label>
+              <input
+                type="text"
+                value={donor?.fullName || ""}
+                onChange={(e) => handleInputChange("fullName", e.target.value)}
+                className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+              />
+            </div>
             <div className="w-full">
               <Label
                 htmlFor="first_name"
