@@ -9,7 +9,18 @@ import { User, Donor } from "../../types/types";
 export default function Profile() {
   const { state, signOut, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
-  const [donor, setDonor] = useState<Donor | null>(null);
+  const [donor, setDonor] = useState<Donor>({
+    nic: "",
+    fullName: "",
+    email: user?.email || "",
+    contactNumber: "",
+    address: "",
+    birthdate: "",
+    age: 0,
+    bloodGroup: "",
+    avatar: "",
+  });
+
   const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -29,6 +40,12 @@ export default function Profile() {
           if (!response.ok) throw new Error("Failed to fetch user info");
           const userInfo = await response.json();
           setUser(userInfo);
+
+          // Set email when user info is fetched
+          setDonor((prev) => ({
+            ...prev,
+            email: userInfo.email || "",
+          }));
 
           // Fetch donor info if user exists
           const donorResponse = await fetch(
@@ -72,7 +89,7 @@ export default function Profile() {
         { headers: { "Content-Type": "multipart/form-data" } }
       );
 
-      setDonor((prev) => (prev ? { ...prev, avatar: data.avatarUrl } : null));
+      setDonor((prev) => ({ ...prev, avatar: data.avatarUrl }));
       alert("Avatar updated successfully!");
     } catch (error) {
       console.error("Error uploading avatar:", error);
