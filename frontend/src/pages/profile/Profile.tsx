@@ -79,12 +79,12 @@ export default function Profile() {
 
   // Handle avatar upload
   const handleAvatarUpdate = async () => {
-    if (!selectedFile || !user) return;
+    if (!selectedFile || !user?.email) return;
     setIsUploading(true);
 
     const formData = new FormData();
     formData.append("file", selectedFile);
-    formData.append("userId", user.sub);
+    formData.append("email", user.email);
 
     try {
       const { data } = await axios.post(
@@ -93,7 +93,9 @@ export default function Profile() {
         { headers: { "Content-Type": "multipart/form-data" } }
       );
 
+      // Update the donor record with new avatar URL
       setDonor((prev) => ({ ...prev, avatar: data.avatarUrl }));
+
       alert("Avatar updated successfully!");
     } catch (error) {
       console.error("Error uploading avatar:", error);
