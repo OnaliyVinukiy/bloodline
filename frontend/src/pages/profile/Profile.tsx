@@ -70,17 +70,21 @@ export default function Profile() {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       setSelectedFile(file);
+
+      // Create an object URL for image preview
+      const imageUrl = URL.createObjectURL(file);
+      setDonor((prev) => ({ ...prev, avatar: imageUrl }));
     }
   };
 
   // Handle avatar upload
   const handleAvatarUpdate = async () => {
-    if (!selectedFile || !user) return;
+    if (!selectedFile || !user?.email) return;
     setIsUploading(true);
 
     const formData = new FormData();
     formData.append("file", selectedFile);
-    formData.append("userId", user.sub);
+    formData.append("email", user.email);
 
     try {
       const { data } = await axios.post(
@@ -89,7 +93,9 @@ export default function Profile() {
         { headers: { "Content-Type": "multipart/form-data" } }
       );
 
+      // Update the donor record with new avatar URL
       setDonor((prev) => ({ ...prev, avatar: data.avatarUrl }));
+
       alert("Avatar updated successfully!");
     } catch (error) {
       console.error("Error uploading avatar:", error);

@@ -11,10 +11,9 @@ import fetch from "node-fetch";
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 
-dotenv.config();
-
 const app = express();
 app.use(express.json());
+dotenv.config();
 
 // Azure Blob Storage Configuration
 const AZURE_STORAGE_CONNECTION_STRING =
@@ -25,7 +24,7 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(
 );
 const containerClient = blobServiceClient.getContainerClient(CONTAINER_NAME);
 
-// DB Configuration
+// Azure DB Configuration
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
 const DATABASE_ID = "donorDB";
 const CONTAINER_ID = "donors";
@@ -85,18 +84,38 @@ const getUserInfo = async (req, res) => {
 
 // Handle avatar upload to Azure Blob Storage
 const uploadAvatar = async (req, res) => {
-  const { file, userId } = req.body;
-
   try {
-    const blobClient = containerClient.getBlockBlobClient(
-      `${userId}_avatar.jpg`
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const { email } = req.body;
+    const blobName = `${email}-${Date.now()}-${req.file.originalname}`;
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+    await blockBlobClient.uploadData(req.file.buffer, {
+      blobHTTPHeaders: { blobContentType: req.file.mimetype },
+    });
+
+    const avatarUrl = blockBlobClient.url;
+
+    // Update donor record in Cosmos DB
+    const mongoClient = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await mongoClient.connect();
+    const database = mongoClient.db(DATABASE_ID);
+    const donorsCollection = database.collection(CONTAINER_ID);
+
+    await donorsCollection.updateOne(
+      { email },
+      { $set: { avatar: avatarUrl } }
     );
-    await blobClient.upload(file.buffer, file.buffer.length);
-    const avatarUrl = blobClient.url;
+
+    await mongoClient.close();
+
     res.status(200).json({ avatarUrl });
   } catch (error) {
     console.error("Error uploading avatar:", error);
-    res.status(500).json({ message: "Error uploading avatar" });
+    res.status(500).json({ error: "Failed to upload avatar" });
   }
 };
 
@@ -105,7 +124,7 @@ const upsertDonor = async (req, res) => {
   const donor = req.body;
 
   try {
-    const { db, collection, client } = await connectToCosmos();
+    const { collection, client } = await connectToCosmos();
     const upsertResult = await collection.updateOne(
       { email: donor.email },
       { $set: donor },
@@ -126,7 +145,7 @@ const upsertDonor = async (req, res) => {
 
 const getDonorByEmail = async (req, res) => {
   try {
-    const { db, collection, client } = await connectToCosmos();
+    const { collection, client } = await connectToCosmos();
     const { email } = req.params;
     const donor = await collection.findOne({ email });
 
