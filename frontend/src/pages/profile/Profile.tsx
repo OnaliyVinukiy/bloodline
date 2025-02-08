@@ -70,6 +70,10 @@ export default function Profile() {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       setSelectedFile(file);
+
+      // Create an object URL for image preview
+      const imageUrl = URL.createObjectURL(file);
+      setDonor((prev) => ({ ...prev, avatar: imageUrl }));
     }
   };
 
