@@ -16,7 +16,7 @@ export function CarouselSlider() {
   //Direct the user to relevant page based on authentication status
   const handleDonorRegistration = () => {
     if (state?.isAuthenticated) {
-      navigate("/register-donor");
+      navigate("/profile");
     } else {
       signIn();
     }
