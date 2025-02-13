@@ -6,7 +6,21 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 "use client";
+import { useAuthContext } from "@asgardeo/auth-react";
+import { useNavigate } from "react-router-dom";
+
 export function CarouselSlider() {
+  const { state, signIn } = useAuthContext();
+  const navigate = useNavigate();
+
+  //Direct the user to relevant page based on authentication status
+  const handleDonorRegistration = () => {
+    if (state?.isAuthenticated) {
+      navigate("/register-donor");
+    } else {
+      signIn();
+    }
+  };
   return (
     <section
       className="bg-cover bg-no-repeat bg-center h-[700px] flex items-center"
@@ -50,10 +64,10 @@ export function CarouselSlider() {
         </h1>
         <p className="text-base font-normal text-white sm:text-lg md:text-xl dark:text-gray-400">
           Join us in creating a world where no life is lost due to the lack of
-          blood. 
+          blood.
         </p>
         <p className="mb-8 text-base font-normal text-white sm:text-lg md:text-xl dark:text-gray-400">
-        Together, we save lives.
+          Together, we save lives.
         </p>
         <div className="flex flex-col mb-8 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
           <a
@@ -74,8 +88,8 @@ export function CarouselSlider() {
               ></path>
             </svg>
           </a>
-          <a
-            href="#"
+          <button
+            onClick={handleDonorRegistration}
             className="inline-flex justify-center items-center py-2 px-4 text-sm font-medium text-center text-white rounded-lg border border-gray-300 hover:bg-black focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-black dark:focus:ring-gray-800 sm:py-3 sm:px-5 sm:text-base"
           >
             <svg
@@ -94,7 +108,7 @@ export function CarouselSlider() {
               />
             </svg>
             Register as a Donor
-          </a>
+          </button>
         </div>
       </div>
     </section>
