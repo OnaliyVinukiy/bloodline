@@ -31,6 +31,7 @@ export default function Profile() {
   const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch user info from Asgardeo
   useEffect(() => {
@@ -38,14 +39,12 @@ export default function Profile() {
       if (state?.isAuthenticated) {
         try {
           const accessToken = await getAccessToken();
-          const response = await fetch("http://localhost:5000/api/user-info", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ accessToken }),
-          });
+          const { data: userInfo } = await axios.post(
+            "http://localhost:5000/api/user-info",
+            { accessToken },
+            { headers: { "Content-Type": "application/json" } }
+          );
 
-          if (!response.ok) throw new Error("Failed to fetch user info");
-          const userInfo = await response.json();
           setUser(userInfo);
 
           // Set email when user info is fetched
@@ -55,16 +54,18 @@ export default function Profile() {
           }));
 
           // Fetch donor info if user exists
-          const donorResponse = await fetch(
+          const { data: donorInfo } = await axios.get(
             `http://localhost:5000/api/donor/${userInfo.email}`
           );
-          if (donorResponse.ok) {
-            const donorInfo = await donorResponse.json();
+
+          if (donorInfo) {
             setDonor(donorInfo);
             setIsProfileComplete(true);
           }
         } catch (error) {
           console.error("Error fetching user info:", error);
+        } finally {
+          setIsLoading(false);
         }
       }
     };
@@ -154,10 +155,34 @@ export default function Profile() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
   if (!user) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p className="text-lg text-gray-700">Loading...</p>
+        <p className="text-lg text-gray-700">
+          Please login to view profile data
+        </p>
       </div>
     );
   }
