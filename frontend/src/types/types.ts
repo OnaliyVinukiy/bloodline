@@ -21,4 +21,5 @@ export interface Donor {
   age: number;
   bloodGroup: string;
   avatar: string | null;
+  gender: string;
 }
