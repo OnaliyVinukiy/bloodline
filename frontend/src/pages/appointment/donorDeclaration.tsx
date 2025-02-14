@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import BasicInfo from "./components/basicInfo";
 
 const DonorDeclaration = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -46,8 +47,8 @@ const DonorDeclaration = () => {
         </ul>
       </div>
 
-      <div className="mt-6 p-6 border border-gray-200 rounded-lg dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-        {activeTab === "tab1" && <p>English Form</p>}
+      <div>
+        {activeTab === "tab1" && <BasicInfo />}
         {activeTab === "tab2" && <p>Sinhala Form</p>}
         {activeTab === "tab3" && <p>Tamil Form</p>}
       </div>
