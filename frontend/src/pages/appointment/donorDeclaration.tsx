@@ -3,6 +3,17 @@ import BasicInfo from "./components/basicInfo";
 
 const DonorDeclaration = () => {
   const [activeTab, setActiveTab] = useState("tab1");
+  const [step, setStep] = useState(1);
+
+  //Handle next button
+  const handleNextStep = () => {
+    setStep((prevStep) => prevStep + 1);
+  };
+
+  //Handle back button
+  const handlePreviousStep = () => {
+    setStep((prevStep) => Math.max(prevStep - 1, 1));
+  };
 
   return (
     <div className="mt-12">
@@ -48,7 +59,13 @@ const DonorDeclaration = () => {
       </div>
 
       <div>
-        {activeTab === "tab1" && <BasicInfo />}
+        {activeTab === "tab1" && (
+          <BasicInfo
+            step={step}
+            onNextStep={handleNextStep}
+            onPreviousStep={handlePreviousStep}
+          />
+        )}
         {activeTab === "tab2" && <p>Sinhala Form</p>}
         {activeTab === "tab3" && <p>Tamil Form</p>}
       </div>
