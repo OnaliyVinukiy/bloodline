@@ -26,6 +26,7 @@ export default function Profile() {
     age: 0,
     bloodGroup: "",
     avatar: "",
+    gender: "",
   });
 
   const [isProfileComplete, setIsProfileComplete] = useState(false);
@@ -309,20 +310,65 @@ export default function Profile() {
                 className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
               />
             </div>
-            <div className="w-full">
-              <Label
-                htmlFor="first_name"
-                className="block mb-2 text-sm font-medium text-indigo-900"
-              >
-                {" "}
-                NIC
-              </Label>
-              <input
-                type="text"
-                value={donor?.nic || ""}
-                onChange={(e) => handleInputChange("nic", e.target.value)}
-                className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-              />
+            <div className="flex space-x-6 mb-6">
+              <div className="w-3/4">
+                <Label
+                  htmlFor="first_name"
+                  className="block mb-2 text-sm font-medium text-indigo-900"
+                >
+                  {" "}
+                  NIC
+                </Label>
+                <input
+                  type="text"
+                  value={donor?.nic || ""}
+                  onChange={(e) => handleInputChange("nic", e.target.value)}
+                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                />
+              </div>
+
+              <div className="w-1/4">
+                <Label
+                  htmlFor="gender"
+                  className="mt-1 block mb-2 text-sm font-medium text-indigo-900"
+                >
+                  Gender
+                </Label>
+                <div className="mt-4 flex items-center">
+                  <input
+                    type="radio"
+                    id="male"
+                    name="gender"
+                    value="Male"
+                    checked={donor?.gender === "Male"}
+                    onChange={(e) =>
+                      handleInputChange("gender", e.target.value)
+                    }
+                    className="mr-2"
+                  />
+                  <Label
+                    htmlFor="male"
+                    className="mr-4 text-sm text-indigo-900"
+                  >
+                    Male
+                  </Label>
+
+                  <input
+                    type="radio"
+                    id="female"
+                    name="gender"
+                    value="Female"
+                    checked={donor?.gender === "Female"}
+                    onChange={(e) =>
+                      handleInputChange("gender", e.target.value)
+                    }
+                    className="mr-2"
+                  />
+                  <Label htmlFor="female" className="text-sm text-indigo-900">
+                    Female
+                  </Label>
+                </div>
+              </div>
             </div>
 
             <div>
