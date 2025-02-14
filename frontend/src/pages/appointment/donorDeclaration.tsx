@@ -6,7 +6,7 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import React, { useState } from "react";
-import BasicInfo from "./components/basicInfo";
+import BasicInfo from "./components/DonorDeclarationForm";
 
 const DonorDeclaration = () => {
   const [activeTab, setActiveTab] = useState("tab1");
