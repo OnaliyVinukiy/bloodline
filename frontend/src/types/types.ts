@@ -23,3 +23,8 @@ export interface Donor {
   avatar: string | null;
   gender: string;
 }
+
+export interface StepperProps {
+  onNextStep: () => void;
+  onPreviousStep: () => void;
+}
