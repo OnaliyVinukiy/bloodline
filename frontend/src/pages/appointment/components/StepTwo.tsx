@@ -7,13 +7,9 @@
  */
 import { Datepicker, Label } from "flowbite-react";
 import React, { useState } from "react";
+import { StepperProps } from "../../../types/types";
 
-interface StepTwoProps {
-  onNextStep: () => void;
-  onPreviousStep: () => void;
-}
-
-const StepTwo: React.FC<StepTwoProps> = ({ onNextStep, onPreviousStep }) => {
+const StepTwo: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
   const [formState, setFormState] = useState({
     isDonatedBefore: null,
     isAnyDifficulty: null,
@@ -167,78 +163,78 @@ const StepTwo: React.FC<StepTwoProps> = ({ onNextStep, onPreviousStep }) => {
                       </div>
                     )}
                   </div>
-                  <div className="mt-6 space-y-6">
-                    <div className="w-full">
-                      <Label
-                        htmlFor="donatedBefore"
-                        className="block mb-2 text-md font-medium text-indigo-900"
-                      >
-                        2.) Have you ever been medically advised not to donate
-                        blood?
-                      </Label>
-                      <div className="flex items-center space-x-4">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="medicallyAdvised"
-                            value="yes"
-                            checked={formState.isMedicallyAdvised === "yes"}
-                            onChange={handleRadioChange("isMedicallyAdvised")}
-                            className="mr-2"
-                          />
-                          Yes
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="medicallyAdvised"
-                            value="no"
-                            checked={formState.isMedicallyAdvised === "no"}
-                            onChange={handleRadioChange("isMedicallyAdvised")}
-                            className="mr-2"
-                          />
-                          No
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-6 space-y-6">
-                    <div className="w-full">
-                      <Label
-                        htmlFor="donatedBefore"
-                        className="block mb-2 text-md font-medium text-indigo-900"
-                      >
-                        3.) Have you read and understood the "Blood donors
-                        information leaflet"?
-                      </Label>
-                      <div className="flex items-center space-x-4">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="leafletRead"
-                            value="yes"
-                            checked={formState.isLeafletRead === "yes"}
-                            onChange={handleRadioChange("isLeafletRead")}
-                            className="mr-2"
-                          />
-                          Yes
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="leafletRead"
-                            value="no"
-                            checked={formState.isLeafletRead === "no"}
-                            onChange={handleRadioChange("isLeafletRead")}
-                            className="mr-2"
-                          />
-                          No
-                        </label>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               )}
+              <div className="mt-6 space-y-6">
+                <div className="w-full">
+                  <Label
+                    htmlFor="donatedBefore"
+                    className="block mb-2 text-md font-medium text-indigo-900"
+                  >
+                    2.) Have you ever been medically advised not to donate
+                    blood?
+                  </Label>
+                  <div className="flex items-center space-x-4">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="medicallyAdvised"
+                        value="yes"
+                        checked={formState.isMedicallyAdvised === "yes"}
+                        onChange={handleRadioChange("isMedicallyAdvised")}
+                        className="mr-2"
+                      />
+                      Yes
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="medicallyAdvised"
+                        value="no"
+                        checked={formState.isMedicallyAdvised === "no"}
+                        onChange={handleRadioChange("isMedicallyAdvised")}
+                        className="mr-2"
+                      />
+                      No
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 space-y-6">
+                <div className="w-full">
+                  <Label
+                    htmlFor="donatedBefore"
+                    className="block mb-2 text-md font-medium text-indigo-900"
+                  >
+                    3.) Have you read and understood the "Blood donors
+                    information leaflet"?
+                  </Label>
+                  <div className="flex items-center space-x-4">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="leafletRead"
+                        value="yes"
+                        checked={formState.isLeafletRead === "yes"}
+                        onChange={handleRadioChange("isLeafletRead")}
+                        className="mr-2"
+                      />
+                      Yes
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="leafletRead"
+                        value="no"
+                        checked={formState.isLeafletRead === "no"}
+                        onChange={handleRadioChange("isLeafletRead")}
+                        className="mr-2"
+                      />
+                      No
+                    </label>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="flex justify-between mt-6">
