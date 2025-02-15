@@ -8,15 +8,10 @@
 import { Datepicker, Label } from "flowbite-react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Donor, User } from "../../../types/types";
+import { Donor, StepperProps, User } from "../../../types/types";
 import { useAuthContext } from "@asgardeo/auth-react";
 
-interface StepOneProps {
-  onNextStep: () => void;
-  onPreviousStep: () => void;
-}
-
-const StepOne: React.FC<StepOneProps> = ({ onNextStep, onPreviousStep }) => {
+const StepOne: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
   const [donor, setDonor] = useState<Donor>({
