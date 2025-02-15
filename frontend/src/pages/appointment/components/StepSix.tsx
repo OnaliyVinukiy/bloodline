@@ -9,7 +9,7 @@ import { Label } from "flowbite-react";
 import React, { useState } from "react";
 import { StepperProps } from "../../../types/types";
 
-const StepFour: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
+const StepSix: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
   const [formState, setFormState] = useState({
     hadDengue: null,
     hadOtherFever: null,
@@ -219,4 +219,4 @@ const StepFour: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
   );
 };
 
-export default StepFour;
+export default StepSix;
