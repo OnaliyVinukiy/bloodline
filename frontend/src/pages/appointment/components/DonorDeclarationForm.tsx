@@ -15,6 +15,7 @@ import StepThree from "./StepThree";
 import StepFour from "./StepFour";
 import StepFive from "./StepFive";
 import StepSix from "./StepSix";
+import StepSeven from "./StepSeven";
 
 const BasicInfo = ({
   step,
@@ -104,6 +105,9 @@ const BasicInfo = ({
       )}
       {step === 6 && (
         <StepSix onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 7 && (
+        <StepSeven onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
     </div>
   );
