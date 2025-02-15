@@ -11,6 +11,8 @@ import { User } from "../../../types/types";
 import { useAuthContext } from "@asgardeo/auth-react";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
+import StepThree from "./StepThree";
+import StepFour from "./StepFour";
 
 const BasicInfo = ({
   step,
@@ -88,6 +90,12 @@ const BasicInfo = ({
       )}
       {step === 2 && (
         <StepTwo onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 3 && (
+        <StepThree onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 4 && (
+        <StepFour onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
     </div>
   );
