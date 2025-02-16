@@ -134,9 +134,7 @@ export function Navigationbar() {
         <Navbar.Link href="#" className="text-lg font-medium">
           Services
         </Navbar.Link>
-        <Navbar.Link href="#" className="text-lg font-medium">
-          Appointments
-        </Navbar.Link>
+       
         <Navbar.Link href="#" className="text-lg font-medium">
           Contact Us
         </Navbar.Link>
