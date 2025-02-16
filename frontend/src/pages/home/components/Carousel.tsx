@@ -21,6 +21,14 @@ export function CarouselSlider() {
       signIn();
     }
   };
+
+  const handleAppointmentSchedule = () => {
+    if (state?.isAuthenticated) {
+      navigate("/donorDeclaration");
+    } else {
+      signIn();
+    }
+  };
   return (
     <section
       className="bg-cover bg-no-repeat bg-center h-[700px] flex items-center"
@@ -70,8 +78,8 @@ export function CarouselSlider() {
           Together, we save lives.
         </p>
         <div className="flex flex-col mb-8 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
-          <a
-            href="#"
+        <button
+            onClick={handleAppointmentSchedule}
             className="inline-flex justify-center items-center py-2 px-4 text-sm font-medium text-center text-white rounded-lg bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900 sm:py-3 sm:px-5 sm:text-base"
           >
             Place an appointment
@@ -87,7 +95,7 @@ export function CarouselSlider() {
                 clipRule="evenodd"
               ></path>
             </svg>
-          </a>
+          </button>
           <button
             onClick={handleDonorRegistration}
             className="inline-flex justify-center items-center py-2 px-4 text-sm font-medium text-center text-white rounded-lg border border-gray-300 hover:bg-black focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-black dark:focus:ring-gray-800 sm:py-3 sm:px-5 sm:text-base"
