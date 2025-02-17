@@ -9,7 +9,12 @@ import { Datepicker, Label } from "flowbite-react";
 import React, { useState } from "react";
 import { StepperProps } from "../../../types/types";
 
-const StepTwo: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
+const StepTwo: React.FC<StepperProps> = ({
+  onNextStep,
+  onPreviousStep,
+  onFormDataChange,
+  formData,
+}) => {
   const [formState, setFormState] = useState({
     isDonatedBefore: null,
     isAnyDifficulty: null,
@@ -17,16 +22,50 @@ const StepTwo: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
     isLeafletRead: null,
   });
 
+  //Structure for the blood donor data
+  const [formOneData, setFormOneData] = useState({
+    isDonatedBefore: null,
+    timesOfDonation: "",
+    lastDonationDate: "",
+    isAnyDifficulty: null,
+    difficulty: "",
+    isMedicallyAdvised: null,
+    isLeafletRead: null,
+  });
+
+  //Function to set form data (radiobuttons)
   const handleRadioChange =
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setFormState((prevState) => ({
         ...prevState,
         [field]: event.target.value,
       }));
+      setFormOneData((prevState) => ({
+        ...prevState,
+        [field]: event.target.value,
+      }));
     };
+
+  //Function to set form data (textboxes)
+  const handleInputChange = (field: string, value: string) => {
+    setFormOneData((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
+  };
+
+  //Function to move to next step
+  const handleNext = () => {
+    onFormDataChange({
+      ...formData,
+      firstForm: formOneData,
+    });
+    onNextStep();
+  };
 
   const [isLoading, setIsLoading] = useState(false);
 
+  //Loading animation
   if (isLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
@@ -93,16 +132,18 @@ const StepTwo: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                 <div>
                   <div className="mt-4 w-full">
                     <Label
-                      htmlFor="first_name"
+                      htmlFor="timesOfDonation"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
                       1.1.) How many times?
                     </Label>
                     <input
-                      type="email"
-                      value=""
+                      type="text"
+                      value={formOneData.timesOfDonation}
                       className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-                      disabled
+                      onChange={(e) =>
+                        handleInputChange("timesOfDonation", e.target.value)
+                      }
                     />
                   </div>
                   <div className="mt-4 w-full">
@@ -112,7 +153,22 @@ const StepTwo: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                     >
                       1.2.) Date of last donation
                     </Label>
-                    <Datepicker className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
+                    <Datepicker
+                      className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                      value={
+                        formData?.lastDonationDate
+                          ? new Date(formData.lastDonationDate)
+                          : undefined
+                      }
+                      onChange={(date) => {
+                        if (date) {
+                          handleInputChange(
+                            "lastDonationDate",
+                            date.toISOString().split("T")[0]
+                          );
+                        }
+                      }}
+                    />
                   </div>
                   <div className="mt-4 w-full">
                     <Label
@@ -149,16 +205,18 @@ const StepTwo: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                     {formState.isAnyDifficulty === "yes" && (
                       <div className="mt-4 w-full">
                         <Label
-                          htmlFor="difficultyDetails"
+                          htmlFor="difficulty"
                           className="block mb-2 text-sm font-medium text-indigo-900"
                         >
                           1.4.) What was the difficulty?
                         </Label>
                         <input
                           type="text"
-                          value=""
+                          value={formOneData.difficulty}
+                          onChange={(e) =>
+                            handleInputChange("difficulty", e.target.value)
+                          }
                           className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-                          disabled
                         />
                       </div>
                     )}
@@ -245,7 +303,7 @@ const StepTwo: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                 Back
               </button>
               <button
-                onClick={onNextStep}
+                onClick={handleNext}
                 className="px-4 py-2 text-white bg-red-800 rounded-lg hover:bg-red-700"
               >
                 Next
