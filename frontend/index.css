@@ -1,33 +1,60 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 .loading svg polyline {
-    fill: none;
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.loading svg polyline#back {
+  fill: none;
+  stroke: #ff4d5033;
+}
+
+.loading svg polyline#front {
+  fill: none;
+  stroke: #fe191d;
+  stroke-dasharray: 48, 144;
+  stroke-dashoffset: 192;
+  animation: dash_682 1.4s linear infinite;
+}
+
+@keyframes dash_682 {
+  72.5% {
+    opacity: 0;
   }
-  
-  .loading svg polyline#back {
-    fill: none;
-    stroke: #ff4d5033;
+
+  to {
+    stroke-dashoffset: 0;
   }
-  
-  .loading svg polyline#front {
-    fill: none;
-    stroke: #ff4d4f;
-    stroke-dasharray: 48, 144;
-    stroke-dashoffset: 192;
-    animation: dash_682 1.4s linear infinite;
-  }
-  
-  @keyframes dash_682 {
-    72.5% {
-      opacity: 0;
-    }
-  
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-  
+}
+.react-datepicker {
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.react-datepicker__header {
+  background-color: #a4bfef;
+  color: white;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.react-datepicker__day:hover {
+  background-color: #dbeafe;
+  border-radius: 50%;
+}
+
+.react-datepicker__day--today {
+  font-weight: bold;
+  color: #1e3a8a;
+}
+
+.react-datepicker__day--selected {
+  background-color: #f36581;
+  color: white;
+  border-radius: 50%;
+}

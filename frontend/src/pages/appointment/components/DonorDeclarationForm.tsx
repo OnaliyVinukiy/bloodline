@@ -17,6 +17,7 @@ import StepFive from "./StepFive";
 import StepSix from "./StepSix";
 import StepSeven from "./StepSeven";
 import StepEight from "./StepEight";
+import ScheduleForm from "./ScheduleForm";
 
 const BasicInfo = ({
   step,
@@ -90,27 +91,30 @@ const BasicInfo = ({
   return (
     <div>
       {step === 1 && (
-        <StepOne onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <ScheduleForm onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
       {step === 2 && (
-        <StepTwo onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepOne onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
       {step === 3 && (
-        <StepThree onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepTwo onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
       {step === 4 && (
-        <StepFour onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepThree onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
       {step === 5 && (
-        <StepFive onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepFour onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
       {step === 6 && (
-        <StepSix onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepFive onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
       {step === 7 && (
-        <StepSeven onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepSix onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
       {step === 8 && (
+        <StepSeven onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 9 && (
         <StepEight onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
     </div>
