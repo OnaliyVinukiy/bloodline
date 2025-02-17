@@ -8,18 +8,28 @@
 import { Datepicker, Label } from "flowbite-react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Donor, StepperProps, User } from "../../../types/types";
+import { BloodDonor, Donor, StepperProps, User } from "../../../types/types";
 import { useAuthContext } from "@asgardeo/auth-react";
 
-const StepOne: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
+const StepOne: React.FC<StepperProps> = ({
+  onNextStep,
+  onPreviousStep,
+  onFormDataChange,
+  formData,
+}) => {
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
-  const [donor, setDonor] = useState<Donor>({
+
+  //Structure for donor information
+  const [donor, setDonor] = useState<BloodDonor>({
     nic: "",
     fullName: "",
     email: user?.email || "",
     contactNumber: "",
+    contactNumberHome: "",
+    contactNumberOffice: "",
     address: "",
+    addressOffice: "",
     birthdate: "",
     age: 0,
     bloodGroup: "",
@@ -27,6 +37,15 @@ const StepOne: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
     gender: "",
   });
 
+  //Handle input change
+  const handleInputChange = (field: keyof BloodDonor, value: string) => {
+    if (donor) {
+      setDonor((prev) => ({
+        ...prev!,
+        [field]: value,
+      }));
+    }
+  };
   const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -86,16 +105,16 @@ const StepOne: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
     return age;
   };
 
-  // Handle input changes for donor fields
-  const handleInputChange = (field: keyof Donor, value: string) => {
-    if (donor) {
-      setDonor((prev) => ({
-        ...prev!,
-        [field]: value,
-      }));
-    }
+  //Save donor information to the form data
+  const handleNext = () => {
+    onFormDataChange({
+      ...formData,
+      donorInfo: donor,
+    });
+    onNextStep();
   };
 
+  //Loading animation
   if (isLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
@@ -168,7 +187,7 @@ const StepOne: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
 
               <div className="w-full">
                 <Label
-                  htmlFor="first_name"
+                  htmlFor="nic"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
                   {" "}
@@ -248,8 +267,10 @@ const StepOne: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                 </Label>
                 <input
                   type="text"
-                  value={donor?.address || ""}
-                  onChange={(e) => handleInputChange("address", e.target.value)}
+                  value={donor?.addressOffice || ""}
+                  onChange={(e) =>
+                    handleInputChange("addressOffice", e.target.value)
+                  }
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
               </div>
@@ -281,9 +302,9 @@ const StepOne: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                 </Label>
                 <input
                   type="text"
-                  value={donor?.contactNumber || ""}
+                  value={donor?.contactNumberHome || ""}
                   onChange={(e) =>
-                    handleInputChange("contactNumber", e.target.value)
+                    handleInputChange("contactNumberHome", e.target.value)
                   }
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
@@ -298,9 +319,9 @@ const StepOne: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                 </Label>
                 <input
                   type="text"
-                  value={donor?.contactNumber || ""}
+                  value={donor?.contactNumberOffice || ""}
                   onChange={(e) =>
-                    handleInputChange("contactNumber", e.target.value)
+                    handleInputChange("contactNumberOffice", e.target.value)
                   }
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
@@ -371,7 +392,7 @@ const StepOne: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                   Back
                 </button>
                 <button
-                  onClick={onNextStep}
+                  onClick={handleNext}
                   className="px-4 py-2 text-white bg-red-800 rounded-lg hover:bg-red-700"
                 >
                   Next
