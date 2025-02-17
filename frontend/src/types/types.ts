@@ -24,7 +24,26 @@ export interface Donor {
   gender: string;
 }
 
+export interface BloodDonor {
+  _id?: ObjectId;
+  nic: string;
+  fullName: string;
+  email: string;
+  contactNumber: string;
+  contactNumberHome: string;
+  contactNumberOffice: string;
+  address: string;
+  addressOffice: string;
+  birthdate: string;
+  age: number;
+  bloodGroup: string;
+  avatar: string | null;
+  gender: string;
+}
+
 export interface StepperProps {
   onNextStep: () => void;
   onPreviousStep: () => void;
+  onFormDataChange: (data: any) => void;
+  formData: any;
 }
