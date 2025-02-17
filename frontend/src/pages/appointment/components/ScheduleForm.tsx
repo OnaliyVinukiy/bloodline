@@ -1,4 +1,11 @@
-import React, { useState } from "react";
+/*!
+ * Bloodline Blood Bank Management System
+ * Copyright (c) 2025 Onaliy Jayawardana
+ * All rights reserved.
+ *
+ * Unauthorized copying, modification, or distribution of this code is prohibited.
+ */
+import React, { useEffect, useState } from "react";
 import { Button, Label } from "flowbite-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -7,6 +14,8 @@ import { StepperProps } from "../../../types/types";
 const ScheduleForm: React.FC<StepperProps> = ({
   onNextStep,
   onPreviousStep,
+  onFormDataChange,
+  formData,
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -32,6 +41,13 @@ const ScheduleForm: React.FC<StepperProps> = ({
   };
 
   const timeSlots = generateTimeSlots();
+
+  // Set the form data when the date and time slot is selected
+  useEffect(() => {
+    if (selectedDate && selectedSlot) {
+      onFormDataChange({ selectedDate, selectedSlot });
+    }
+  }, [selectedDate, selectedSlot, onFormDataChange]);
 
   return (
     <div className="flex justify-center items-center bg-gray-100">
