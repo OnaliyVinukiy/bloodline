@@ -79,7 +79,7 @@ export function Navigationbar() {
           className="mr-3 h-6 sm:h-9"
           alt="Bloodline Logo"
         />
-        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
+        <span className="self-center whitespace-nowrap text-xl font-semibold ">
           Bloodline
         </span>
       </Navbar.Brand>
@@ -125,17 +125,21 @@ export function Navigationbar() {
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
-        <Navbar.Link href="/" className="text-lg font-medium" active>
+        <Navbar.Link
+          href="/"
+          className="text-lg font-medium font-roboto"
+          active
+        >
           Home
         </Navbar.Link>
-        <Navbar.Link href="#" className="text-lg font-medium">
+        <Navbar.Link href="#" className="text-lg font-medium font-roboto">
           About
         </Navbar.Link>
-        <Navbar.Link href="#" className="text-lg font-medium">
+        <Navbar.Link href="#" className="text-lg font-medium font-roboto">
           Services
         </Navbar.Link>
-       
-        <Navbar.Link href="#" className="text-lg font-medium">
+
+        <Navbar.Link href="#" className="text-lg font-medium font-roboto">
           Contact Us
         </Navbar.Link>
       </Navbar.Collapse>
