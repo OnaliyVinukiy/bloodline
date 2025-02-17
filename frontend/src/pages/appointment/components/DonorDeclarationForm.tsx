@@ -32,6 +32,33 @@ const BasicInfo = ({
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  //Structure for the declaration form data
+  const [formData, setFormData] = useState({
+    nic: "",
+    selectedDate: "",
+    selectedSlot: "",
+    donorInfo: {
+      nic: "",
+      fullName: "",
+      email: user?.email || "",
+      contactNumber: "",
+      address: "",
+      birthdate: "",
+      age: 0,
+      bloodGroup: "",
+      avatar: "",
+      gender: "",
+    },
+    firstForm: {
+      isDonatedBefore: "",
+      timesOfDonation: "",
+      lastDonatedDate: "",
+      isAnyDifficulty: "",
+      isMedicallyAdvised: "",
+      isLeafletRead: "",
+    },
+  });
+
   // Fetch user info from Asgardeo
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -55,6 +82,15 @@ const BasicInfo = ({
 
     fetchUserInfo();
   }, [state?.isAuthenticated, getAccessToken]);
+
+  //Handle form data change
+  const handleFormDataChange = (newData: any) => {
+    setFormData((prevData) => ({ ...prevData, ...newData }));
+  };
+
+  useEffect(() => {
+    console.log(formData);
+  }, [formData]);
 
   //Loading animation
   if (isLoading) {
@@ -91,31 +127,76 @@ const BasicInfo = ({
   return (
     <div>
       {step === 1 && (
-        <ScheduleForm onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <ScheduleForm
+          onNextStep={onNextStep}
+          onPreviousStep={onPreviousStep}
+          onFormDataChange={handleFormDataChange}
+          formData={formData}
+        />
       )}
       {step === 2 && (
-        <StepOne onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepOne
+          onNextStep={onNextStep}
+          onPreviousStep={onPreviousStep}
+          onFormDataChange={handleFormDataChange}
+          formData={formData}
+        />
       )}
       {step === 3 && (
-        <StepTwo onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepTwo
+          onNextStep={onNextStep}
+          onPreviousStep={onPreviousStep}
+          onFormDataChange={handleFormDataChange}
+          formData={formData}
+        />
       )}
       {step === 4 && (
-        <StepThree onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepThree
+          onNextStep={onNextStep}
+          onPreviousStep={onPreviousStep}
+          onFormDataChange={handleFormDataChange}
+          formData={formData}
+        />
       )}
       {step === 5 && (
-        <StepFour onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepFour
+          onNextStep={onNextStep}
+          onPreviousStep={onPreviousStep}
+          onFormDataChange={handleFormDataChange}
+          formData={formData}
+        />
       )}
       {step === 6 && (
-        <StepFive onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepFive
+          onNextStep={onNextStep}
+          onPreviousStep={onPreviousStep}
+          onFormDataChange={handleFormDataChange}
+          formData={formData}
+        />
       )}
       {step === 7 && (
-        <StepSix onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepSix
+          onNextStep={onNextStep}
+          onPreviousStep={onPreviousStep}
+          onFormDataChange={handleFormDataChange}
+          formData={formData}
+        />
       )}
       {step === 8 && (
-        <StepSeven onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepSeven
+          onNextStep={onNextStep}
+          onPreviousStep={onPreviousStep}
+          onFormDataChange={handleFormDataChange}
+          formData={formData}
+        />
       )}
       {step === 9 && (
-        <StepEight onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepEight
+          onNextStep={onNextStep}
+          onPreviousStep={onPreviousStep}
+          onFormDataChange={handleFormDataChange}
+          formData={formData}
+        />
       )}
     </div>
   );
