@@ -9,19 +9,28 @@ import { Label } from "flowbite-react";
 import React, { useState } from "react";
 import { StepperProps } from "../../../types/types";
 
-const StepFour: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
-  const [formState, setFormState] = useState({
+const StepFour: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormDataChange, formData }) => {
+  const [formThreeData, setFormThreeData] = useState({
     hadHepatitis: null,
     hadTyphoid: null,
   });
 
   const handleRadioChange =
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setFormState((prevState) => ({
+      setFormThreeData((prevState) => ({
         ...prevState,
         [field]: event.target.value,
       }));
     };
+
+    //Function to move to next step
+  const handleNext = () => {
+    onFormDataChange({
+      ...formData,
+      thirdForm: formThreeData,
+    });
+    onNextStep();
+  };
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -67,7 +76,7 @@ const StepFour: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                       type="radio"
                       name="hadHepatitis"
                       value="yes"
-                      checked={formState.hadHepatitis === "yes"}
+                      checked={formThreeData.hadHepatitis === "yes"}
                       onChange={handleRadioChange("hadHepatitis")}
                       className="mr-2"
                     />
@@ -78,7 +87,7 @@ const StepFour: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                       type="radio"
                       name="hadHepatitis"
                       value="no"
-                      checked={formState.hadHepatitis === "no"}
+                      checked={formThreeData.hadHepatitis === "no"}
                       onChange={handleRadioChange("hadHepatitis")}
                       className="mr-2"
                     />
@@ -102,7 +111,7 @@ const StepFour: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadTyphoid"
                         value="yes"
-                        checked={formState.hadTyphoid === "yes"}
+                        checked={formThreeData.hadTyphoid === "yes"}
                         onChange={handleRadioChange("hadTyphoid")}
                         className="mr-2"
                       />
@@ -113,7 +122,7 @@ const StepFour: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadTyphoid"
                         value="no"
-                        checked={formState.hadTyphoid === "no"}
+                        checked={formThreeData.hadTyphoid === "no"}
                         onChange={handleRadioChange("hadTyphoid")}
                         className="mr-2"
                       />
@@ -132,7 +141,7 @@ const StepFour: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                 Back
               </button>
               <button
-                onClick={onNextStep}
+                onClick={handleNext}
                 className="px-4 py-2 text-white bg-red-800 rounded-lg hover:bg-red-700"
               >
                 Next
