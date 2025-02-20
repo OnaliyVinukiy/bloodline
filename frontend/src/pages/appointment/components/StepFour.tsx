@@ -6,15 +6,22 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { Label } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/types";
 
-const StepFour: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormDataChange, formData }) => {
+const StepFour: React.FC<StepperProps> = ({
+  onNextStep,
+  onPreviousStep,
+  onFormDataChange,
+  formData,
+}) => {
+  //Structure for form data
   const [formThreeData, setFormThreeData] = useState({
     hadHepatitis: null,
     hadTyphoid: null,
   });
 
+  //Function to set form data (radio buttons)
   const handleRadioChange =
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setFormThreeData((prevState) => ({
@@ -23,7 +30,7 @@ const StepFour: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormDa
       }));
     };
 
-    //Function to move to next step
+  //Function to move to next step
   const handleNext = () => {
     onFormDataChange({
       ...formData,
@@ -32,8 +39,16 @@ const StepFour: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormDa
     onNextStep();
   };
 
+  // Populate the form state from the parent formData
+  useEffect(() => {
+    if (formData?.thirdForm) {
+      setFormThreeData(formData.thirdForm);
+    }
+  }, [formData]);
+
   const [isLoading, setIsLoading] = useState(false);
 
+  //Loading animation
   if (isLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
