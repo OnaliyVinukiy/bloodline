@@ -6,7 +6,7 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { Datepicker, Label } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/types";
 
 const StepTwo: React.FC<StepperProps> = ({
@@ -51,6 +51,13 @@ const StepTwo: React.FC<StepperProps> = ({
     });
     onNextStep();
   };
+
+  // Populate the form data from the parent form data
+  useEffect(() => {
+    if (formData?.firstForm) {
+      setFormOneData(formData.firstForm);
+    }
+  }, [formData]);
 
   const [isLoading, setIsLoading] = useState(false);
 

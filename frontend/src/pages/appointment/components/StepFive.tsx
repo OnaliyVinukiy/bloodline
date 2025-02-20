@@ -6,11 +6,17 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { Label } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/types";
 
-const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
-  const [formState, setFormState] = useState({
+const StepFive: React.FC<StepperProps> = ({
+  onNextStep,
+  onPreviousStep,
+  onFormDataChange,
+  formData,
+}) => {
+  //Structure for form data
+  const [formFourData, setFormFourData] = useState({
     hadVaccination: null,
     hadAcupuncture: null,
     hadImprisoned: null,
@@ -19,16 +25,34 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
     hadMaleria: null,
   });
 
+  //Function to set form data (radio buttons)
   const handleRadioChange =
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setFormState((prevState) => ({
+      setFormFourData((prevState) => ({
         ...prevState,
         [field]: event.target.value,
       }));
     };
 
+  //Function to move to next step
+  const handleNext = () => {
+    onFormDataChange({
+      ...formData,
+      fourthForm: formFourData,
+    });
+    onNextStep();
+  };
+
+  // Populate the form data from the parent form data
+  useEffect(() => {
+    if (formData?.fourthForm) {
+      setFormFourData(formData.fourthForm);
+    }
+  }, [formData]);
+
   const [isLoading, setIsLoading] = useState(false);
 
+  //Loading animation
   if (isLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
@@ -79,7 +103,7 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                       type="radio"
                       name="hadVaccination"
                       value="yes"
-                      checked={formState.hadVaccination === "yes"}
+                      checked={formFourData.hadVaccination === "yes"}
                       onChange={handleRadioChange("hadVaccination")}
                       className="mr-2"
                     />
@@ -90,7 +114,7 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                       type="radio"
                       name="hadVaccination"
                       value="no"
-                      checked={formState.hadVaccination === "no"}
+                      checked={formFourData.hadVaccination === "no"}
                       onChange={handleRadioChange("hadVaccination")}
                       className="mr-2"
                     />
@@ -114,7 +138,7 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadAcupuncture"
                         value="yes"
-                        checked={formState.hadAcupuncture === "yes"}
+                        checked={formFourData.hadAcupuncture === "yes"}
                         onChange={handleRadioChange("hadAcupuncture")}
                         className="mr-2"
                       />
@@ -125,7 +149,7 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadAcupuncture"
                         value="no"
-                        checked={formState.hadAcupuncture === "no"}
+                        checked={formFourData.hadAcupuncture === "no"}
                         onChange={handleRadioChange("hadAcupuncture")}
                         className="mr-2"
                       />
@@ -149,7 +173,7 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadImprisoned"
                         value="yes"
-                        checked={formState.hadImprisoned === "yes"}
+                        checked={formFourData.hadImprisoned === "yes"}
                         onChange={handleRadioChange("hadImprisoned")}
                         className="mr-2"
                       />
@@ -160,7 +184,7 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadImprisoned"
                         value="no"
-                        checked={formState.hadImprisoned === "no"}
+                        checked={formFourData.hadImprisoned === "no"}
                         onChange={handleRadioChange("hadImprisoned")}
                         className="mr-2"
                       />
@@ -183,7 +207,7 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadTravelledAbroad"
                         value="yes"
-                        checked={formState.hadTravelledAbroad === "yes"}
+                        checked={formFourData.hadTravelledAbroad === "yes"}
                         onChange={handleRadioChange("hadTravelledAbroad")}
                         className="mr-2"
                       />
@@ -194,7 +218,7 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadTravelledAbroad"
                         value="no"
-                        checked={formState.hadTravelledAbroad === "no"}
+                        checked={formFourData.hadTravelledAbroad === "no"}
                         onChange={handleRadioChange("hadTravelledAbroad")}
                         className="mr-2"
                       />
@@ -218,7 +242,7 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadReceivedBlood"
                         value="yes"
-                        checked={formState.hadReceivedBlood === "yes"}
+                        checked={formFourData.hadReceivedBlood === "yes"}
                         onChange={handleRadioChange("hadReceivedBlood")}
                         className="mr-2"
                       />
@@ -229,7 +253,7 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadReceivedBlood"
                         value="no"
-                        checked={formState.hadReceivedBlood === "no"}
+                        checked={formFourData.hadReceivedBlood === "no"}
                         onChange={handleRadioChange("hadReceivedBlood")}
                         className="mr-2"
                       />
@@ -252,7 +276,7 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadMaleria"
                         value="yes"
-                        checked={formState.hadMaleria === "yes"}
+                        checked={formFourData.hadMaleria === "yes"}
                         onChange={handleRadioChange("hadMaleria")}
                         className="mr-2"
                       />
@@ -263,7 +287,7 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadMaleria"
                         value="no"
-                        checked={formState.hadMaleria === "no"}
+                        checked={formFourData.hadMaleria === "no"}
                         onChange={handleRadioChange("hadMaleria")}
                         className="mr-2"
                       />
@@ -282,7 +306,7 @@ const StepFive: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                 Back
               </button>
               <button
-                onClick={onNextStep}
+                onClick={handleNext}
                 className="px-4 py-2 text-white bg-red-800 rounded-lg hover:bg-red-700"
               >
                 Next
