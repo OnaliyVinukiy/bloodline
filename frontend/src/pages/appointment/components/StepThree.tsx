@@ -6,7 +6,7 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { Label } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/types";
 
 const StepThree: React.FC<StepperProps> = ({
@@ -42,6 +42,13 @@ const StepThree: React.FC<StepperProps> = ({
     });
     onNextStep();
   };
+
+  // Populate the form data from the parent form data
+  useEffect(() => {
+    if (formData?.secondForm) {
+      setFormTwoData(formData.secondForm);
+    }
+  }, [formData]);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -133,6 +140,7 @@ const StepThree: React.FC<StepperProps> = ({
                           type="checkbox"
                           name="diseases"
                           value={disease}
+                          checked={formTwoData.diseases.includes(disease)}
                           onChange={(event) => {
                             const value = event.target.value;
                             setFormTwoData((prevState) => {
