@@ -6,27 +6,50 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { Label } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/types";
 
-const StepSeven: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
-  const [formState, setFormState] = useState({
+const StepSeven: React.FC<StepperProps> = ({
+  onNextStep,
+  onPreviousStep,
+  onFormDataChange,
+  formData,
+}) => {
+  //Structure for form data
+  const [formSixData, setFormSixData] = useState({
     isInformed: null,
     isHarmfulCategory: null,
-    hadImprisoned: null,
     hadPersistentFever: null,
   });
 
+  //Function to handle radio button change
   const handleRadioChange =
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setFormState((prevState) => ({
+      setFormSixData((prevState) => ({
         ...prevState,
         [field]: event.target.value,
       }));
     };
 
+  //Function to move to next step
+  const handleNext = () => {
+    onFormDataChange({
+      ...formData,
+      sixthForm: formSixData,
+    });
+    onNextStep();
+  };
+
+  // Populate the form data from the parent form data
+  useEffect(() => {
+    if (formData?.sixthForm) {
+      setFormSixData(formData.sixthForm);
+    }
+  }, [formData]);
+
   const [isLoading, setIsLoading] = useState(false);
 
+  //Loading animation
   if (isLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
@@ -56,7 +79,9 @@ const StepSeven: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
         <main className="mt-2 mb-16 flex justify-center items-center w-full max-w-4xl px-4 py-6 md:w-2/3 lg:w-3/4">
           <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg">
             <div className="mb-6 p-4 bg-red-200 rounded-lg">
-              <p className="text-red-700 font-semibold font-opensans">Important!</p>
+              <p className="text-red-700 font-semibold font-opensans">
+                Important!
+              </p>
             </div>
             <div className="mt-4 space-y-6">
               <div className="w-full">
@@ -98,7 +123,7 @@ const StepSeven: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                       type="radio"
                       name="isInformed"
                       value="yes"
-                      checked={formState.isInformed === "yes"}
+                      checked={formSixData.isInformed === "yes"}
                       onChange={handleRadioChange("isInformed")}
                       className="mr-2"
                     />
@@ -109,7 +134,7 @@ const StepSeven: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                       type="radio"
                       name="isInformed"
                       value="no"
-                      checked={formState.isInformed === "no"}
+                      checked={formSixData.isInformed === "no"}
                       onChange={handleRadioChange("isInformed")}
                       className="mr-2"
                     />
@@ -133,7 +158,7 @@ const StepSeven: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="isHarmfulCategory"
                         value="yes"
-                        checked={formState.isHarmfulCategory === "yes"}
+                        checked={formSixData.isHarmfulCategory === "yes"}
                         onChange={handleRadioChange("isHarmfulCategory")}
                         className="mr-2"
                       />
@@ -144,7 +169,7 @@ const StepSeven: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="isHarmfulCategory"
                         value="no"
-                        checked={formState.isHarmfulCategory === "no"}
+                        checked={formSixData.isHarmfulCategory === "no"}
                         onChange={handleRadioChange("isHarmfulCategory")}
                         className="mr-2"
                       />
@@ -169,7 +194,7 @@ const StepSeven: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadPersistentFever"
                         value="yes"
-                        checked={formState.hadPersistentFever === "yes"}
+                        checked={formSixData.hadPersistentFever === "yes"}
                         onChange={handleRadioChange("hadPersistentFever")}
                         className="mr-2"
                       />
@@ -180,7 +205,7 @@ const StepSeven: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="hadPersistentFever"
                         value="no"
-                        checked={formState.hadPersistentFever === "no"}
+                        checked={formSixData.hadPersistentFever === "no"}
                         onChange={handleRadioChange("hadPersistentFever")}
                         className="mr-2"
                       />
@@ -199,7 +224,7 @@ const StepSeven: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                 Back
               </button>
               <button
-                onClick={onNextStep}
+                onClick={handleNext}
                 className="px-4 py-2 text-white bg-red-800 rounded-lg hover:bg-red-700"
               >
                 Next
