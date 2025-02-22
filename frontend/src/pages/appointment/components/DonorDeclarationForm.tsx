@@ -51,11 +51,12 @@ const BasicInfo = ({
     },
     firstForm: {
       isDonatedBefore: null,
-      timesOfDonation: null,
-      lastDonatedDate: null,
-      isAnyDifficulty: null,
-      isMedicallyAdvised: null,
-      isLeafletRead: null,
+    timesOfDonation: "",
+    lastDonationDate: "",
+    isAnyDifficulty: null,
+    difficulty: "",
+    isMedicallyAdvised: null,
+    isLeafletRead: null,
     },
     secondForm: {
       isFeelingWell: null,
@@ -68,6 +69,30 @@ const BasicInfo = ({
     thirdForm: {
       hadHepatitis: null,
       hadTyphoid: null,
+    },
+    fourthForm: {
+      hadVaccination: null,
+      hadAcupuncture: null,
+      hadImprisoned: null,
+      hadTravelledAbroad: null,
+      hadReceivedBlood: null,
+      hadMaleria: null,
+    },
+    fifthForm: {
+      hadDengue: null,
+      hadOtherFever: null,
+      hadDentalExtraction: null,
+      hadAntibiotic: null,
+    },
+    sixthForm: {
+      isInformed: null,
+      isHarmfulCategory: null,
+      hadPersistentFever: null,
+    },
+    seventhForm: {
+      donatingMonth: null,
+    donorName: "",
+    dateSigned: "",
     },
   });
 
