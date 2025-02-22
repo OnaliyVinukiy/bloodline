@@ -6,24 +6,64 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { Datepicker, Label } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/types";
+import axios from "axios";
 
-const StepEight: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
-  const [formState, setFormState] = useState({
+const StepEight: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormDataChange, formData }) => {
+
+  //Structure for form data
+  const [formSevenData, setFormSevenData] = useState({
     donatingMonth: null,
+    donorName: "",
+    dateSigned: "",
   });
 
+  //Function to set form data (radio buttons)
   const handleRadioChange =
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setFormState((prevState) => ({
+      setFormSevenData((prevState) => ({
         ...prevState,
         [field]: event.target.value,
       }));
     };
 
+ //Function to set form data (textboxes)
+  const handleInputChange = (field: string, value: string) => {
+    setFormSevenData((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
+  };
+
+ 
+  // Populate the form state from the parent formData
+  useEffect(() => {
+    if (formData?.seventhForm) {
+      setFormSevenData(formData.seventhForm);
+    }
+  }, [formData]);
+
+  //Function to submit form data
+  const submitForm = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/appointments/save-appointment', formData, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+  
+      if (response.status === 201) {
+        alert('Appointment created successfully');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to create appointment');
+    }
+  };
+  
+
   const [isLoading, setIsLoading] = useState(false);
 
+  //Loading animation
   if (isLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
@@ -108,7 +148,7 @@ const StepEight: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="donatingMonth"
                         value="four"
-                        checked={formState.donatingMonth === "four"}
+                        checked={formSevenData.donatingMonth === "four"}
                         onChange={handleRadioChange("donatingMonth")}
                         className="mr-2"
                       />
@@ -119,7 +159,7 @@ const StepEight: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="donatingMonth"
                         value="six"
-                        checked={formState.donatingMonth === "six"}
+                        checked={formSevenData.donatingMonth === "six"}
                         onChange={handleRadioChange("donatingMonth")}
                         className="mr-2"
                       />
@@ -130,7 +170,7 @@ const StepEight: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                         type="radio"
                         name="isHarmfulCategory"
                         value="twelve"
-                        checked={formState.donatingMonth === "twelve"}
+                        checked={formSevenData.donatingMonth === "twelve"}
                         onChange={handleRadioChange("donatingMonth")}
                         className="mr-2"
                       />
@@ -155,8 +195,11 @@ const StepEight: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                 </Label>
                 <input
                   type="text"
-                  value=""
+                  value={formSevenData.donorName}
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                  onChange={(e) =>
+                    handleInputChange("donorName", e.target.value)
+                  }
                 />
                 <Label
                   htmlFor="fullName"
@@ -164,7 +207,19 @@ const StepEight: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                 >
                   Date
                 </Label>
-                <Datepicker className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
+                <Datepicker className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" value={
+                        formSevenData?.dateSigned
+                          ? new Date(formSevenData.dateSigned)
+                          : undefined
+                      }
+                      onChange={(date) => {
+                        if (date) {
+                          handleInputChange(
+                            "dateSigned",
+                            date.toISOString().split("T")[0]
+                          );
+                        }
+                      }} />
               </div>
             </div>
 
@@ -176,7 +231,7 @@ const StepEight: React.FC<StepperProps> = ({ onNextStep, onPreviousStep }) => {
                 Back
               </button>
               <button
-                onClick={onNextStep}
+                onClick={submitForm}
                 className="px-4 py-2 text-white bg-red-800 rounded-lg hover:bg-red-700"
               >
                 Next
