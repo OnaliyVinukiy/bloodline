@@ -10,8 +10,12 @@ import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/types";
 import axios from "axios";
 
-const StepEight: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormDataChange, formData }) => {
-
+const StepEight: React.FC<StepperProps> = ({
+  onNextStep,
+  onPreviousStep,
+  onFormDataChange,
+  formData,
+}) => {
   //Structure for form data
   const [formSevenData, setFormSevenData] = useState({
     donatingMonth: null,
@@ -28,7 +32,7 @@ const StepEight: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormD
       }));
     };
 
- //Function to set form data (textboxes)
+  //Function to set form data (textboxes)
   const handleInputChange = (field: string, value: string) => {
     setFormSevenData((prevState) => ({
       ...prevState,
@@ -36,7 +40,6 @@ const StepEight: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormD
     }));
   };
 
- 
   // Populate the form state from the parent formData
   useEffect(() => {
     if (formData?.seventhForm) {
@@ -47,19 +50,22 @@ const StepEight: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormD
   //Function to submit form data
   const submitForm = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/appointments/save-appointment', formData, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-  
+      const response = await axios.post(
+        "http://localhost:5000/api/appointments/save-appointment",
+        formData,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
       if (response.status === 201) {
-        alert('Appointment created successfully');
+        alert("Appointment created successfully");
       }
     } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to create appointment');
+      console.error("Error submitting form:", error);
+      alert("Failed to create appointment");
     }
   };
-  
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -207,19 +213,22 @@ const StepEight: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormD
                 >
                   Date
                 </Label>
-                <Datepicker className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" value={
-                        formSevenData?.dateSigned
-                          ? new Date(formSevenData.dateSigned)
-                          : undefined
-                      }
-                      onChange={(date) => {
-                        if (date) {
-                          handleInputChange(
-                            "dateSigned",
-                            date.toISOString().split("T")[0]
-                          );
-                        }
-                      }} />
+                <Datepicker
+                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                  value={
+                    formSevenData?.dateSigned
+                      ? new Date(formSevenData.dateSigned)
+                      : undefined
+                  }
+                  onChange={(date) => {
+                    if (date) {
+                      handleInputChange(
+                        "dateSigned",
+                        date.toISOString().split("T")[0]
+                      );
+                    }
+                  }}
+                />
               </div>
             </div>
 
