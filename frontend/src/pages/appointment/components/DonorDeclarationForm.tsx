@@ -51,12 +51,12 @@ const BasicInfo = ({
     },
     firstForm: {
       isDonatedBefore: null,
-    timesOfDonation: "",
-    lastDonationDate: "",
-    isAnyDifficulty: null,
-    difficulty: "",
-    isMedicallyAdvised: null,
-    isLeafletRead: null,
+      timesOfDonation: "",
+      lastDonationDate: "",
+      isAnyDifficulty: null,
+      difficulty: "",
+      isMedicallyAdvised: null,
+      isLeafletRead: null,
     },
     secondForm: {
       isFeelingWell: null,
@@ -91,8 +91,8 @@ const BasicInfo = ({
     },
     seventhForm: {
       donatingMonth: null,
-    donorName: "",
-    dateSigned: "",
+      donorName: "",
+      dateSigned: "",
     },
   });
 
