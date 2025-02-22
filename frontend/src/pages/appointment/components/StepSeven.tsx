@@ -9,8 +9,12 @@ import { Label } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/types";
 
-const StepSeven: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormDataChange, formData }) => {
-
+const StepSeven: React.FC<StepperProps> = ({
+  onNextStep,
+  onPreviousStep,
+  onFormDataChange,
+  formData,
+}) => {
   //Structure for form data
   const [formSixData, setFormSixData] = useState({
     isInformed: null,
@@ -27,7 +31,7 @@ const StepSeven: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormD
       }));
     };
 
- //Function to move to next step
+  //Function to move to next step
   const handleNext = () => {
     onFormDataChange({
       ...formData,
@@ -36,13 +40,12 @@ const StepSeven: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormD
     onNextStep();
   };
 
-  
-    // Populate the form data from the parent form data
-    useEffect(() => {
-      if (formData?.sixthForm) {
-        setFormSixData(formData.sixthForm);
-      }
-    }, [formData]);
+  // Populate the form data from the parent form data
+  useEffect(() => {
+    if (formData?.sixthForm) {
+      setFormSixData(formData.sixthForm);
+    }
+  }, [formData]);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -76,7 +79,9 @@ const StepSeven: React.FC<StepperProps> = ({ onNextStep, onPreviousStep, onFormD
         <main className="mt-2 mb-16 flex justify-center items-center w-full max-w-4xl px-4 py-6 md:w-2/3 lg:w-3/4">
           <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg">
             <div className="mb-6 p-4 bg-red-200 rounded-lg">
-              <p className="text-red-700 font-semibold font-opensans">Important!</p>
+              <p className="text-red-700 font-semibold font-opensans">
+                Important!
+              </p>
             </div>
             <div className="mt-4 space-y-6">
               <div className="w-full">
