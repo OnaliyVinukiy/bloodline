@@ -10,24 +10,22 @@ import { BlobServiceClient } from "@azure/storage-blob";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
+import {
+  COSMOS_DB_CONNECTION_STRING,
+  DATABASE_ID,
+  DONOR_COLLECTION_ID,
+  CONTAINER_NAME,
+  AZURE_STORAGE_CONNECTION_STRING,
+} from "../config/azureConfig.js";
 
 const app = express();
 app.use(express.json());
 dotenv.config();
 
-// Azure Blob Storage Configuration
-const AZURE_STORAGE_CONNECTION_STRING =
-  process.env.AZURE_STORAGE_CONNECTION_STRING;
-const CONTAINER_NAME = "profile-pictures";
 const blobServiceClient = BlobServiceClient.fromConnectionString(
   AZURE_STORAGE_CONNECTION_STRING
 );
 const containerClient = blobServiceClient.getContainerClient(CONTAINER_NAME);
-
-// Azure DB Configuration
-const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
-const DATABASE_ID = "donorDB";
-const CONTAINER_ID = "donors";
 
 // Connect to DB using MongoClient
 const connectToCosmos = async () => {
@@ -38,7 +36,7 @@ const connectToCosmos = async () => {
     });
 
     const db = client.db(DATABASE_ID);
-    const collection = db.collection(CONTAINER_ID);
+    const collection = db.collection(DONOR_COLLECTION_ID);
 
     console.log("Connected to Cosmos DB");
     return { db, collection, client };
