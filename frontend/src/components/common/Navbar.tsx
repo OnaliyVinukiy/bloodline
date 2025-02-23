@@ -12,10 +12,12 @@ import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { User } from "../../types/types";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 export function Navigationbar() {
   const { state, signIn, signOut, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,6 +28,14 @@ export function Navigationbar() {
         try {
           setIsLoading(true);
           const accessToken = await getAccessToken();
+          const decodedToken: any = jwtDecode(accessToken);
+
+          // Check if the user is an Admin
+          if (decodedToken.roles && decodedToken.roles.includes("Admin")) {
+            setIsAdmin(true);
+          } else {
+            setIsAdmin(false);
+          }
 
           const response = await axios.post(
             "http://localhost:5000/api/user-info",
@@ -34,7 +44,6 @@ export function Navigationbar() {
           );
 
           setUser(response.data);
-          console.log("user", response.data);
         } catch (error) {
           console.error("Error fetching user info:", error);
         } finally {
@@ -48,6 +57,7 @@ export function Navigationbar() {
     fetchUserInfo();
   }, [state?.isAuthenticated, getAccessToken]);
 
+  //Loading Animation
   if (isLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
@@ -84,7 +94,7 @@ export function Navigationbar() {
         </span>
       </Navbar.Brand>
       <div className="flex md:order-2 md:mr-24">
-        {user ? (
+        {user && !isAdmin ? (
           <Dropdown
             arrowIcon={false}
             inline
@@ -111,6 +121,36 @@ export function Navigationbar() {
             </Dropdown.Item>
             <Dropdown.Item>Donations</Dropdown.Item>
             <Dropdown.Item>Appointments</Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
+          </Dropdown>
+        ) : user && isAdmin ? (
+          <Dropdown
+            arrowIcon={false}
+            inline
+            label={
+              user.avatar ? (
+                <Avatar alt="User settings" img={user.avatar} rounded />
+              ) : (
+                <div className="w-10 h-10 flex items-center justify-center bg-gray-300 rounded-full">
+                  <UserIcon className="w-6 h-6 text-gray-600" />
+                </div>
+              )
+            }
+          >
+            <Dropdown.Header>
+              <span className="block text-sm">
+                {user.firstName} {user.lastName}
+              </span>
+              <span className="block truncate text-sm font-medium">
+                {user.email}
+              </span>
+            </Dropdown.Header>
+            <Dropdown.Item onClick={() => navigate("/profile")}>
+              Admin Dashboard
+            </Dropdown.Item>
+            <Dropdown.Item>Appointments</Dropdown.Item>
+            <Dropdown.Item>Campaigns</Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
           </Dropdown>
