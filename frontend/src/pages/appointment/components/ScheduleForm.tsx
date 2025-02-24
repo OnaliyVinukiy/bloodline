@@ -10,6 +10,7 @@ import { Button, Label } from "flowbite-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { StepperProps } from "../../../types/types";
+import axios from "axios";
 
 const ScheduleForm: React.FC<StepperProps> = ({
   onNextStep,
@@ -19,6 +20,46 @@ const ScheduleForm: React.FC<StepperProps> = ({
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+
+  //Convert the date format
+  const getFormattedDate = (date: Date) => {
+    const offsetDate = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    );
+    return offsetDate.toISOString().split("T")[0];
+  };
+
+  //Fetch booked slots
+  useEffect(() => {
+    if (selectedDate) {
+      const fetchBookedSlots = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:5000/api/appointments/${getFormattedDate(
+              selectedDate
+            )}`
+          );
+
+          const slots = response.data.map(
+            (appointment: any) => appointment.selectedSlot
+          );
+          setBookedSlots(slots);
+        } catch (error) {
+          console.error("Error fetching booked slots:", error);
+        }
+      };
+      fetchBookedSlots();
+    }
+  }, [selectedDate]);
+
+  //Format selected date
+  useEffect(() => {
+    if (selectedDate && selectedSlot) {
+      const formattedDate = getFormattedDate(selectedDate);
+      onFormDataChange({ selectedDate: formattedDate, selectedSlot });
+    }
+  }, [selectedDate, selectedSlot, onFormDataChange]);
 
   // Generate time slots with intervals
   const generateTimeSlots = () => {
@@ -41,13 +82,6 @@ const ScheduleForm: React.FC<StepperProps> = ({
   };
 
   const timeSlots = generateTimeSlots();
-
-  // Set the form data when the date and time slot is selected
-  useEffect(() => {
-    if (selectedDate && selectedSlot) {
-      onFormDataChange({ selectedDate, selectedSlot });
-    }
-  }, [selectedDate, selectedSlot, onFormDataChange]);
 
   return (
     <div className="flex justify-center items-center bg-gray-100">
