@@ -85,11 +85,12 @@ export function Navigationbar() {
     <Navbar fluid rounded>
       <Navbar.Brand href="/" className="md:ml-24 h-6 sm:h-9">
         <img
-          src="src/assets/bloodlogo.png"
-          className="mr-3 h-6 sm:h-9"
+          src="https://bloodlineresources.blob.core.windows.net/assets/logo.png"
+          className="mb-8 mt-2 mr-3 h-16 sm:h-16 "
           alt="Bloodline Logo"
         />
-        <span className="self-center whitespace-nowrap text-xl font-semibold ">
+
+        <span className="mt-1 self-center whitespace-nowrap text-xl font-semibold ">
           Bloodline
         </span>
       </Navbar.Brand>
@@ -149,7 +150,10 @@ export function Navigationbar() {
             <Dropdown.Item onClick={() => navigate("/profile")}>
               Admin Dashboard
             </Dropdown.Item>
-            <Dropdown.Item>Appointments</Dropdown.Item>
+            <Dropdown.Item onClick={() => navigate("/admin/appointments")}>
+              {" "}
+              Appointments
+            </Dropdown.Item>
             <Dropdown.Item>Campaigns</Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
