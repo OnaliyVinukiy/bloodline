@@ -11,18 +11,27 @@ import { FooterComponent } from "./components/common/Footer";
 import { Navigationbar } from "./components/common/Navbar";
 import EligibilityCriteria from "./pages/eligibility/Eligibility";
 import Profile from "./pages/profile/Profile";
+import DonorDeclaration from "./pages/appointment/DonorDeclaration";
+import Appointments from "./pages/admin/Appointments";
+import PendingAppointments from "./pages/admin/PendingAppointments";
 
 function App() {
   return (
-    <Router>
-      <Navigationbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/eligibility" element={<EligibilityCriteria />} />
-        <Route path="/profile" element={<Profile />} />
-      </Routes>
-      <FooterComponent />
-    </Router>
+    <div className="flex flex-col min-h-screen">
+      <Router>
+        <Navigationbar />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/eligibility" element={<EligibilityCriteria />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/donorDeclaration" element={<DonorDeclaration />} />
+            <Route path="/admin/appointments" element={<Appointments />} />
+          </Routes>
+        </main>
+        <FooterComponent />
+      </Router>
+    </div>
   );
 }
 
