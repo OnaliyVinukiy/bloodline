@@ -101,7 +101,7 @@ const uploadAvatar = async (req, res) => {
     const mongoClient = new MongoClient(COSMOS_DB_CONNECTION_STRING);
     await mongoClient.connect();
     const database = mongoClient.db(DATABASE_ID);
-    const donorsCollection = database.collection(CONTAINER_ID);
+    const donorsCollection = database.collection(DONOR_COLLECTION_ID);
 
     await donorsCollection.updateOne(
       { email },
@@ -141,6 +141,7 @@ const upsertDonor = async (req, res) => {
   }
 };
 
+//Fetch donor by email
 const getDonorByEmail = async (req, res) => {
   try {
     const { collection, client } = await connectToCosmos();
