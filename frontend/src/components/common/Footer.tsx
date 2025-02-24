@@ -11,10 +11,7 @@ import { Footer } from "flowbite-react";
 
 export function FooterComponent() {
   return (
-    <Footer
-      container
-      className="bg-gray-800 text-white !rounded-none"
-    >
+    <Footer container className="mb-0 bg-gray-800 text-white !rounded-none">
       <div className="w-full text-center">
         <div className="w-full justify-between sm:flex sm:items-center sm:justify-between">
           <Footer.Brand
@@ -24,11 +21,10 @@ export function FooterComponent() {
             alt="Bloodline Logo"
           >
             <span className="self-center text-white whitespace-nowrap text-xl font-semibold">
-              Bloodline  
+              Bloodline
             </span>
-            
           </Footer.Brand>
-          
+
           <Footer.LinkGroup className="mr-8">
             <Footer.Link href="#" className="hover:text-white">
               About
