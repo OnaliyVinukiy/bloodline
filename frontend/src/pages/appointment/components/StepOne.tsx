@@ -8,6 +8,7 @@
 import { Datepicker, Label } from "flowbite-react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { UserIcon } from "@heroicons/react/24/solid";
 import { BloodDonor, Donor, StepperProps, User } from "../../../types/types";
 import { useAuthContext } from "@asgardeo/auth-react";
 
@@ -47,6 +48,9 @@ const StepOne: React.FC<StepperProps> = ({
     }
   };
   const [isProfileComplete, setIsProfileComplete] = useState(false);
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch user info from Asgardeo
@@ -105,6 +109,46 @@ const StepOne: React.FC<StepperProps> = ({
     return age;
   };
 
+  // Handle file selection for avatar
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+      setSelectedFile(file);
+
+      // Create an object URL for image preview
+      const imageUrl = URL.createObjectURL(file);
+      setDonor((prev) => ({ ...prev, avatar: imageUrl }));
+    }
+  };
+
+  // Handle avatar upload
+  const handleAvatarUpdate = async () => {
+    if (!selectedFile || !user?.email) return;
+    setIsUploading(true);
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("email", user.email);
+
+    try {
+      const { data } = await axios.post(
+        "http://localhost:5000/api/upload-avatar",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      // Update the donor record with new avatar URL
+      setDonor((prev) => ({ ...prev, avatar: data.avatarUrl }));
+
+      alert("Avatar updated successfully!");
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      alert("Error updating avatar.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   //Save donor information to the form data
   const handleNext = () => {
     onFormDataChange({
@@ -152,6 +196,45 @@ const StepOne: React.FC<StepperProps> = ({
         <main className="mt-2 mb-16 flex justify-center items-center w-full max-w-4xl px-4 py-6 md:w-2/3 lg:w-3/4">
           <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg">
             <div className="mt-4 space-y-6">
+              <div className="lg:ml-4 flex justify-center items-center flex-col sm:flex-row sm:space-y-0 sm:space-x-6">
+                {donor?.avatar ? (
+                  <img
+                    className="object-cover w-40 h-40 p-1 rounded-full ring-2 ring-red-300"
+                    src={donor.avatar}
+                    alt="User Avatar"
+                  />
+                ) : (
+                  <div className="w-40 h-40 p-1 rounded-full ring-2 ring-red-300 flex items-center justify-center bg-gray-300">
+                    <UserIcon className="w-12 h-12 text-gray-600" />
+                  </div>
+                )}
+
+                <input
+                  type="file"
+                  id="avatar"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  accept="image/*"
+                />
+
+                <div className="ml-4">
+                  <button
+                    onClick={() => document.getElementById("avatar")?.click()}
+                    className="px-4 py-2 text-sm text-indigo-600 hover:text-indigo-800"
+                  >
+                    Change Avatar
+                  </button>
+                  {selectedFile && (
+                    <button
+                      onClick={handleAvatarUpdate}
+                      className="ml-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                      disabled={isUploading}
+                    >
+                      {isUploading ? "Uploading..." : "Upload"}
+                    </button>
+                  )}
+                </div>
+              </div>
               <div className="w-full">
                 <Label
                   htmlFor="fullName"
