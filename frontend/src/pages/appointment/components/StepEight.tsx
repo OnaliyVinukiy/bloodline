@@ -47,9 +47,30 @@ const StepEight: React.FC<StepperProps> = ({
     }
   }, [formData]);
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+
   //Function to submit form data
   const submitForm = async () => {
     try {
+      const newErrors: { [key: string]: string } = {};
+
+      // Check if necessary fields are filled
+      if (!formSevenData.donatingMonth)
+        newErrors.month = "Please select an option.";
+      if (!formSevenData.donorName) newErrors.name = "Please enter your name.";
+      if (!formSevenData.dateSigned) newErrors.date = "Please enter the date.";
+
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        setShowErrorMessage(true);
+        return;
+      }
+
+      setErrors({});
+      setShowErrorMessage(false);
+
+      //Submit appointment data
       const response = await axios.post(
         "http://localhost:5000/api/appointments/save-appointment",
         formData,
@@ -66,32 +87,6 @@ const StepEight: React.FC<StepperProps> = ({
       alert("Failed to create appointment");
     }
   };
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  //Loading animation
-  if (isLoading) {
-    return (
-      <div className="loading flex justify-center items-center h-screen">
-        <svg width="64px" height="48px">
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="back"
-            stroke="#e53e3e"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="front"
-            stroke="#f56565"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-        </svg>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -183,6 +178,9 @@ const StepEight: React.FC<StepperProps> = ({
                       Once a year
                     </label>
                   </div>
+                  {errors.month && (
+                    <div className="text-red-500 text-sm">{errors.month}</div>
+                  )}
                 </div>
               </div>
 
@@ -207,8 +205,11 @@ const StepEight: React.FC<StepperProps> = ({
                     handleInputChange("donorName", e.target.value)
                   }
                 />
+                {errors.name && (
+                  <div className="text-red-500 text-sm">{errors.name}</div>
+                )}
                 <Label
-                  htmlFor="fullName"
+                  htmlFor="date"
                   className="mt-4 block mb-2 text-sm font-medium text-indigo-900"
                 >
                   Date
@@ -229,6 +230,9 @@ const StepEight: React.FC<StepperProps> = ({
                     }
                   }}
                 />
+                {errors.date && (
+                  <div className="text-red-500 text-sm">{errors.date}</div>
+                )}
               </div>
             </div>
 
@@ -239,6 +243,11 @@ const StepEight: React.FC<StepperProps> = ({
               >
                 Back
               </button>
+              {showErrorMessage && (
+                <p className="text-red-500 text-sm mt-2">
+                  Please fill all required fields before proceeding.
+                </p>
+              )}
               <button
                 onClick={submitForm}
                 className="px-4 py-2 text-white bg-red-800 rounded-lg hover:bg-red-700"
