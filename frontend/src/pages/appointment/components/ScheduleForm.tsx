@@ -21,7 +21,7 @@ const ScheduleForm: React.FC<StepperProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
-
+  const [isLoading, setIsLoading] = useState(false);
   //Convert the date format
   const getFormattedDate = (date: Date) => {
     const offsetDate = new Date(
@@ -33,6 +33,7 @@ const ScheduleForm: React.FC<StepperProps> = ({
   //Fetch booked slots
   useEffect(() => {
     if (selectedDate) {
+      setIsLoading(true);
       const fetchBookedSlots = async () => {
         try {
           const response = await axios.get(
@@ -45,6 +46,7 @@ const ScheduleForm: React.FC<StepperProps> = ({
             (appointment: any) => appointment.selectedSlot
           );
           setBookedSlots(slots);
+          setIsLoading(false);
         } catch (error) {
           console.error("Error fetching booked slots:", error);
         }
@@ -112,8 +114,28 @@ const ScheduleForm: React.FC<StepperProps> = ({
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 rounded-lg p-2 w-full"
                 />
               </div>
+              {selectedDate && isLoading && (
+                <div className="loading flex justify-center mt-4">
+                  <svg width="64px" height="48px">
+                    <polyline
+                      points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+                      id="back"
+                      stroke="#e53e3e"
+                      strokeWidth="2"
+                      fill="none"
+                    ></polyline>
+                    <polyline
+                      points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+                      id="front"
+                      stroke="#f56565"
+                      strokeWidth="2"
+                      fill="none"
+                    ></polyline>
+                  </svg>
+                </div>
+              )}
 
-              {selectedDate && (
+              {selectedDate && !isLoading && (
                 <div>
                   <Label
                     htmlFor="time-slots"
@@ -122,33 +144,35 @@ const ScheduleForm: React.FC<StepperProps> = ({
                     Select an Available Time Slot
                   </Label>
                   <div className="mt-4 flex flex-wrap gap-5">
-                    {timeSlots.map((slot, index) => (
-                      <Button
-                        key={index}
-                        onClick={() => setSelectedSlot(slot)}
-                        color={selectedSlot === slot ? "success" : "light"}
-                      >
-                        <svg
-                          className="w-5 h-5 text-black me-2"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
+                    <div className="mt-4 flex flex-wrap gap-5">
+                      {timeSlots.map((slot, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setSelectedSlot(slot)}
+                          color={selectedSlot === slot ? "success" : "light"}
+                          disabled={bookedSlots.includes(slot)}
                         >
-                          <path
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                          />
-                        </svg>
-
-                        {slot}
-                      </Button>
-                    ))}
+                          <svg
+                            className="w-5 h-5 text-black me-2"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                            />
+                          </svg>
+                          {slot}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -162,7 +186,12 @@ const ScheduleForm: React.FC<StepperProps> = ({
               </button>
               <button
                 onClick={onNextStep}
-                className="focus:outline-none text-white bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                className={`focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ${
+                  !selectedDate || !selectedSlot
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300"
+                }`}
+                disabled={!selectedDate || !selectedSlot}
               >
                 Next
               </button>
