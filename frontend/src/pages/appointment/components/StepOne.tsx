@@ -20,6 +20,9 @@ const StepOne: React.FC<StepperProps> = ({
 }) => {
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
+  const [errors, setErrors] = useState<{ [key in keyof BloodDonor]?: string }>(
+    {}
+  );
 
   //Structure for donor information
   const [donor, setDonor] = useState<BloodDonor>({
@@ -149,12 +152,37 @@ const StepOne: React.FC<StepperProps> = ({
     }
   };
 
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+
   //Save donor information to the form data
   const handleNext = () => {
+    //Error helper texts to display if fields are empty
+    const newErrors: { [key in keyof BloodDonor]?: string } = {};
+
+    if (!donor.nic) newErrors.nic = "NIC is required.";
+    if (!donor.fullName) newErrors.fullName = "Full Name is required.";
+    if (!donor.email) newErrors.email = "Email is required.";
+    if (!donor.contactNumber)
+      newErrors.contactNumber = "Contact number is required.";
+    if (!donor.address) newErrors.address = "Address is required.";
+    if (!donor.birthdate) newErrors.birthdate = "Birthdate is required.";
+    if (!donor.bloodGroup) newErrors.bloodGroup = "Blood Group is required.";
+    if (!donor.gender) newErrors.gender = "Gender is required.";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setShowErrorMessage(true);
+      return;
+    }
+
+    setErrors({});
+    setShowErrorMessage(false);
+
     onFormDataChange({
       ...formData,
       donorInfo: donor,
     });
+
     onNextStep();
   };
 
@@ -184,12 +212,11 @@ const StepOne: React.FC<StepperProps> = ({
   if (!user) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p className="text-lg text-gray-700">
-          Please login to view profile data
-        </p>
+        <p className="text-lg text-gray-700">Please login to fill the form</p>
       </div>
     );
   }
+
   return (
     <div>
       <div className="flex justify-center items-center bg-gray-100">
@@ -241,7 +268,7 @@ const StepOne: React.FC<StepperProps> = ({
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
                   {" "}
-                  Full Name (As in NIC)
+                  Full Name (As in NIC)*
                 </Label>
                 <input
                   type="text"
@@ -250,7 +277,11 @@ const StepOne: React.FC<StepperProps> = ({
                     handleInputChange("fullName", e.target.value)
                   }
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                  required
                 />
+                {errors.fullName && (
+                  <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>
+                )}
               </div>
               <div className="w-full">
                 <Label
@@ -258,7 +289,7 @@ const StepOne: React.FC<StepperProps> = ({
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
                   {" "}
-                  Email
+                  Email*
                 </Label>
                 <input
                   type="email"
@@ -266,6 +297,9 @@ const StepOne: React.FC<StepperProps> = ({
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                   disabled
                 />
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                )}
               </div>
 
               <div className="w-full">
@@ -274,7 +308,7 @@ const StepOne: React.FC<StepperProps> = ({
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
                   {" "}
-                  NIC
+                  NIC*
                 </Label>
                 <input
                   type="text"
@@ -282,6 +316,9 @@ const StepOne: React.FC<StepperProps> = ({
                   onChange={(e) => handleInputChange("nic", e.target.value)}
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
+                {errors.nic && (
+                  <p className="text-red-500 text-xs mt-1">{errors.nic}</p>
+                )}
               </div>
 
               <div className="w-full">
@@ -289,7 +326,7 @@ const StepOne: React.FC<StepperProps> = ({
                   htmlFor="gender"
                   className="mt-1 block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  Gender
+                  Gender*
                 </Label>
                 <div className="mt-4 flex items-center">
                   <input
@@ -324,6 +361,9 @@ const StepOne: React.FC<StepperProps> = ({
                   <Label htmlFor="female" className="text-sm text-indigo-900">
                     Female
                   </Label>
+                  {errors.gender && (
+                    <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
+                  )}
                 </div>
               </div>
 
@@ -332,7 +372,7 @@ const StepOne: React.FC<StepperProps> = ({
                   htmlFor="fullName"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  Address (Home)
+                  Address (Home)*
                 </Label>
                 <input
                   type="text"
@@ -340,6 +380,9 @@ const StepOne: React.FC<StepperProps> = ({
                   onChange={(e) => handleInputChange("address", e.target.value)}
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
+                {errors.address && (
+                  <p className="text-red-500 text-xs mt-1">{errors.address}</p>
+                )}
               </div>
               <div>
                 <Label
@@ -364,7 +407,7 @@ const StepOne: React.FC<StepperProps> = ({
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
                   {" "}
-                  Contact Number (Mobile)
+                  Contact Number (Mobile)*
                 </Label>
                 <input
                   type="text"
@@ -374,6 +417,11 @@ const StepOne: React.FC<StepperProps> = ({
                   }
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
+                {errors.contactNumber && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.contactNumber}
+                  </p>
+                )}
               </div>
               <div className="w-full">
                 <Label
@@ -415,7 +463,7 @@ const StepOne: React.FC<StepperProps> = ({
                   htmlFor="fullName"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  Blood Group
+                  Blood Group*
                 </Label>
                 <input
                   type="text"
@@ -425,6 +473,11 @@ const StepOne: React.FC<StepperProps> = ({
                   }
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
+                {errors.bloodGroup && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.bloodGroup}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -432,7 +485,7 @@ const StepOne: React.FC<StepperProps> = ({
                   htmlFor="fullName"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  Date of Birth
+                  Date of Birth*
                 </Label>
                 <Datepicker
                   value={
@@ -448,6 +501,11 @@ const StepOne: React.FC<StepperProps> = ({
                   }}
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
+                {errors.birthdate && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.birthdate}
+                  </p>
+                )}
               </div>
 
               {donor?.birthdate && (
@@ -470,13 +528,19 @@ const StepOne: React.FC<StepperProps> = ({
               <div className="flex justify-between mt-6">
                 <button
                   onClick={onPreviousStep}
-                  className="px-4 py-2 text-white bg-gray-600 rounded-lg hover:bg-gray-400"
+                  className="text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-md px-5 py-2.5 text-center me-2 mb-2 dark:hover:text-white "
                 >
                   Back
                 </button>
+                {showErrorMessage && (
+                  <p className="text-red-500 text-sm mt-2">
+                    Please fill all required fields before proceeding.
+                  </p>
+                )}
+
                 <button
                   onClick={handleNext}
-                  className="px-4 py-2 text-white bg-red-800 rounded-lg hover:bg-red-700"
+                  className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300"
                 >
                   Next
                 </button>
