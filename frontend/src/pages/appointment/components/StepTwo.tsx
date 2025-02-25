@@ -6,7 +6,7 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import React, { useState, useEffect } from "react";
-import { Datepicker, Label } from "flowbite-react";
+import { Button, Datepicker, Label, Modal } from "flowbite-react";
 import { StepperProps } from "../../../types/types";
 
 const StepTwo: React.FC<StepperProps> = ({
@@ -28,6 +28,7 @@ const StepTwo: React.FC<StepperProps> = ({
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   // Populate the form data from the parent form data
   useEffect(() => {
@@ -66,7 +67,6 @@ const StepTwo: React.FC<StepperProps> = ({
       newErrors.lastDonationDate = "Last donation date is required.";
     if (formOneData.isAnyDifficulty === "yes" && !formOneData.difficulty)
       newErrors.difficulty = "Please specify the difficulty.";
-
     if (!formOneData.isMedicallyAdvised)
       newErrors.isMedicallyAdvised = "Medical advice status is required.";
     if (!formOneData.isLeafletRead)
@@ -76,6 +76,19 @@ const StepTwo: React.FC<StepperProps> = ({
       setErrors(newErrors);
       setShowErrorMessage(true);
       return;
+    }
+
+    // Check if last donation was within the last 6 months
+    if (formOneData.isDonatedBefore === "yes" && formOneData.lastDonationDate) {
+      const lastDonation = new Date(formOneData.lastDonationDate);
+      const today = new Date();
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(today.getMonth() - 6);
+
+      if (lastDonation > sixMonthsAgo) {
+        setShowModal(true);
+        return;
+      }
     }
 
     setErrors({});
@@ -349,6 +362,20 @@ const StepTwo: React.FC<StepperProps> = ({
             </div>
           </div>
         </main>
+        <Modal show={showModal} onClose={() => setShowModal(false)}>
+          <Modal.Header>Donation Eligibility</Modal.Header>
+          <Modal.Body>
+            <p className="text-lg text-gray-700">
+              You cannot donate blood as your last donation was less than 6
+              months ago. Please wait until you are eligible.
+            </p>
+          </Modal.Body>
+          <Modal.Footer className="flex justify-end">
+            <Button color="failure" onClick={() => setShowModal(false)}>
+              OK
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     </div>
   );
