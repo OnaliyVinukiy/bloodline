@@ -30,12 +30,32 @@ const StepFour: React.FC<StepperProps> = ({
       }));
     };
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
   //Function to move to next step
   const handleNext = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    // Check if necessary fields are filled
+    if (!formThreeData.hadHepatitis || !formThreeData.hadTyphoid)
+      newErrors.isEmpty = "Please select an option.";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setShowErrorMessage(true);
+      return;
+    }
+
+    setErrors({});
+    setShowErrorMessage(false);
+
     onFormDataChange({
       ...formData,
       thirdForm: formThreeData,
     });
+
     onNextStep();
   };
 
@@ -109,6 +129,9 @@ const StepFour: React.FC<StepperProps> = ({
                     No
                   </label>
                 </div>
+                {errors.isEmpty && (
+                  <div className="text-red-500 text-sm">{errors.isEmpty}</div>
+                )}
               </div>
 
               <div className="mt-6 space-y-6">
@@ -144,6 +167,9 @@ const StepFour: React.FC<StepperProps> = ({
                       No
                     </label>
                   </div>
+                  {errors.isEmpty && (
+                    <div className="text-red-500 text-sm">{errors.isEmpty}</div>
+                  )}
                 </div>
               </div>
             </div>
