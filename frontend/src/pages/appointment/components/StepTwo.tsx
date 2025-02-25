@@ -5,8 +5,8 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { Datepicker, Label } from "flowbite-react";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Button, Datepicker, Label, Modal } from "flowbite-react";
 import { StepperProps } from "../../../types/types";
 
 const StepTwo: React.FC<StepperProps> = ({
@@ -15,7 +15,7 @@ const StepTwo: React.FC<StepperProps> = ({
   onFormDataChange,
   formData,
 }) => {
-  //Structure for the blood donor data
+  //Structure for form data
   const [formOneData, setFormOneData] = useState({
     isDonatedBefore: null,
     timesOfDonation: "",
@@ -26,31 +26,9 @@ const StepTwo: React.FC<StepperProps> = ({
     isLeafletRead: null,
   });
 
-  //Function to set form data (radiobuttons)
-  const handleRadioChange =
-    (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setFormOneData((prevState) => ({
-        ...prevState,
-        [field]: event.target.value,
-      }));
-    };
-
-  //Function to set form data (textboxes)
-  const handleInputChange = (field: string, value: string) => {
-    setFormOneData((prevState) => ({
-      ...prevState,
-      [field]: value,
-    }));
-  };
-
-  //Function to move to next step
-  const handleNext = () => {
-    onFormDataChange({
-      ...formData,
-      firstForm: formOneData,
-    });
-    onNextStep();
-  };
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   // Populate the form data from the parent form data
   useEffect(() => {
@@ -59,31 +37,70 @@ const StepTwo: React.FC<StepperProps> = ({
     }
   }, [formData]);
 
-  const [isLoading, setIsLoading] = useState(false);
+  //Function to set form data (radio buttons)
+  const handleRadioChange =
+    (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setFormOneData((prevState) => ({
+        ...prevState,
+        [field]: event.target.value,
+      }));
+    };
 
-  //Loading animation
-  if (isLoading) {
-    return (
-      <div className="loading flex justify-center items-center h-screen">
-        <svg width="64px" height="48px">
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="back"
-            stroke="#e53e3e"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="front"
-            stroke="#f56565"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-        </svg>
-      </div>
-    );
-  }
+  //Function to set form data (text fields)
+  const handleInputChange = (field: string, value: string) => {
+    setFormOneData((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
+  };
+
+  //Save form data and move to next step
+  const handleNext = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    // Check if necessary fields are filled
+    if (!formOneData.isDonatedBefore)
+      newErrors.isDonatedBefore = "Donation history is required.";
+    if (formOneData.isDonatedBefore === "yes" && !formOneData.timesOfDonation)
+      newErrors.timesOfDonation = "Times of donation is required.";
+    if (formOneData.isDonatedBefore === "yes" && !formOneData.lastDonationDate)
+      newErrors.lastDonationDate = "Last donation date is required.";
+    if (formOneData.isAnyDifficulty === "yes" && !formOneData.difficulty)
+      newErrors.difficulty = "Please specify the difficulty.";
+    if (!formOneData.isMedicallyAdvised)
+      newErrors.isMedicallyAdvised = "Medical advice status is required.";
+    if (!formOneData.isLeafletRead)
+      newErrors.isLeafletRead = "Leaflet read status is required.";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setShowErrorMessage(true);
+      return;
+    }
+
+    // Check if last donation was within the last 6 months
+    if (formOneData.isDonatedBefore === "yes" && formOneData.lastDonationDate) {
+      const lastDonation = new Date(formOneData.lastDonationDate);
+      const today = new Date();
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(today.getMonth() - 6);
+
+      if (lastDonation > sixMonthsAgo) {
+        setShowModal(true);
+        return;
+      }
+    }
+
+    setErrors({});
+    setShowErrorMessage(false);
+
+    onFormDataChange({
+      ...formData,
+      firstForm: formOneData,
+    });
+
+    onNextStep();
+  };
 
   return (
     <div>
@@ -122,10 +139,15 @@ const StepTwo: React.FC<StepperProps> = ({
                     No
                   </label>
                 </div>
+                {errors.isDonatedBefore && (
+                  <div className="text-red-500 text-sm">
+                    {errors.isDonatedBefore}
+                  </div>
+                )}
               </div>
 
               {formOneData.isDonatedBefore === "yes" && (
-                <div>
+                <>
                   <div className="mt-4 w-full">
                     <Label
                       htmlFor="timesOfDonation"
@@ -136,15 +158,20 @@ const StepTwo: React.FC<StepperProps> = ({
                     <input
                       type="text"
                       value={formOneData.timesOfDonation}
-                      className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                       onChange={(e) =>
                         handleInputChange("timesOfDonation", e.target.value)
                       }
+                      className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     />
+                    {errors.timesOfDonation && (
+                      <div className="text-red-500 text-sm">
+                        {errors.timesOfDonation}
+                      </div>
+                    )}
                   </div>
                   <div className="mt-4 w-full">
                     <Label
-                      htmlFor="first_name"
+                      htmlFor="lastDonationDate"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
                       1.2.) Date of last donation
@@ -152,7 +179,7 @@ const StepTwo: React.FC<StepperProps> = ({
                     <Datepicker
                       className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                       value={
-                        formOneData?.lastDonationDate
+                        formOneData.lastDonationDate
                           ? new Date(formOneData.lastDonationDate)
                           : undefined
                       }
@@ -165,13 +192,18 @@ const StepTwo: React.FC<StepperProps> = ({
                         }
                       }}
                     />
+                    {errors.lastDonationDate && (
+                      <div className="text-red-500 text-sm">
+                        {errors.lastDonationDate}
+                      </div>
+                    )}
                   </div>
                   <div className="mt-4 w-full">
                     <Label
                       htmlFor="difficulty"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
-                      1.3.) Did you experience any ailment, difficulty or
+                      1.3.) Did you experience any ailment, difficulty, or
                       discomfort during previous donations?
                     </Label>
                     <div className="flex items-center space-x-4">
@@ -214,15 +246,21 @@ const StepTwo: React.FC<StepperProps> = ({
                           }
                           className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                         />
+                        {errors.difficulty && (
+                          <div className="text-red-500 text-sm">
+                            {errors.difficulty}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
-                </div>
+                </>
               )}
+
               <div className="mt-6 space-y-6">
                 <div className="w-full">
                   <Label
-                    htmlFor="donatedBefore"
+                    htmlFor="medicallyAdvised"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
                     2.) Have you ever been medically advised not to donate
@@ -252,12 +290,18 @@ const StepTwo: React.FC<StepperProps> = ({
                       No
                     </label>
                   </div>
+                  {errors.isMedicallyAdvised && (
+                    <div className="text-red-500 text-sm">
+                      {errors.isMedicallyAdvised}
+                    </div>
+                  )}
                 </div>
               </div>
+
               <div className="mt-6 space-y-6">
                 <div className="w-full">
                   <Label
-                    htmlFor="donatedBefore"
+                    htmlFor="leafletRead"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
                     3.) Have you read and understood the "Blood donors
@@ -287,6 +331,11 @@ const StepTwo: React.FC<StepperProps> = ({
                       No
                     </label>
                   </div>
+                  {errors.isLeafletRead && (
+                    <div className="text-red-500 text-sm">
+                      {errors.isLeafletRead}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -298,15 +347,35 @@ const StepTwo: React.FC<StepperProps> = ({
               >
                 Back
               </button>
+              {showErrorMessage && (
+                <p className="text-red-500 text-sm mt-2">
+                  Please fill all required fields before proceeding.
+                </p>
+              )}
+
               <button
                 onClick={handleNext}
-                className="px-4 py-2 text-white bg-red-800 rounded-lg hover:bg-red-700"
+                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300"
               >
                 Next
               </button>
             </div>
           </div>
         </main>
+        <Modal show={showModal} onClose={() => setShowModal(false)}>
+          <Modal.Header>Donation Eligibility</Modal.Header>
+          <Modal.Body>
+            <p className="text-lg text-gray-700">
+              You cannot donate blood as your last donation was less than 6
+              months ago. Please wait until you are eligible.
+            </p>
+          </Modal.Body>
+          <Modal.Footer className="flex justify-end">
+            <Button color="failure" onClick={() => setShowModal(false)}>
+              OK
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     </div>
   );

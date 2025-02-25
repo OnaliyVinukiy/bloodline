@@ -156,7 +156,8 @@ const StepOne: React.FC<StepperProps> = ({
 
   //Save donor information to the form data
   const handleNext = () => {
-    //Error helper texts to display if fields are empty
+
+    // Check if necessary fields are filled
     const newErrors: { [key in keyof BloodDonor]?: string } = {};
 
     if (!donor.nic) newErrors.nic = "NIC is required.";
