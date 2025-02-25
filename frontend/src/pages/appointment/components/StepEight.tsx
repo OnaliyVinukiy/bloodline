@@ -239,13 +239,13 @@ const StepEight: React.FC<StepperProps> = ({
             <div className="flex justify-between mt-6">
               <button
                 onClick={onPreviousStep}
-                className="px-4 py-2 text-white bg-gray-600 rounded-lg hover:bg-gray-400"
+                className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
               >
                 Back
               </button>
               {showErrorMessage && (
                 <p className="text-red-500 text-sm mt-2">
-                  Please fill all required fields before proceeding.
+                  Please fill all required fields
                 </p>
               )}
               <button
