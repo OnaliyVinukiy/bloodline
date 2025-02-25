@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 import { UserIcon } from "@heroicons/react/24/solid";
-import { User } from "../../types/types";
+import { Donor, User } from "../../types/types";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
@@ -20,6 +20,18 @@ export function Navigationbar() {
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [donor, setDonor] = useState<Donor>({
+    nic: "",
+    fullName: "",
+    email: user?.email || "",
+    contactNumber: "",
+    address: "",
+    birthdate: "",
+    age: 0,
+    bloodGroup: "",
+    avatar: "",
+    gender: "",
+  });
 
   // Fetch and assign user info
   useEffect(() => {
@@ -44,6 +56,7 @@ export function Navigationbar() {
           );
 
           setUser(response.data);
+          console.log(response.data);
         } catch (error) {
           console.error("Error fetching user info:", error);
         } finally {
@@ -56,6 +69,32 @@ export function Navigationbar() {
 
     fetchUserInfo();
   }, [state?.isAuthenticated, getAccessToken]);
+
+  // Fetch donor info after user info is fetched
+  useEffect(() => {
+    const fetchDonorInfo = async () => {
+      if (user) {
+        try {
+          setIsLoading(true);
+
+          // Fetch donor info using the user's email
+          const { data: donorInfo } = await axios.get(
+            `http://localhost:5000/api/donor/${user.email}`
+          );
+
+          if (donorInfo) {
+            setDonor(donorInfo);
+          }
+        } catch (error) {
+          console.error("Error fetching donor info:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchDonorInfo();
+  }, [user]);
 
   //Loading Animation
   if (isLoading) {
@@ -102,6 +141,8 @@ export function Navigationbar() {
             label={
               user.avatar ? (
                 <Avatar alt="User settings" img={user.avatar} rounded />
+              ) : donor.avatar ? (
+                <Avatar alt="User settings" img={donor.avatar} rounded />
               ) : (
                 <div className="w-10 h-10 flex items-center justify-center bg-gray-300 rounded-full">
                   <UserIcon className="w-6 h-6 text-gray-600" />
