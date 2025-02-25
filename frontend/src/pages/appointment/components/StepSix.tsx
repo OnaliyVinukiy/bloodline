@@ -32,12 +32,36 @@ const StepSix: React.FC<StepperProps> = ({
       }));
     };
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+
   //Function to move to next step
   const handleNext = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    // Check if necessary fields are filled
+    if (
+      !formFiveData.hadAntibiotic ||
+      !formFiveData.hadDengue ||
+      !formFiveData.hadDentalExtraction ||
+      !formFiveData.hadOtherFever
+    )
+      newErrors.isEmpty = "Please select an option.";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setShowErrorMessage(true);
+      return;
+    }
+
+    setErrors({});
+    setShowErrorMessage(false);
+
     onFormDataChange({
       ...formData,
       fifthForm: formFiveData,
     });
+
     onNextStep();
   };
 
@@ -111,6 +135,9 @@ const StepSix: React.FC<StepperProps> = ({
                     No
                   </label>
                 </div>
+                {errors.isEmpty && (
+                  <div className="text-red-500 text-sm">{errors.isEmpty}</div>
+                )}
               </div>
 
               <div className="mt-6 space-y-6">
@@ -147,6 +174,9 @@ const StepSix: React.FC<StepperProps> = ({
                       No
                     </label>
                   </div>
+                  {errors.isEmpty && (
+                    <div className="text-red-500 text-sm">{errors.isEmpty}</div>
+                  )}
                 </div>
               </div>
 
@@ -182,6 +212,9 @@ const StepSix: React.FC<StepperProps> = ({
                       No
                     </label>
                   </div>
+                  {errors.isEmpty && (
+                    <div className="text-red-500 text-sm">{errors.isEmpty}</div>
+                  )}
                 </div>
               </div>
               <div className="mt-6 space-y-6">
@@ -217,6 +250,9 @@ const StepSix: React.FC<StepperProps> = ({
                       No
                     </label>
                   </div>
+                  {errors.isEmpty && (
+                    <div className="text-red-500 text-sm">{errors.isEmpty}</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -228,9 +264,15 @@ const StepSix: React.FC<StepperProps> = ({
               >
                 Back
               </button>
+              {showErrorMessage && (
+                <p className="text-red-500 text-sm mt-2">
+                  Please fill all required fields before proceeding.
+                </p>
+              )}
+
               <button
                 onClick={handleNext}
-                className="px-4 py-2 text-white bg-red-800 rounded-lg hover:bg-red-700"
+                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300"
               >
                 Next
               </button>
