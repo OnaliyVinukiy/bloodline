@@ -37,7 +37,6 @@ const StepThree: React.FC<StepperProps> = ({
       }));
     };
 
-  //Function to move to next step
   //Save form data and move to next step
   const handleNext = () => {
     const newErrors: { [key: string]: string } = {};
