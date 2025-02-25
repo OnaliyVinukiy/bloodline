@@ -68,6 +68,7 @@ const StepFive: React.FC<StepperProps> = ({
 
     onNextStep();
   };
+  
   // Populate the form data from the parent form data
   useEffect(() => {
     if (formData?.fourthForm) {
