@@ -44,7 +44,7 @@ export function CarouselSlider() {
         />
         <a
           href="#"
-          className="inline-flex justify-between items-center py-1 px-1 pr-4 mb-6 text-sm text-gray-700 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+          className="inline-flex justify-between items-center py-1 px-1 pr-4 mb-6 text-sm text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200"
           role="alert"
         >
           <span className="text-xs bg-red-600 rounded-full text-white px-4 py-1.5 mr-3">
@@ -70,17 +70,17 @@ export function CarouselSlider() {
         <h1 className="mb-6 text-3xl font-semibold tracking-tight leading-tight text-white sm:mb-8 sm:text-4xl md:text-5xl lg:text-6xl">
           Every Drop Counts, Every Life Matters!
         </h1>
-        <p className="text-base font-normal text-white sm:text-lg md:text-xl dark:text-gray-400">
+        <p className="text-base font-normal text-white sm:text-lg md:text-xl">
           Join us in creating a world where no life is lost due to the lack of
           blood.
         </p>
-        <p className="mb-8 text-base font-normal text-white sm:text-lg md:text-xl dark:text-gray-400">
+        <p className="mb-8 text-base font-normal text-white sm:text-lg md:text-xl">
           Together, we save lives.
         </p>
         <div className="flex flex-col mb-8 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
-        <button
+          <button
             onClick={handleAppointmentSchedule}
-            className="inline-flex justify-center items-center py-2 px-4 text-sm font-medium text-center text-white rounded-lg bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900 sm:py-3 sm:px-5 sm:text-base"
+            className="inline-flex justify-center items-center py-2 px-4 text-sm font-medium text-center text-white rounded-lg bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 sm:py-3 sm:px-5 sm:text-base"
           >
             Place an appointment
             <svg
@@ -98,7 +98,7 @@ export function CarouselSlider() {
           </button>
           <button
             onClick={handleDonorRegistration}
-            className="inline-flex justify-center items-center py-2 px-4 text-sm font-medium text-center text-white rounded-lg border border-gray-300 hover:bg-black focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-black dark:focus:ring-gray-800 sm:py-3 sm:px-5 sm:text-base"
+            className="inline-flex justify-center items-center py-2 px-4 text-sm font-medium text-center text-white rounded-lg border border-gray-300 hover:bg-black focus:ring-4 focus:ring-gray-100 sm:py-3 sm:px-5 sm:text-base"
           >
             <svg
               className="mr-2 -ml-1 w-4 h-4 sm:w-5 sm:h-5"
