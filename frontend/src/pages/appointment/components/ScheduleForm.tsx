@@ -177,13 +177,7 @@ const ScheduleForm: React.FC<StepperProps> = ({
                 </div>
               )}
             </div>
-            <div className="flex justify-between">
-              <button
-                onClick={onPreviousStep}
-                className="text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-md px-5 py-2.5 text-center me-2 mb-2 dark:hover:text-white "
-              >
-                Back
-              </button>
+            <div className="flex justify-end">
               <button
                 onClick={onNextStep}
                 className={`focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ${
