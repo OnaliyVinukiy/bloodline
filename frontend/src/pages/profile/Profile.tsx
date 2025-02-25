@@ -8,7 +8,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuthContext } from "@asgardeo/auth-react";
 import axios from "axios";
-import { Label } from "flowbite-react";
+import { Button, Label, Modal } from "flowbite-react";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { Datepicker } from "flowbite-react";
 import { User, Donor } from "../../types/types";
@@ -16,6 +16,9 @@ import { User, Donor } from "../../types/types";
 export default function Profile() {
   const { state, signOut, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [showErrorModal, setErrorModal] = useState(false);
   const [donor, setDonor] = useState<Donor>({
     nic: "",
     fullName: "",
@@ -135,14 +138,17 @@ export default function Profile() {
     if (!user || !donor) return;
 
     try {
+      setLoading(true);
       const { _id, ...donorData } = donor;
 
       await axios.post("http://localhost:5000/api/update-donor", donorData);
       setIsProfileComplete(true);
-      alert("Profile updated successfully!");
+      setLoading(false);
+      setShowModal(true);
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Error updating profile.");
+      setLoading(false);
+      setErrorModal(true);
     }
   };
 
@@ -442,14 +448,67 @@ export default function Profile() {
             <div className="flex justify-end mt-6">
               <button
                 onClick={handleUpdate}
-                className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                disabled={loading}
+                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 disabled:bg-red-500 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                {isProfileComplete ? "Update Profile" : "Complete Profile"}
+                {loading ? (
+                  <>
+                    <svg
+                      aria-hidden="true"
+                      className="w-4 h-4 mr-2 text-white animate-spin"
+                      viewBox="0 0 100 101"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M100 50.5c0 27.6-22.4 50-50 50S0 78.1 0 50.5 22.4.5 50 .5s50 22.4 50 50z"
+                        fill="currentColor"
+                        opacity=".2"
+                      />
+                      <path
+                        d="M93.3 50.5c0-23.9-19.4-43.3-43.3-43.3-6.3 0-12.3 1.3-17.8 3.7-1.6.7-2.2 2.6-1.5 4.2.7 1.6 2.6 2.2 4.2 1.5 4.9-2.1 10.2-3.2 15.6-3.2 21.6 0 39.3 17.7 39.3 39.3s-17.7 39.3-39.3 39.3c-21.6 0-39.3-17.7-39.3-39.3 0-6.8 1.7-13.3 5-19.1.9-1.5.4-3.4-1-4.3s-3.4-.4-4.3 1c-3.8 6.4-5.8 13.7-5.8 21.3 0 23.9 19.4 43.3 43.3 43.3s43.3-19.4 43.3-43.3z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                    Updating...
+                  </>
+                ) : isProfileComplete ? (
+                  "Update Profile"
+                ) : (
+                  "Complete Profile"
+                )}
               </button>
             </div>
           </div>
         </div>
       </main>
+
+      <Modal show={showModal} onClose={() => setShowModal(false)}>
+        <Modal.Header>Registered Successfully!</Modal.Header>
+        <Modal.Body>
+          <p className="text-lg text-gray-700">
+            Your donor details are updated successfully.
+          </p>
+        </Modal.Body>
+        <Modal.Footer className="flex justify-end">
+          <Button color="failure" onClick={() => setShowModal(false)}>
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <Modal show={showErrorModal} onClose={() => setErrorModal(false)}>
+        <Modal.Header>Oops an Error!</Modal.Header>
+        <Modal.Body>
+          <p className="text-lg text-gray-700">
+            Error updating the profile. Please try again shortly.
+          </p>
+        </Modal.Body>
+        <Modal.Footer className="flex justify-end">
+          <Button color="failure" onClick={() => setErrorModal(false)}>
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

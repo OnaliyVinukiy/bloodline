@@ -156,7 +156,6 @@ const StepOne: React.FC<StepperProps> = ({
 
   //Save donor information to the form data
   const handleNext = () => {
-
     // Check if necessary fields are filled
     const newErrors: { [key in keyof BloodDonor]?: string } = {};
 
@@ -529,7 +528,7 @@ const StepOne: React.FC<StepperProps> = ({
               <div className="flex justify-between mt-6">
                 <button
                   onClick={onPreviousStep}
-                  className="text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-md px-5 py-2.5 text-center me-2 mb-2 dark:hover:text-white "
+                  className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
                 >
                   Back
                 </button>

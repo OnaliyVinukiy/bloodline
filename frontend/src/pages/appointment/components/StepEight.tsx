@@ -5,7 +5,7 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { Datepicker, Label } from "flowbite-react";
+import { Button, Datepicker, Label, Modal } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/types";
 import axios from "axios";
@@ -22,6 +22,9 @@ const StepEight: React.FC<StepperProps> = ({
     donorName: "",
     dateSigned: "",
   });
+
+  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   //Function to set form data (radio buttons)
   const handleRadioChange =
@@ -47,51 +50,48 @@ const StepEight: React.FC<StepperProps> = ({
     }
   }, [formData]);
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+
   //Function to submit form data
   const submitForm = async () => {
     try {
+      setLoading(true);
+      const newErrors: { [key: string]: string } = {};
+
+      // Check if necessary fields are filled
+      if (!formSevenData.donatingMonth)
+        newErrors.month = "Please select an option.";
+      if (!formSevenData.donorName) newErrors.name = "Please enter your name.";
+      if (!formSevenData.dateSigned) newErrors.date = "Please enter the date.";
+
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        setShowErrorMessage(true);
+        setLoading(false);
+        return;
+      }
+
+      setErrors({});
+      setShowErrorMessage(false);
+
+      //Submit appointment data
       const response = await axios.post(
         "http://localhost:5000/api/appointments/save-appointment",
         formData,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
+        { headers: { "Content-Type": "application/json" } }
       );
 
       if (response.status === 201) {
-        alert("Appointment created successfully");
+        setShowModal(true);
       }
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Failed to create appointment");
+    } finally {
+      setLoading(false);
     }
   };
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  //Loading animation
-  if (isLoading) {
-    return (
-      <div className="loading flex justify-center items-center h-screen">
-        <svg width="64px" height="48px">
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="back"
-            stroke="#e53e3e"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="front"
-            stroke="#f56565"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-        </svg>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -183,6 +183,9 @@ const StepEight: React.FC<StepperProps> = ({
                       Once a year
                     </label>
                   </div>
+                  {errors.month && (
+                    <div className="text-red-500 text-sm">{errors.month}</div>
+                  )}
                 </div>
               </div>
 
@@ -207,8 +210,11 @@ const StepEight: React.FC<StepperProps> = ({
                     handleInputChange("donorName", e.target.value)
                   }
                 />
+                {errors.name && (
+                  <div className="text-red-500 text-sm">{errors.name}</div>
+                )}
                 <Label
-                  htmlFor="fullName"
+                  htmlFor="date"
                   className="mt-4 block mb-2 text-sm font-medium text-indigo-900"
                 >
                   Date
@@ -229,25 +235,73 @@ const StepEight: React.FC<StepperProps> = ({
                     }
                   }}
                 />
+                {errors.date && (
+                  <div className="text-red-500 text-sm">{errors.date}</div>
+                )}
               </div>
             </div>
 
             <div className="flex justify-between mt-6">
               <button
                 onClick={onPreviousStep}
-                className="px-4 py-2 text-white bg-gray-600 rounded-lg hover:bg-gray-400"
+                className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
               >
                 Back
               </button>
+              {showErrorMessage && (
+                <p className="text-red-500 text-sm mt-2">
+                  Please fill all required fields
+                </p>
+              )}
               <button
                 onClick={submitForm}
-                className="px-4 py-2 text-white bg-red-800 rounded-lg hover:bg-red-700"
+                disabled={loading}
+                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 disabled:bg-red-500 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                Next
+                {loading ? (
+                  <>
+                    <svg
+                      aria-hidden="true"
+                      className="w-4 h-4 mr-2 text-white animate-spin"
+                      viewBox="0 0 100 101"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M100 50.5c0 27.6-22.4 50-50 50S0 78.1 0 50.5 22.4.5 50 .5s50 22.4 50 50z"
+                        fill="currentColor"
+                        opacity=".2"
+                      />
+                      <path
+                        d="M93.3 50.5c0-23.9-19.4-43.3-43.3-43.3-6.3 0-12.3 1.3-17.8 3.7-1.6.7-2.2 2.6-1.5 4.2.7 1.6 2.6 2.2 4.2 1.5 4.9-2.1 10.2-3.2 15.6-3.2 21.6 0 39.3 17.7 39.3 39.3s-17.7 39.3-39.3 39.3c-21.6 0-39.3-17.7-39.3-39.3 0-6.8 1.7-13.3 5-19.1.9-1.5.4-3.4-1-4.3s-3.4-.4-4.3 1c-3.8 6.4-5.8 13.7-5.8 21.3 0 23.9 19.4 43.3 43.3 43.3s43.3-19.4 43.3-43.3z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                    Submitting...
+                  </>
+                ) : (
+                  "Submit"
+                )}
               </button>
             </div>
           </div>
         </main>
+        <Modal show={showModal} onClose={() => setShowModal(false)}>
+          <Modal.Header>Appointment Request Submitted</Modal.Header>
+          <Modal.Body>
+            <p className="text-lg text-gray-700">
+              Your blood donation appointment request has been successfully
+              submitted. Our team will review your request, and you will receive
+              a confirmation email once it has been approved or rejected. Thank
+              you for your willingness to donate and make a difference!
+            </p>
+          </Modal.Body>
+          <Modal.Footer className="flex justify-end">
+            <Button color="failure" onClick={() => setShowModal(false)}>
+              OK
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     </div>
   );
