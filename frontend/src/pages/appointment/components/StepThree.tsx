@@ -358,9 +358,15 @@ const StepThree: React.FC<StepperProps> = ({
               >
                 Back
               </button>
+              {showErrorMessage && (
+                <p className="text-red-500 text-sm mt-2">
+                  Please fill all required fields before proceeding.
+                </p>
+              )}
+
               <button
                 onClick={handleNext}
-                className="px-4 py-2 text-white bg-red-800 rounded-lg hover:bg-red-700"
+                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300"
               >
                 Next
               </button>
