@@ -25,6 +25,9 @@ const StepThree: React.FC<StepperProps> = ({
     diseases: [] as string[],
   });
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+
   //Function to set form data (radiobuttons)
   const handleRadioChange =
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,11 +38,34 @@ const StepThree: React.FC<StepperProps> = ({
     };
 
   //Function to move to next step
+  //Save form data and move to next step
   const handleNext = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    // Check if necessary fields are filled
+    if (
+      !formTwoData.isFeelingWell ||
+      !formTwoData.isEngageHeavyWork ||
+      !formTwoData.isPregnant ||
+      !formTwoData.isSurgeryDone ||
+      !formTwoData.isTakingTreatment
+    )
+      newErrors.isEmpty = "Please select an option.";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setShowErrorMessage(true);
+      return;
+    }
+
+    setErrors({});
+    setShowErrorMessage(false);
+
     onFormDataChange({
       ...formData,
       secondForm: formTwoData,
     });
+
     onNextStep();
   };
 
@@ -112,6 +138,9 @@ const StepThree: React.FC<StepperProps> = ({
                     No
                   </label>
                 </div>
+                {errors.isEmpty && (
+                  <div className="text-red-500 text-sm">{errors.isEmpty}</div>
+                )}
               </div>
 
               <div className="mt-6 space-y-6">
@@ -199,6 +228,9 @@ const StepThree: React.FC<StepperProps> = ({
                       No
                     </label>
                   </div>
+                  {errors.isEmpty && (
+                    <div className="text-red-500 text-sm">{errors.isEmpty}</div>
+                  )}
                 </div>
               </div>
               <div className="mt-6 space-y-6">
@@ -233,6 +265,9 @@ const StepThree: React.FC<StepperProps> = ({
                       No
                     </label>
                   </div>
+                  {errors.isEmpty && (
+                    <div className="text-red-500 text-sm">{errors.isEmpty}</div>
+                  )}
                 </div>
               </div>
               <div className="mt-6 space-y-6">
@@ -269,6 +304,9 @@ const StepThree: React.FC<StepperProps> = ({
                       No
                     </label>
                   </div>
+                  {errors.isEmpty && (
+                    <div className="text-red-500 text-sm">{errors.isEmpty}</div>
+                  )}
                 </div>
               </div>
               <div className="mt-6 space-y-6">
@@ -304,6 +342,11 @@ const StepThree: React.FC<StepperProps> = ({
                       />
                       No
                     </label>
+                    {errors.isEmpty && (
+                      <div className="text-red-500 text-sm">
+                        {errors.isEmpty}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
