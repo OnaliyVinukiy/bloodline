@@ -116,8 +116,8 @@ const StepSix: React.FC<StepperProps> = ({
                     <input
                       type="radio"
                       name="hadDengue"
-                      value="yes"
-                      checked={formFiveData.hadDengue === "yes"}
+                      value="Yes"
+                      checked={formFiveData.hadDengue === "Yes"}
                       onChange={handleRadioChange("hadDengue")}
                       className="mr-2"
                     />
@@ -127,8 +127,8 @@ const StepSix: React.FC<StepperProps> = ({
                     <input
                       type="radio"
                       name="hadDengue"
-                      value="no"
-                      checked={formFiveData.hadDengue === "no"}
+                      value="No"
+                      checked={formFiveData.hadDengue === "No"}
                       onChange={handleRadioChange("hadDengue")}
                       className="mr-2"
                     />
@@ -155,8 +155,8 @@ const StepSix: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="hadOtherFever"
-                        value="yes"
-                        checked={formFiveData.hadOtherFever === "yes"}
+                        value="Yes"
+                        checked={formFiveData.hadOtherFever === "Yes"}
                         onChange={handleRadioChange("hadOtherFever")}
                         className="mr-2"
                       />
@@ -166,8 +166,8 @@ const StepSix: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="hadOtherFever"
-                        value="no"
-                        checked={formFiveData.hadOtherFever === "no"}
+                        value="No"
+                        checked={formFiveData.hadOtherFever === "No"}
                         onChange={handleRadioChange("hadOtherFever")}
                         className="mr-2"
                       />
@@ -195,8 +195,8 @@ const StepSix: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="hadDentalExtraction"
-                        value="yes"
-                        checked={formFiveData.hadDentalExtraction === "yes"}
+                        value="Yes"
+                        checked={formFiveData.hadDentalExtraction === "Yes"}
                         onChange={handleRadioChange("hadDentalExtraction")}
                         className="mr-2"
                       />
@@ -206,8 +206,8 @@ const StepSix: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="hadDentalExtraction"
-                        value="no"
-                        checked={formFiveData.hadDentalExtraction === "no"}
+                        value="No"
+                        checked={formFiveData.hadDentalExtraction === "No"}
                         onChange={handleRadioChange("hadDentalExtraction")}
                         className="mr-2"
                       />
@@ -235,8 +235,8 @@ const StepSix: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="hadAntibiotic"
-                        value="yes"
-                        checked={formFiveData.hadAntibiotic === "yes"}
+                        value="Yes"
+                        checked={formFiveData.hadAntibiotic === "Yes"}
                         onChange={handleRadioChange("hadAntibiotic")}
                         className="mr-2"
                       />
@@ -246,8 +246,8 @@ const StepSix: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="hadAntibiotic"
-                        value="no"
-                        checked={formFiveData.hadAntibiotic === "no"}
+                        value="No"
+                        checked={formFiveData.hadAntibiotic === "No"}
                         onChange={handleRadioChange("hadAntibiotic")}
                         className="mr-2"
                       />
