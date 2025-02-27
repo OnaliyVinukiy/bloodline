@@ -118,8 +118,8 @@ const StepThree: React.FC<StepperProps> = ({
                     <input
                       type="radio"
                       name="isFeelingWell"
-                      value="yes"
-                      checked={formTwoData.isFeelingWell === "yes"}
+                      value="Yes"
+                      checked={formTwoData.isFeelingWell === "Yes"}
                       onChange={handleRadioChange("isFeelingWell")}
                       className="mr-2"
                     />
@@ -129,8 +129,8 @@ const StepThree: React.FC<StepperProps> = ({
                     <input
                       type="radio"
                       name="isFeelingWell"
-                      value="no"
-                      checked={formTwoData.isFeelingWell === "no"}
+                      value="No"
+                      checked={formTwoData.isFeelingWell === "No"}
                       onChange={handleRadioChange("isFeelingWell")}
                       className="mr-2"
                     />
@@ -208,8 +208,8 @@ const StepThree: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="isTakingTreatment"
-                        value="yes"
-                        checked={formTwoData.isTakingTreatment === "yes"}
+                        value="Yes"
+                        checked={formTwoData.isTakingTreatment === "Yes"}
                         onChange={handleRadioChange("isTakingTreatment")}
                         className="mr-2"
                       />
@@ -219,8 +219,8 @@ const StepThree: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="isTakingTreatment"
-                        value="no"
-                        checked={formTwoData.isTakingTreatment === "no"}
+                        value="No"
+                        checked={formTwoData.isTakingTreatment === "No"}
                         onChange={handleRadioChange("isTakingTreatment")}
                         className="mr-2"
                       />
@@ -247,8 +247,8 @@ const StepThree: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="isSurgeryDone"
-                        value="yes"
-                        checked={formTwoData.isSurgeryDone === "yes"}
+                        value="Yes"
+                        checked={formTwoData.isSurgeryDone === "Yes"}
                         onChange={handleRadioChange("isSurgeryDone")}
                         className="mr-2"
                       />
@@ -258,8 +258,8 @@ const StepThree: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="isSurgeryDone"
-                        value="no"
-                        checked={formTwoData.isSurgeryDone === "no"}
+                        value="No"
+                        checked={formTwoData.isSurgeryDone === "No"}
                         onChange={handleRadioChange("isSurgeryDone")}
                         className="mr-2"
                       />
@@ -288,8 +288,8 @@ const StepThree: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="isEngageHeavyWork"
-                        value="yes"
-                        checked={formTwoData.isEngageHeavyWork === "yes"}
+                        value="Yes"
+                        checked={formTwoData.isEngageHeavyWork === "Yes"}
                         onChange={handleRadioChange("isEngageHeavyWork")}
                         className="mr-2"
                       />
@@ -299,8 +299,8 @@ const StepThree: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="isEngageHeavyWork"
-                        value="no"
-                        checked={formTwoData.isEngageHeavyWork === "no"}
+                        value="No"
+                        checked={formTwoData.isEngageHeavyWork === "No"}
                         onChange={handleRadioChange("isEngageHeavyWork")}
                         className="mr-2"
                       />
@@ -321,7 +321,7 @@ const StepThree: React.FC<StepperProps> = ({
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
                     6.) (For Females) Are you pregnant or breast feeding at
-                    presen? Or have you had a child birth or an abortion during
+                    present? Or have you had a child birth or an abortion during
                     last 12 months?
                   </Label>
                   <div className="flex items-center space-x-4">
@@ -329,8 +329,8 @@ const StepThree: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="isPregnant"
-                        value="yes"
-                        checked={formTwoData.isPregnant === "yes"}
+                        value="Yes"
+                        checked={formTwoData.isPregnant === "Yes"}
                         onChange={handleRadioChange("isPregnant")}
                         className="mr-2"
                       />
@@ -340,8 +340,8 @@ const StepThree: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="isPregnant"
-                        value="no"
-                        checked={formTwoData.isPregnant === "no"}
+                        value="No"
+                        checked={formTwoData.isPregnant === "No"}
                         onChange={handleRadioChange("isPregnant")}
                         className="mr-2"
                       />

@@ -110,8 +110,8 @@ const StepFour: React.FC<StepperProps> = ({
                     <input
                       type="radio"
                       name="hadHepatitis"
-                      value="yes"
-                      checked={formThreeData.hadHepatitis === "yes"}
+                      value="Yes"
+                      checked={formThreeData.hadHepatitis === "Yes"}
                       onChange={handleRadioChange("hadHepatitis")}
                       className="mr-2"
                     />
@@ -121,8 +121,8 @@ const StepFour: React.FC<StepperProps> = ({
                     <input
                       type="radio"
                       name="hadHepatitis"
-                      value="no"
-                      checked={formThreeData.hadHepatitis === "no"}
+                      value="No"
+                      checked={formThreeData.hadHepatitis === "No"}
                       onChange={handleRadioChange("hadHepatitis")}
                       className="mr-2"
                     />
@@ -148,8 +148,8 @@ const StepFour: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="hadTyphoid"
-                        value="yes"
-                        checked={formThreeData.hadTyphoid === "yes"}
+                        value="Yes"
+                        checked={formThreeData.hadTyphoid === "Yes"}
                         onChange={handleRadioChange("hadTyphoid")}
                         className="mr-2"
                       />
@@ -159,8 +159,8 @@ const StepFour: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="hadTyphoid"
-                        value="no"
-                        checked={formThreeData.hadTyphoid === "no"}
+                        value="No"
+                        checked={formThreeData.hadTyphoid === "No"}
                         onChange={handleRadioChange("hadTyphoid")}
                         className="mr-2"
                       />
