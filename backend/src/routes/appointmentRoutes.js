@@ -10,6 +10,8 @@ import {
   saveAppointment,
   getAppointments,
   getAppointmentsByDate,
+  getAppointmentById,
+  approveAppointment,
 } from "../controllers/appointmentController.js";
 
 const router = express.Router();
@@ -19,6 +21,11 @@ router.post("/save-appointment", saveAppointment);
 
 //Routes to fetch appointment data
 router.get("/fetch-appointment", getAppointments);
+router.get("/fetch-appointment/:id", getAppointmentById);
+
 router.get("/:date", getAppointmentsByDate);
+
+// Route to approve appointment
+router.put("/approve-appointment/:id", approveAppointment);
 
 export default router;
