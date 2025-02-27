@@ -5,7 +5,6 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-
 import { MongoClient } from "mongodb";
 import {
   COSMOS_DB_CONNECTION_STRING,
