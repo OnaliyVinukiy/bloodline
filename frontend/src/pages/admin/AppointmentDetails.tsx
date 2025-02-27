@@ -24,6 +24,7 @@ const AppointmentDetails = () => {
           `http://localhost:5000/api/appointments/fetch-appointment/${id}`
         );
         setAppointment(response.data);
+        console.log("response", response.data);
       } catch (error) {
         console.error("Error fetching appointment:", error);
         setError("Failed to fetch appointment details.");
@@ -34,6 +35,20 @@ const AppointmentDetails = () => {
 
     fetchAppointment();
   }, [id]);
+
+  //Handle approve appointment
+  const handleApprove = async () => {
+    try {
+      await axios.put(
+        `http://localhost:5000/api/appointments/approve-appointment/${id}`
+      );
+      setAppointment((prev: any) => ({ ...prev, status: "Approved" }));
+      alert("Appointment approved successfully!");
+    } catch (error) {
+      console.error("Error approving appointment:", error);
+      alert("Failed to approve appointment.");
+    }
+  };
 
   //Loading animation
   if (isLoading) {
@@ -317,6 +332,7 @@ const AppointmentDetails = () => {
             <div className="flex justify-end pb-2">
               <button
                 type="button"
+                onClick={handleApprove}
                 className="mt-8 focus:outline-none text-white inline-flex items-center text-center bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
               >
                 <svg
