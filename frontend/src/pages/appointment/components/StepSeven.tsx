@@ -119,8 +119,8 @@ const StepSeven: React.FC<StepperProps> = ({
                     <input
                       type="radio"
                       name="isInformed"
-                      value="yes"
-                      checked={formSixData.isInformed === "yes"}
+                      value="Yes"
+                      checked={formSixData.isInformed === "Yes"}
                       onChange={handleRadioChange("isInformed")}
                       className="mr-2"
                     />
@@ -130,8 +130,8 @@ const StepSeven: React.FC<StepperProps> = ({
                     <input
                       type="radio"
                       name="isInformed"
-                      value="no"
-                      checked={formSixData.isInformed === "no"}
+                      value="No"
+                      checked={formSixData.isInformed === "No"}
                       onChange={handleRadioChange("isInformed")}
                       className="mr-2"
                     />
@@ -157,8 +157,8 @@ const StepSeven: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="isHarmfulCategory"
-                        value="yes"
-                        checked={formSixData.isHarmfulCategory === "yes"}
+                        value="Yes"
+                        checked={formSixData.isHarmfulCategory === "Yes"}
                         onChange={handleRadioChange("isHarmfulCategory")}
                         className="mr-2"
                       />
@@ -168,8 +168,8 @@ const StepSeven: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="isHarmfulCategory"
-                        value="no"
-                        checked={formSixData.isHarmfulCategory === "no"}
+                        value="No"
+                        checked={formSixData.isHarmfulCategory === "No"}
                         onChange={handleRadioChange("isHarmfulCategory")}
                         className="mr-2"
                       />
@@ -198,8 +198,8 @@ const StepSeven: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="hadPersistentFever"
-                        value="yes"
-                        checked={formSixData.hadPersistentFever === "yes"}
+                        value="Yes"
+                        checked={formSixData.hadPersistentFever === "Yes"}
                         onChange={handleRadioChange("hadPersistentFever")}
                         className="mr-2"
                       />
@@ -209,8 +209,8 @@ const StepSeven: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="hadPersistentFever"
-                        value="no"
-                        checked={formSixData.hadPersistentFever === "no"}
+                        value="No"
+                        checked={formSixData.hadPersistentFever === "No"}
                         onChange={handleRadioChange("hadPersistentFever")}
                         className="mr-2"
                       />

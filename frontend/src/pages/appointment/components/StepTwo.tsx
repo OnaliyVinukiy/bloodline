@@ -61,13 +61,13 @@ const StepTwo: React.FC<StepperProps> = ({
     // Check if necessary fields are filled
     if (!formOneData.isDonatedBefore)
       newErrors.isDonatedBefore = "Please select an option.";
-    if (formOneData.isDonatedBefore === "yes" && !formOneData.timesOfDonation)
+    if (formOneData.isDonatedBefore === "Yes" && !formOneData.timesOfDonation)
       newErrors.timesOfDonation = "Times of donation is required.";
-    if (formOneData.isDonatedBefore === "yes" && !formOneData.lastDonationDate)
+    if (formOneData.isDonatedBefore === "Yes" && !formOneData.lastDonationDate)
       newErrors.lastDonationDate = "Last donation date is required.";
-    if (formOneData.isDonatedBefore === "yes" && !formOneData.isAnyDifficulty)
+    if (formOneData.isDonatedBefore === "Yes" && !formOneData.isAnyDifficulty)
       newErrors.isAnyDifficulty = "Please select an option.";
-    if (formOneData.isAnyDifficulty === "yes" && !formOneData.difficulty)
+    if (formOneData.isAnyDifficulty === "Yes" && !formOneData.difficulty)
       newErrors.difficulty = "Please specify the difficulty.";
     if (!formOneData.isMedicallyAdvised)
       newErrors.isMedicallyAdvised = "Please select an option.";
@@ -81,7 +81,7 @@ const StepTwo: React.FC<StepperProps> = ({
     }
 
     // Check if last donation was within the last 6 months
-    if (formOneData.isDonatedBefore === "yes" && formOneData.lastDonationDate) {
+    if (formOneData.isDonatedBefore === "Yes" && formOneData.lastDonationDate) {
       const lastDonation = new Date(formOneData.lastDonationDate);
       const today = new Date();
       const sixMonthsAgo = new Date();
@@ -122,8 +122,8 @@ const StepTwo: React.FC<StepperProps> = ({
                     <input
                       type="radio"
                       name="donatedBefore"
-                      value="yes"
-                      checked={formOneData.isDonatedBefore === "yes"}
+                      value="Yes"
+                      checked={formOneData.isDonatedBefore === "Yes"}
                       onChange={handleRadioChange("isDonatedBefore")}
                       className="mr-2"
                     />
@@ -133,8 +133,8 @@ const StepTwo: React.FC<StepperProps> = ({
                     <input
                       type="radio"
                       name="donatedBefore"
-                      value="no"
-                      checked={formOneData.isDonatedBefore === "no"}
+                      value="No"
+                      checked={formOneData.isDonatedBefore === "No"}
                       onChange={handleRadioChange("isDonatedBefore")}
                       className="mr-2"
                     />
@@ -148,7 +148,7 @@ const StepTwo: React.FC<StepperProps> = ({
                 </div>
               </div>
 
-              {formOneData.isDonatedBefore === "yes" && (
+              {formOneData.isDonatedBefore === "Yes" && (
                 <>
                   <div className="mt-4 w-full">
                     <Label
@@ -213,8 +213,8 @@ const StepTwo: React.FC<StepperProps> = ({
                         <input
                           type="radio"
                           name="difficulty"
-                          value="yes"
-                          checked={formOneData.isAnyDifficulty === "yes"}
+                          value="Yes"
+                          checked={formOneData.isAnyDifficulty === "Yes"}
                           onChange={handleRadioChange("isAnyDifficulty")}
                           className="mr-2"
                         />
@@ -224,8 +224,8 @@ const StepTwo: React.FC<StepperProps> = ({
                         <input
                           type="radio"
                           name="difficulty"
-                          value="no"
-                          checked={formOneData.isAnyDifficulty === "no"}
+                          value="No"
+                          checked={formOneData.isAnyDifficulty === "No"}
                           onChange={handleRadioChange("isAnyDifficulty")}
                           className="mr-2"
                         />
@@ -237,7 +237,7 @@ const StepTwo: React.FC<StepperProps> = ({
                         </div>
                       )}
                     </div>
-                    {formOneData.isAnyDifficulty === "yes" && (
+                    {formOneData.isAnyDifficulty === "Yes" && (
                       <div className="mt-4 w-full">
                         <Label
                           htmlFor="difficulty"
@@ -278,8 +278,8 @@ const StepTwo: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="medicallyAdvised"
-                        value="yes"
-                        checked={formOneData.isMedicallyAdvised === "yes"}
+                        value="Yes"
+                        checked={formOneData.isMedicallyAdvised === "Yes"}
                         onChange={handleRadioChange("isMedicallyAdvised")}
                         className="mr-2"
                       />
@@ -289,8 +289,8 @@ const StepTwo: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="medicallyAdvised"
-                        value="no"
-                        checked={formOneData.isMedicallyAdvised === "no"}
+                        value="No"
+                        checked={formOneData.isMedicallyAdvised === "No"}
                         onChange={handleRadioChange("isMedicallyAdvised")}
                         className="mr-2"
                       />
@@ -319,8 +319,8 @@ const StepTwo: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="leafletRead"
-                        value="yes"
-                        checked={formOneData.isLeafletRead === "yes"}
+                        value="Yes"
+                        checked={formOneData.isLeafletRead === "Yes"}
                         onChange={handleRadioChange("isLeafletRead")}
                         className="mr-2"
                       />
@@ -330,8 +330,8 @@ const StepTwo: React.FC<StepperProps> = ({
                       <input
                         type="radio"
                         name="leafletRead"
-                        value="no"
-                        checked={formOneData.isLeafletRead === "no"}
+                        value="No"
+                        checked={formOneData.isLeafletRead === "No"}
                         onChange={handleRadioChange("isLeafletRead")}
                         className="mr-2"
                       />
