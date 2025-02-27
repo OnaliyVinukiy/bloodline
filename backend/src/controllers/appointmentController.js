@@ -15,6 +15,7 @@ import {
 import dotenv from "dotenv";
 
 dotenv.config();
+import { ObjectId } from "mongodb";
 
 // Save appointment data
 export const saveAppointment = async (req, res) => {
@@ -135,5 +136,40 @@ export const getAppointmentsByDate = async (req, res) => {
   } catch (error) {
     console.error("Error fetching appointments:", error);
     res.status(500).json({ message: "Error fetching appointments", error });
+  }
+};
+
+//Approve pending appointments
+export const approveAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Connect to the database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+    const objectId = new ObjectId(id);
+
+    const updatedAppointment = await collection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: { status: "Approved" } },
+      { returnDocument: "after" }
+    );
+
+    await client.close();
+
+    if (!updatedAppointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    res.status(200).json(updatedAppointment);
+  } catch (error) {
+    console.error("Error updating appointment status:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
