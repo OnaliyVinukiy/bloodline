@@ -7,6 +7,7 @@
  */
 import React, { useState } from "react";
 import PendingAppointments from "./PendingAppointments";
+import ApprovedAppointments from "./ApprovedAppointments";
 
 const DonorDeclaration = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -55,7 +56,7 @@ const DonorDeclaration = () => {
 
       <div>
         {activeTab === "tab1" && <PendingAppointments />}
-        {activeTab === "tab2" && <p>Sinhala Form</p>}
+        {activeTab === "tab2" && <ApprovedAppointments />}
         {activeTab === "tab3" && <p>Tamil Form</p>}
       </div>
     </div>

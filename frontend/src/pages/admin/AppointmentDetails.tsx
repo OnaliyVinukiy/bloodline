@@ -9,12 +9,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { Toast } from "flowbite-react";
+import { HiCheck } from "react-icons/hi";
+import { Button, Modal } from "flowbite-react";
 
 const AppointmentDetails = () => {
   const { id } = useParams();
   const [appointment, setAppointment] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isApproving, setIsApproving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   //Fetch appointment data
   useEffect(() => {
@@ -39,14 +45,18 @@ const AppointmentDetails = () => {
   //Handle approve appointment
   const handleApprove = async () => {
     try {
+      setIsApproving(true);
       await axios.put(
         `http://localhost:5000/api/appointments/approve-appointment/${id}`
       );
       setAppointment((prev: any) => ({ ...prev, status: "Approved" }));
-      alert("Appointment approved successfully!");
+      setShowToast(true);
     } catch (error) {
       console.error("Error approving appointment:", error);
-      alert("Failed to approve appointment.");
+      setError("Failed to approve appointment.");
+    } finally {
+      setIsApproving(false);
+      setShowModal(false);
     }
   };
 
@@ -332,7 +342,7 @@ const AppointmentDetails = () => {
             <div className="flex justify-end pb-2">
               <button
                 type="button"
-                onClick={handleApprove}
+                onClick={() => setShowModal(true)}
                 className="mt-8 focus:outline-none text-white inline-flex items-center text-center bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
               >
                 <svg
@@ -352,7 +362,7 @@ const AppointmentDetails = () => {
                     d="M5 11.917 9.724 16.5 19 7.5"
                   />
                 </svg>
-                Accept
+                Approve
               </button>
               <button
                 type="button"
@@ -381,6 +391,59 @@ const AppointmentDetails = () => {
           </div>
         </div>
       </main>
+      <Modal show={showModal} onClose={() => setShowModal(false)}>
+        <Modal.Header>Approve Appointment</Modal.Header>
+        <Modal.Body>
+          <p className="text-lg text-gray-700">
+            Are you sure you want to approve this appointment?
+          </p>
+        </Modal.Body>
+        <Modal.Footer className="flex justify-end">
+          <Button color="failure" onClick={handleApprove}>
+            {isApproving ? (
+              <>
+                <svg
+                  aria-hidden="true"
+                  className="w-4 h-4 mr-2 text-white animate-spin"
+                  viewBox="0 0 100 101"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M100 50.5c0 27.6-22.4 50-50 50S0 78.1 0 50.5 22.4.5 50 .5s50 22.4 50 50z"
+                    fill="currentColor"
+                    opacity=".2"
+                  />
+                  <path
+                    d="M93.3 50.5c0-23.9-19.4-43.3-43.3-43.3-6.3 0-12.3 1.3-17.8 3.7-1.6.7-2.2 2.6-1.5 4.2.7 1.6 2.6 2.2 4.2 1.5 4.9-2.1 10.2-3.2 15.6-3.2 21.6 0 39.3 17.7 39.3 39.3s-17.7 39.3-39.3 39.3c-21.6 0-39.3-17.7-39.3-39.3 0-6.8 1.7-13.3 5-19.1.9-1.5.4-3.4-1-4.3s-3.4-.4-4.3 1c-3.8 6.4-5.8 13.7-5.8 21.3 0 23.9 19.4 43.3 43.3 43.3s43.3-19.4 43.3-43.3z"
+                    fill="currentColor"
+                  />
+                </svg>
+                Approving...
+              </>
+            ) : (
+              "Yes"
+            )}
+          </Button>
+          <Button
+            color="failure"
+            outline
+            onClick={() => setShowModal(false)}
+            className="border-red-700 text-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300"
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {showToast && (
+        <Toast className="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200">
+            <HiCheck className="h-5 w-5" />
+          </div>
+          <div className="ml-3 text-sm font-normal">Approved successfully.</div>
+          <Toast.Toggle onClick={() => setShowToast(false)} />
+        </Toast>
+      )}
     </div>
   );
 };
