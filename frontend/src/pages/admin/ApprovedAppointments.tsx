@@ -111,9 +111,9 @@ const ApprovedAppointments = () => {
                 NIC
               </th>
               <th scope="col" className="px-6 py-3">
-                Contact Number
+                Contact No
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="px-6 py-3 text-center">
                 Status
               </th>
 
@@ -150,10 +150,10 @@ const ApprovedAppointments = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {appointment.donorInfo.contactNumber}
                 </td>
-                <td className="px-6 py-6 flex items-center whitespace-nowrap">
-                  <div className="h-2.5 w-2.5 rounded-full bg-green-600 mr-2"></div>
-                  {appointment.status.charAt(0).toUpperCase() +
-                    appointment.status.slice(1)}
+                <td className="px-6 py-6 text-center">
+                  <div className="badges flex justify-center">
+                    <button className="green">Approved</button>
+                  </div>
                 </td>
 
                 <td className="px-8 py-4 text-center">
