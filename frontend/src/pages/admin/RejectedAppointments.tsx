@@ -9,22 +9,22 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const ApprovedAppointments = () => {
+const RejectedAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  //Fetch approved appointments
+  //Fetch rejected appointments
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
         const response = await axios.get(
           "http://localhost:5000/api/appointments/fetch-appointment"
         );
-        const approvedAppointments = response.data.filter(
-          (appointment: any) => appointment.status === "Approved"
+        const rejectedAppointments = response.data.filter(
+          (appointment: any) => appointment.status === "Rejected"
         );
-        setAppointments(approvedAppointments);
-        console.log(approvedAppointments);
+        setAppointments(rejectedAppointments);
+        console.log(rejectedAppointments);
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {
@@ -152,7 +152,7 @@ const ApprovedAppointments = () => {
                 </td>
                 <td className="px-6 py-6 text-center">
                   <div className="badges flex justify-center">
-                    <button className="green">Approved</button>
+                    <button className="red">Rejected</button>
                   </div>
                 </td>
 
@@ -266,7 +266,7 @@ const ApprovedAppointments = () => {
                   colSpan={6}
                   className="text-center px-6 py-4 text-gray-500 dark:text-gray-400"
                 >
-                  No approved appointments found.
+                  No rejected appointments found.
                 </td>
               </tr>
             )}
@@ -277,4 +277,4 @@ const ApprovedAppointments = () => {
   );
 };
 
-export default ApprovedAppointments;
+export default RejectedAppointments;
