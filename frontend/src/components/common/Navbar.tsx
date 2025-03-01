@@ -40,14 +40,6 @@ export function Navigationbar() {
         try {
           setIsLoading(true);
           const accessToken = await getAccessToken();
-          const decodedToken: any = jwtDecode(accessToken);
-
-          // Check if the user is an Admin
-          if (decodedToken.roles && decodedToken.roles.includes("Admin")) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
 
           const response = await axios.post(
             "http://localhost:5000/api/user-info",
@@ -57,6 +49,15 @@ export function Navigationbar() {
 
           setUser(response.data);
           console.log(response.data);
+          if (
+            response.data.role &&
+            response.data.role.includes("Internal/Admin")
+          ) {
+            setIsAdmin(true);
+            console.log("Admin");
+          } else {
+            setIsAdmin(false);
+          }
         } catch (error) {
           console.error("Error fetching user info:", error);
         } finally {
@@ -128,7 +129,6 @@ export function Navigationbar() {
           className="mb-8 mt-2 mr-3 h-16 sm:h-16 "
           alt="Bloodline Logo"
         />
-
         <span className="mt-1 self-center whitespace-nowrap text-xl font-semibold ">
           Bloodline
         </span>
@@ -223,7 +223,6 @@ export function Navigationbar() {
         <Navbar.Link href="#" className="text-lg font-medium font-roboto">
           Services
         </Navbar.Link>
-
         <Navbar.Link href="#" className="text-lg font-medium font-roboto">
           Contact Us
         </Navbar.Link>
