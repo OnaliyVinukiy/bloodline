@@ -21,7 +21,7 @@ const PendingAppointments = () => {
           "http://localhost:5000/api/appointments/fetch-appointment"
         );
         const pendingAppointments = response.data.filter(
-          (appointment: any) => appointment.status === "pending"
+          (appointment: any) => appointment.status === "Pending"
         );
         setAppointments(pendingAppointments);
         console.log(pendingAppointments);
