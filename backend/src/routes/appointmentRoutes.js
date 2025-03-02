@@ -12,6 +12,7 @@ import {
   getAppointmentsByDate,
   getAppointmentById,
   approveAppointment,
+  rejectAppointment,
 } from "../controllers/appointmentController.js";
 
 const router = express.Router();
@@ -27,5 +28,8 @@ router.get("/:date", getAppointmentsByDate);
 
 // Route to approve appointment
 router.put("/approve-appointment/:id", approveAppointment);
+
+// Route to reject appointment
+router.put("/reject-appointment/:id", rejectAppointment);
 
 export default router;
