@@ -12,6 +12,8 @@ import {
   APPOINTMENT_COLLECTION_ID,
 } from "../config/azureConfig.js";
 import dotenv from "dotenv";
+import nodemailer from "nodemailer";
+import { AppointmentConfirmation } from "../emailTemplates/AppointmentConfirmation.js";
 
 dotenv.config();
 import { ObjectId } from "mongodb";
@@ -32,6 +34,9 @@ export const saveAppointment = async (req, res) => {
     const collection = database.collection(APPOINTMENT_COLLECTION_ID);
     const result = await collection.insertOne(appointmentData);
 
+    // Send confirmation email
+    await sendConfirmationEmail(appointmentData);
+
     res.status(201).json({
       message: "Appointment saved successfully",
       appointmentId: result.insertedId,
@@ -40,8 +45,31 @@ export const saveAppointment = async (req, res) => {
     await client.close();
   } catch (error) {
     console.error("Error saving appointment:", error);
-    res.status(500).json({ message: "Error saving appointment", error });
+    res.status(500).json({ message: "Failed to save appointment" });
   }
+};
+
+// Send confirmation email to the donor
+const sendConfirmationEmail = async (appointment) => {
+  console.log("EMAIL_USER:", process.env.EMAIL_USER);
+  console.log("EMAIL_PASS:", process.env.COSMOS_DB_CONNECTION_STRING);
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: appointment.donorInfo.email,
+    subject: "Blood Donation Appointment Request Placed",
+    html: AppointmentConfirmation(appointment),
+  };
+
+  await transporter.sendMail(mailOptions);
 };
 
 // Fetch appointment data
