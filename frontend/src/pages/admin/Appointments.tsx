@@ -10,6 +10,7 @@ import PendingAppointments from "./PendingAppointments";
 import ApprovedAppointments from "./ApprovedAppointments";
 import RejectedAppointments from "./RejectedAppointments";
 import AllAppointments from "./AllAppointments";
+import CalendarPage from "./CalendarPage";
 
 const DonorDeclaration = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -65,6 +66,18 @@ const DonorDeclaration = () => {
               Rejected
             </button>
           </li>
+          <li className="me-2">
+            <button
+              onClick={() => setActiveTab("tab5")}
+              className={`px-6 py-3 rounded-t-lg transition-colors duration-300 ${
+                activeTab === "tab5"
+                  ? "text-white bg-red-800 border-b-0"
+                  : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}
+            >
+              Calendar
+            </button>
+          </li>
         </ul>
       </div>
 
@@ -73,6 +86,7 @@ const DonorDeclaration = () => {
         {activeTab === "tab2" && <PendingAppointments />}
         {activeTab === "tab3" && <ApprovedAppointments />}
         {activeTab === "tab4" && <RejectedAppointments />}
+        {activeTab === "tab5" && <CalendarPage />}
       </div>
     </div>
   );
