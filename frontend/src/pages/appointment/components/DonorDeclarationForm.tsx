@@ -36,7 +36,7 @@ const BasicInfo = ({
   const [formData, setFormData] = useState({
     selectedDate: null,
     selectedSlot: null,
-    status: "pending",
+    status: "Pending",
     donorInfo: {
       nic: null,
       fullName: null,
