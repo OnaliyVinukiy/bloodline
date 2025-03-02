@@ -74,11 +74,15 @@ const StepEight: React.FC<StepperProps> = ({
 
       setErrors({});
       setShowErrorMessage(false);
+      onFormDataChange({
+        ...formData,
+        seventhForm: formSevenData,
+      });
 
       //Submit appointment data
       const response = await axios.post(
         "http://localhost:5000/api/appointments/save-appointment",
-        formData,
+        { ...formData, seventhForm: formSevenData },
         { headers: { "Content-Type": "application/json" } }
       );
 
