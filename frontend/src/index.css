@@ -100,3 +100,34 @@
   color: rgb(239 68 68);
   border: 1px rgb(239 68 68) solid;
 }
+
+.custom-calendar {
+  border-radius: 10px;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.react-calendar {
+  width: 100%;
+  max-width: 350px;
+  background: white;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.react-calendar__tile {
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.react-calendar__tile--active {
+  background: #3b82f6 !important;
+  color: white !important;
+}
+
+.react-calendar__tile--now {
+  background: #facc15 !important;
+  color: black !important;
+  font-weight: bold;
+}
