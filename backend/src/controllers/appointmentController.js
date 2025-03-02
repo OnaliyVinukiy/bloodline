@@ -172,3 +172,38 @@ export const approveAppointment = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+//Reject pending appointments
+export const rejectAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Connect to the database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+    const objectId = new ObjectId(id);
+
+    const updatedAppointment = await collection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: { status: "Rejected" } },
+      { returnDocument: "after" }
+    );
+
+    await client.close();
+
+    if (!updatedAppointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    res.status(200).json(updatedAppointment);
+  } catch (error) {
+    console.error("Error updating appointment status:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
