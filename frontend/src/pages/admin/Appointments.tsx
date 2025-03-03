@@ -10,7 +10,7 @@ import PendingAppointments from "./PendingAppointments";
 import ApprovedAppointments from "./ApprovedAppointments";
 import RejectedAppointments from "./RejectedAppointments";
 import AllAppointments from "./AllAppointments";
-import CalendarPage from "./CalendarPage";
+import CalendarPage from "./AppointmentsCalendar";
 
 const DonorDeclaration = () => {
   const [activeTab, setActiveTab] = useState("tab1");
