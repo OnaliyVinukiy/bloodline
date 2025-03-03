@@ -17,6 +17,7 @@ import { AppointmentConfirmation } from "../emailTemplates/AppointmentConfirmati
 
 dotenv.config();
 import { ObjectId } from "mongodb";
+import { AppointmentRejection } from "../emailTemplates/AppointmentRejection.js";
 
 // Save appointment data
 export const saveAppointment = async (req, res) => {
@@ -233,6 +234,9 @@ export const rejectAppointment = async (req, res) => {
       { returnDocument: "after" }
     );
 
+    // Send rejection email
+    await sendRejectionEmail(updatedAppointment);
+
     await client.close();
 
     if (!updatedAppointment) {
@@ -244,4 +248,24 @@ export const rejectAppointment = async (req, res) => {
     console.error("Error updating appointment status:", error);
     res.status(500).json({ message: "Server error" });
   }
+};
+
+// Send rejection email to the donor
+const sendRejectionEmail = async (appointment) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: appointment.donorInfo.email,
+    subject: "Blood Donation Appointment Rejected",
+    html: AppointmentRejection(appointment),
+  };
+
+  await transporter.sendMail(mailOptions);
 };
