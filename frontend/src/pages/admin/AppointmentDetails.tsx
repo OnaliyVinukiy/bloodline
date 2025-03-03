@@ -23,6 +23,7 @@ const AppointmentDetails = () => {
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [isApprovedToastOpen, setIsApprovedToastOpen] = useState(false);
   const [isRejectedToastOpen, setIsRejectedToastOpen] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   //Fetch appointment data
   useEffect(() => {
@@ -54,8 +55,8 @@ const AppointmentDetails = () => {
       setAppointment((prev: any) => ({ ...prev, status: "Approved" }));
       setIsApprovedToastOpen(true);
     } catch (error) {
-      console.error("Error approving appointment:", error);
-      setError("Failed to approve appointment.");
+      console.error("Error rejecting appointment:", error);
+      setError("Failed to reject appointment.");
     } finally {
       setIsApproving(false);
       setIsApproveModalOpen(false);
@@ -64,19 +65,25 @@ const AppointmentDetails = () => {
 
   //Handle reject appointment
   const handleReject = async () => {
+    if (!rejectionReason.trim()) {
+      setError("Please provide a reason for rejection.");
+      return;
+    }
     try {
       setIsRejecting(true);
       await axios.put(
-        `http://localhost:5000/api/appointments/reject-appointment/${id}`
+        `http://localhost:5000/api/appointments/reject-appointment/${id}`,
+        { reason: rejectionReason }
       );
       setAppointment((prev: any) => ({ ...prev, status: "Rejected" }));
       setIsRejectedToastOpen(true);
     } catch (error) {
-      console.error("Error approving appointment:", error);
-      setError("Failed to approve appointment.");
+      console.error("Error rejecting appointment:", error);
+      setError("Failed to reject appointment.");
     } finally {
       setIsRejecting(false);
       setIsRejectModalOpen(false);
+      setRejectionReason("");
     }
   };
 
@@ -461,53 +468,67 @@ const AppointmentDetails = () => {
         </Modal.Footer>
       </Modal>
 
-      <Modal
-        show={isRejectModalOpen}
-        onClose={() => setIsRejectModalOpen(false)}
-      >
-        <Modal.Header>Reject Appointment</Modal.Header>
-        <Modal.Body>
-          <p className="text-lg text-gray-700">
-            Are you sure you want to reject this appointment?
-          </p>
-        </Modal.Body>
-        <Modal.Footer className="flex justify-end">
-          <Button color="failure" onClick={handleReject}>
-            {isRejecting ? (
-              <>
-                <svg
-                  aria-hidden="true"
-                  className="w-4 h-4 mr-2 text-white animate-spin"
-                  viewBox="0 0 100 101"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M100 50.5c0 27.6-22.4 50-50 50S0 78.1 0 50.5 22.4.5 50 .5s50 22.4 50 50z"
-                    fill="currentColor"
-                    opacity=".2"
-                  />
-                  <path
-                    d="M93.3 50.5c0-23.9-19.4-43.3-43.3-43.3-6.3 0-12.3 1.3-17.8 3.7-1.6.7-2.2 2.6-1.5 4.2.7 1.6 2.6 2.2 4.2 1.5 4.9-2.1 10.2-3.2 15.6-3.2 21.6 0 39.3 17.7 39.3 39.3s-17.7 39.3-39.3 39.3c-21.6 0-39.3-17.7-39.3-39.3 0-6.8 1.7-13.3 5-19.1.9-1.5.4-3.4-1-4.3s-3.4-.4-4.3 1c-3.8 6.4-5.8 13.7-5.8 21.3 0 23.9 19.4 43.3 43.3 43.3s43.3-19.4 43.3-43.3z"
-                    fill="currentColor"
-                  />
-                </svg>
-                Rejecting...
-              </>
-            ) : (
-              "Yes"
-            )}
-          </Button>
-          <Button
-            color="failure"
-            outline
-            onClick={() => setIsRejectModalOpen(false)}
-            className="border-red-700 text-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300"
-          >
-            Cancel
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {isRejectModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Reject Appointment
+            </h2>
+            <p className="text-sm text-gray-600 mt-2">
+              Provide a reason for rejection:
+            </p>
+
+            <textarea
+              className="w-full mt-3 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
+              rows={3}
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Enter reason..."
+            />
+
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+
+            <div className="flex justify-end space-x-3 mt-4">
+              <button
+                onClick={() => setIsRejectModalOpen(false)}
+                className="px-4 py-2 text-red-800 hover:text-white border border-red-800 hover:bg-red-700 rounded-lg text-sm hover:bg-red-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReject}
+                disabled={isRejecting}
+                className="px-4 py-2 bg-red-700 text-white rounded-lg  text-sm hover:bg-red-800 disabled:bg-red-400 flex items-center justify-center"
+              >
+                {isRejecting ? (
+                  <div className="flex items-center">
+                    <svg
+                      aria-hidden="true"
+                      className="w-4 h-4 mr-2 text-white animate-spin"
+                      viewBox="0 0 100 101"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M100 50.5c0 27.6-22.4 50-50 50S0 78.1 0 50.5 22.4.5 50 .5s50 22.4 50 50z"
+                        fill="currentColor"
+                        opacity=".2"
+                      />
+                      <path
+                        d="M93.3 50.5c0-23.9-19.4-43.3-43.3-43.3-6.3 0-12.3 1.3-17.8 3.7-1.6.7-2.2 2.6-1.5 4.2.7 1.6 2.6 2.2 4.2 1.5 4.9-2.1 10.2-3.2 15.6-3.2 21.6 0 39.3 17.7 39.3 39.3s-17.7 39.3-39.3 39.3c-21.6 0-39.3-17.7-39.3-39.3 0-6.8 1.7-13.3 5-19.1.9-1.5.4-3.4-1-4.3s-3.4-.4-4.3 1c-3.8 6.4-5.8 13.7-5.8 21.3 0 23.9 19.4 43.3 43.3 43.3s43.3-19.4 43.3-43.3z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                    <span>Rejecting</span>
+                  </div>
+                ) : (
+                  "Reject"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isRejectedToastOpen && (
         <Toast className="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50">

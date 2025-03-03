@@ -205,6 +205,11 @@ export const approveAppointment = async (req, res) => {
 export const rejectAppointment = async (req, res) => {
   try {
     const { id } = req.params;
+    const { reason } = req.body;
+
+    if (!reason) {
+      return res.status(400).json({ message: "Rejection reason is required" });
+    }
 
     // Connect to the database
     const client = new MongoClient(COSMOS_DB_CONNECTION_STRING, {
@@ -219,7 +224,12 @@ export const rejectAppointment = async (req, res) => {
 
     const updatedAppointment = await collection.findOneAndUpdate(
       { _id: objectId },
-      { $set: { status: "Rejected" } },
+      {
+        $set: {
+          status: "Rejected",
+          reason,
+        },
+      },
       { returnDocument: "after" }
     );
 
