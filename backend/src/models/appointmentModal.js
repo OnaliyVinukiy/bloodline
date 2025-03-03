@@ -11,7 +11,7 @@ const appointmentSchema = new mongoose.Schema(
   {
     selectedDate: { type: String, required: true },
     selectedSlot: { type: String, required: true },
-    status: { type: String, enum: ["pending", "approved"], default: "pending" },
+    status: { type: String, enum: ["Pending", "approved"], default: "Pending" },
 
     donorInfo: {
       _id: { type: mongoose.Schema.Types.ObjectId, required: true },
