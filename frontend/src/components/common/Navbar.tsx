@@ -196,6 +196,10 @@ export function Navigationbar() {
               Appointments
             </Dropdown.Item>
             <Dropdown.Item>Campaigns</Dropdown.Item>
+            <Dropdown.Item onClick={() => navigate("/admin/calendar")}>
+              {" "}
+              Calendar
+            </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
           </Dropdown>
