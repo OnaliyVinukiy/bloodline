@@ -8,7 +8,7 @@
 
 import React from "react";
 import { StepperPropsCampaign } from "../../../types/types";
-
+import BloodInventory from "../../../assets/bloodinventory.jpg";
 const StepOne: React.FC<StepperPropsCampaign> = ({
   onNextStep,
   onPreviousStep,
@@ -33,6 +33,13 @@ const StepOne: React.FC<StepperPropsCampaign> = ({
               </div>
             </div>
 
+            <div className="flex justify-center mb-8">
+              <img
+                src={BloodInventory}
+                alt="Blood Donation Campaign"
+                className="rounded-lg shadow-md w-full max-w-2xl h-64 object-cover"
+              />
+            </div>
             <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md text-center text-gray-700 leading-relaxed">
                 Our main goal is to encourage and support blood donation to help
@@ -49,7 +56,7 @@ const StepOne: React.FC<StepperPropsCampaign> = ({
             <div className="flex justify-end mt-8">
               <button
                 onClick={handleNext}
-                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300"
+                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
                 Next
               </button>
