@@ -46,21 +46,23 @@ const Cards: React.FC = () => {
 
       <Card className="max-w-sm md:w-full sm:w-72">
         <img
-          src="src/assets/camp.png"
+          src="src/assets/journey.png"
           alt="Meaningful alt text for an image that is not purely decorative"
           className="w-40 h-45 object-cover mx-auto"
         />
         <h5 className="text-2xl text-center font-bold tracking-tight text-gray-900 dark:text-white">
-          Find a Blood Drive
+          Host a Blood Donation Camp
         </h5>
         <p className="font-normal text-center text-gray-700 dark:text-gray-400">
-          Search for upcoming blood drives and donation events near you.
+          Register to host a blood donation camp and help save lives in your
+          community.
         </p>
         <Button
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
+          href="/campaign-registration"
         >
-          Find Out
+          Register Now
           <svg
             className="-mr-1 ml-2 mt-1 h-4 w-4"
             fill="currentColor"
@@ -78,22 +80,21 @@ const Cards: React.FC = () => {
 
       <Card className="max-w-sm md:w-full sm:w-72">
         <img
-          src="src/assets/journey.png"
+          src="src/assets/camp.png"
           alt="Meaningful alt text for an image that is not purely decorative"
           className="w-40 h-45 object-cover mx-auto"
         />
         <h5 className="text-2xl text-center font-bold tracking-tight text-gray-900 dark:text-white">
-          Blood Donation Journey
+          Find a Blood Donation Camp
         </h5>
         <p className="font-normal text-center text-gray-700 dark:text-gray-400">
-          Learn how your blood saves lives and the steps involved in the
-          process.
+          Search for upcoming blood drives and donation events near you.
         </p>
         <Button
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
         >
-          Learn More
+          Find Out
           <svg
             className="-mr-1 ml-2 mt-1 h-4 w-4"
             fill="currentColor"
