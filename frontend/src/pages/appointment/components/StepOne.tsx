@@ -9,7 +9,7 @@ import { Datepicker, Label } from "flowbite-react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { UserIcon } from "@heroicons/react/24/solid";
-import { BloodDonor, Donor, StepperProps, User } from "../../../types/types";
+import { BloodDonor,  StepperProps, User } from "../../../types/types";
 import { useAuthContext } from "@asgardeo/auth-react";
 
 const StepOne: React.FC<StepperProps> = ({
@@ -50,7 +50,7 @@ const StepOne: React.FC<StepperProps> = ({
       }));
     }
   };
-  const [isProfileComplete, setIsProfileComplete] = useState(false);
+
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -83,7 +83,7 @@ const StepOne: React.FC<StepperProps> = ({
 
           if (donorInfo) {
             setDonor(donorInfo);
-            setIsProfileComplete(true);
+           
           }
         } catch (error) {
           console.error("Error fetching user info:", error);

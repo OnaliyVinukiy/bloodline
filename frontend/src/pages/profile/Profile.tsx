@@ -14,7 +14,7 @@ import { Datepicker } from "flowbite-react";
 import { User, Donor } from "../../types/types";
 
 export default function Profile() {
-  const { state, signOut, getAccessToken } = useAuthContext();
+  const { state,  getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);

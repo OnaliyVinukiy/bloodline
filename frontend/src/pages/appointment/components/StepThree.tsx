@@ -75,31 +75,7 @@ const StepThree: React.FC<StepperProps> = ({
     }
   }, [formData]);
 
-  const [isLoading, setIsLoading] = useState(false);
-
-  if (isLoading) {
-    return (
-      <div className="loading flex justify-center items-center h-screen">
-        <svg width="64px" height="48px">
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="back"
-            stroke="#e53e3e"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="front"
-            stroke="#f56565"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-        </svg>
-      </div>
-    );
-  }
-
+ 
   return (
     <div>
       <div className="flex justify-center items-center bg-gray-100">

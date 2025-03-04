@@ -5,7 +5,7 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { Toast } from "flowbite-react";

@@ -6,7 +6,7 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { User } from "../../../types/types";
 import { useAuthContext } from "@asgardeo/auth-react";
 import StepOne from "./StepOne";

@@ -5,7 +5,6 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import React from "react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { AuthProvider } from "@asgardeo/auth-react";
@@ -29,11 +28,7 @@ createRoot(document.getElementById("root")!).render(
           "given_name",
           "family_name",
           "birthdate",
-          "internal_user_mgt_list",
-          "internal_user_mgt_view",
-          "internal_user_mgt_delete",
-          "internal_user_mgt_update",
-          "internal_org_user_mgt_update"
+          "internal_user_mgt_create", "internal_user_mgt_list", "internal_user_mgt_view", "internal_user_mgt_delete", "internal_user_mgt_update", "internal_org_user_mgt_update", "internal_org_user_mgt_list", "internal_org_user_mgt_create", "internal_org_user_mgt_view", "internal_role_mgt_create", "internal_role_mgt_update", "internal_role_mgt_view", "internal_role_mgt_delete", "internal_bulk_resource_create",
         ],
       }}
     >
