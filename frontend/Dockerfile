@@ -15,7 +15,7 @@ COPY . .
 
 
 # Expose the port for the frontend development server
-EXPOSE 80
+EXPOSE 5173
 
 # Start the development server
 CMD ["npm", "run", "dev"]
