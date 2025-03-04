@@ -3,7 +3,7 @@ services:
   frontend:
     image: onaliy/bloodline-frontend:latest
     ports:
-      - "5173:5173"
+      - "80:80"
 
   backend:
     image: onaliy/bloodline-backend:latest

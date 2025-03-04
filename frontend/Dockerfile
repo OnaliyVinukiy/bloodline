@@ -13,9 +13,14 @@ RUN npm install
 # Copy the rest of the frontend code to the container
 COPY . .
 
+# Build the frontend for production
+RUN npm run build
 
-# Expose the port for the frontend development server
-EXPOSE 5173
+# Install a lightweight static server
+RUN npm install -g serve
 
-# Start the development server
-CMD ["npm", "run", "dev"]
+# Expose port 80 (Required by Azure)
+EXPOSE 80
+
+# Start the production server
+CMD ["serve", "-s", "dist", "-l", "80"]
