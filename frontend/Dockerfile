@@ -4,7 +4,7 @@ WORKDIR /usr/src/frontend
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run build  # Build the React app
+RUN npm run build
 
 # Stage 2: Serve the application
 FROM nginx:alpine
