@@ -31,5 +31,5 @@ jobs:
       - name: Deploy Frontend to Azure App Service
         uses: azure/webapps-deploy@v2
         with:
-          app-name: bloodlinehealth
+          app-name: bloodline
           images: onaliy/bloodline-frontend:latest
