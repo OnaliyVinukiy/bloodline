@@ -1,13 +1,23 @@
-# Stage 1: Build the application
-FROM node:alpine AS build
-WORKDIR /usr/src/frontend
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+# Use the Node.js LTS image as the base
+FROM node:lts
 
-# Stage 2: Serve the application
-FROM nginx:alpine
-COPY --from=build /usr/src/frontend/dist /usr/share/nginx/html
+# Set the working directory inside the container
+WORKDIR /usr/src/frontend
+
+# Copy package.json and package-lock.json to the container
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the frontend code to the container
+COPY . .
+
+# Run tests before deploying
+RUN npm test -- -u
+
+# Expose the port for the frontend development server
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+
+# Start the development server
+CMD ["npm", "run", "dev"]
