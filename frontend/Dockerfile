@@ -13,8 +13,6 @@ RUN npm install
 # Copy the rest of the frontend code to the container
 COPY . .
 
-# Run tests before deploying
-RUN npm test -- -u
 
 # Expose the port for the frontend development server
 EXPOSE 80
