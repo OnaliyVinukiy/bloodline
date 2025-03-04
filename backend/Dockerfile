@@ -17,7 +17,7 @@ RUN npm rebuild bcrypt --build-from-source
 COPY . .
 
 # Expose the port for the backend server
-EXPOSE 4000
+EXPOSE 5000
 
 # Start the development server
 CMD ["npm", "run", "dev"]

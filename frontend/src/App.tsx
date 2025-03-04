@@ -14,6 +14,9 @@ import Profile from "./pages/profile/Profile";
 import DonorDeclaration from "./pages/appointment/DonorDeclaration";
 import Appointments from "./pages/admin/Appointments";
 import PendingAppointments from "./pages/admin/PendingAppointments";
+import CalendarPage from "./pages/admin/CalendarPage";
+import AppointmentDetails from "./pages/admin/AppointmentDetails";
+import BloodCampaignRegistration from "./pages/campaign/BloodCampRegistration";
 
 function App() {
   return (
@@ -27,6 +30,15 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/donorDeclaration" element={<DonorDeclaration />} />
             <Route path="/admin/appointments" element={<Appointments />} />
+            <Route path="/appointment/:id" element={<AppointmentDetails />} />
+            <Route
+              path="/campaign-registration"
+              element={<BloodCampaignRegistration />} />
+            <Route
+              path="/admin/pending-appointments"
+              element={<PendingAppointments />}
+            />
+            <Route path="/admin/calendar" element={<CalendarPage />} />
           </Routes>
         </main>
         <FooterComponent />

@@ -25,19 +25,36 @@ const StepTwo: React.FC<StepperPropsCampaign> = ({
 
           <div className="relative bg-white rounded-xl p-8 z-10">
             <div className="text-center mb-8">
-              <h2 className="mt-4 text-3xl font-bold text-gray-800">
-                Select a Date for Your Blood Donation Campaign
+              <h2 className="flex flex-col md:flex-row items-center gap-4 mt-4 text-2xl md:text-3xl font-bold text-gray-800">
+                <svg
+                  className="w-8 h-8 md:w-10 md:h-10 text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"
+                  />
+                </svg>
+                Selecting a Date for Your Blood Donation Campaign
               </h2>
-              <div className="mt-2 text-lg text-gray-500">
+              <div className="mt-2 text-base md:text-lg text-gray-500">
                 Every drop counts. Let’s make a difference together!
               </div>
             </div>
 
             <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 shadow-sm">
-              <div className="mt-4 mb-8 font-roboto font-medium text-md text-justify text-gray-700 leading-relaxed">
+              <div className="mt-4 mb-8 font-roboto font-medium text-base md:text-lg text-justify text-gray-700 leading-relaxed">
                 You have the freedom to pick a date that aligns with your
-                campaign goals. However, please inform the National Blood
-                Transfusion Service (NBTS) at Narahenpita or your local blood
+                campaign goals. However, please inform the <strong>National Blood
+                Transfusion Service (NBTS) at Narahenpita</strong> or your local blood
                 bank at least <strong>one month in advance</strong>. Weekends
                 and holidays are in high demand for blood donation campaigns, so
                 we recommend securing your date at least{" "}
