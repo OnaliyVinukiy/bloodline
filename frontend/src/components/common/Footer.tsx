@@ -36,7 +36,7 @@ export function FooterComponent() {
               Licensing
             </Footer.Link>
             <Footer.Link href="#" className="hover:text-white">
-              Contact
+              Contac
             </Footer.Link>
           </Footer.LinkGroup>
         </div>
