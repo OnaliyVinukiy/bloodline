@@ -47,3 +47,8 @@ export interface StepperProps {
   onFormDataChange: (data: any) => void;
   formData: any;
 }
+
+export interface StepperPropsCampaign {
+  onNextStep: () => void;
+  onPreviousStep: () => void;
+}
