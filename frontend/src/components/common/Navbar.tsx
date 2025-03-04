@@ -12,7 +12,6 @@ import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { Donor, User } from "../../types/types";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
 
 export function Navigationbar() {
   const { state, signIn, signOut, getAccessToken } = useAuthContext();

@@ -11,7 +11,7 @@ import { FooterComponent } from "./components/common/Footer";
 import { Navigationbar } from "./components/common/Navbar";
 import EligibilityCriteria from "./pages/eligibility/Eligibility";
 import Profile from "./pages/profile/Profile";
-import DonorDeclaration from "./pages/appointment/DonorDeclaration";
+import DonorDeclaration from "./pages/appointment/DonorDeclarations";
 import Appointments from "./pages/admin/Appointments";
 import PendingAppointments from "./pages/admin/PendingAppointments";
 import CalendarPage from "./pages/admin/CalendarPage";

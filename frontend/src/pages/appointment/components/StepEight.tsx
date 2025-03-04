@@ -11,7 +11,7 @@ import { StepperProps } from "../../../types/types";
 import axios from "axios";
 
 const StepEight: React.FC<StepperProps> = ({
-  onNextStep,
+  
   onPreviousStep,
   onFormDataChange,
   formData,

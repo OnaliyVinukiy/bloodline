@@ -11,7 +11,7 @@ import { StepperPropsCampaign } from "../../../types/types";
 import BloodInventory from "../../../assets/bloodinventory.jpg";
 const StepOne: React.FC<StepperPropsCampaign> = ({
   onNextStep,
-  onPreviousStep,
+ 
 }) => {
   const handleNext = () => {
     onNextStep();
