@@ -1,20 +1,13 @@
-# Use the Node.js LTS image as the base
-FROM node:alpine
-
-# Set the working directory inside the container
+# Stage 1: Build the application
+FROM node:alpine AS build
 WORKDIR /usr/src/frontend
-
-# Copy package.json and package-lock.json to the container
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
-
-# Copy the rest of the frontend code to the container
 COPY . .
+RUN npm run build  # Build the React app
 
-# Expose the port for the frontend development server
+# Stage 2: Serve the application
+FROM nginx:alpine
+COPY --from=build /usr/src/frontend/dist /usr/share/nginx/html
 EXPOSE 80
-
-# Start the development server
-CMD ["npm", "run", "dev"]
+CMD ["nginx", "-g", "daemon off;"]
