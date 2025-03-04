@@ -5,7 +5,7 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import React, { useState } from "react";
+import  { useState } from "react";
 import PendingAppointments from "./PendingAppointments";
 import AppointmentCalendar from "./AppointmentsCalendar";
 

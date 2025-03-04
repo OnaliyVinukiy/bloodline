@@ -5,7 +5,7 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import React, { useState } from "react";
+import { useState } from "react";
 import BasicInfo from "./components/DonorDeclarationForm";
 
 const DonorDeclaration = () => {

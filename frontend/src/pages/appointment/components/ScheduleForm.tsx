@@ -14,9 +14,9 @@ import axios from "axios";
 
 const ScheduleForm: React.FC<StepperProps> = ({
   onNextStep,
-  onPreviousStep,
+
   onFormDataChange,
-  formData,
+  
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
