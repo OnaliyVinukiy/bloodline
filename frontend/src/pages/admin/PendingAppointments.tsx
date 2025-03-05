@@ -13,12 +13,17 @@ const PendingAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
+
   //Fetch pending appointments
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/appointments/fetch-appointment"
+          `${backendURL}/api/appointments/fetch-appointment`
         );
         const pendingAppointments = response.data.filter(
           (appointment: any) => appointment.status === "Pending"
