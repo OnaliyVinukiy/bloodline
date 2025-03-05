@@ -26,6 +26,11 @@ const Stepper = ({
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
+
   // Fetch user info from Asgardeo
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -33,7 +38,7 @@ const Stepper = ({
         try {
           const accessToken = await getAccessToken();
           const { data: userInfo } = await axios.post(
-            "http://localhost:5000/api/user-info",
+            `${backendURL}/api/user-info`,
             { accessToken },
             { headers: { "Content-Type": "application/json" } }
           );

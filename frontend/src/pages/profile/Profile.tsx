@@ -14,7 +14,7 @@ import { Datepicker } from "flowbite-react";
 import { User, Donor } from "../../types/types";
 
 export default function Profile() {
-  const { state,  getAccessToken } = useAuthContext();
+  const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -37,6 +37,11 @@ export default function Profile() {
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
+
   // Fetch user info from Asgardeo
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -44,7 +49,7 @@ export default function Profile() {
         try {
           const accessToken = await getAccessToken();
           const { data: userInfo } = await axios.post(
-            "http://localhost:5000/api/user-info",
+            `${backendURL}/api/user-info`,
             { accessToken },
             { headers: { "Content-Type": "application/json" } }
           );
@@ -59,7 +64,7 @@ export default function Profile() {
 
           // Fetch donor info if user exists
           const { data: donorInfo } = await axios.get(
-            `http://localhost:5000/api/donor/${userInfo.email}`
+            `${backendURL}/api/donor/${userInfo.email}`
           );
 
           if (donorInfo) {
@@ -100,7 +105,7 @@ export default function Profile() {
 
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/upload-avatar",
+        `${backendURL}/api/upload-avatar`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -141,7 +146,7 @@ export default function Profile() {
       setLoading(true);
       const { _id, ...donorData } = donor;
 
-      await axios.post("http://localhost:5000/api/update-donor", donorData);
+      await axios.post(`${backendURL}/api/update-donor`, donorData);
       setIsProfileComplete(true);
       setLoading(false);
       setShowModal(true);
