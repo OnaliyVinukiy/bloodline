@@ -25,12 +25,17 @@ const AppointmentDetails = () => {
   const [isRejectedToastOpen, setIsRejectedToastOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
 
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
+
   //Fetch appointment data
   useEffect(() => {
     const fetchAppointment = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/appointments/fetch-appointment/${id}`
+          `${backendURL}/api/appointments/fetch-appointment/${id}`
         );
         setAppointment(response.data);
         console.log("response", response.data);
@@ -50,7 +55,7 @@ const AppointmentDetails = () => {
     try {
       setIsApproving(true);
       await axios.put(
-        `http://localhost:5000/api/appointments/approve-appointment/${id}`
+        `${backendURL}/api/appointments/approve-appointment/${id}`
       );
       setAppointment((prev: any) => ({ ...prev, status: "Approved" }));
       setIsApprovedToastOpen(true);
@@ -72,7 +77,7 @@ const AppointmentDetails = () => {
     try {
       setIsRejecting(true);
       await axios.put(
-        `http://localhost:5000/api/appointments/reject-appointment/${id}`,
+        `${backendURL}/api/appointments/reject-appointment/${id}`,
         { reason: rejectionReason }
       );
       setAppointment((prev: any) => ({ ...prev, status: "Rejected" }));
