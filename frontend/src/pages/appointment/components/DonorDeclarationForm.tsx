@@ -32,6 +32,11 @@ const BasicInfo = ({
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
+
   //Structure for the declaration form data
   const [formData, setFormData] = useState({
     selectedDate: null,
@@ -103,7 +108,7 @@ const BasicInfo = ({
         try {
           const accessToken = await getAccessToken();
           const { data: userInfo } = await axios.post(
-            "http://localhost:5000/api/user-info",
+            `${backendURL}/api/user-info`,
             { accessToken },
             { headers: { "Content-Type": "application/json" } }
           );
