@@ -11,8 +11,19 @@ import userRoutes from "./src/routes/userRoutes.js";
 import appointmentRoutes from "./src/routes/appointmentRoutes.js";
 
 const app = express();
+const allowedOrigins = [
+  "https://bloodline-gxfvfrfyg7bqbahz.southeastasia-01.azurewebsites.net",
+  "https://bloodlinebackend-avepf5h9fdfsera7.southeastasia-01.azurewebsites.net",
+];
 
-app.use(cors());
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 //User Routes
