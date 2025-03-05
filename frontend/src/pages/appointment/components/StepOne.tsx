@@ -9,7 +9,7 @@ import { Datepicker, Label } from "flowbite-react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { UserIcon } from "@heroicons/react/24/solid";
-import { BloodDonor,  StepperProps, User } from "../../../types/types";
+import { BloodDonor, StepperProps, User } from "../../../types/types";
 import { useAuthContext } from "@asgardeo/auth-react";
 
 const StepOne: React.FC<StepperProps> = ({
@@ -51,10 +51,14 @@ const StepOne: React.FC<StepperProps> = ({
     }
   };
 
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
 
   // Fetch user info from Asgardeo
   useEffect(() => {
@@ -63,7 +67,7 @@ const StepOne: React.FC<StepperProps> = ({
         try {
           const accessToken = await getAccessToken();
           const { data: userInfo } = await axios.post(
-            "http://localhost:5000/api/user-info",
+            `${backendURL}/api/user-info`,
             { accessToken },
             { headers: { "Content-Type": "application/json" } }
           );
@@ -78,12 +82,11 @@ const StepOne: React.FC<StepperProps> = ({
 
           // Fetch donor info if user exists
           const { data: donorInfo } = await axios.get(
-            `http://localhost:5000/api/donor/${userInfo.email}`
+            `${backendURL}/api/donor/${userInfo.email}`
           );
 
           if (donorInfo) {
             setDonor(donorInfo);
-           
           }
         } catch (error) {
           console.error("Error fetching user info:", error);
@@ -135,7 +138,7 @@ const StepOne: React.FC<StepperProps> = ({
 
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/upload-avatar",
+        `${backendURL}/api/upload-avatar`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
