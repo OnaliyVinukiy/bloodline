@@ -7,7 +7,7 @@
  */
 import { CarouselSlider } from "./components/Carousel";
 import Cards from "./components/Cards";
-import Map from "./components/Map";
+import Map from "./components/Stock";
 
 const Home = () => {
   return (

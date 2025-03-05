@@ -9,42 +9,42 @@ import React from "react";
 const Map: React.FC = () => {
   const bloodTypes = [
     {
-      src: "src/assets/apositive.png",
+      src: "https://github.com/OnaliyVinukiy/bloodline/raw/main/frontend/src/assets/apositive.png",
       alt: "Blood Type A+",
       text: "When the stock is over 10 days, A+ is needed less. When the stock for A+ is below 8 days, A+ is especially important.",
     },
     {
-      src: "src/assets/anegative.png",
+      src: "https://github.com/OnaliyVinukiy/bloodline/raw/main/frontend/src/assets/anegative.png",
       alt: "Blood Type A-",
       text: "When the stock is over 10 days, A- is needed less. When the stock for A- is below 8 days, A- is especially important.",
     },
     {
-      src: "src/assets/bpositive.png",
+      src: "https://github.com/OnaliyVinukiy/bloodline/raw/main/frontend/src/assets/bpositive.png",
       alt: "Blood Type B+",
       text: "When the stock is over 10 days, B+ is needed less. When the stock for B+ is below 8 days, B+ is especially important.",
     },
     {
-      src: "src/assets/bnegative.png",
+      src: "https://github.com/OnaliyVinukiy/bloodline/raw/main/frontend/src/assets/bnegative.png",
       alt: "Blood Type B-",
       text: "When the stock is over 10 days, B- is needed less. When the stock for B- is below 8 days, B- is especially important.",
     },
     {
-      src: "src/assets/opositive.png",
+      src: "https://github.com/OnaliyVinukiy/bloodline/raw/main/frontend/src/assets/opositive.png",
       alt: "Blood Type O+",
       text: "When the stock is over 10 days, O+ is needed less. When the stock for O+ is below 8 days, O+ is especially important.",
     },
     {
-      src: "src/assets/onegative.png",
+      src: "https://github.com/OnaliyVinukiy/bloodline/raw/main/frontend/src/assets/onegative.png",
       alt: "Blood Type O-",
       text: "When the stock is over 10 days, O- is needed less. When the stock for O- is below 8 days, O- is especially important.",
     },
     {
-      src: "src/assets/abpositive.png",
+      src: "https://github.com/OnaliyVinukiy/bloodline/raw/main/frontend/src/assets/abpositive.png",
       alt: "Blood Type AB+",
       text: "When the stock is over 10 days, AB+ is needed less. When the stock for AB+ is below 8 days, AB+ is especially needed.",
     },
     {
-      src: "src/assets/abnegative.png",
+      src: "https://github.com/OnaliyVinukiy/bloodline/raw/main/frontend/src/assets/abnegative.png",
       alt: "Blood Type AB-",
       text: "When the stock is over 10 days, AB- is needed less. When the stock for AB- is below 8 days, AB- is especially needed.",
     },
