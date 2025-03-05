@@ -17,8 +17,8 @@ createRoot(document.getElementById("root")!).render(
       config={{
         signInRedirectURL: signInSignOutRedirectURL,
         signOutRedirectURL: signInSignOutRedirectURL,
-        clientID: "y2aL7duzUDfj_N3_aG7ZB1efXhMa",
-        baseUrl: "https://api.asgardeo.io/t/onaliy",
+        clientID: import.meta.env.VITE_CLIENT_ID as string,
+        baseUrl: import.meta.env.VITE_BASE_URL as string,
         scope: [
           "openid",
           "profile",
