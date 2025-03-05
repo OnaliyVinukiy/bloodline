@@ -31,7 +31,8 @@ export function Navigationbar() {
     avatar: "",
     gender: "",
   });
-  const backendurl =
+  
+  const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
@@ -45,7 +46,7 @@ export function Navigationbar() {
           const accessToken = await getAccessToken();
           console.log("acess", accessToken);
           const response = await axios.post(
-            `${backendurl}/api/user-info`,
+            `${backendURL}/api/user-info`,
             { accessToken },
             { headers: { "Content-Type": "application/json" } }
           );
@@ -83,7 +84,7 @@ export function Navigationbar() {
 
           // Fetch donor info using the user's email
           const { data: donorInfo } = await axios.get(
-            `http://localhost:5000/api/donor/${user.email}`
+            `${backendURL}/api/donor/${user.email}`
           );
 
           if (donorInfo) {
