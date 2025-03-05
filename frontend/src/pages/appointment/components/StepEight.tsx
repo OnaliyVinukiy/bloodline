@@ -11,7 +11,6 @@ import { StepperProps } from "../../../types/types";
 import axios from "axios";
 
 const StepEight: React.FC<StepperProps> = ({
-  
   onPreviousStep,
   onFormDataChange,
   formData,
@@ -53,6 +52,11 @@ const StepEight: React.FC<StepperProps> = ({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
+
   //Function to submit form data
   const submitForm = async () => {
     try {
@@ -81,7 +85,7 @@ const StepEight: React.FC<StepperProps> = ({
 
       //Submit appointment data
       const response = await axios.post(
-        "http://localhost:5000/api/appointments/save-appointment",
+        `${backendURL}/api/appointments/save-appointment`,
         { ...formData, seventhForm: formSevenData },
         { headers: { "Content-Type": "application/json" } }
       );
