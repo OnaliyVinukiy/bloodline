@@ -27,7 +27,7 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(
 );
 const containerClient = blobServiceClient.getContainerClient(CONTAINER_NAME);
 
-// Connect to DB using MongoClient
+// Connect to DB using MongoClient.
 const connectToCosmos = async () => {
   try {
     const client = await MongoClient.connect(COSMOS_DB_CONNECTION_STRING, {
@@ -50,6 +50,13 @@ const connectToCosmos = async () => {
 const getUserInfo = async (req, res) => {
   const { accessToken } = req.body;
 
+  // Log token for debugging
+  console.log("Access Token:", accessToken);
+
+  if (!accessToken) {
+    return res.status(400).json({ message: "Access token is missing" });
+  }
+
   try {
     const response = await fetch(
       "https://api.asgardeo.io/t/onaliy/oauth2/userinfo",
@@ -57,12 +64,15 @@ const getUserInfo = async (req, res) => {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
+          "Accept": "application/json",  // Added Accept header
         },
       }
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch user info");
+      const errorText = await response.text();  // Log the error message from the API
+      console.error("Asgardeo API Response:", errorText);
+      throw new Error(`Failed to fetch user info: ${errorText}`);
     }
 
     const userInfo = await response.json();
@@ -75,10 +85,12 @@ const getUserInfo = async (req, res) => {
     };
     res.status(200).json(user);
   } catch (error) {
-    console.error("Error fetching user info:", error);
-    res.status(500).json({ message: "Error fetching user info" });
+    console.error("Error fetching user info:", error.message || error);
+    res.status(500).json({ message: "Error fetching user info", error: error.message || error });
   }
 };
+
+
 
 // Handle avatar upload to Azure Blob Storage
 const uploadAvatar = async (req, res) => {
