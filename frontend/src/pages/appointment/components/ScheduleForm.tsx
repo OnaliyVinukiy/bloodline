@@ -16,7 +16,6 @@ const ScheduleForm: React.FC<StepperProps> = ({
   onNextStep,
 
   onFormDataChange,
-  
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -30,6 +29,11 @@ const ScheduleForm: React.FC<StepperProps> = ({
     return offsetDate.toISOString().split("T")[0];
   };
 
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
+
   //Fetch booked slots
   useEffect(() => {
     if (selectedDate) {
@@ -37,9 +41,7 @@ const ScheduleForm: React.FC<StepperProps> = ({
       const fetchBookedSlots = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:5000/api/appointments/${getFormattedDate(
-              selectedDate
-            )}`
+            `${backendURL}/api/appointments/${getFormattedDate(selectedDate)}`
           );
 
           const slots = response.data.map(
