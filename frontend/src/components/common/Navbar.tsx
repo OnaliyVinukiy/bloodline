@@ -31,6 +31,7 @@ export function Navigationbar() {
     avatar: "",
     gender: "",
   });
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch and assign user info
   useEffect(() => {
@@ -41,10 +42,10 @@ export function Navigationbar() {
           const accessToken = await getAccessToken();
 
           const response = await axios.post(
-            "http://localhost:5000/api/user-info",
-            { accessToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
+          `${BACKEND_URL}/api/user-info`,
+          { accessToken },
+          { headers: { "Content-Type": "application/json" } }
+        );
 
           setUser(response.data);
           console.log(response.data);
