@@ -5,7 +5,7 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
@@ -15,12 +15,17 @@ const AppointmentCalendar = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
+
   //Fetch appointments
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/appointments/fetch-appointment"
+          `${backendURL}/api/appointments/fetch-appointment`
         );
         setAppointments(response.data);
       } catch (error) {
@@ -66,12 +71,12 @@ const AppointmentCalendar = () => {
 
   return (
     <div className="flex flex-col items-center mt-8">
-       <Calendar
-          onChange={(date) => setSelectedDate(date as Date)}
-          value={selectedDate}
-          className="custom-calendar"
-          tileClassName="text-center p-2 rounded-md transition duration-200 hover:bg-blue-500 hover:text-white"
-        />
+      <Calendar
+        onChange={(date) => setSelectedDate(date as Date)}
+        value={selectedDate}
+        className="custom-calendar"
+        tileClassName="text-center p-2 rounded-md transition duration-200 hover:bg-blue-500 hover:text-white"
+      />
 
       <div className="mt-8 relative overflow-x-auto shadow-md sm:rounded-lg max-w-7xl w-full mb-20">
         <h2 className="text-lg font-semibold text-center mb-4">
