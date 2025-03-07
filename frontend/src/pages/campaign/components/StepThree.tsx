@@ -25,7 +25,7 @@ const StepThree: React.FC<StepperPropsCampaign> = ({
 
           <div className="relative bg-white rounded-xl p-8 z-10">
             <div className="text-center mb-8">
-              <h2 className="flex flex-col md:flex-row items-center gap-4 mt-4 text-2xl md:text-3xl font-bold text-gray-800">
+              <h2 className="mt-4 flex justify-center items-center gap-4 text-2xl md:text-3xl font-bold text-gray-800">
                 <svg
                   className="w-8 h-8 md:w-10 md:h-10 text-gray-800 dark:text-white"
                   aria-hidden="true"
@@ -43,7 +43,7 @@ const StepThree: React.FC<StepperPropsCampaign> = ({
                     d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                   />
                 </svg>
-                Selecting a Time for Your Blood Donation Campaign
+                Selecting a Time for the Blood Donation Camp
               </h2>
               <div className="mt-2 text-base md:text-lg text-gray-500">
                 Every drop counts. Let’s make a difference together!
