@@ -15,9 +15,9 @@ export function FooterComponent() {
       <div className="w-full text-center">
         <div className="w-full justify-between sm:flex sm:items-center sm:justify-between">
           <Footer.Brand
-            src="src/assets/bloodlogo.png"
+            src="https://bloodlineresources.blob.core.windows.net/assets/logo.png"
             href="#"
-            className="mr-3 h-6 sm:h-9 ml-8"
+            className="mr-3 h-10 sm:h-10 ml-8 mb-8"
             alt="Bloodline Logo"
           >
             <span className="self-center text-white whitespace-nowrap text-xl font-semibold">
