@@ -9,7 +9,7 @@
 import React from "react";
 import { StepperPropsCampaign } from "../../../types/types";
 
-const StepThree: React.FC<StepperPropsCampaign> = ({
+const StepFour: React.FC<StepperPropsCampaign> = ({
   onNextStep,
   onPreviousStep,
 }) => {
@@ -37,13 +37,20 @@ const StepThree: React.FC<StepperPropsCampaign> = ({
                 >
                   <path
                     stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+                  />
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.8 13.938h-.011a7 7 0 1 0-11.464.144h-.016l.14.171c.1.127.2.251.3.371L12 21l5.13-6.248c.194-.209.374-.429.54-.659l.13-.155Z"
                   />
                 </svg>
-                Selecting a Time for the Blood Donation Camp
+                Selecting a Venue for the Blood Donation Camp
               </h2>
               <div className="mt-2 text-base md:text-lg text-gray-500">
                 Every drop counts. Let’s make a difference together!
@@ -52,15 +59,33 @@ const StepThree: React.FC<StepperPropsCampaign> = ({
 
             <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-base md:text-lg text-justify text-gray-700 leading-relaxed">
-                A blood donation campaign is normally held from{" "}
-                <strong>9:00 AM to 3:00 PM.</strong> This time frame ensures
-                that the collected blood can be properly processed. Once
-                donated, blood must be separated into blood constituents within
-                six hours. Therefore, campaigns cannot exceed this time limit.
-                <br />
-                <br />
-                Planning your campaign within this time frame helps ensure that
-                every donation makes the maximum impact in saving lives!
+                Selecting the right venue is essential for a smooth and
+                successful campaign. Here are some key factors to consider:
+                <ul className="list-disc pl-6 mt-4 space-y-2">
+                  <li>
+                    <strong>Easily Accessible Location</strong> – A well-known
+                    public place ensures better participation and ease of travel
+                    for both donors and staff.
+                  </li>
+                  <li>
+                    <strong>Good Transport Access</strong> – The venue should be
+                    easily reachable by vehicles, ensuring a hassle-free
+                    experience for donors and medical teams.
+                  </li>
+                  <li>
+                    <strong>Clean & Safe Environment</strong> – A permanent
+                    building with a clean and hygienic surrounding is ideal for
+                    maintaining health and safety standards.
+                  </li>
+                  <li>
+                    <strong>Toilet Facilities</strong> – Proper restroom
+                    facilities must be available for donors and staff throughout
+                    the event.
+                  </li>
+                </ul>
+                <br />A well-planned venue creates a comfortable experience for
+                everyone involved and contributes to a successful blood donation
+                drive!
               </div>
             </div>
 
@@ -85,4 +110,4 @@ const StepThree: React.FC<StepperPropsCampaign> = ({
   );
 };
 
-export default StepThree;
+export default StepFour;
