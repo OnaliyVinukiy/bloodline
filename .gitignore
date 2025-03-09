@@ -1,21 +1,16 @@
-# Logs
+# Ignore node_modules directory
 node_modules/
-logs
+dist/
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# Ignore logs and editor files
+.vscode/
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
