@@ -1,4 +1,11 @@
-export const AppointmentApproval = (appointment) => {
+/*!
+ * Bloodline Blood Bank Management System
+ * Copyright (c) 2025 Onaliy Jayawardana
+ * All rights reserved.
+ *
+ * Unauthorized copying, modification, or distribution of this code is prohibited.
+ */
+export const AppointmentApproval = (appointment: any) => {
   const startDate = new Date(
     `${appointment.selectedDate} ${appointment.selectedSlot}`
   );

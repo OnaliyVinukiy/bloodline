@@ -13,7 +13,7 @@ import {
   getAppointmentById,
   approveAppointment,
   rejectAppointment,
-} from "../controllers/appointmentController.js";
+} from "../controllers/appointmentController";
 
 const router = express.Router();
 

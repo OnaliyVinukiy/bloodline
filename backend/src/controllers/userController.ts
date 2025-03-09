@@ -7,20 +7,32 @@
  */
 import express from "express";
 import { BlobServiceClient } from "@azure/storage-blob";
+import { Request, Response } from "express";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 import {
-  COSMOS_DB_CONNECTION_STRING,
   DATABASE_ID,
   DONOR_COLLECTION_ID,
   CONTAINER_NAME,
-  AZURE_STORAGE_CONNECTION_STRING,
-} from "../config/azureConfig.js";
+} from "../config/azureConfig";
+import {UserInfo} from "../types/users.js";
 
 const app = express();
 app.use(express.json());
 dotenv.config();
+
+const AZURE_STORAGE_CONNECTION_STRING =
+  process.env.AZURE_STORAGE_CONNECTION_STRING;
+if (!AZURE_STORAGE_CONNECTION_STRING) {
+  throw new Error(
+    "Missing environment variable: AZURE_STORAGE_CONNECTION_STRING"
+  );
+}
+const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
+if (!COSMOS_DB_CONNECTION_STRING) {
+  throw new Error("Missing environment variable: COSMOS_DB_CONNECTION_STRING");
+}
 
 const blobServiceClient = BlobServiceClient.fromConnectionString(
   AZURE_STORAGE_CONNECTION_STRING
@@ -30,10 +42,7 @@ const containerClient = blobServiceClient.getContainerClient(CONTAINER_NAME);
 // Connect to DB using MongoClient.
 const connectToCosmos = async () => {
   try {
-    const client = await MongoClient.connect(COSMOS_DB_CONNECTION_STRING, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
 
     const db = client.db(DATABASE_ID);
     const collection = db.collection(DONOR_COLLECTION_ID);
@@ -47,7 +56,7 @@ const connectToCosmos = async () => {
 };
 
 // Fetch user info from Asgardeo API
-const getUserInfo = async (req, res) => {
+const getUserInfo = async (req: Request, res: Response) => {
   const { accessToken } = req.body;
 
   // Log token for debugging
@@ -64,18 +73,18 @@ const getUserInfo = async (req, res) => {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Accept": "application/json",  // Added Accept header
+          Accept: "application/json", // Added Accept header
         },
       }
     );
 
     if (!response.ok) {
-      const errorText = await response.text();  // Log the error message from the API
+      const errorText = await response.text(); // Log the error message from the API
       console.error("Asgardeo API Response:", errorText);
       throw new Error(`Failed to fetch user info: ${errorText}`);
     }
 
-    const userInfo = await response.json();
+    const userInfo = (await response.json()) as UserInfo;
     const user = {
       sub: userInfo.sub,
       firstName: userInfo.given_name || "Guest",
@@ -85,15 +94,19 @@ const getUserInfo = async (req, res) => {
     };
     res.status(200).json(user);
   } catch (error) {
-    console.error("Error fetching user info:", error.message || error);
-    res.status(500).json({ message: "Error fetching user info", error: error.message || error });
+    const errorMessage = (error as Error).message || error;
+    console.error("Error fetching user info:", errorMessage);
+    res
+      .status(500)
+      .json({
+        message: "Error fetching user info",
+        error: (error as Error).message || error,
+      });
   }
 };
 
-
-
 // Handle avatar upload to Azure Blob Storage
-const uploadAvatar = async (req, res) => {
+const uploadAvatar = async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -130,7 +143,7 @@ const uploadAvatar = async (req, res) => {
 };
 
 // Create or update donor record in DB
-const upsertDonor = async (req, res) => {
+const upsertDonor = async (req: Request, res: Response) => {
   const donor = req.body;
 
   try {
@@ -154,7 +167,7 @@ const upsertDonor = async (req, res) => {
 };
 
 //Fetch donor by email
-const getDonorByEmail = async (req, res) => {
+const getDonorByEmail = async (req: Request, res: Response) => {
   try {
     const { collection, client } = await connectToCosmos();
     const { email } = req.params;
