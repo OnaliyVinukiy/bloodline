@@ -24,7 +24,7 @@ import {
 
 const router = express.Router();
 
-router.get("/cities", getCities);
+router.get("/cities-list", getCities);
 router.get("/district/:districtName", getCitiesByDistrict);
 router.get("/province/:provinceName", getCitiesByProvince);
 router.get("/postcode/:postcode", getCityByPostcode);
