@@ -7,7 +7,7 @@
  */
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { User } from "../../../types/stepper";
+import { User } from "../../../types/users";
 import { useAuthContext } from "@asgardeo/auth-react";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
