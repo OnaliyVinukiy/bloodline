@@ -10,6 +10,8 @@ import cors from "cors";
 import userRoutes from "./routes/userRoutes";
 import appointmentRoutes from "./routes/appointmentRoutes";
 import cityRoutes from "./routes/cityRoutes";
+import provinceRoutes from "./routes/provinceRoutes";
+import districtRoutes from "./routes/districtRoutes";
 import dataService from "./utils/dataService";
 
 const app = express();
@@ -33,7 +35,14 @@ app.use("/api", userRoutes);
 // Appointment Routes
 app.use("/api/appointments", appointmentRoutes);
 
+// City Routes
 app.use("/api/city", cityRoutes);
+
+// Provinces Routes
+app.use("/api/provinces", provinceRoutes);
+
+// Provinces Routes
+app.use("/api/districts", districtRoutes);
 
 // Home route
 app.get("/", (req: Request, res: Response): void => {
