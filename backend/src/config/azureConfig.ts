@@ -5,7 +5,6 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-
 import dotenv from "dotenv";
 
 dotenv.config();
