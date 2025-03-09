@@ -1,3 +1,10 @@
+/*!
+ * Bloodline Blood Bank Management System
+ * Copyright (c) 2025 Onaliy Jayawardana
+ * All rights reserved.
+ *
+ * Unauthorized copying, modification, or distribution of this code is prohibited.
+ */
 import { ObjectId } from "mongodb";
 
 export interface User {
@@ -39,16 +46,4 @@ export interface BloodDonor {
   bloodGroup: string;
   avatar: string | null;
   gender: string;
-}
-
-export interface StepperProps {
-  onNextStep: () => void;
-  onPreviousStep: () => void;
-  onFormDataChange: (data: any) => void;
-  formData: any;
-}
-
-export interface StepperPropsCampaign {
-  onNextStep: () => void;
-  onPreviousStep: () => void;
 }

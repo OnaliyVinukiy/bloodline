@@ -9,7 +9,8 @@ import { Datepicker, Label } from "flowbite-react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { UserIcon } from "@heroicons/react/24/solid";
-import { BloodDonor, StepperProps, User } from "../../../types/types";
+import { StepperProps } from "../../../types/stepper";
+import { BloodDonor, User } from "../../../types/users";
 import { useAuthContext } from "@asgardeo/auth-react";
 
 const StepOne: React.FC<StepperProps> = ({
