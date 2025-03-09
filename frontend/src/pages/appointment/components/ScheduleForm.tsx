@@ -9,7 +9,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Label } from "flowbite-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { StepperProps } from "../../../types/types";
+import { StepperProps } from "../../../types/stepper";
 import axios from "axios";
 
 const ScheduleForm: React.FC<StepperProps> = ({
