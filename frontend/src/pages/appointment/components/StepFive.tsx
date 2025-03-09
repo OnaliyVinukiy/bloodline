@@ -7,7 +7,7 @@
  */
 import { Label } from "flowbite-react";
 import React, { useEffect, useState } from "react";
-import { StepperProps } from "../../../types/types";
+import { StepperProps } from "../../../types/stepper";
 
 const StepFive: React.FC<StepperProps> = ({
   onNextStep,
