@@ -13,11 +13,14 @@ RUN npm install --omit=dev
 # Copy the rest of the backend code to the container
 COPY . .
 
+# Install ts-node and TypeScript as dev dependencies
+RUN npm install --save-dev ts-node typescript
+
 # Expose the port
 EXPOSE 5000
 
 # Set the environment variable
 ENV PORT=5000
 
-# Start the server using Node.js (not nodemon)
-CMD ["node", "index.js"]
+# Start the server using ts-node to run TypeScript directly
+CMD ["npx", "ts-node", "src/index.ts"]
