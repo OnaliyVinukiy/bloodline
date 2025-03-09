@@ -11,7 +11,7 @@ import axios from "axios";
 import { Button, Label, Modal } from "flowbite-react";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { Datepicker } from "flowbite-react";
-import { User, Donor } from "../../types/types";
+import { User, Donor } from "../../types/users";
 
 export default function Profile() {
   const { state, getAccessToken } = useAuthContext();

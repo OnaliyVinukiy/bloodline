@@ -7,7 +7,7 @@
  */
 import React, { useState, useEffect } from "react";
 import { Button, Datepicker, Label, Modal } from "flowbite-react";
-import { StepperProps } from "../../../types/types";
+import { StepperProps } from "../../../types/stepper";
 
 const StepTwo: React.FC<StepperProps> = ({
   onNextStep,
