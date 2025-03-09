@@ -1,4 +1,11 @@
-export const AppointmentRejection = (appointment) => {
+/*!
+ * Bloodline Blood Bank Management System
+ * Copyright (c) 2025 Onaliy Jayawardana
+ * All rights reserved.
+ *
+ * Unauthorized copying, modification, or distribution of this code is prohibited.
+ */
+export const AppointmentRejection = (appointment: any) => {
   return `
       <div style="font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; border-radius: 10px; max-width: 600px; margin: 0 auto;">
         <div style="background-color: #e2e8f0; padding: 10px; border-radius: 5px; text-align: center;">

@@ -7,29 +7,31 @@
  */
 import { MongoClient } from "mongodb";
 import {
-  COSMOS_DB_CONNECTION_STRING,
   DATABASE_ID,
   APPOINTMENT_COLLECTION_ID,
-} from "../config/azureConfig.js";
+} from "../config/azureConfig";
 import dotenv from "dotenv";
+import { Request, Response } from "express";
 import nodemailer from "nodemailer";
-import { AppointmentConfirmation } from "../emailTemplates/AppointmentConfirmation.js";
+import { AppointmentConfirmation } from "../emailTemplates/AppointmentConfirmation";
 
 dotenv.config();
 import { ObjectId } from "mongodb";
-import { AppointmentRejection } from "../emailTemplates/AppointmentRejection.js";
-import { AppointmentApproval } from "../emailTemplates/AppointmentApproval.js";
+import { AppointmentRejection } from "../emailTemplates/AppointmentRejection";
+import { AppointmentApproval } from "../emailTemplates/AppointmentApproval";
 
+const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
+if (!COSMOS_DB_CONNECTION_STRING) {
+  throw new Error("Missing environment variable: COSMOS_DB_CONNECTION_STRING");
+}
 // Save appointment data
-export const saveAppointment = async (req, res) => {
+export const saveAppointment = async (req: Request, res: Response) => {
   const appointmentData = req.body;
 
   try {
     // Connect to the database
-    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+
     await client.connect();
 
     const database = client.db(DATABASE_ID);
@@ -52,7 +54,7 @@ export const saveAppointment = async (req, res) => {
 };
 
 // Send confirmation email to the donor
-const sendConfirmationEmail = async (appointment) => {
+const sendConfirmationEmail = async (appointment: any) => {
   console.log("EMAIL_USER:", process.env.EMAIL_USER);
   console.log("EMAIL_PASS:", process.env.COSMOS_DB_CONNECTION_STRING);
 
@@ -75,13 +77,11 @@ const sendConfirmationEmail = async (appointment) => {
 };
 
 // Fetch appointment data
-export const getAppointments = async (req, res) => {
+export const getAppointments = async (req: Request, res: Response) => {
   try {
     // Connect to the database
-    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+
     await client.connect();
 
     const database = client.db(DATABASE_ID);
@@ -100,15 +100,13 @@ export const getAppointments = async (req, res) => {
 };
 
 // Fetch a single appointment by ID
-export const getAppointmentById = async (req, res) => {
+export const getAppointmentById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
     // Connect to the database
-    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+
     await client.connect();
 
     const database = client.db(DATABASE_ID);
@@ -131,14 +129,12 @@ export const getAppointmentById = async (req, res) => {
 };
 
 // Fetch booked slots for a specific date
-export const getAppointmentsByDate = async (req, res) => {
+export const getAppointmentsByDate = async (req: Request, res: Response) => {
   const { date } = req.params;
   try {
     //Connect to the database
-    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+
     await client.connect();
 
     const database = client.db(DATABASE_ID);
@@ -169,15 +165,13 @@ export const getAppointmentsByDate = async (req, res) => {
 };
 
 //Approve pending appointments
-export const approveAppointment = async (req, res) => {
+export const approveAppointment = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
     // Connect to the database
-    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+
     await client.connect();
 
     const database = client.db(DATABASE_ID);
@@ -207,7 +201,7 @@ export const approveAppointment = async (req, res) => {
 };
 
 // Send approval email to the donor
-const sendApprovalEmail = async (appointment) => {
+const sendApprovalEmail = async (appointment: any) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -227,7 +221,7 @@ const sendApprovalEmail = async (appointment) => {
 };
 
 //Reject pending appointments
-export const rejectAppointment = async (req, res) => {
+export const rejectAppointment = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
@@ -237,10 +231,8 @@ export const rejectAppointment = async (req, res) => {
     }
 
     // Connect to the database
-    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+
     await client.connect();
 
     const database = client.db(DATABASE_ID);
@@ -275,7 +267,7 @@ export const rejectAppointment = async (req, res) => {
 };
 
 // Send rejection email to the donor
-const sendRejectionEmail = async (appointment) => {
+const sendRejectionEmail = async (appointment: any) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
