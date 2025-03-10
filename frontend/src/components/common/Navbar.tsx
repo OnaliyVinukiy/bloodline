@@ -129,14 +129,14 @@ export function Navigationbar() {
   }
 
   return (
-    <Navbar fluid rounded>
+    <Navbar fluid rounded className="shadow-lg py-4">
       <Navbar.Brand href="/" className="md:ml-24 h-6 sm:h-9">
         <img
           src="https://bloodlineresources.blob.core.windows.net/assets/logo.png"
-          className="mb-8 mt-2 mr-3 h-16 sm:h-16 "
+          className="mb-10 mt-2 mr-3 h-16 sm:h-16 "
           alt="Bloodline Logo"
         />
-        <span className="mt-1 self-center whitespace-nowrap text-xl font-semibold ">
+        <span className="self-center whitespace-nowrap text-red-800 text-3xl font-lobster  ">
           Bloodline
         </span>
       </Navbar.Brand>
@@ -221,16 +221,28 @@ export function Navigationbar() {
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
-        <Navbar.Link href="/" className="text-lg font-medium font-roboto">
+        <Navbar.Link
+          href="/"
+          className="text-xl font-medium font-roboto hover:!text-red-700"
+        >
           Home
         </Navbar.Link>
-        <Navbar.Link href="#" className="text-lg font-medium font-roboto">
+        <Navbar.Link
+          href="#"
+          className="text-xl font-medium font-roboto hover:!text-red-700"
+        >
           About
         </Navbar.Link>
-        <Navbar.Link href="#" className="text-lg font-medium font-roboto">
+        <Navbar.Link
+          href="#"
+          className="text-xl font-medium font-roboto hover:!text-red-700"
+        >
           Services
         </Navbar.Link>
-        <Navbar.Link href="#" className="text-lg font-medium font-roboto">
+        <Navbar.Link
+          href="#"
+          className="text-xl font-medium font-roboto hover:!text-red-700"
+        >
           Contact Us
         </Navbar.Link>
       </Navbar.Collapse>
