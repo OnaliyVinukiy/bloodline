@@ -38,7 +38,7 @@ const StepSix: React.FC<StepperPropsCampaign> = ({
                   <path d="M441 7l32 32 32 32c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-15-15L417.9 128l55 55c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-72-72L295 73c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l55 55L422.1 56 407 41c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0zM210.3 155.7l61.1-61.1c.3 .3 .6 .7 1 1l16 16 56 56 56 56 16 16c.3 .3 .6 .6 1 1l-191 191c-10.5 10.5-24.7 16.4-39.6 16.4H97.9L41 505c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l57-57V325.3c0-14.9 5.9-29.1 16.4-39.6l43.3-43.3 57 57c6.2 6.2 16.4 6.2 22.6 0s6.2-16.4 0-22.6l-57-57 41.4-41.4 57 57c6.2 6.2 16.4 6.2 22.6 0s6.2-16.4 0-22.6l-57-57z" />
                 </svg>
 
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
+                <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
                   Equipments & Assets Required
                 </h2>
               </div>
@@ -48,7 +48,7 @@ const StepSix: React.FC<StepperPropsCampaign> = ({
             </div>
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
-              <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-justify text-gray-700 leading-relaxed">
+              <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
                 When organizing a blood donation campaign for{" "}
                 <strong className="text-red-700">
                   approximately 100 donors,

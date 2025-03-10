@@ -43,7 +43,7 @@ const StepFive: React.FC<StepperPropsCampaign> = ({
                     d="M48 0C21.5 0 0 21.5 0 48V464c0 26.5 21.5 48 48 48h96V432c0-26.5 21.5-48 48-48s48 21.5 48 48v80h96c15.1 0 28.5-6.9 37.3-17.8C340.4 462.2 320 417.5 320 368c0-54.7 24.9-103.5 64-135.8V48c0-26.5-21.5-48-48-48H48zM64 240c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V240zm112-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V240c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V240zM80 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V112zM272 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zM640 368a144 144 0 1 0 -288 0 144 144 0 1 0 288 0zm-76.7-43.3c6.2 6.2 6.2 16.4 0 22.6l-72 72c-6.2 6.2-16.4 6.2-22.6 0l-40-40c-6.2-6.2-6.2-16.4 0-22.6s16.4-6.2 22.6 0L480 385.4l60.7-60.7c6.2-6.2 16.4-6.2 22.6 0z"
                   />
                 </svg>
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
+                <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
                   Selecting a Building for the Blood Donation Camp
                 </h2>
               </div>
@@ -53,7 +53,7 @@ const StepFive: React.FC<StepperPropsCampaign> = ({
             </div>
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
-              <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-justify text-gray-700 leading-relaxed">
+              <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
                 To ensure the safety and well-being of both donors and collected
                 blood, the National Blood Transfusion Service (NBTS) Sri Lanka
                 does not approve the use of temporary buildings like tents. The
