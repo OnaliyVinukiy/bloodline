@@ -9,11 +9,9 @@
 import React from "react";
 import { StepperPropsCampaign } from "../../../types/stepper";
 import BloodInventory from "../../../assets/bloodinventory.jpg";
-const StepOne: React.FC<StepperPropsCampaign> = ({
-  onNextStep,
- 
-}) => {
+const StepOne: React.FC<StepperPropsCampaign> = ({ onNextStep }) => {
   const handleNext = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
   };
 

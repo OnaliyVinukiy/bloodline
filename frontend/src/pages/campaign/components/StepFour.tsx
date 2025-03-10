@@ -14,7 +14,13 @@ const StepFour: React.FC<StepperPropsCampaign> = ({
   onPreviousStep,
 }) => {
   const handleNext = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
+  };
+
+  const handlePrevious = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    onPreviousStep();
   };
 
   return (
@@ -59,29 +65,29 @@ const StepFour: React.FC<StepperPropsCampaign> = ({
                 <ul className="list-disc pl-6 mt-6 space-y-4">
                   <li>
                     <strong className="text-red-700">
-                      Easily Accessible Location
+                      Easily Accessible Location:
                     </strong>{" "}
-                    – A well-known public place ensures better participation and
+                    A well-known public place ensures better participation and
                     ease of travel for both donors and staff.
                   </li>
                   <li>
                     <strong className="text-red-700">
-                      Good Transport Access
+                      Good Transport Access:
                     </strong>{" "}
-                    – The venue should be easily reachable by vehicles, ensuring
-                    a hassle-free experience for donors and medical teams.
+                    The venue should be easily reachable by vehicles, ensuring a
+                    hassle-free experience for donors and medical teams.
                   </li>
                   <li>
                     <strong className="text-red-700">
-                      Clean & Safe Environment
+                      Clean & Safe Environment:
                     </strong>{" "}
-                    – A permanent building with a clean and hygienic surrounding
+                    A permanent building with a clean and hygienic surrounding
                     is ideal for maintaining health and safety standards.
                   </li>
                   <li>
-                    <strong className="text-red-700">Toilet Facilities</strong>{" "}
-                    – Proper restroom facilities must be available for donors
-                    and staff throughout the event.
+                    <strong className="text-red-700">Toilet Facilities:</strong>{" "}
+                    Proper restroom facilities must be available for donors and
+                    staff throughout the event.
                   </li>
                 </ul>
                 <br />A well-planned venue creates a comfortable experience for
@@ -92,7 +98,7 @@ const StepFour: React.FC<StepperPropsCampaign> = ({
 
             <div className="flex justify-between mt-8">
               <button
-                onClick={onPreviousStep}
+                onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-6 py-3 text-center me-2 mb-2 transition-all duration-300"
               >
                 Back
