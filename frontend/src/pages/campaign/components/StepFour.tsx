@@ -53,7 +53,7 @@ const StepFour: React.FC<StepperPropsCampaign> = ({
             </div>
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
-              <div className="mt-4 mb-8 font-roboto font-medium text-lg md:text-xl text-left text-gray-700 leading-relaxed">
+              <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
                 Selecting the right venue is essential for a smooth and
                 successful campaign. Here are some key factors to consider:
                 <ul className="list-disc pl-6 mt-6 space-y-4">
