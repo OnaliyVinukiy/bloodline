@@ -23,8 +23,8 @@ const BloodCampaignRegistration = () => {
   };
 
   return (
-    <div className="mt-12">
-      <div className="flex justify-center border-b border-gray-200 dark:border-gray-700">
+    <div className="mt-12 bg-white">
+      <div className="flex justify-center bg-white border-b border-gray-200 dark:border-gray-700">
         <ul className="flex flex-wrap -mb-px text-sm font-medium text-center">
           <li className="me-2">
             <button
