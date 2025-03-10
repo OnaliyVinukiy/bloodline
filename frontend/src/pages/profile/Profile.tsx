@@ -19,11 +19,27 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showErrorModal, setErrorModal] = useState(false);
+  const [showAgeValidationModal, setShowAgeValidationModal] = useState(false);
+  const [province, setProvince] = useState<
+    { province_id: string; province_name_en: string }[]
+  >([]);
+
+  const [district, setDistrict] = useState<
+    { district_id: string; district_name_en: string; province_id: string }[]
+  >([]);
+
+  const [city, setCity] = useState<
+    { city_id: string; city_name_en: string; district_id: string }[]
+  >([]);
+
   const [donor, setDonor] = useState<Donor>({
     nic: "",
     fullName: "",
     email: user?.email || "",
     contactNumber: "",
+    province: "",
+    district: "",
+    city: "",
     address: "",
     birthdate: "",
     age: 0,
@@ -70,6 +86,8 @@ export default function Profile() {
           if (donorInfo) {
             setDonor(donorInfo);
             setIsProfileComplete(true);
+            fetchDistricts(donorInfo.province);
+            fetchCities(donorInfo.district);
           }
         } catch (error) {
           console.error("Error fetching user info:", error);
@@ -81,6 +99,77 @@ export default function Profile() {
 
     fetchUserInfo();
   }, [state?.isAuthenticated, getAccessToken]);
+
+  //Fetch provinces list
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      try {
+        const response = await axios.get(
+          `${backendURL}/api/provinces/provinces-list`
+        );
+        setProvince(response.data);
+      } catch (error) {
+        console.error("Error fetching provinces:", error);
+      }
+    };
+
+    fetchProvinces();
+  }, [backendURL]);
+
+  //Fetch districts list
+  const fetchDistricts = async (provinceName: string) => {
+    try {
+      const response = await fetch(
+        `${backendURL}/api/districts/province-name/${provinceName}`
+      );
+      const districts = await response.json();
+      if (response.ok) {
+        setDistrict(districts);
+      } else {
+        setDistrict([]);
+      }
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+    }
+  };
+
+  const handleProvinceChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedProvince = event.target.value;
+    setDonor((prev) => ({ ...prev, province: selectedProvince }));
+    fetchDistricts(selectedProvince);
+  };
+
+  const handleDistrictChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedDistrict = event.target.value;
+    setDonor((prev) => ({ ...prev, district: selectedDistrict }));
+    fetchCities(selectedDistrict);
+  };
+
+  const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCity = event.target.value;
+    setDonor((prev) => ({ ...prev, city: selectedCity }));
+  };
+
+  //Fetch districts list
+  const fetchCities = async (districtName: string) => {
+    try {
+      const response = await fetch(
+        `${backendURL}/api/city/district/${districtName}`
+      );
+      const cities = await response.json();
+      if (response.ok) {
+        setCity(cities);
+      } else {
+        setCity([]);
+      }
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+    }
+  };
 
   // Handle file selection for avatar
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,6 +230,15 @@ export default function Profile() {
   // Handle donor profile update
   const handleUpdate = async () => {
     if (!user || !donor) return;
+
+    // Calculate age from birthdate
+    const age = calculateAge(donor.birthdate);
+
+    // Check if the user is under 18
+    if (age < 18) {
+      setShowAgeValidationModal(true);
+      return;
+    }
 
     try {
       setLoading(true);
@@ -259,8 +357,8 @@ export default function Profile() {
             </div>
 
             {/* Form Fields */}
-            <div className="flex space-x-6 mb-6">
-              <div className="w-1/3">
+            <div className="flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0 mb-6">
+              <div className="w-full md:w-1/3">
                 <Label
                   htmlFor="first_name"
                   className="block mb-2 text-sm font-medium text-indigo-900"
@@ -275,7 +373,7 @@ export default function Profile() {
                 />
               </div>
 
-              <div className="w-1/3">
+              <div className="w-full md:w-1/3">
                 <Label
                   htmlFor="first_name"
                   className="block mb-2 text-sm font-medium text-indigo-900"
@@ -290,7 +388,7 @@ export default function Profile() {
                 />
               </div>
 
-              <div className="w-1/3">
+              <div className="w-full md:w-1/3">
                 <Label
                   htmlFor="first_name"
                   className="block mb-2 text-sm font-medium text-indigo-900"
@@ -338,7 +436,7 @@ export default function Profile() {
                 />
               </div>
 
-              <div className="w-1/4">
+              <div className="w-3/4">
                 <Label
                   htmlFor="gender"
                   className="mt-1 block mb-2 text-sm font-medium text-indigo-900"
@@ -382,6 +480,91 @@ export default function Profile() {
               </div>
             </div>
 
+            {/* Provinces, District and Cities Section */}
+            <div className="flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0 mb-6">
+              <div className="w-full md:w-1/3">
+                <Label
+                  htmlFor="province"
+                  className="block mb-2 text-sm font-medium text-indigo-900"
+                >
+                  Province
+                </Label>
+                <select
+                  id="province"
+                  value={donor.province}
+                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                  onChange={handleProvinceChange}
+                >
+                  <option value="">Select a province</option>
+                  {province.map((prov) => (
+                    <option
+                      key={prov.province_id}
+                      value={prov.province_name_en}
+                    >
+                      {prov.province_name_en}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="w-full md:w-1/3">
+                <Label
+                  htmlFor="district"
+                  className="block mb-2 text-sm font-medium text-indigo-900"
+                >
+                  District
+                </Label>
+                <select
+                  id="district"
+                  value={donor.district}
+                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                  onChange={handleDistrictChange}
+                >
+                  <option value="">Select a district</option>
+                  {district.length > 0 ? (
+                    district.map((districtItem) => (
+                      <option
+                        key={districtItem.district_id}
+                        value={districtItem.district_name_en}
+                      >
+                        {districtItem.district_name_en}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="">Please select a province first</option>
+                  )}
+                </select>
+              </div>
+
+              <div className="w-full md:w-1/3">
+                <Label
+                  htmlFor="city"
+                  className="block mb-2 text-sm font-medium text-indigo-900"
+                >
+                  City
+                </Label>
+                <select
+                  id="city"
+                  value={donor.city}
+                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                  onChange={handleCityChange}
+                >
+                  <option value="">Select a city</option>
+                  {city.length > 0 ? (
+                    city.map((cityItem) => (
+                      <option
+                        key={cityItem.city_id}
+                        value={cityItem.city_name_en}
+                      >
+                        {cityItem.city_name_en}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="">Please select a district first</option>
+                  )}
+                </select>
+              </div>
+            </div>
             <div>
               <Label>Address</Label>
               <input
@@ -488,6 +671,7 @@ export default function Profile() {
         </div>
       </main>
 
+      {/* Profile Update Confirmation Modal */}
       <Modal show={showModal} onClose={() => setShowModal(false)}>
         <Modal.Header>Registered Successfully!</Modal.Header>
         <Modal.Body>
@@ -510,6 +694,49 @@ export default function Profile() {
         </Modal.Body>
         <Modal.Footer className="flex justify-end">
           <Button color="failure" onClick={() => setErrorModal(false)}>
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Age Validation Modal */}
+      <Modal
+        show={showAgeValidationModal}
+        onClose={() => setShowAgeValidationModal(false)}
+      >
+        <Modal.Header className="flex items-center gap-2 ">
+          <p className="flex items-center gap-2 text-xl text-red-600">
+            <svg
+              className="w-6 h-6 text-red-600"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              />
+            </svg>
+            Age Restriction
+          </p>
+        </Modal.Header>
+
+        <Modal.Body>
+          <p className="flex items-center gap-2 text-lg text-gray-800">
+            You cannot register as a donor unless you are aged 18 or above.
+          </p>
+        </Modal.Body>
+        <Modal.Footer className="flex justify-end">
+          <Button
+            color="failure"
+            onClick={() => setShowAgeValidationModal(false)}
+          >
             OK
           </Button>
         </Modal.Footer>

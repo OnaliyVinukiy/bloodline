@@ -24,6 +24,9 @@ export function Navigationbar() {
     fullName: "",
     email: user?.email || "",
     contactNumber: "",
+    province: "",
+    district: "",
+    city: "",
     address: "",
     birthdate: "",
     age: 0,
@@ -31,7 +34,7 @@ export function Navigationbar() {
     avatar: "",
     gender: "",
   });
-  
+
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
@@ -218,11 +221,7 @@ export function Navigationbar() {
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
-        <Navbar.Link
-          href="/"
-          className="text-lg font-medium font-roboto"
-          active
-        >
+        <Navbar.Link href="/" className="text-lg font-medium font-roboto">
           Home
         </Navbar.Link>
         <Navbar.Link href="#" className="text-lg font-medium font-roboto">
