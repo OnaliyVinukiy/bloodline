@@ -23,6 +23,9 @@ export interface Donor {
   fullName: string;
   email: string;
   contactNumber: string;
+  province: string;
+  district: string;
+  city: string;
   address: string;
   birthdate: string;
   age: number;
