@@ -55,7 +55,7 @@ const StepSix: React.FC<StepperPropsCampaign> = ({
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                When organizing a blood donation campaign for{" "}
+                When organizing a blood donation camp for{" "}
                 <strong className="text-red-700">
                   approximately 100 donors,
                 </strong>{" "}
