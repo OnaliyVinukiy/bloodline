@@ -136,7 +136,7 @@ export function Navigationbar() {
           className="mb-10 mt-2 mr-3 h-16 sm:h-16 "
           alt="Bloodline Logo"
         />
-        <span className="self-center whitespace-nowrap text-red-800 text-3xl font-lobster  ">
+        <span className="self-center whitespace-nowrap text-red-800 text-2xl md:text-3xl font-lobster  ">
           Bloodline
         </span>
       </Navbar.Brand>
@@ -212,11 +212,12 @@ export function Navigationbar() {
           </Dropdown>
         ) : (
           <Button
-            className="bg-red-800 hover:bg-red-700 text-white"
-            onClick={() => signIn()}
-          >
-            Login
-          </Button>
+          className="bg-red-800 hover:bg-red-700 text-white text-sm md:text-base"
+          onClick={() => signIn()}
+        >
+          Login
+        </Button>
+        
         )}
         <Navbar.Toggle />
       </div>
