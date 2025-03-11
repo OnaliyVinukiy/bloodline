@@ -8,6 +8,7 @@ module.exports = {
         playfair: ["Playfair Display", "serif"],
         roboto: ["Roboto", "serif"],
         opensans: ["Open Sans", "serif"],
+        lobster: ["Lobster", "serif"],
 
          
       },

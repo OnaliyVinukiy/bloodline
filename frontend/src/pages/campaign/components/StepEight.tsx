@@ -9,7 +9,7 @@
 import React from "react";
 import { StepperPropsCampaign } from "../../../types/stepper";
 
-const StepFour: React.FC<StepperPropsCampaign> = ({
+const StepEight: React.FC<StepperPropsCampaign> = ({
   onNextStep,
   onPreviousStep,
 }) => {
@@ -35,64 +35,72 @@ const StepFour: React.FC<StepperPropsCampaign> = ({
                 <svg
                   className="w-12 h-12 text-red-700"
                   aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
                   fill="currentColor"
-                  viewBox="0 0 512 512"
+                  viewBox="0 0 640 512"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
                     stroke="currentColor"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM288 176c0-44.2-35.8-80-80-80s-80 35.8-80 80c0 48.8 46.5 111.6 68.6 138.6c6 7.3 16.8 7.3 22.7 0c22.1-27 68.6-89.8 68.6-138.6zm-112 0a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"
+                    d="M48 48h88c13.3 0 24-10.7 24-24s-10.7-24-24-24H32C14.3 0 0 14.3 0 32V136c0 13.3 10.7 24 24 24s24-10.7 24-24V48zM175.8 224a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm-26.5 32C119.9 256 96 279.9 96 309.3c0 14.7 11.9 26.7 26.7 26.7h56.1c8-34.1 32.8-61.7 65.2-73.6c-7.5-4.1-16.2-6.4-25.3-6.4H149.3zm368 80c14.7 0 26.7-11.9 26.7-26.7c0-29.5-23.9-53.3-53.3-53.3H421.3c-9.2 0-17.8 2.3-25.3 6.4c32.4 11.9 57.2 39.5 65.2 73.6h56.1zm-89.4 0c-8.6-24.3-29.9-42.6-55.9-47c-3.9-.7-7.9-1-12-1H280c-4.1 0-8.1 .3-12 1c-26 4.4-47.3 22.7-55.9 47c-2.7 7.5-4.1 15.6-4.1 24c0 13.3 10.7 24 24 24H408c13.3 0 24-10.7 24-24c0-8.4-1.4-16.5-4.1-24zM464 224a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm-80-32a64 64 0 1 0 -128 0 64 64 0 1 0 128 0zM504 48h88v88c0 13.3 10.7 24 24 24s24-10.7 24-24V32c0-17.7-14.3-32-32-32H504c-13.3 0-24 10.7-24 24s10.7 24 24 24zM48 464V376c0-13.3-10.7-24-24-24s-24 10.7-24 24V480c0 17.7 14.3 32 32 32H136c13.3 0 24-10.7 24-24s-10.7-24-24-24H48zm456 0c-13.3 0-24 10.7-24 24s10.7 24 24 24H608c17.7 0 32-14.3 32-32V376c0-13.3-10.7-24-24-24s-24 10.7-24 24v88H504z"
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Selecting a Venue for the Blood Donation Camp
+                  Finding Blood Donors
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
                 Every drop counts. Let’s make a difference together!
               </div>
             </div>
-
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                Selecting the right venue is essential for a smooth and
-                successful blood donation camp. Here are some key factors to consider:
+                A successful blood donation camp is a collective effort. With
+                sincere dedication and hard work, you can get the help of
+                everyone. Friends, sports clubs, voluntary organizations,
+                government and non-government institutions are some of the
+                parties that can help you.
+                <br />
+                <br />
+                Blood donation camps focused only on personal fame often fail. A
+                camp that is fair and free from discrimination based on race,
+                caste, political affiliation, or religion will gain support and
+                be successful.
                 <ul className="list-disc pl-6 mt-6 space-y-4">
                   <li>
-                    <strong className="text-red-700">
-                      Easily Accessible Location:
-                    </strong>{" "}
-                    A well-known public place ensures better participation and
-                    ease of travel for both donors and staff.
+                    Healthy individuals aged{" "}
+                    <strong className="text-red-700">18 to 55</strong>, weighing
+                    more than <strong className="text-red-700">50 kg</strong>,
+                    can donate blood once every{" "}
+                    <strong className="text-red-700">4 months.</strong>
                   </li>
                   <li>
-                    <strong className="text-red-700">
-                      Good Transport Access:
-                    </strong>{" "}
-                    The venue should be easily reachable by vehicles, ensuring a
-                    hassle-free experience for donors and medical teams.
+                    Those who have previously had their blood tested can donate
+                    up to the age of 60.
                   </li>
                   <li>
-                    <strong className="text-red-700">
-                      Clean & Safe Environment:
-                    </strong>{" "}
-                    A permanent building with a clean and hygienic surrounding
-                    is ideal for maintaining health and safety standards.
+                    Make a list of eligible donors, inform them personally, and
+                    encourage them to donate blood.
                   </li>
+
                   <li>
-                    <strong className="text-red-700">Toilet Facilities:</strong>{" "}
-                    Proper restroom facilities must be available for donors and
-                    staff throughout the event.
+                    For a successful blood donation camp on a{" "}
+                    <strong className="text-red-700">weekday</strong>, at least
+                    <strong className="text-red-700"> 50 donors</strong> are
+                    needed
+                  </li>
+
+                  <li>
+                    For a successful blood donation camp on a{" "}
+                    <strong className="text-red-700">holiday</strong>, at least
+                    <strong className="text-red-700"> 100 donors</strong> are
+                    needed
                   </li>
                 </ul>
-                <br />A well-planned venue creates a comfortable experience for
-                everyone involved and contributes to a successful blood donation
-                drive!
               </div>
             </div>
 
@@ -117,4 +125,4 @@ const StepFour: React.FC<StepperPropsCampaign> = ({
   );
 };
 
-export default StepFour;
+export default StepEight;

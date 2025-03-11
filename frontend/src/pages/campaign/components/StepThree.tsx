@@ -14,59 +14,68 @@ const StepThree: React.FC<StepperPropsCampaign> = ({
   onPreviousStep,
 }) => {
   const handleNext = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
   };
 
+  const handlePrevious = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    onPreviousStep();
+  };
+
   return (
-    <div className="flex justify-center bg-gradient-to-r from-gray-50 to-gray-100">
+    <div className="flex justify-center bg-gradient-to-r from-gray-50 to-gray-100 min-h-screen">
       <main className="mt-8 mb-8 w-full max-w-4xl px-4 py-8">
         <div className="relative bg-white rounded-xl shadow-2xl overflow-hidden p-1">
           <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-800 rounded-xl z-0"></div>
 
           <div className="relative bg-white rounded-xl p-8 z-10">
             <div className="text-center mb-8">
-              <h2 className="mt-4 flex justify-center items-center gap-4 text-2xl md:text-3xl font-bold text-gray-800">
+              <div className="flex flex-col items-center gap-4">
                 <svg
-                  className="w-8 h-8 md:w-10 md:h-10 text-gray-800 dark:text-white"
+                  className="w-12 h-12 text-red-700"
                   aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  viewBox="0 0 512 512"
                 >
                   <path
                     stroke="currentColor"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120V256c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2V120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"
                   />
                 </svg>
-                Selecting a Time for the Blood Donation Camp
-              </h2>
-              <div className="mt-2 text-base md:text-lg text-gray-500">
+                <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
+                  Selecting a Time for the Blood Donation Camp
+                </h2>
+              </div>
+              <div className="mt-2 text-lg md:text-xl text-gray-600">
                 Every drop counts. Let’s make a difference together!
               </div>
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 shadow-sm">
-              <div className="mt-4 mb-8 font-roboto font-medium text-base md:text-lg text-justify text-gray-700 leading-relaxed">
-                A blood donation campaign is normally held from{" "}
-                <strong>9:00 AM to 3:00 PM.</strong> This time frame ensures
-                that the collected blood can be properly processed. Once
-                donated, blood must be separated into blood constituents within
-                six hours. Therefore, campaigns cannot exceed this time limit.
+            <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
+              <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-justify text-gray-700 leading-relaxed">
+                A blood donation camp is normally held from{" "}
+                <strong className="text-red-700">9:00 AM to 3:00 PM.</strong>{" "}
+                This time frame ensures that the collected blood can be properly
+                processed. Once donated, blood must be separated into blood
+                constituents within six hours. Therefore, blood donation camps cannot
+                exceed this time limit.
                 <br />
                 <br />
-                Planning your campaign within this time frame helps ensure that
+                Planning your camp within this time frame helps ensure that
                 every donation makes the maximum impact in saving lives!
               </div>
             </div>
 
             <div className="flex justify-between mt-8">
               <button
-                onClick={onPreviousStep}
+                onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
                 Back

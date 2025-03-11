@@ -14,7 +14,13 @@ const StepFive: React.FC<StepperPropsCampaign> = ({
   onPreviousStep,
 }) => {
   const handleNext = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
+  };
+
+  const handlePrevious = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    onPreviousStep();
   };
 
   return (
@@ -60,41 +66,43 @@ const StepFive: React.FC<StepperPropsCampaign> = ({
                 selected venue must meet the following essential requirements:
                 <ul className="list-disc pl-6 mt-6 space-y-4">
                   <li>
-                    <strong className="text-red-700">Permanent Building</strong>{" "}
-                    – The building should be a solid, secure structure to
-                    provide a stable and safe environment.
+                    <strong className="text-red-700">
+                      Permanent Building:
+                    </strong>{" "}
+                    The building should be a solid, secure structure to provide
+                    a stable and safe environment.
                   </li>
                   <li>
-                    <strong className="text-red-700">No Water Leakages</strong>{" "}
-                    – The building must be free from leaks to maintain a
-                    hygienic space for the blood donation process.
+                    <strong className="text-red-700">No Water Leakages:</strong>{" "}
+                    The building must be free from leaks to maintain a hygienic
+                    space for the blood donation process.
                   </li>
                   <li>
                     <strong className="text-red-700">
-                      Clean, Dust-Free Floor
+                      Clean, Dust-Free Floor:
                     </strong>{" "}
-                    – A flat and dust-free ground ensures a sanitary and
+                    A flat and dust-free ground ensures a sanitary and
                     comfortable experience for donors and medical staff.
                   </li>
                   <li>
                     <strong className="text-red-700">
-                      Proper Lighting & Ventilation
+                      Proper Lighting & Ventilation:
                     </strong>{" "}
-                    – Sufficient lighting and air circulation are necessary for
-                    a comfortable and safe atmosphere.
+                    Sufficient lighting and air circulation are necessary for a
+                    comfortable and safe atmosphere.
                   </li>
                   <li>
                     <strong className="text-red-700">
-                      Electricity & Water Facilities
+                      Electricity & Water Facilities:
                     </strong>{" "}
-                    – The venue must have a reliable electricity supply and
-                    access to clean water.
+                    The venue must have a reliable electricity supply and access
+                    to clean water.
                   </li>
                   <li>
                     <strong className="text-red-700">
-                      Easy Accessibility for Donors
+                      Easy Accessibility for Donors:
                     </strong>{" "}
-                    – If the venue is on an upper floor, an elevator must be
+                    If the venue is on an upper floor, an elevator must be
                     available for donors. If no elevator is present, the venue
                     should be on the ground floor to avoid the need for stair
                     access.
@@ -110,7 +118,7 @@ const StepFive: React.FC<StepperPropsCampaign> = ({
 
             <div className="flex justify-between mt-8">
               <button
-                onClick={onPreviousStep}
+                onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
                 Back
