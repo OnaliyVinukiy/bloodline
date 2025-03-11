@@ -59,7 +59,7 @@ const StepTwo: React.FC<StepperPropsCampaign> = ({
             </div>
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
-              <div className="mt-4 mb-8 font-roboto font-medium text-lg md:text-xl text-justify text-gray-700 leading-relaxed">
+              <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-justify text-gray-700 leading-relaxed">
                 You have the freedom to pick a date that aligns with your
                 campaign goals. However, please inform the{" "}
                 <strong className="text-red-700">
