@@ -100,28 +100,6 @@ const StepEight: React.FC<StepperPropsCampaign> = ({
                     <strong className="text-red-700"> 100 donors</strong> are
                     needed
                   </li>
-                  <li>
-                    Raise awareness about the camp through posters, pamphlets,
-                    banners, newspaper advertisements
-                  </li>
-                  <li>
-                    Also inform blood donors by holding meetings in public
-                    institutions in the area. For example, school
-                    societies, banks, etc.
-                  </li>
-                  <li>
-                    Publicity work can be done using speakerphones on the day of
-                    the camp and the day before. Remember to obtain the
-                    necessary permission for this in advance. Orators and poets
-                    who can speak to the hearts of people can do a
-                    great service here. Radio and television advertisements can
-                    also be used.
-                  </li>
-                  <li>
-                    The date, time, and venue of the blood donation camp should
-                    be clearly advertised. It is also important to highlight the
-                    importance of donating blood.
-                  </li>
                 </ul>
               </div>
             </div>
