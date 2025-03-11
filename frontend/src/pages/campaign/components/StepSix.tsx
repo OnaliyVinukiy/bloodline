@@ -61,33 +61,22 @@ const StepSix: React.FC<StepperPropsCampaign> = ({
                 </strong>{" "}
                 the following equipment should be arranged to ensure a smooth
                 and comfortable process:
-                <ul className="pl-6 mt-6 space-y-4">
+                <ul className="list-disc pl-6 mt-6 space-y-4">
+                  <li>5 office tables</li>
+                  <li>15 normal chairs</li>
                   <li>
-                    <ul className="list-[square] pl-6 mt-2 space-y-2">
-                      <li>5 office tables</li>
-                      <li>15 normal chairs</li>
-                      <li>
-                        Chairs or benches for donors to sit (Must accommodate at
-                        least 30 donors at once while waiting or resting after
-                        donation)
-                      </li>
-                    </ul>
+                    Chairs or benches for donors to sit (Must accommodate at
+                    least 30 donors at once while waiting or resting after
+                    donation)
                   </li>
 
+                  <li>7 fans</li>
+
                   <li>
-                    <ul className="list-[square] pl-6 mt-2 space-y-2">
-                      <li>7 fans</li>
-                    </ul>
-                  </li>
-                  <li>
-                    <ul className="list-[square] pl-6 mt-2 space-y-2">
-                      <li>
-                        All necessary medical supplies, beds and other equipment
-                        required for the blood collection process will be
-                        provided by the National Blood Transfusion Service
-                        (NBTS) or the nearest blood bank.
-                      </li>
-                    </ul>
+                    All necessary medical supplies, beds and other equipment
+                    required for the blood collection process will be provided
+                    by the National Blood Transfusion Service (NBTS) or the
+                    nearest blood bank.
                   </li>
                 </ul>
               </div>
