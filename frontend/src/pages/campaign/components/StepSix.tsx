@@ -14,7 +14,13 @@ const StepSix: React.FC<StepperPropsCampaign> = ({
   onPreviousStep,
 }) => {
   const handleNext = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
+  };
+
+  const handlePrevious = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    onPreviousStep();
   };
 
   return (
@@ -49,39 +55,28 @@ const StepSix: React.FC<StepperPropsCampaign> = ({
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                When organizing a blood donation campaign for{" "}
+                When organizing a blood donation camp for{" "}
                 <strong className="text-red-700">
                   approximately 100 donors,
                 </strong>{" "}
                 the following equipment should be arranged to ensure a smooth
                 and comfortable process:
-                <ul className="pl-6 mt-6 space-y-4">
+                <ul className="list-disc pl-6 mt-6 space-y-4">
+                  <li>5 office tables</li>
+                  <li>15 normal chairs</li>
                   <li>
-                    <ul className="list-[square] pl-6 mt-2 space-y-2">
-                      <li>5 office tables</li>
-                      <li>15 normal chairs</li>
-                      <li>
-                        Chairs or benches for donors to sit (Must accommodate at
-                        least 30 donors at once while waiting or resting after
-                        donation)
-                      </li>
-                    </ul>
+                    Chairs or benches for donors to sit (Must accommodate at
+                    least 30 donors at once while waiting or resting after
+                    donation)
                   </li>
 
+                  <li>7 fans</li>
+
                   <li>
-                    <ul className="list-[square] pl-6 mt-2 space-y-2">
-                      <li>7 fans</li>
-                    </ul>
-                  </li>
-                  <li>
-                    <ul className="list-[square] pl-6 mt-2 space-y-2">
-                      <li>
-                        All necessary medical supplies, beds and other equipment
-                        required for the blood collection process will be
-                        provided by the National Blood Transfusion Service
-                        (NBTS) or the nearest blood bank.
-                      </li>
-                    </ul>
+                    All necessary medical supplies, beds and other equipment
+                    required for the blood collection process will be provided
+                    by the National Blood Transfusion Service (NBTS) or the
+                    nearest blood bank.
                   </li>
                 </ul>
               </div>
@@ -89,7 +84,7 @@ const StepSix: React.FC<StepperPropsCampaign> = ({
 
             <div className="flex justify-between mt-8">
               <button
-                onClick={onPreviousStep}
+                onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
                 Back
