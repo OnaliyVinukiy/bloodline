@@ -50,51 +50,39 @@ const StepSeven: React.FC<StepperPropsCampaign> = ({
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Food and Beverages for Donors
+                  Snacks and Drinks for Donors
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
                 Every drop counts. Let’s make a difference together!
               </div>
             </div>
-
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                When organizing a blood donation campaign for{" "}
-                <strong className="text-red-700">
-                  approximately 100 donors,
-                </strong>{" "}
-                the following equipment should be arranged to ensure a smooth
-                and comfortable process:
-                <ul className="pl-6 mt-6 space-y-4">
-                  <li>
-                    <ul className="list-[square] pl-6 mt-2 space-y-2">
-                      <li>5 office tables</li>
-                      <li>15 normal chairs</li>
-                      <li>
-                        Chairs or benches for donors to sit (Must accommodate at
-                        least 30 donors at once while waiting or resting after
-                        donation)
-                      </li>
-                    </ul>
-                  </li>
-
-                  <li>
-                    <ul className="list-[square] pl-6 mt-2 space-y-2">
-                      <li>7 fans</li>
-                    </ul>
-                  </li>
-                  <li>
-                    <ul className="list-[square] pl-6 mt-2 space-y-2">
-                      <li>
-                        All necessary medical supplies, beds and other equipment
-                        required for the blood collection process will be
-                        provided by the National Blood Transfusion Service
-                        (NBTS) or the nearest blood bank.
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
+                It is not advisable to give blood donors a heavy meal. A cool
+                drink such as{" "}
+                <strong className="text-red-700">king coconut</strong> is best.
+                Giving a{" "}
+                <strong className="text-red-700">glass of clean water</strong>{" "}
+                before donating blood can help minimize discomfort
+                such as fainting. <br />
+                <br />
+                Also, when providing food and drinks to blood donors, necessary
+                steps should be taken to provide them in a hygienic
+                and safe manner. <br />
+                <br />A blood donation camp becomes successful only if it
+                attended by voluntary blood donors who do not accept any form of
+                benefit in return for their donation. Therefore, the National
+                Blood Transfusion Service{" "}
+                <strong className="text-red-700">does not approve</strong> any
+                form of payment or valuable giftings to blood donors, as the
+                concept of 'Voluntary Blood Donation' cannot be protected
+                through that. <br />
+                <br />
+                However, it is possible to give non-monetary items such as
+                souvenirs and certificates. However, it is not necessary. The
+                most important thing is to donate
+                blood voluntarily and without any expectations.
               </div>
             </div>
 
