@@ -61,23 +61,23 @@ const StepTwo: React.FC<StepperPropsCampaign> = ({
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-justify text-gray-700 leading-relaxed">
                 You have the freedom to pick a date that aligns with your
-                campaign goals. However, please inform the{" "}
+                camp goals. However, please inform the{" "}
                 <strong className="text-red-700">
                   National Blood Transfusion Service (NBTS) at Narahenpita
                 </strong>{" "}
                 or your local blood bank at least{" "}
                 <strong className="text-red-700">one month in advance</strong>.
                 Weekends and holidays are in high demand for blood donation
-                campaigns, so we recommend securing your date at least{" "}
+                camps, so we recommend securing your date at least{" "}
                 <strong className="text-red-700">three months ahead</strong> if
-                you’re planning a campaign during these days.
+                you’re planning a camp during these days.
                 <br />
                 <br />
                 If your potential donors are typically unavailable on weekdays
-                due to work, a weekend campaign might be the best fit. On the
+                due to work, a weekend camp might be the best fit. On the
                 other hand, if an organization or company is hosting the event,
                 a weekday could be more convenient. Thoughtful planning ensures
-                a seamless and impactful campaign, helping save countless lives
+                a seamless and impactful camp, helping save countless lives
                 in the process!
               </div>
             </div>
