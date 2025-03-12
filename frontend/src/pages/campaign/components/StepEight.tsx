@@ -63,7 +63,7 @@ const StepEight: React.FC<StepperPropsCampaign> = ({
                 sincere dedication and hard work, you can get the help of
                 everyone. Friends, sports clubs, voluntary organizations,
                 government and non-government institutions are some of the
-                parties that can help you.
+                parties that can help you.
                 <br />
                 <br />
                 Blood donation camps focused only on personal fame often fail. A
@@ -80,47 +80,103 @@ const StepEight: React.FC<StepperPropsCampaign> = ({
                   </li>
                   <li>
                     Those who have previously had their blood tested can donate
-                    up to the age of 60.
+                    up to the age of <strong className="text-red-700">60</strong>.
                   </li>
                   <li>
                     Make a list of eligible donors, inform them personally, and
                     encourage them to donate blood.
                   </li>
-
                   <li>
                     For a successful blood donation camp on a{" "}
-                    <strong className="text-red-700">weekday</strong>, at least
-                    <strong className="text-red-700"> 50 donors</strong> are
-                    needed
+                    <strong className="text-red-700">weekday</strong>, at least{" "}
+                    <strong className="text-red-700">50 donors</strong> are
+                    needed.
                   </li>
-
                   <li>
                     For a successful blood donation camp on a{" "}
-                    <strong className="text-red-700">holiday</strong>, at least
-                    <strong className="text-red-700"> 100 donors</strong> are
-                    needed
+                    <strong className="text-red-700">holiday</strong>, at least{" "}
+                    <strong className="text-red-700">100 donors</strong> are
+                    needed.
                   </li>
                   <li>
-                    Raise awareness about the camp through posters, pamphlets,
-                    banners, newspaper advertisements
+                    Raise awareness about the camp through{" "}
+                    <strong className="text-red-700">posters</strong>,{" "}
+                    <strong className="text-red-700">pamphlets</strong>,{" "}
+                    <strong className="text-red-700">banners</strong>, and{" "}
+                    <strong className="text-red-700">newspaper advertisements</strong>.
                   </li>
                   <li>
                     Also inform blood donors by holding meetings in public
-                    institutions in the area. For example, school
-                    societies, banks, etc.
+                    institutions in the area. For example,{" "}
+                    <strong className="text-red-700">school societies</strong> and{" "}
+                    <strong className="text-red-700">banks</strong>.
                   </li>
                   <li>
-                    Publicity work can be done using speakerphones on the day of
+                    Publicity work can be done using{" "}
+                    <strong className="text-red-700">speakerphones</strong> on the day of
                     the camp and the day before. Remember to obtain the
-                    necessary permission for this in advance. Orators and poets
-                    who can speak to the hearts of people can do a
-                    great service here. Radio and television advertisements can
-                    also be used.
+                    necessary permission for this in advance.{" "}
+                    <strong className="text-red-700">Orators</strong> and{" "}
+                    <strong className="text-red-700">poets</strong> who can speak to the hearts of people can do a
+                    great service here.{" "}
+                    <strong className="text-red-700">Radio</strong> and{" "}
+                    <strong className="text-red-700">television advertisements</strong> can
+                    also be used.
                   </li>
                   <li>
-                    The date, time, and venue of the blood donation camp should
+                    The <strong className="text-red-700">date</strong>,{" "}
+                    <strong className="text-red-700">time</strong>, and{" "}
+                    <strong className="text-red-700">venue</strong> of the blood donation camp should
                     be clearly advertised. It is also important to highlight the
                     importance of donating blood.
+                  </li>
+                  <li>
+                    By sending letters to those who have participated once, we
+                    can bring them back for the next camp. We have found this to
+                    be a very successful method. Even if they were ineligible
+                    before, they may be eligible for future donations.
+                  </li>
+                  <li>
+                    If you represent an organization, assign each member to
+                    bring a specific number of blood donors.
+                  </li>
+                  <li>
+                    You can further increase the number of blood donors who may
+                    take part by informing them from{" "}
+                    <strong className="text-red-700">house to house</strong>.
+                  </li>
+                  <li>
+                    Modern advertising media such as{" "}
+                    <strong className="text-red-700">telephone</strong> and{" "}
+                    <strong className="text-red-700">internet</strong> can
+                    also be used to attract blood donors.
+                  </li>
+                  <li>
+                    Posters are provided by the{" "}
+                    <strong className="text-red-700">NBTS</strong> or by the relevant blood
+                    banks for awareness. If possible, display them twice, once
+                    in advance and again{" "}
+                    <strong className="text-red-700">2-3 days before</strong> the blood donation
+                    camp.
+                  </li>
+                  <li>
+                    Furthermore, <strong className="text-red-700">meetings</strong>,{" "}
+                    <strong className="text-red-700">short films</strong>, and{" "}
+                    <strong className="text-red-700">videos</strong> can be
+                    provided to target groups as needed. While organizing all
+                    this, it is important to maintain close contact
+                    with the relevant blood bank.
+                  </li>
+                  <li>
+                    Also, the main organizer's{" "}
+                    <strong className="text-red-700">landline number</strong> and a{" "}
+                    <strong className="text-red-700">mobile phone number</strong> should be provided to the relevant blood
+                    bank.
+                  </li>
+                  <li>
+                    Since the government incurs a high amount in organizing
+                    blood donation camps, it's crucial to make them{" "}
+                    <strong className="text-red-700">successful</strong>.
                   </li>
                 </ul>
               </div>
