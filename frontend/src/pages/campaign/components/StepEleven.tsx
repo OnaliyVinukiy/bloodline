@@ -12,9 +12,20 @@ import { Button, Label } from "flowbite-react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 
-const StepEleven: React.FC<StepperPropsCampaign> = ({
+const StepEleven: React.FC<
+  StepperPropsCampaign & {
+    selectedDate: Date | null;
+    setSelectedDate: (date: Date | null) => void;
+    selectedSlot: string | null;
+    setSelectedSlot: (slot: string | null) => void;
+  }
+> = ({
   onNextStep,
   onPreviousStep,
+  selectedDate,
+  setSelectedDate,
+  selectedSlot,
+  setSelectedSlot,
 }) => {
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -25,10 +36,10 @@ const StepEleven: React.FC<StepperPropsCampaign> = ({
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
   };
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
   //Convert the date format
   const getFormattedDate = (date: Date) => {
     const offsetDate = new Date(
@@ -64,14 +75,6 @@ const StepEleven: React.FC<StepperPropsCampaign> = ({
       fetchBookedSlots();
     }
   }, [selectedDate]);
-
-  //Format selected date
-  useEffect(() => {
-    if (selectedDate && selectedSlot) {
-      const formattedDate = getFormattedDate(selectedDate);
-      //   onFormDataChange({ selectedDate: formattedDate, selectedSlot });
-    }
-  }, [selectedDate, selectedSlot]);
 
   // Generate time slots with intervals
   const generateTimeSlots = () => {
@@ -147,8 +150,14 @@ const StepEleven: React.FC<StepperPropsCampaign> = ({
                     <DatePicker
                       selected={selectedDate}
                       onChange={(date) => {
-                        setSelectedDate(date);
-                        setSelectedSlot(null);
+                        if (date) {
+                          const offset = 5.5 * 60;
+                          const offsetDate = new Date(
+                            date.getTime() + offset * 60000
+                          );
+                          setSelectedDate(offsetDate);
+                          setSelectedSlot(null);
+                        }
                       }}
                       inline
                       minDate={new Date()}
