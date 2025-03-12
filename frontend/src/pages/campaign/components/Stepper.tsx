@@ -19,15 +19,19 @@ import StepSeven from "./StepSeven";
 import StepEight from "./StepEight";
 import StepNine from "./StepNine";
 import StepTen from "./StepTen";
+import StepEleven from "./StepEleven";
+import StepTwelve from "./StepTwelve";
 
 const Stepper = ({
   step,
   onNextStep,
   onPreviousStep,
+  onStepChange,
 }: {
   step: number;
   onNextStep: () => void;
   onPreviousStep: () => void;
+  onStepChange: (step: number) => void;
 }) => {
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
@@ -104,8 +108,17 @@ const Stepper = ({
     "Food",
     "Promotion",
     "Organize",
-    "Review"
+    "Review",
+    "Slot",
+    "Registration",
   ];
+
+  // Handle step label click
+  const handleStepClick = (stepNumber: number) => {
+    if (stepNumber <= step) {
+      onStepChange(stepNumber);
+    }
+  };
 
   return (
     <div>
@@ -116,16 +129,25 @@ const Stepper = ({
               <div
                 className="h-2.5 rounded-full absolute top-0 left-0 transition-all duration-300"
                 style={{
-                  width: `${((step - 1) / 9) * 100}%`,
-                  background: "linear-gradient(90deg,rgb(184, 38, 1),rgb(235, 56, 36))",
+                  width: `${((step - 1) / 11) * 100}%`,
+                  background:
+                    "linear-gradient(90deg,rgb(184, 38, 1),rgb(235, 56, 36))",
                 }}
               ></div>
             </div>
             <div className="flex flex-wrap justify-center gap-4 md:justify-between">
               {steps.map((label, index) => (
-                <div key={index} className="text-center flex flex-col items-center">
+                <div
+                  key={index}
+                  className="text-center flex flex-col items-center cursor-pointer"
+                  onClick={() => handleStepClick(index + 1)}
+                >
                   <div
-                    className={`w-8 h-8 flex items-center justify-center rounded-full font-semibold transition-all duration-300 ${index + 1 <= step ? "bg-gradient-to-r from-red-800 to-red-600 text-white" : "bg-gray-200 text-gray-500"}`}
+                    className={`w-8 h-8 flex items-center justify-center rounded-full font-semibold transition-all duration-300 ${
+                      index + 1 <= step
+                        ? "bg-gradient-to-r from-red-800 to-red-600 text-white"
+                        : "bg-gray-200 text-gray-500"
+                    }`}
                   >
                     {index + 1}
                   </div>
@@ -136,19 +158,44 @@ const Stepper = ({
           </div>
         </div>
       </div>
-      
-        {step === 1 && <StepOne onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
-        {step === 2 && <StepTwo onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
-        {step === 3 && <StepThree onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
-        {step === 4 && <StepFour onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
-        {step === 5 && <StepFive onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
-        {step === 6 && <StepSix onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
-        {step === 7 && <StepSeven onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
-        {step === 8 && <StepEight onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
-        {step === 9 && <StepNine onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
-        {step === 10 && <StepTen onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
-      </div>
-   
+
+      {step === 1 && (
+        <StepOne onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 2 && (
+        <StepTwo onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 3 && (
+        <StepThree onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 4 && (
+        <StepFour onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 5 && (
+        <StepFive onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 6 && (
+        <StepSix onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 7 && (
+        <StepSeven onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 8 && (
+        <StepEight onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 9 && (
+        <StepNine onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 10 && (
+        <StepTen onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 11 && (
+        <StepEleven onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 12 && (
+        <StepTwelve onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+    </div>
   );
 };
 
