@@ -14,13 +14,13 @@ import axios from "axios";
 
 const ScheduleForm: React.FC<StepperProps> = ({
   onNextStep,
-
   onFormDataChange,
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  
   //Convert the date format
   const getFormattedDate = (date: Date) => {
     const offsetDate = new Date(
