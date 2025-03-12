@@ -36,6 +36,8 @@ const Stepper = ({
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
 
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -190,10 +192,22 @@ const Stepper = ({
         <StepTen onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
       {step === 11 && (
-        <StepEleven onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepEleven
+          onNextStep={onNextStep}
+          onPreviousStep={onPreviousStep}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          selectedSlot={selectedSlot}
+          setSelectedSlot={setSelectedSlot}
+        />
       )}
       {step === 12 && (
-        <StepTwelve onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+        <StepTwelve
+          onNextStep={onNextStep}
+          onPreviousStep={onPreviousStep}
+          selectedDate={selectedDate}
+          selectedSlot={selectedSlot}
+        />
       )}
     </div>
   );
