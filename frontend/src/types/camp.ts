@@ -6,12 +6,14 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 export interface Camp {
-  organizationName: "";
-  fullName: "";
-  nic: "";
-  email: "";
-  contactNumber: "";
-  province: "";
-  district: "";
-  city: "";
+  organizationName: string;
+  fullName: string;
+  nic: string;
+  email: string;
+  contactNumber: string;
+  province: string;
+  district: string;
+  city: string;
+  date: string | null;
+  time: string | null;
 }
