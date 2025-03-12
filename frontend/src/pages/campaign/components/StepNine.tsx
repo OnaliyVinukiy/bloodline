@@ -62,41 +62,26 @@ const StepNine: React.FC<StepperPropsCampaign> = ({
                 <ul className="list-disc pl-6 mt-6 space-y-4">
                   <li>
                     Organizers should ensure a{" "}
-                    <strong className="text-red-700">
-                      calm and safe environment
-                    </strong>{" "}
-                    at the blood donation camp.
+                    <strong className="text-red-700">calm and safe environment</strong> at the blood donation camp.
                   </li>
                   <li>
                     The environment should be{" "}
-                    <strong className="text-red-700">
-                      free from excessive noise.{" "}
-                    </strong>
+                    <strong className="text-red-700">free from excessive noise</strong>.
                   </li>
                   <li>
                     Steps should be taken to ensure the{" "}
-                    <strong className="text-red-700">
-                      safety of the officers
-                    </strong>{" "}
-                    taking part in the blood donation camp.
+                    <strong className="text-red-700">safety of the officers</strong> taking part in the blood donation camp.
                   </li>
                   <li>
-                    While the organizer of the blood donation camp maintains the
-                    connection with relevant blood bank, the sub communities
-                    under him such as the Blood Donor Searching Community,
-                    Promotion Community, Venue Preparation Community, Catering
-                    Community, can taking part in organizing the blood donation
-                    camp.
+                    While the organizer of the blood donation camp maintains the connection with the relevant blood bank, the sub-communities under them—such as the{" "}
+                    <strong className="text-red-700">Blood Donor Searching Community</strong>,{" "}
+                    <strong className="text-red-700">Promotion Community</strong>,{" "}
+                    <strong className="text-red-700">Venue Preparation Community</strong>, and{" "}
+                    <strong className="text-red-700">Catering Community</strong>—can take part in organizing the blood donation camp.
                   </li>
                   <li>
-                    In cases where the number of blood donors exceeds the number
-                    we are prepared for at a camp, it may not be possible for
-                    the National Blood Transfusion Service to collect blood from
-                    everyone. In such a case, the details of those blood donors
-                    will be gathered and blood will be collected from them
-                    at a later time by the National Blood Transfusion Service.It
-                    is important to inform the blood donors and your team about
-                    this.
+                    In cases where the number of blood donors exceeds the number we are prepared for at a camp, it may not be possible for the National Blood Transfusion Service to collect blood from everyone. In such a case, the details of those blood donors will be gathered, and blood will be collected from them at a{" "}
+                    <strong className="text-red-700">later time</strong> by the National Blood Transfusion Service. It is important to inform the blood donors and your team about this.
                   </li>
                 </ul>
               </div>
