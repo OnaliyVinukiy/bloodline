@@ -9,7 +9,7 @@
 import React from "react";
 import { StepperPropsCampaign } from "../../../types/stepper";
 
-const StepEight: React.FC<StepperPropsCampaign> = ({
+const StepNine: React.FC<StepperPropsCampaign> = ({
   onNextStep,
   onPreviousStep,
 }) => {
@@ -38,7 +38,7 @@ const StepEight: React.FC<StepperPropsCampaign> = ({
                   width="24"
                   height="24"
                   fill="currentColor"
-                  viewBox="0 0 640 512"
+                  viewBox="0 0 512 512"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
@@ -46,11 +46,11 @@ const StepEight: React.FC<StepperPropsCampaign> = ({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M48 48h88c13.3 0 24-10.7 24-24s-10.7-24-24-24H32C14.3 0 0 14.3 0 32V136c0 13.3 10.7 24 24 24s24-10.7 24-24V48zM175.8 224a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm-26.5 32C119.9 256 96 279.9 96 309.3c0 14.7 11.9 26.7 26.7 26.7h56.1c8-34.1 32.8-61.7 65.2-73.6c-7.5-4.1-16.2-6.4-25.3-6.4H149.3zm368 80c14.7 0 26.7-11.9 26.7-26.7c0-29.5-23.9-53.3-53.3-53.3H421.3c-9.2 0-17.8 2.3-25.3 6.4c32.4 11.9 57.2 39.5 65.2 73.6h56.1zm-89.4 0c-8.6-24.3-29.9-42.6-55.9-47c-3.9-.7-7.9-1-12-1H280c-4.1 0-8.1 .3-12 1c-26 4.4-47.3 22.7-55.9 47c-2.7 7.5-4.1 15.6-4.1 24c0 13.3 10.7 24 24 24H408c13.3 0 24-10.7 24-24c0-8.4-1.4-16.5-4.1-24zM464 224a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm-80-32a64 64 0 1 0 -128 0 64 64 0 1 0 128 0zM504 48h88v88c0 13.3 10.7 24 24 24s24-10.7 24-24V32c0-17.7-14.3-32-32-32H504c-13.3 0-24 10.7-24 24s10.7 24 24 24zM48 464V376c0-13.3-10.7-24-24-24s-24 10.7-24 24V480c0 17.7 14.3 32 32 32H136c13.3 0 24-10.7 24-24s-10.7-24-24-24H48zm456 0c-13.3 0-24 10.7-24 24s10.7 24 24 24H608c17.7 0 32-14.3 32-32V376c0-13.3-10.7-24-24-24s-24 10.7-24 24v88H504z"
+                    d="M152.1 38.2c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 113C-2.3 103.6-2.3 88.4 7 79s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zm0 160c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 273c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zM224 96c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32zm0 160c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32zM160 416c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H192c-17.7 0-32-14.3-32-32zM48 368a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Finding Blood Donors
+                  Organizing Activities of the Blood Donation Camp
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
@@ -59,46 +59,44 @@ const StepEight: React.FC<StepperPropsCampaign> = ({
             </div>
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                A successful blood donation camp is a collective effort. With
-                sincere dedication and hard work, you can get the help of
-                everyone. Friends, sports clubs, voluntary organizations,
-                government and non-government institutions are some of the
-                parties that can help you.
-                <br />
-                <br />
-                Blood donation camps focused only on personal fame often fail. A
-                camp that is fair and free from discrimination based on race,
-                caste, political affiliation, or religion will gain support and
-                be successful.
                 <ul className="list-disc pl-6 mt-6 space-y-4">
                   <li>
-                    Healthy individuals aged{" "}
-                    <strong className="text-red-700">18 to 55</strong>, weighing
-                    more than <strong className="text-red-700">50 kg</strong>,
-                    can donate blood once every{" "}
-                    <strong className="text-red-700">4 months.</strong>
+                    Organizers should ensure a{" "}
+                    <strong className="text-red-700">
+                      calm and safe environment
+                    </strong>{" "}
+                    at the blood donation camp.
                   </li>
                   <li>
-                    Those who have previously had their blood tested can donate
-                    up to the age of 60.
+                    The environment should be{" "}
+                    <strong className="text-red-700">
+                      free from excessive noise.{" "}
+                    </strong>
                   </li>
                   <li>
-                    Make a list of eligible donors, inform them personally, and
-                    encourage them to donate blood.
+                    Steps should be taken to ensure the{" "}
+                    <strong className="text-red-700">
+                      safety of the officers
+                    </strong>{" "}
+                    taking part in the blood donation camp.
                   </li>
-
                   <li>
-                    For a successful blood donation camp on a{" "}
-                    <strong className="text-red-700">weekday</strong>, at least
-                    <strong className="text-red-700"> 50 donors</strong> are
-                    needed
+                    While the organizer of the blood donation camp maintains the
+                    connection with relevant blood bank, the sub communities
+                    under him such as the Blood Donor Searching Community,
+                    Promotion Community, Venue Preparation Community, Catering
+                    Community, can taking part in organizing the blood donation
+                    camp.
                   </li>
-
                   <li>
-                    For a successful blood donation camp on a{" "}
-                    <strong className="text-red-700">holiday</strong>, at least
-                    <strong className="text-red-700"> 100 donors</strong> are
-                    needed
+                    In cases where the number of blood donors exceeds the number
+                    we are prepared for at a camp, it may not be possible for
+                    the National Blood Transfusion Service to collect blood from
+                    everyone. In such a case, the details of those blood donors
+                    will be gathered and blood will be collected from them
+                    at a later time by the National Blood Transfusion Service.It
+                    is important to inform the blood donors and your team about
+                    this.
                   </li>
                 </ul>
               </div>
@@ -125,4 +123,4 @@ const StepEight: React.FC<StepperPropsCampaign> = ({
   );
 };
 
-export default StepEight;
+export default StepNine;
