@@ -18,6 +18,7 @@ import StepSix from "./StepSix";
 import StepSeven from "./StepSeven";
 import StepEight from "./StepEight";
 import StepNine from "./StepNine";
+import StepTen from "./StepTen";
 
 const Stepper = ({
   step,
@@ -57,7 +58,6 @@ const Stepper = ({
         }
       }
     };
-
     fetchUserInfo();
   }, [state?.isAuthenticated, getAccessToken]);
 
@@ -88,7 +88,7 @@ const Stepper = ({
   if (!user) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p className="text-lg text-gray-700">Please login to fill the form</p>
+        <p className="text-lg text-gray-100">Please login to fill the form</p>
       </div>
     );
   }
@@ -104,6 +104,7 @@ const Stepper = ({
     "Food",
     "Promotion",
     "Organize",
+    "Review"
   ];
 
   return (
@@ -115,68 +116,39 @@ const Stepper = ({
               <div
                 className="h-2.5 rounded-full absolute top-0 left-0 transition-all duration-300"
                 style={{
-                  width: `${((step - 1) / 8) * 100}%`,
-                  background:
-                    "linear-gradient(90deg,rgb(184, 38, 1),rgb(235, 56, 36))",
+                  width: `${((step - 1) / 9) * 100}%`,
+                  background: "linear-gradient(90deg,rgb(184, 38, 1),rgb(235, 56, 36))",
                 }}
               ></div>
             </div>
-
-            {/* Step Labels */}
-            <div className="flex justify-between">
+            <div className="flex flex-wrap justify-center gap-4 md:justify-between">
               {steps.map((label, index) => (
-                <div
-                  key={index}
-                  className={`text-center ${
-                    index + 1 <= step ? "text-red-800" : "text-gray-400"
-                  }`}
-                >
+                <div key={index} className="text-center flex flex-col items-center">
                   <div
-                    className={`w-8 h-8 flex items-center justify-center mx-auto rounded-full ${
-                      index + 1 <= step
-                        ? "bg-gradient-to-r from-red-800 to-red-600 text-white"
-                        : "bg-gray-200 text-gray-500"
-                    } font-semibold`}
+                    className={`w-8 h-8 flex items-center justify-center rounded-full font-semibold transition-all duration-300 ${index + 1 <= step ? "bg-gradient-to-r from-red-800 to-red-600 text-white" : "bg-gray-200 text-gray-500"}`}
                   >
                     {index + 1}
                   </div>
-                  <span className="text-sm mt-2">{label}</span>
+                  <span className="text-xs md:text-sm mt-1">{label}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
-
-      {/* Step Content */}
-      {step === 1 && (
-        <StepOne onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
-      )}
-      {step === 2 && (
-        <StepTwo onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
-      )}
-      {step === 3 && (
-        <StepThree onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
-      )}
-      {step === 4 && (
-        <StepFour onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
-      )}
-      {step === 5 && (
-        <StepFive onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
-      )}
-      {step === 6 && (
-        <StepSix onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
-      )}
-      {step === 7 && (
-        <StepSeven onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
-      )}
-      {step === 8 && (
-        <StepEight onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
-      )}
-      {step === 9 && (
-        <StepNine onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
-      )}
-    </div>
+      
+        {step === 1 && <StepOne onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
+        {step === 2 && <StepTwo onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
+        {step === 3 && <StepThree onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
+        {step === 4 && <StepFour onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
+        {step === 5 && <StepFive onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
+        {step === 6 && <StepSix onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
+        {step === 7 && <StepSeven onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
+        {step === 8 && <StepEight onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
+        {step === 9 && <StepNine onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
+        {step === 10 && <StepTen onNextStep={onNextStep} onPreviousStep={onPreviousStep} />}
+      </div>
+   
   );
 };
 

@@ -24,8 +24,8 @@ const StepEight: React.FC<StepperPropsCampaign> = ({
   };
 
   return (
-    <div className="flex justify-center bg-gradient-to-r from-gray-50 to-gray-100 min-h-screen">
-      <main className="mt-8 mb-8 w-full max-w-4xl px-4 py-8">
+    <div className="flex justify-center bg-white min-h-screen">
+      <main className="mt-0 mb-8 w-full max-w-4xl px-4 py-8">
         <div className="relative bg-white rounded-xl shadow-2xl overflow-hidden p-1">
           <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-800 rounded-xl z-0"></div>
 
