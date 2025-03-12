@@ -1,4 +1,11 @@
-const mongoose = require("mongoose");
+/*!
+ * Bloodline Blood Bank Management System
+ * Copyright (c) 2025 Onaliy Jayawardana
+ * All rights reserved.
+ *
+ * Unauthorized copying, modification, or distribution of this code is prohibited.
+ */
+import mongoose from "mongoose";
 
 const DonorSchema = new mongoose.Schema({
   nic: String,
