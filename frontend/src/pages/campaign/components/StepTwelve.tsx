@@ -124,7 +124,7 @@ const StepTwelve: React.FC<
     fetchCities(selectedDistrict);
   };
 
-  const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCityChange = () => {
     //const selectedCity = event.target.value;
   };
 
