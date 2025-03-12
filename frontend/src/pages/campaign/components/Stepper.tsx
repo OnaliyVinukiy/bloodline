@@ -26,12 +26,10 @@ const Stepper = ({
   step,
   onNextStep,
   onPreviousStep,
-  onStepChange,
 }: {
   step: number;
   onNextStep: () => void;
   onPreviousStep: () => void;
-  onStepChange: (step: number) => void;
 }) => {
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
@@ -115,13 +113,6 @@ const Stepper = ({
     "Registration",
   ];
 
-  // Handle step label click
-  const handleStepClick = (stepNumber: number) => {
-    if (stepNumber <= step) {
-      onStepChange(stepNumber);
-    }
-  };
-
   return (
     <div>
       <div className="bg-white shadow-sm py-6">
@@ -142,7 +133,6 @@ const Stepper = ({
                 <div
                   key={index}
                   className="text-center flex flex-col items-center cursor-pointer"
-                  onClick={() => handleStepClick(index + 1)}
                 >
                   <div
                     className={`w-8 h-8 flex items-center justify-center rounded-full font-semibold transition-all duration-300 ${

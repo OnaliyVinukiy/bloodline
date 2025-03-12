@@ -125,7 +125,7 @@ const StepTwelve: React.FC<
   };
 
   const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedCity = event.target.value;
+    //const selectedCity = event.target.value;
   };
 
   const handleChange = (
