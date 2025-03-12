@@ -24,8 +24,8 @@ const StepThree: React.FC<StepperPropsCampaign> = ({
   };
 
   return (
-    <div className="flex justify-center bg-gradient-to-r from-gray-50 to-gray-100 min-h-screen">
-      <main className="mt-8 mb-8 w-full max-w-4xl px-4 py-8">
+    <div className="flex justify-center bg-white min-h-screen">
+      <main className="mt-0 mb-8 w-full max-w-4xl px-4 py-8">
         <div className="relative bg-white rounded-xl shadow-2xl overflow-hidden p-1">
           <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-800 rounded-xl z-0"></div>
 
@@ -59,13 +59,13 @@ const StepThree: React.FC<StepperPropsCampaign> = ({
             </div>
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
-              <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-justify text-gray-700 leading-relaxed">
+              <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
                 A blood donation camp is normally held from{" "}
                 <strong className="text-red-700">9:00 AM to 3:00 PM.</strong>{" "}
                 This time frame ensures that the collected blood can be properly
                 processed. Once donated, blood must be separated into blood
-                constituents within six hours. Therefore, blood donation camps cannot
-                exceed this time limit.
+                constituents within six hours. Therefore, blood donation camps
+                cannot exceed this time limit.
                 <br />
                 <br />
                 Planning your camp within this time frame helps ensure that
