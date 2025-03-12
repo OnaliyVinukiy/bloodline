@@ -129,8 +129,8 @@ export function Navigationbar() {
   }
 
   return (
-    <Navbar fluid rounded className="shadow-lg py-4">
-      <Navbar.Brand href="/" className="md:ml-24 h-6 sm:h-9">
+    <Navbar fluid rounded className="shadow-lg md:py-4 py-2">
+      <Navbar.Brand href="/" className="md:ml-24 md: h-6 h-4">
         <img
           src="https://bloodlineresources.blob.core.windows.net/assets/logo.png"
           className="mb-10 mt-2 mr-3 h-16 sm:h-16 "
@@ -211,13 +211,16 @@ export function Navigationbar() {
             <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
           </Dropdown>
         ) : (
+          <>
           <Button
-          className="bg-red-800 hover:bg-red-700 text-white text-sm md:text-base"
-          onClick={() => signIn()}
-        >
-          Login
-        </Button>
-        
+         
+            className="bg-red-800 hover:bg-red-700 text-white text-xs md:text-base text-sm"
+            onClick={() => signIn()}
+          >
+            Login
+          </Button>
+         
+          </>
         )}
         <Navbar.Toggle />
       </div>
