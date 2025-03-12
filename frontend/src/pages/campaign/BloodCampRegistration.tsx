@@ -22,6 +22,8 @@ const BloodCampaignRegistration = () => {
     setStep((prevStep) => Math.max(prevStep - 1, 1));
   };
 
+  const [currentStep, setCurrentStep] = useState(1);
+
   return (
     <div className="mt-12 bg-white">
       <div className="flex justify-center bg-white border-b border-gray-200 dark:border-gray-700">
@@ -71,6 +73,7 @@ const BloodCampaignRegistration = () => {
             step={step}
             onNextStep={handleNextStep}
             onPreviousStep={handlePreviousStep}
+            onStepChange={(step) => setCurrentStep(step)}
           />
         )}
         {activeTab === "tab2" && <p>Sinhala Form</p>}
