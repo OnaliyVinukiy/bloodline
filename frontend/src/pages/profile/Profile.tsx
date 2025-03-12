@@ -49,6 +49,8 @@ export default function Profile() {
   });
 
   const [isProfileComplete, setIsProfileComplete] = useState(false);
+  const [showProfileIncompleteModal, setShowProfileIncompleteModal] =
+    useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -99,6 +101,12 @@ export default function Profile() {
 
     fetchUserInfo();
   }, [state?.isAuthenticated, getAccessToken]);
+
+  useEffect(() => {
+    if (!isLoading && !isProfileComplete) {
+      setShowProfileIncompleteModal(true);
+    }
+  }, [isLoading, isProfileComplete]);
 
   //Fetch provinces list
   useEffect(() => {
@@ -611,12 +619,17 @@ export default function Profile() {
                 value={donor?.birthdate ? new Date(donor.birthdate) : undefined}
                 onChange={(date) => {
                   if (date) {
+                    const offset = 5.5 * 60;
+                    const offsetDate = new Date(
+                      date.getTime() + offset * 60000
+                    );
                     handleInputChange(
                       "birthdate",
-                      date.toISOString().split("T")[0]
+                      offsetDate.toISOString().split("T")[0]
                     );
                   }
                 }}
+                maxDate={new Date()}
                 className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
               />
             </div>
@@ -736,6 +749,27 @@ export default function Profile() {
           <Button
             color="failure"
             onClick={() => setShowAgeValidationModal(false)}
+          >
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Profile Completion Modal */}
+      <Modal
+        show={showProfileIncompleteModal}
+        onClose={() => setShowProfileIncompleteModal(false)}
+      >
+        <Modal.Header>Complete Your Profile</Modal.Header>
+        <Modal.Body>
+          <p className="text-lg text-gray-700">
+            Please complete your profile to register as a donor.
+          </p>
+        </Modal.Body>
+        <Modal.Footer className="flex justify-end">
+          <Button
+            color="failure"
+            onClick={() => setShowProfileIncompleteModal(false)}
           >
             OK
           </Button>
