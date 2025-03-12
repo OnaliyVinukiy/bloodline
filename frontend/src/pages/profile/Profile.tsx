@@ -619,12 +619,17 @@ export default function Profile() {
                 value={donor?.birthdate ? new Date(donor.birthdate) : undefined}
                 onChange={(date) => {
                   if (date) {
+                    const offset = 5.5 * 60;
+                    const offsetDate = new Date(
+                      date.getTime() + offset * 60000
+                    );
                     handleInputChange(
                       "birthdate",
-                      date.toISOString().split("T")[0]
+                      offsetDate.toISOString().split("T")[0]
                     );
                   }
                 }}
+                maxDate={new Date()}
                 className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
               />
             </div>
