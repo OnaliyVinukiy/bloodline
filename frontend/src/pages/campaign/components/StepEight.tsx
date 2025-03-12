@@ -122,6 +122,45 @@ const StepEight: React.FC<StepperPropsCampaign> = ({
                     be clearly advertised. It is also important to highlight the
                     importance of donating blood.
                   </li>
+                  <li>
+                    By sending letters to those who have participated once, we
+                    can bring them back for the next camp. We have found this to
+                    be a very successful method. Even if they were ineligible
+                    before, they may be eligible for future donations.
+                  </li>
+                  <li>
+                    If you represent an organization, assign each member to
+                    bring a specific number of blood donors.
+                  </li>
+                  <li>
+                    You can further increase the number of blood donors who may
+                    take part by informing them from house to house.
+                  </li>
+                  <li>
+                    Modern advertising media such as telephone and internet can
+                    also be used to attract blood donors.
+                  </li>
+                  <li>
+                    Posters are provided by the NBTS or by the relevant blood
+                    banks for awareness. If possible, display them twice, once
+                    in advance and again 2-3 days before the blood donation
+                    camp.
+                  </li>
+                  <li>
+                    Furthermore, meetings, short films and videos can be
+                    provided to target groups as needed. While organizing all
+                    this, it is important to maintain close contact
+                    with the relevant blood bank.
+                  </li>
+                  <li>
+                    Also the main organizer's landline number and a
+                    mobile phone number should be provided to the relevant blood
+                    bank.
+                  </li>
+                  <li>
+                    Since the government incure a high amount in organizing
+                    blood donation camps, it's crucial to make them successful.
+                  </li>
                 </ul>
               </div>
             </div>
