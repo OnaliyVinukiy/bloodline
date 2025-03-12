@@ -17,9 +17,10 @@ export default function Profile() {
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const [showErrorModal, setErrorModal] = useState(false);
   const [showAgeValidationModal, setShowAgeValidationModal] = useState(false);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [province, setProvince] = useState<
     { province_id: string; province_name_en: string }[]
   >([]);
@@ -255,7 +256,11 @@ export default function Profile() {
       await axios.post(`${backendURL}/api/update-donor`, donorData);
       setIsProfileComplete(true);
       setLoading(false);
-      setShowModal(true);
+      if (!isProfileComplete) {
+        setShowRegistrationModal(true);
+      } else {
+        setShowUpdateModal(true);
+      }
     } catch (error) {
       console.error("Error updating profile:", error);
       setLoading(false);
@@ -603,14 +608,23 @@ export default function Profile() {
 
             <div>
               <Label>Blood Group</Label>
-              <input
-                type="text"
+              <select
                 value={donor?.bloodGroup || ""}
                 onChange={(e) =>
                   handleInputChange("bloodGroup", e.target.value)
                 }
                 className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-              />
+              >
+                <option value="">Select Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
             </div>
 
             <div>
@@ -619,14 +633,12 @@ export default function Profile() {
                 value={donor?.birthdate ? new Date(donor.birthdate) : undefined}
                 onChange={(date) => {
                   if (date) {
-                    const offset = 5.5 * 60;
-                    const offsetDate = new Date(
-                      date.getTime() + offset * 60000
-                    );
-                    handleInputChange(
-                      "birthdate",
-                      offsetDate.toISOString().split("T")[0]
-                    );
+                    const offsetDate = new Date(date);
+                    offsetDate.setMinutes(offsetDate.getMinutes() + 330);
+
+                    const formattedDate =
+                      offsetDate.toLocaleDateString("en-CA");
+                    handleInputChange("birthdate", formattedDate);
                   }
                 }}
                 maxDate={new Date()}
@@ -684,16 +696,79 @@ export default function Profile() {
         </div>
       </main>
 
-      {/* Profile Update Confirmation Modal */}
-      <Modal show={showModal} onClose={() => setShowModal(false)}>
-        <Modal.Header>Registered Successfully!</Modal.Header>
+      {/* Registration Confirmation Modal */}
+      <Modal
+        show={showRegistrationModal}
+        onClose={() => setShowRegistrationModal(false)}
+      >
+        <Modal.Header className="flex items-center gap-2 ">
+          <p className="flex items-center gap-2 text-xl text-green-600">
+            <svg
+              className="w-6 h-6 text-green-600"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              viewBox="0 0 512 512"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"
+              />
+            </svg>
+            Registered Successfully!
+          </p>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-lg text-gray-700">
+            You got successfully registered as a blood donor.
+          </p>
+        </Modal.Body>
+        <Modal.Footer className="flex justify-end">
+          <Button
+            color="failure"
+            onClick={() => setShowRegistrationModal(false)}
+          >
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Update Confirmation Modal */}
+      <Modal show={showUpdateModal} onClose={() => setShowUpdateModal(false)}>
+        <Modal.Header className="flex items-center gap-2 ">
+          <p className="flex items-center gap-2 text-xl text-green-600">
+            <svg
+              className="w-6 h-6 text-green-600"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              viewBox="0 0 512 512"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"
+              />
+            </svg>
+            Details Updated Successfully!
+          </p>
+        </Modal.Header>
         <Modal.Body>
           <p className="text-lg text-gray-700">
             Your donor details are updated successfully.
           </p>
         </Modal.Body>
         <Modal.Footer className="flex justify-end">
-          <Button color="failure" onClick={() => setShowModal(false)}>
+          <Button color="failure" onClick={() => setShowUpdateModal(false)}>
             OK
           </Button>
         </Modal.Footer>
