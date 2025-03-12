@@ -298,7 +298,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="flex justify-center items-center bg-gray-100">
+    <div className="flex justify-center items-center bg-gray-50">
       <main className="mt-16 mb-16 flex justify-center items-center w-full max-w-4xl px-4 py-6 md:w-2/3 lg:w-3/4">
         <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg">
           {!isProfileComplete ? (
