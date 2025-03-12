@@ -24,8 +24,8 @@ const StepTwo: React.FC<StepperPropsCampaign> = ({
   };
 
   return (
-    <div className="flex justify-center bg-gradient-to-r from-gray-50 to-gray-100 min-h-screen">
-      <main className="mt-8 mb-8 w-full max-w-4xl px-4 py-8">
+    <div className="flex justify-center bg-white min-h-screen">
+      <main className="mt-0 mb-8 w-full max-w-4xl px-4 py-8">
         <div className="relative bg-white rounded-xl shadow-2xl overflow-hidden p-1">
           <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-800 rounded-xl z-0"></div>
 
@@ -59,9 +59,9 @@ const StepTwo: React.FC<StepperPropsCampaign> = ({
             </div>
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
-              <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-justify text-gray-700 leading-relaxed">
-                You have the freedom to pick a date that aligns with your
-                camp goals. However, please inform the{" "}
+              <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
+                You have the freedom to pick a date that aligns with your camp
+                goals. However, please inform the{" "}
                 <strong className="text-red-700">
                   National Blood Transfusion Service (NBTS) at Narahenpita
                 </strong>{" "}
@@ -74,11 +74,11 @@ const StepTwo: React.FC<StepperPropsCampaign> = ({
                 <br />
                 <br />
                 If your potential donors are typically unavailable on weekdays
-                due to work, a weekend camp might be the best fit. On the
-                other hand, if an organization or company is hosting the event,
-                a weekday could be more convenient. Thoughtful planning ensures
-                a seamless and impactful camp, helping save countless lives
-                in the process!
+                due to work, a weekend camp might be the best fit. On the other
+                hand, if an organization or company is hosting the event, a
+                weekday could be more convenient. Thoughtful planning ensures a
+                seamless and impactful camp, helping save countless lives in the
+                process!
               </div>
             </div>
 
