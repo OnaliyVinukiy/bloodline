@@ -6,16 +6,31 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import jwt from "jsonwebtoken";
+import jwksClient from "jwks-rsa";
 import { Request, Response, NextFunction } from "express";
-
-const ASGARDEO_JWT_PUBLIC_KEY = process.env.ASGARDEO_JWT_PUBLIC_KEY;
-
-if (!ASGARDEO_JWT_PUBLIC_KEY) {
-  throw new Error("Missing environment variable: ASGARDEO_JWT_PUBLIC_KEY");
-}
 
 interface AuthenticatedRequest extends Request {
   user?: any;
+}
+
+const ASGARDEO_TENANT = process.env.ASGARDEO_TENANT;
+if (!ASGARDEO_TENANT) {
+  throw new Error("Missing environment variable: ASGARDEO_TENANT");
+}
+
+// JWKS client to fetch public key dynamically
+const client = jwksClient({
+  jwksUri: `https://api.asgardeo.io/t/${ASGARDEO_TENANT}/oauth2/jwks`,
+});
+
+function getKey(header: any, callback: any) {
+  client.getSigningKey(header.kid, (err, key) => {
+    if (err) {
+      return callback(err);
+    }
+    const signingKey = key?.getPublicKey();
+    callback(null, signingKey);
+  });
 }
 
 export const authenticateUser = (
@@ -31,7 +46,7 @@ export const authenticateUser = (
 
   const token = authHeader.split(" ")[1];
 
-  jwt.verify(token, ASGARDEO_JWT_PUBLIC_KEY, (err, decoded) => {
+  jwt.verify(token, getKey, { algorithms: ["RS256"] }, (err, decoded) => {
     if (err) {
       return res.status(401).json({ message: "Invalid token" });
     }
