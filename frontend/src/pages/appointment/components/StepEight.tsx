@@ -9,6 +9,7 @@ import { Button, Datepicker, Label, Modal } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/stepper";
 import axios from "axios";
+import { useAuthContext } from "@asgardeo/auth-react";
 
 const StepEight: React.FC<StepperProps> = ({
   onPreviousStep,
@@ -22,8 +23,23 @@ const StepEight: React.FC<StepperProps> = ({
     dateSigned: "",
   });
 
+  // Populate the form state from the parent formData
+  useEffect(() => {
+    if (formData?.seventhForm) {
+      setFormSevenData(formData.seventhForm);
+    }
+  }, [formData]);
+
+  const { getAccessToken } = useAuthContext();
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
+
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   //Function to set form data (radio buttons)
   const handleRadioChange =
@@ -41,21 +57,6 @@ const StepEight: React.FC<StepperProps> = ({
       [field]: value,
     }));
   };
-
-  // Populate the form state from the parent formData
-  useEffect(() => {
-    if (formData?.seventhForm) {
-      setFormSevenData(formData.seventhForm);
-    }
-  }, [formData]);
-
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
-
-  const backendURL =
-    import.meta.env.VITE_IS_PRODUCTION === "true"
-      ? import.meta.env.VITE_BACKEND_URL
-      : "http://localhost:5000";
 
   //Function to submit form data
   const submitForm = async () => {
@@ -83,11 +84,18 @@ const StepEight: React.FC<StepperProps> = ({
         seventhForm: formSevenData,
       });
 
+      const token = await getAccessToken();
+
       //Submit appointment data
       const response = await axios.post(
         `${backendURL}/api/appointments/save-appointment`,
         { ...formData, seventhForm: formSevenData },
-        { headers: { "Content-Type": "application/json" } }
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       if (response.status === 201) {
