@@ -5,14 +5,20 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useAuthContext } from "@asgardeo/auth-react";
 
 const AllAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { getAccessToken } = useAuthContext();
 
+  const memoizedGetAccessToken = useCallback(
+    () => getAccessToken(),
+    [getAccessToken]
+  );
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
@@ -22,8 +28,17 @@ const AllAppointments = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
+        setIsLoading(true);
+        const token = await memoizedGetAccessToken();
+
+        // Fetch appointments with Authorization header
         const response = await axios.get(
-          `${backendURL}/api/appointments/fetch-appointment`
+          `${backendURL}/api/appointments/fetch-appointment`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         setAppointments(response.data);
@@ -35,7 +50,7 @@ const AllAppointments = () => {
     };
 
     fetchAppointments();
-  }, []);
+  }, [memoizedGetAccessToken]);
 
   //Loading animation
   if (isLoading) {
