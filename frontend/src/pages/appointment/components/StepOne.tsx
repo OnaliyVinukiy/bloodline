@@ -469,14 +469,23 @@ const StepOne: React.FC<StepperProps> = ({
                 >
                   Blood Group*
                 </Label>
-                <input
-                  type="text"
+                <select
                   value={donor?.bloodGroup || ""}
                   onChange={(e) =>
                     handleInputChange("bloodGroup", e.target.value)
                   }
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-                />
+                >
+                  <option value="">Select Blood Group</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                </select>
                 {errors.bloodGroup && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.bloodGroup}
@@ -497,12 +506,15 @@ const StepOne: React.FC<StepperProps> = ({
                   }
                   onChange={(date) => {
                     if (date) {
-                      handleInputChange(
-                        "birthdate",
-                        date.toISOString().split("T")[0]
-                      );
+                      const offsetDate = new Date(date);
+                      offsetDate.setMinutes(offsetDate.getMinutes() + 330);
+
+                      const formattedDate =
+                        offsetDate.toLocaleDateString("en-CA");
+                      handleInputChange("birthdate", formattedDate);
                     }
                   }}
+                  maxDate={new Date()}
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
                 {errors.birthdate && (
