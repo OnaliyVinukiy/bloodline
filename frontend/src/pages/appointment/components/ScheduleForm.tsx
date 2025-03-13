@@ -5,12 +5,13 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Button, Label } from "flowbite-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { StepperProps } from "../../../types/stepper";
 import axios from "axios";
+import { useAuthContext } from "@asgardeo/auth-react";
 
 const ScheduleForm: React.FC<StepperProps> = ({
   onNextStep,
@@ -19,8 +20,13 @@ const ScheduleForm: React.FC<StepperProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+  const { getAccessToken } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
-  
+  const memoizedGetAccessToken = useCallback(
+    () => getAccessToken(),
+    [getAccessToken]
+  );
+
   //Convert the date format
   const getFormattedDate = (date: Date) => {
     const offsetDate = new Date(
@@ -38,10 +44,17 @@ const ScheduleForm: React.FC<StepperProps> = ({
   useEffect(() => {
     if (selectedDate) {
       setIsLoading(true);
+
       const fetchBookedSlots = async () => {
+        const token = await memoizedGetAccessToken();
         try {
           const response = await axios.get(
-            `${backendURL}/api/appointments/${getFormattedDate(selectedDate)}`
+            `${backendURL}/api/appointments/${getFormattedDate(selectedDate)}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
           );
 
           const slots = response.data.map(
