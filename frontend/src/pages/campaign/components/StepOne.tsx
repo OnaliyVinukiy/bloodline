@@ -8,7 +8,7 @@
 
 import React from "react";
 import { StepperPropsCampaign } from "../../../types/stepper";
-import BloodInventory from "../../../assets/bloodinventory.jpg";
+import BloodInventory from "../../../../public/bloodTube.jpg";
 
 const StepOne: React.FC<StepperPropsCampaign> = ({ onNextStep }) => {
   const handleNext = () => {
@@ -46,10 +46,10 @@ const StepOne: React.FC<StepperPropsCampaign> = ({ onNextStep }) => {
                 save lives. You can organize a blood donation camp for any
                 reason, whether it's for a national or religious event or even a
                 personal occasion like your birthday. You can choose to hold the
-                camp in your own community or at one of our blood centers.
-                If you decide to host it at one of our blood centers, our team
-                will be there to support you every step of the way. Together, we
-                can make a difference!
+                camp in your own community or at one of our blood centers. If
+                you decide to host it at one of our blood centers, our team will
+                be there to support you every step of the way. Together, we can
+                make a difference!
               </div>
             </div>
 
