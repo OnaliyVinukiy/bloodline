@@ -11,9 +11,11 @@ import { useParams } from "react-router-dom";
 import { Toast } from "flowbite-react";
 import { HiCheck } from "react-icons/hi";
 import { Button, Modal } from "flowbite-react";
+import { useAuthContext } from "@asgardeo/auth-react";
 
 const AppointmentDetails = () => {
   const { id } = useParams();
+  const { getAccessToken } = useAuthContext();
   const [appointment, setAppointment] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isApproving, setIsApproving] = useState(false);
@@ -34,8 +36,14 @@ const AppointmentDetails = () => {
   useEffect(() => {
     const fetchAppointment = async () => {
       try {
+        const token = await getAccessToken();
         const response = await axios.get(
-          `${backendURL}/api/appointments/fetch-appointment/${id}`
+          `${backendURL}/api/appointments/fetch-appointment/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setAppointment(response.data);
         console.log("response", response.data);
@@ -52,34 +60,56 @@ const AppointmentDetails = () => {
 
   //Handle approve appointment
   const handleApprove = async () => {
+    const token = await getAccessToken();
+
     try {
       setIsApproving(true);
       await axios.put(
-        `${backendURL}/api/appointments/approve-appointment/${id}`
+        `${backendURL}/api/appointments/approve-appointment/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
       setAppointment((prev: any) => ({ ...prev, status: "Approved" }));
       setIsApprovedToastOpen(true);
+
+      setTimeout(() => {
+        window.location.href = "http://localhost:5173/admin/appointments";
+      }, 1500);
     } catch (error) {
-      console.error("Error rejecting appointment:", error);
-      setError("Failed to reject appointment.");
+      console.error("Error approving appointment:", error);
+      setError("Failed to approve appointment.");
     } finally {
       setIsApproving(false);
       setIsApproveModalOpen(false);
     }
   };
-
   //Handle reject appointment
   const handleReject = async () => {
+    const token = await getAccessToken();
+
     if (!rejectionReason.trim()) {
       setError("Please provide a reason for rejection.");
       return;
     }
+
     try {
       setIsRejecting(true);
       await axios.put(
         `${backendURL}/api/appointments/reject-appointment/${id}`,
-        { reason: rejectionReason }
+        { reason: rejectionReason },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
+
       setAppointment((prev: any) => ({ ...prev, status: "Rejected" }));
       setIsRejectedToastOpen(true);
     } catch (error) {
