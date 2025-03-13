@@ -72,6 +72,7 @@ export function Navigationbar() {
         }
       } else {
         setUser(null);
+        setIsLoading(false);
       }
     };
 
@@ -141,86 +142,86 @@ export function Navigationbar() {
         </span>
       </Navbar.Brand>
       <div className="flex md:order-2 md:mr-24">
-        {user && !isAdmin ? (
-          <Dropdown
-            arrowIcon={false}
-            inline
-            label={
-              user.avatar ? (
-                <Avatar alt="User settings" img={user.avatar} rounded />
-              ) : donor.avatar ? (
-                <Avatar alt="User settings" img={donor.avatar} rounded />
-              ) : (
-                <div className="w-10 h-10 flex items-center justify-center bg-gray-300 rounded-full">
-                  <UserIcon className="w-6 h-6 text-gray-600" />
-                </div>
-              )
-            }
-          >
-            <Dropdown.Header>
-              <span className="block text-sm">
-                {user.firstName} {user.lastName}
-              </span>
-              <span className="block truncate text-sm font-medium">
-                {user.email}
-              </span>
-            </Dropdown.Header>
-            <Dropdown.Item onClick={() => navigate("/profile")}>
-              Profile
-            </Dropdown.Item>
-            <Dropdown.Item>Donations</Dropdown.Item>
-            <Dropdown.Item>Appointments</Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
-          </Dropdown>
-        ) : user && isAdmin ? (
-          <Dropdown
-            arrowIcon={false}
-            inline
-            label={
-              user.avatar ? (
-                <Avatar alt="User settings" img={user.avatar} rounded />
-              ) : (
-                <div className="w-10 h-10 flex items-center justify-center bg-gray-300 rounded-full">
-                  <UserIcon className="w-6 h-6 text-gray-600" />
-                </div>
-              )
-            }
-          >
-            <Dropdown.Header>
-              <span className="block text-sm">
-                {user.firstName} {user.lastName}
-              </span>
-              <span className="block truncate text-sm font-medium">
-                {user.email}
-              </span>
-            </Dropdown.Header>
-            <Dropdown.Item onClick={() => navigate("/profile")}>
-              Admin Dashboard
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => navigate("/admin/appointments")}>
-              {" "}
-              Appointments
-            </Dropdown.Item>
-            <Dropdown.Item>Campaigns</Dropdown.Item>
-            <Dropdown.Item onClick={() => navigate("/admin/calendar")}>
-              {" "}
-              Calendar
-            </Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
-          </Dropdown>
+        {isLoading ? (
+          <div className="w-10 h-10 bg-gray-300 rounded-full animate-pulse"></div>
+        ) : state?.isAuthenticated ? (
+          user && !isAdmin ? (
+            <Dropdown
+              arrowIcon={false}
+              inline
+              label={
+                user.avatar ? (
+                  <Avatar alt="User settings" img={user.avatar} rounded />
+                ) : donor.avatar ? (
+                  <Avatar alt="User settings" img={donor.avatar} rounded />
+                ) : (
+                  <div className="w-10 h-10 flex items-center justify-center bg-gray-300 rounded-full">
+                    <UserIcon className="w-6 h-6 text-gray-600" />
+                  </div>
+                )
+              }
+            >
+              <Dropdown.Header>
+                <span className="block text-sm">
+                  {user.firstName} {user.lastName}
+                </span>
+                <span className="block truncate text-sm font-medium">
+                  {user.email}
+                </span>
+              </Dropdown.Header>
+              <Dropdown.Item onClick={() => navigate("/profile")}>
+                Profile
+              </Dropdown.Item>
+              <Dropdown.Item>Donations</Dropdown.Item>
+              <Dropdown.Item>Appointments</Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
+            </Dropdown>
+          ) : user && isAdmin ? (
+            <Dropdown
+              arrowIcon={false}
+              inline
+              label={
+                user.avatar ? (
+                  <Avatar alt="User settings" img={user.avatar} rounded />
+                ) : (
+                  <div className="w-10 h-10 flex items-center justify-center bg-gray-300 rounded-full">
+                    <UserIcon className="w-6 h-6 text-gray-600" />
+                  </div>
+                )
+              }
+            >
+              <Dropdown.Header>
+                <span className="block text-sm">
+                  {user.firstName} {user.lastName}
+                </span>
+                <span className="block truncate text-sm font-medium">
+                  {user.email}
+                </span>
+              </Dropdown.Header>
+              <Dropdown.Item onClick={() => navigate("/profile")}>
+                Admin Dashboard
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate("/admin/appointments")}>
+                {" "}
+                Appointments
+              </Dropdown.Item>
+              <Dropdown.Item>Campaigns</Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate("/admin/calendar")}>
+                {" "}
+                Calendar
+              </Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
+            </Dropdown>
+          ) : null
         ) : (
-          <>
           <Button
-         
             className="bg-red-800 hover:bg-red-700 text-white text-xs md:text-base text-sm"
             onClick={() => signIn()}
           >
             Login
           </Button>
-         
-          </>
         )}
         <Navbar.Toggle />
       </div>
