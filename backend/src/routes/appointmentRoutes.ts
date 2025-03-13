@@ -14,22 +14,23 @@ import {
   approveAppointment,
   rejectAppointment,
 } from "../controllers/appointmentController";
+import { authenticateUser } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
 // Route to save appointment data
-router.post("/save-appointment", saveAppointment);
+router.post("/save-appointment", authenticateUser, saveAppointment);
 
 //Routes to fetch appointment data
-router.get("/fetch-appointment", getAppointments);
-router.get("/fetch-appointment/:id", getAppointmentById);
+router.get("/fetch-appointment", authenticateUser, getAppointments);
+router.get("/fetch-appointment/:id", authenticateUser, getAppointmentById);
 
-router.get("/:date", getAppointmentsByDate);
+router.get("/:date", authenticateUser, getAppointmentsByDate);
 
 // Route to approve appointment
-router.put("/approve-appointment/:id", approveAppointment);
+router.put("/approve-appointment/:id", authenticateUser, approveAppointment);
 
 // Route to reject appointment
-router.put("/reject-appointment/:id", rejectAppointment);
+router.put("/reject-appointment/:id", authenticateUser, rejectAppointment);
 
 export default router;
