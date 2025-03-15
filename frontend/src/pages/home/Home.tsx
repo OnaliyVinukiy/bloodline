@@ -7,15 +7,14 @@
  */
 import { CarouselSlider } from "./components/Carousel";
 import Cards from "./components/Cards";
-import Map from "./components/Stock";
+import BloodType from "./components/BloodType";
 
 const Home = () => {
   return (
     <div>
       <CarouselSlider />
       <Cards />
-      <Map />
-     
+      <BloodType />
     </div>
   );
 };
