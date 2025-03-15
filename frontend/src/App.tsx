@@ -7,8 +7,8 @@
  */
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/home/Home";
-import { FooterComponent } from "./components/common/Footer";
-import { Navigationbar } from "./components/common/Navbar";
+import { FooterComponent } from "./components/Footer";
+import { Navigationbar } from "./components/Navbar";
 import EligibilityCriteria from "./pages/eligibility/Eligibility";
 import Profile from "./pages/profile/Profile";
 import DonorDeclaration from "./pages/appointment/DonorDeclarations";
@@ -33,7 +33,8 @@ function App() {
             <Route path="/appointment/:id" element={<AppointmentDetails />} />
             <Route
               path="/campaign-registration"
-              element={<BloodCampaignRegistration />} />
+              element={<BloodCampaignRegistration />}
+            />
             <Route
               path="/admin/pending-appointments"
               element={<PendingAppointments />}
