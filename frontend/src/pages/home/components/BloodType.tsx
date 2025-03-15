@@ -6,47 +6,47 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import React from "react";
-const Map: React.FC = () => {
+const BloodType: React.FC = () => {
   const bloodTypes = [
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/apositive.png",
       alt: "Blood Type A+",
-      text: "When the stock is over 10 days, A+ is needed less. When the stock for A+ is below 8 days, A+ is especially important.",
+      text: "One of the most common blood types and is in high demand for transfusions.",
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/anegative.png",
       alt: "Blood Type A-",
-      text: "When the stock is over 10 days, A- is needed less. When the stock for A- is below 8 days, A- is especially important.",
+      text: "A rare blood type but can be given to A-, A+, AB-, and AB+ patients.",
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/bpositive.png",
       alt: "Blood Type B+",
-      text: "When the stock is over 10 days, B+ is needed less. When the stock for B+ is below 8 days, B+ is especially important.",
+      text: "A relatively common blood type, making up around 8% of the global population.",
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/bnegative.png",
       alt: "Blood Type B-",
-      text: "When the stock is over 10 days, B- is needed less. When the stock for B- is below 8 days, B- is especially important.",
+      text: "One of the rarest blood types, found in only about 2% of people.",
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/opositive.png",
       alt: "Blood Type O+",
-      text: "When the stock is over 10 days, O+ is needed less. When the stock for O+ is below 8 days, O+ is especially important.",
+      text: "The most common blood type and is widely used in emergency transfusions.",
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/onegative.png",
       alt: "Blood Type O-",
-      text: "When the stock is over 10 days, O- is needed less. When the stock for O- is below 8 days, O- is especially important.",
+      text: "The universal donor blood type, meaning it can be given to any patient.",
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/abpositive.png",
       alt: "Blood Type AB+",
-      text: "When the stock is over 10 days, AB+ is needed less. When the stock for AB+ is below 8 days, AB+ is especially needed.",
+      text: "The universal recipient for red blood cells and is rare but valuable for plasma donations.",
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/abnegative.png",
       alt: "Blood Type AB-",
-      text: "When the stock is over 10 days, AB- is needed less. When the stock for AB- is below 8 days, AB- is especially needed.",
+      text: "The rarest blood type and is the universal donor for plasma transfusions.",
     },
   ];
 
@@ -58,15 +58,15 @@ const Map: React.FC = () => {
       }}
     >
       <div className="px-4 mx-auto max-w-screen-xl text-center py-12 lg:py-24">
-        <h1 className="mb-4 text-3xl font-extrabold tracking-tight leading-none text-white sm:text-4xl lg:text-5xl">
-          National Blood Inventory
+        <h1 className="mb-4 text-3xl font-extrabold font-roboto tracking-tight leading-none text-white sm:text-4xl lg:text-5xl">
+          Blood Type Information
         </h1>
 
         <p className="mb-8 text-base font-normal text-gray-300 sm:text-lg lg:text-xl sm:px-6 lg:px-48">
-          The National Blood Transfusion Service manages the blood supply to all
-          provinces of Sri Lanka.
+          Learn about different blood types and their importance in
+          transfusions.
           <br />
-          Below is a summary of the current stock levels of all blood types.
+          Hover over each blood type to see its significance.
         </p>
 
         {/* Blood Type Cards in a Single Horizontal Row */}
@@ -81,7 +81,7 @@ const Map: React.FC = () => {
                 alt={blood.alt}
                 className="w-24 h-24 sm:w-32 sm:h-32 object-contain transition-transform duration-300 group-hover:scale-110"
               />
-              <div className="absolute bottom-[-6rem] sm:bottom-[-8rem] w-52 bg-black text-white text-xs sm:text-sm px-3 py-2 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 z-10">
+              <div className="absolute bottom-[-4rem] sm:bottom-[-5rem] w-52 bg-black text-white text-xs sm:text-sm px-3 py-2 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 z-10">
                 {blood.text}
               </div>
             </div>
@@ -92,7 +92,7 @@ const Map: React.FC = () => {
         <div className="mt-12 sm:mt-16">
           <a
             href="#"
-            className="inline-flex items-center justify-center px-6 py-3 text-sm sm:text-lg font-medium text-white bg-red-800 rounded-lg shadow-md hover:bg-red-700 focus:ring-4 focus:ring-red-300"
+            className="inline-flex items-center justify-center px-6 py-3 text-sm sm:text-lg font-medium text-white bg-red-800 rounded-lg shadow-md hover:bg-red-700 focus:ring-4 focus:ring-red-300 relative"
           >
             Find a Donation Centre
           </a>
@@ -102,4 +102,4 @@ const Map: React.FC = () => {
   );
 };
 
-export default Map;
+export default BloodType;
