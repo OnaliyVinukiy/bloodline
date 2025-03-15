@@ -69,6 +69,7 @@ const BloodCampaignRegistration = () => {
         {activeTab === "tab1" && (
           <Stepper
             step={step}
+            setStep={setStep}
             onNextStep={handleNextStep}
             onPreviousStep={handlePreviousStep}
           />
