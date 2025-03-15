@@ -8,7 +8,6 @@
 
 import React from "react";
 import { StepperPropsCampaign } from "../../../types/stepper";
-import BloodInventory from "../../../../public/bloodTube.jpg";
 
 const StepOne: React.FC<StepperPropsCampaign> = ({ onNextStep }) => {
   const handleNext = () => {
@@ -34,7 +33,7 @@ const StepOne: React.FC<StepperPropsCampaign> = ({ onNextStep }) => {
 
             <div className="flex justify-center mb-8">
               <img
-                src={BloodInventory}
+                src="/bloodTube.jpg"
                 alt="Blood Donation Campaign"
                 className="rounded-lg shadow-md w-full max-w-2xl h-64 md:h-80 object-cover"
               />
