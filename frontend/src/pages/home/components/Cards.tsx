@@ -13,7 +13,7 @@ const Cards: React.FC = () => {
     <div className="flex flex-wrap justify-center gap-8 lg:space-x-40 lg:mt-20 mt-10">
       <Card className="max-w-sm md:w-full sm:w-72">
         <img
-          src="../public/eligible.png"
+          src="/eligible.png"
           alt="Meaningful alt text for an image that is not purely decorative"
           className="w-40 h-45 object-cover mx-auto"
         />
@@ -46,7 +46,7 @@ const Cards: React.FC = () => {
 
       <Card className="max-w-sm md:w-full sm:w-72">
         <img
-          src="../public/journey.png"
+          src="/journey.png"
           alt="Meaningful alt text for an image that is not purely decorative"
           className="w-40 h-45 object-cover mx-auto"
         />
@@ -80,7 +80,7 @@ const Cards: React.FC = () => {
 
       <Card className="max-w-sm md:w-full sm:w-72">
         <img
-          src="../public/camp.png"
+          src="/camp.png"
           alt="Meaningful alt text for an image that is not purely decorative"
           className="w-40 h-45 object-cover mx-auto"
         />
