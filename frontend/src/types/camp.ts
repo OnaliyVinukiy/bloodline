@@ -16,4 +16,5 @@ export interface Camp {
   city: string;
   date: string | null;
   time: string | null;
+  googleMapLink: string;
 }
