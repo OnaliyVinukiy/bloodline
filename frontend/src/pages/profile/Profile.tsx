@@ -12,15 +12,18 @@ import { Button, Label, Modal } from "flowbite-react";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { Datepicker } from "flowbite-react";
 import { User, Donor } from "../../types/users";
+import { ValidationModal } from "../../components/ValidationModal";
+import { validatePhoneNumber } from "../../utils/ValidationsUtils";
 
 export default function Profile() {
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [showErrorModal, setErrorModal] = useState(false);
-  const [showAgeValidationModal, setShowAgeValidationModal] = useState(false);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
+
   const [province, setProvince] = useState<
     { province_id: string; province_name_en: string }[]
   >([]);
@@ -55,6 +58,22 @@ export default function Profile() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showValidationModal, setShowValidationModal] = useState(false);
+
+  const handlePhoneNumberChange = (value: string) => {
+    setIsPhoneNumberValid(validatePhoneNumber(value));
+    handleInputChange("contactNumber", value);
+  };
+
+  const [validationModalContent, setValidationModalContent] = useState({
+    title: "",
+    content: "",
+  });
+
+  const showValidationMessage = (title: string, content: string) => {
+    setValidationModalContent({ title, content });
+    setShowValidationModal(true);
+  };
 
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -245,7 +264,19 @@ export default function Profile() {
 
     // Check if the user is under 18
     if (age < 18) {
-      setShowAgeValidationModal(true);
+      showValidationMessage(
+        "Age Restriction",
+        "You cannot register as a donor unless you are aged 18 or above."
+      );
+      return;
+    }
+
+    // Check if the phone number is valid
+    if (!validatePhoneNumber(donor.contactNumber)) {
+      showValidationMessage(
+        "Invalid Contact Number",
+        "Please enter a valid 10-digit phone number."
+      );
       return;
     }
 
@@ -599,11 +630,16 @@ export default function Profile() {
               <input
                 type="text"
                 value={donor?.contactNumber || ""}
-                onChange={(e) =>
-                  handleInputChange("contactNumber", e.target.value)
-                }
-                className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                onChange={(e) => handlePhoneNumberChange(e.target.value)}
+                className={`bg-indigo-50 border ${
+                  isPhoneNumberValid ? "border-indigo-300" : "border-red-500"
+                } text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
               />
+              {!isPhoneNumberValid && (
+                <p className="text-sm text-red-500 mt-1">
+                  Please enter a valid 10-digit phone number.
+                </p>
+              )}
             </div>
 
             <div>
@@ -695,7 +731,6 @@ export default function Profile() {
           </div>
         </div>
       </main>
-
       {/* Registration Confirmation Modal */}
       <Modal
         show={showRegistrationModal}
@@ -737,7 +772,6 @@ export default function Profile() {
           </Button>
         </Modal.Footer>
       </Modal>
-
       {/* Update Confirmation Modal */}
       <Modal show={showUpdateModal} onClose={() => setShowUpdateModal(false)}>
         <Modal.Header className="flex items-center gap-2 ">
@@ -786,50 +820,6 @@ export default function Profile() {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {/* Age Validation Modal */}
-      <Modal
-        show={showAgeValidationModal}
-        onClose={() => setShowAgeValidationModal(false)}
-      >
-        <Modal.Header className="flex items-center gap-2 ">
-          <p className="flex items-center gap-2 text-xl text-red-600">
-            <svg
-              className="w-6 h-6 text-red-600"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-              />
-            </svg>
-            Age Restriction
-          </p>
-        </Modal.Header>
-
-        <Modal.Body>
-          <p className="flex items-center gap-2 text-lg text-gray-800">
-            You cannot register as a donor unless you are aged 18 or above.
-          </p>
-        </Modal.Body>
-        <Modal.Footer className="flex justify-end">
-          <Button
-            color="failure"
-            onClick={() => setShowAgeValidationModal(false)}
-          >
-            OK
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
       {/* Profile Completion Modal */}
       <Modal
         show={showProfileIncompleteModal}
@@ -850,6 +840,14 @@ export default function Profile() {
           </Button>
         </Modal.Footer>
       </Modal>
+      {/* Validation Modal */}
+      <ValidationModal
+        show={showValidationModal}
+        onClose={() => setShowValidationModal(false)}
+        title={validationModalContent.title}
+        content={validationModalContent.content}
+      />
+      ;
     </div>
   );
 }

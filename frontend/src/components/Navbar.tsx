@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 import { UserIcon } from "@heroicons/react/24/solid";
-import { Donor, User } from "../../types/users";
+import { Donor, User } from "../types/users";
 import axios from "axios";
 
 export function Navigationbar() {
