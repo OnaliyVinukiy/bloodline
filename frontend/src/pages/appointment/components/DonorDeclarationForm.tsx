@@ -134,6 +134,22 @@ const BasicInfo = ({
     console.log(formData);
   }, [formData]);
 
+  // Stepper labels
+  const steps = [
+    "Slot",
+    "Info",
+    "Time",
+    "Venue",
+    "Building",
+    "Assets",
+    "Food",
+    "Promotion",
+    "Organize",
+    "Review",
+    "Slot",
+    "Registration",
+  ];
+
   //Loading animation
   if (isLoading) {
     return (
@@ -168,6 +184,40 @@ const BasicInfo = ({
 
   return (
     <div>
+      <div className="bg-white shadow-sm py-6">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex flex-col space-y-4">
+            <div className="w-full bg-gray-200 rounded-full h-2.5 relative overflow-hidden">
+              <div
+                className="h-2.5 rounded-full absolute top-0 left-0 transition-all duration-300"
+                style={{
+                  width: `${((step - 1) / 11) * 100}%`,
+                  background:
+                    "linear-gradient(90deg,rgb(184, 38, 1),rgb(235, 56, 36))",
+                }}
+              ></div>
+            </div>
+            <div className="flex flex-wrap justify-center gap-4 md:justify-between">
+              {steps.map((label, index) => (
+                <div
+                  key={index}
+                  className="text-center flex flex-col items-center cursor-pointer"
+                >
+                  <div
+                    className={`w-8 h-8 flex items-center justify-center rounded-full font-semibold transition-all duration-300 ${
+                      index + 1 <= step
+                        ? "bg-gradient-to-r from-red-800 to-red-600 text-white"
+                        : "bg-gray-200 text-gray-500"
+                    }`}
+                  >
+                    {index + 1}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
       {step === 1 && (
         <ScheduleForm
           onNextStep={onNextStep}

@@ -27,6 +27,11 @@ const ScheduleForm: React.FC<StepperProps> = ({
     [getAccessToken]
   );
 
+  const handleNext = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    onNextStep();
+  };
+
   //Convert the date format
   const getFormattedDate = (date: Date) => {
     const offsetDate = new Date(
@@ -194,7 +199,7 @@ const ScheduleForm: React.FC<StepperProps> = ({
             </div>
             <div className="flex justify-end">
               <button
-                onClick={onNextStep}
+                onClick={handleNext}
                 className={`focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ${
                   !selectedDate || !selectedSlot
                     ? "bg-gray-400 cursor-not-allowed"

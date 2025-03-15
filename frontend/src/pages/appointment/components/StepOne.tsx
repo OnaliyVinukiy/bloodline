@@ -42,6 +42,11 @@ const StepOne: React.FC<StepperProps> = ({
     gender: "",
   });
 
+  const handlePrevious = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    onPreviousStep();
+  };
+
   //Handle input change
   const handleInputChange = (field: keyof BloodDonor, value: string) => {
     if (donor) {
@@ -186,7 +191,7 @@ const StepOne: React.FC<StepperProps> = ({
       ...formData,
       donorInfo: donor,
     });
-
+    window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
   };
 
@@ -543,7 +548,7 @@ const StepOne: React.FC<StepperProps> = ({
 
               <div className="flex justify-between mt-6">
                 <button
-                  onClick={onPreviousStep}
+                  onClick={handlePrevious}
                   className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
                 >
                   Back
