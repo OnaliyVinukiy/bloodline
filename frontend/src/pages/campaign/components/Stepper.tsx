@@ -26,10 +26,12 @@ const Stepper = ({
   step,
   onNextStep,
   onPreviousStep,
+  setStep,
 }: {
   step: number;
   onNextStep: () => void;
   onPreviousStep: () => void;
+  setStep: (step: number) => void;
 }) => {
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
@@ -113,26 +115,34 @@ const Stepper = ({
     "Registration",
   ];
 
+  const handleStepClick = (index: number) => {
+    setStep(index + 1);
+  };
+
   return (
     <div>
       <div className="bg-white shadow-sm py-6">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-col space-y-4">
+            {/* Progress Bar */}
             <div className="w-full bg-gray-200 rounded-full h-2.5 relative overflow-hidden">
               <div
                 className="h-2.5 rounded-full absolute top-0 left-0 transition-all duration-300"
                 style={{
-                  width: `${((step - 1) / 11) * 100}%`,
+                  width: `${((step - 1) / (steps.length - 1)) * 100}%`,
                   background:
                     "linear-gradient(90deg,rgb(184, 38, 1),rgb(235, 56, 36))",
                 }}
               ></div>
             </div>
+
+            {/* Stepper Labels & Numbers */}
             <div className="flex flex-wrap justify-center gap-4 md:justify-between">
               {steps.map((label, index) => (
                 <div
                   key={index}
                   className="text-center flex flex-col items-center cursor-pointer"
+                  onClick={() => handleStepClick(index)}
                 >
                   <div
                     className={`w-8 h-8 flex items-center justify-center rounded-full font-semibold transition-all duration-300 ${
@@ -151,6 +161,7 @@ const Stepper = ({
         </div>
       </div>
 
+      {/* Render Step Components */}
       {step === 1 && (
         <StepOne onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
