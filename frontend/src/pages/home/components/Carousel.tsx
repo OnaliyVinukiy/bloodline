@@ -33,7 +33,7 @@ export function CarouselSlider() {
     <section
       className="bg-cover bg-no-repeat bg-center h-[700px] flex items-center"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('public/heart.jpg')`,
+        backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/heart.jpg')`,
       }}
     >
       <div className="py-8 px-4 mx-auto max-w-screen-xl text-center sm:py-12">
