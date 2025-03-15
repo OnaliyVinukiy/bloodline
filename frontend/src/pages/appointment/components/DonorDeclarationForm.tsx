@@ -212,6 +212,14 @@ const BasicInfo = ({
                   >
                     {index + 1}
                   </div>
+
+                  <span
+                    className={`text-sm mt-2 ${
+                      index + 1 <= step ? "text-gray-800" : "text-gray-500"
+                    }`}
+                  >
+                    {label}
+                  </span>
                 </div>
               ))}
             </div>
