@@ -51,6 +51,7 @@ const StepTwelve: React.FC<
     city: "",
     date: selectedDate ? selectedDate.toISOString().split("T")[0] : "",
     time: selectedSlot || "",
+    googleMapLink: "",
   });
   useEffect(() => {
     console.log(formData);
@@ -148,6 +149,8 @@ const StepTwelve: React.FC<
     if (!formData.province.trim()) newErrors.province = "Province is required.";
     if (!formData.district.trim()) newErrors.district = "District is required.";
     if (!formData.city.trim()) newErrors.city = "City is required.";
+    if (!formData.googleMapLink.trim())
+      newErrors.googleMapLink = "Google Map Link is required.";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -195,6 +198,12 @@ const StepTwelve: React.FC<
               </div>
             </div>
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
+              <Label
+                htmlFor="province"
+                className="block mb-6 text-lg font-roboto font-medium text-gray-800"
+              >
+                Details of the Organizer
+              </Label>
               <div className="mt-4 space-y-6">
                 <div className="w-full">
                   <Label
@@ -208,6 +217,7 @@ const StepTwelve: React.FC<
                     type="text"
                     value={formData.organizationName}
                     onChange={handleChange}
+                    placeholder="Enter organization name"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
@@ -224,6 +234,7 @@ const StepTwelve: React.FC<
                     type="text"
                     value={formData.fullName}
                     onChange={handleChange}
+                    placeholder="Enter full name"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
@@ -245,6 +256,7 @@ const StepTwelve: React.FC<
                     type="text"
                     value={formData.nic}
                     onChange={handleChange}
+                    placeholder="Enter NIC number"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
@@ -264,6 +276,7 @@ const StepTwelve: React.FC<
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
+                    placeholder="Enter email address"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
@@ -283,7 +296,8 @@ const StepTwelve: React.FC<
                     type="text"
                     value={formData.contactNumber}
                     onChange={handleChange}
-                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    placeholder="Enter contact number"
+                    className="mb-8 bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
                   {errors.contactNumber && (
@@ -292,6 +306,14 @@ const StepTwelve: React.FC<
                     </p>
                   )}
                 </div>
+
+                <Label
+                  htmlFor="province"
+                  className="mt-2 block mb-2 text-lg font-medium font-roboto text-gray-800"
+                >
+                  Details of the Venue
+                </Label>
+
                 <div className="flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0 mb-6">
                   <div className="w-full md:w-1/3">
                     <Label
@@ -387,6 +409,42 @@ const StepTwelve: React.FC<
                     {errors.city && (
                       <p className="text-red-500 text-xs mt-1">{errors.city}</p>
                     )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-6">
+                <div className="w-full">
+                  <Label
+                    htmlFor="googleMapLink"
+                    className="block mb-2 text-sm font-medium text-indigo-900"
+                  >
+                    Google Map Link of the Venue
+                  </Label>
+                  <input
+                    type="text"
+                    name="googleMapLink"
+                    value={formData.googleMapLink}
+                    onChange={handleChange}
+                    placeholder="Enter link"
+                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    required
+                  />
+                  {errors.googleMapLink && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.googleMapLink}
+                    </p>
+                  )}
+                  <div className="mt-2 text-sm text-gray-500">
+                    <span>Don't know how to get the Google Map link? </span>
+                    <a
+                      href="https://www.youtube.com/watch?v=fGWDogeZMTY"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-indigo-600 hover:text-indigo-800"
+                    >
+                      Learn how to get it here.
+                    </a>
                   </div>
                 </div>
               </div>
