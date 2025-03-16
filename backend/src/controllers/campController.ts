@@ -16,7 +16,7 @@ if (!COSMOS_DB_CONNECTION_STRING) {
 }
 
 export const saveCamp = async (req: Request, res: Response) => {
-  const campData = req.body.formData;
+  const campData = req.body;
 
   if (!campData) {
     return res.status(400).json({ message: "Missing form data" });
