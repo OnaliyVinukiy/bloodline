@@ -13,6 +13,7 @@ import axios from "axios";
 import { Camp } from "../../../types/camp";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { HiExclamation } from "react-icons/hi";
+import { validatePhoneNumber } from "../../../utils/ValidationsUtils";
 
 const StepTwelve: React.FC<
   StepperPropsCampaign & {
@@ -59,6 +60,7 @@ const StepTwelve: React.FC<
   const [errors, setErrors] = useState<{ [key in keyof Camp]?: string }>({});
   const [loading, setLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
   const { getAccessToken } = useAuthContext();
 
   //Fetch provinces list
@@ -132,7 +134,12 @@ const StepTwelve: React.FC<
     setFormData((prev) => ({ ...prev, city: selectedCity }));
   };
 
-  const handleChange = (
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsPhoneNumberValid(validatePhoneNumber(e.target.value));
+    handleInputChange(e);
+  };
+
+  const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -249,7 +256,7 @@ const StepTwelve: React.FC<
                   <input
                     type="text"
                     value={formData.organizationName}
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                     name="organizationName"
                     placeholder="Enter organization name"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
@@ -268,7 +275,7 @@ const StepTwelve: React.FC<
                     type="text"
                     name="fullName"
                     value={formData.fullName}
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                     placeholder="Enter full name"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
@@ -291,7 +298,7 @@ const StepTwelve: React.FC<
                     type="text"
                     name="nic"
                     value={formData.nic}
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                     placeholder="Enter NIC number"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
@@ -312,7 +319,7 @@ const StepTwelve: React.FC<
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                     placeholder="Enter email address"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
@@ -333,14 +340,24 @@ const StepTwelve: React.FC<
                     type="text"
                     name="contactNumber"
                     value={formData.contactNumber}
-                    onChange={handleChange}
+                    onChange={handlePhoneNumberChange}
                     placeholder="Enter contact number"
-                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    className={`bg-indigo-50 border ${
+                      isPhoneNumberValid
+                        ? "border-indigo-300"
+                        : "border-red-500"
+                    } text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
                     required
                   />
                   {errors.contactNumber && (
                     <p className="text-red-500 text-xs mt-1">
                       {errors.contactNumber}
+                    </p>
+                  )}
+                  {!isPhoneNumberValid && (
+                    <p className="text-sm text-red-500 mt-1">
+                      Please enter a valid 10-digit phone number starting from
+                      0.
                     </p>
                   )}
                 </div>
@@ -463,7 +480,7 @@ const StepTwelve: React.FC<
                     type="text"
                     name="googleMapLink"
                     value={formData.googleMapLink}
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                     placeholder="Enter link"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
