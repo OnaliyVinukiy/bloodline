@@ -105,7 +105,7 @@ export const saveCamp = async (req: Request, res: Response) => {
   } else {
     try {
       const url = new URL(campData.googleMapLink);
-      if (!url.hostname.includes("google.com")) {
+      if (!url.hostname.includes("goo.gl")) {
         errors.push("Google Map link must be a valid Google Maps URL.");
       }
     } catch (e) {
