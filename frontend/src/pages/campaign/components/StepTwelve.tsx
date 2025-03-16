@@ -8,17 +8,23 @@
 
 import React, { useEffect, useState } from "react";
 import { StepperPropsCampaign } from "../../../types/stepper";
-import { Label } from "flowbite-react";
+import { Label, Modal, Toast } from "flowbite-react";
 import axios from "axios";
 import { Camp } from "../../../types/camp";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { HiExclamation } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
+import {
+  validateEmail,
+  validatePhoneNumber,
+} from "../../../utils/ValidationsUtils";
 
 const StepTwelve: React.FC<
   StepperPropsCampaign & {
     selectedDate: Date | null;
     selectedSlot: string | null;
   }
-> = ({ onNextStep, onPreviousStep, selectedDate, selectedSlot }) => {
+> = ({ onPreviousStep, selectedDate, selectedSlot }) => {
   const handlePrevious = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
@@ -54,12 +60,14 @@ const StepTwelve: React.FC<
     time: selectedSlot || "",
     googleMapLink: "",
   });
-  useEffect(() => {
-    console.log(formData);
-  }, []);
 
   const [errors, setErrors] = useState<{ [key in keyof Camp]?: string }>({});
   const [loading, setLoading] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
   const { getAccessToken } = useAuthContext();
 
   //Fetch provinces list
@@ -133,7 +141,17 @@ const StepTwelve: React.FC<
     setFormData((prev) => ({ ...prev, city: selectedCity }));
   };
 
-  const handleChange = (
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsPhoneNumberValid(validatePhoneNumber(e.target.value));
+    handleInputChange(e);
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsEmailValid(validateEmail(e.target.value));
+    handleInputChange(e);
+  };
+
+  const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -165,7 +183,6 @@ const StepTwelve: React.FC<
       try {
         setLoading(true);
         const token = await getAccessToken();
-        window.scrollTo({ top: 0, behavior: "smooth" });
 
         // Make API call to save camp data
         const response = await axios.post(
@@ -180,18 +197,36 @@ const StepTwelve: React.FC<
         );
 
         if (response.status === 201) {
-          onNextStep();
-          alert("Camp registered successfully!");
-        } else {
-          alert("Failed to register camp. Please try again.");
+          setShowModal(true);
+          setFormData({
+            organizationName: "",
+            fullName: "",
+            nic: "",
+            email: "",
+            contactNumber: "",
+            province: "",
+            district: "",
+            city: "",
+            date: selectedDate ? selectedDate.toISOString().split("T")[0] : "",
+            time: selectedSlot || "",
+            googleMapLink: "",
+          });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error saving camp:", error);
-        alert("There was an error. Please try again later.");
+        const errorMessage =
+          error.response?.data?.errors?.[0] ||
+          "There was an error. Please try again.";
+        setToastMessage(errorMessage);
       } finally {
         setLoading(false);
       }
     }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    navigate("/");
   };
 
   return (
@@ -228,6 +263,7 @@ const StepTwelve: React.FC<
                 Every drop counts. Let’s make a difference together!
               </div>
             </div>
+            {/* Form */}
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <Label
                 htmlFor="province"
@@ -247,7 +283,7 @@ const StepTwelve: React.FC<
                   <input
                     type="text"
                     value={formData.organizationName}
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                     name="organizationName"
                     placeholder="Enter organization name"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
@@ -266,7 +302,7 @@ const StepTwelve: React.FC<
                     type="text"
                     name="fullName"
                     value={formData.fullName}
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                     placeholder="Enter full name"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
@@ -289,7 +325,7 @@ const StepTwelve: React.FC<
                     type="text"
                     name="nic"
                     value={formData.nic}
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                     placeholder="Enter NIC number"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
@@ -310,13 +346,20 @@ const StepTwelve: React.FC<
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleChange}
+                    onChange={handleEmailChange}
                     placeholder="Enter email address"
-                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    className={`bg-indigo-50 border ${
+                      isEmailValid ? "border-indigo-300" : "border-red-500"
+                    } text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
                     required
                   />
                   {errors.email && (
                     <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                  )}
+                  {!isEmailValid && (
+                    <p className="text-sm text-red-500 mt-1">
+                      Please enter a valid email address.
+                    </p>
                   )}
                 </div>
                 <div className="w-full">
@@ -331,9 +374,13 @@ const StepTwelve: React.FC<
                     type="text"
                     name="contactNumber"
                     value={formData.contactNumber}
-                    onChange={handleChange}
+                    onChange={handlePhoneNumberChange}
                     placeholder="Enter contact number"
-                    className="mb-8 bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    className={`bg-indigo-50 border ${
+                      isPhoneNumberValid
+                        ? "border-indigo-300"
+                        : "border-red-500"
+                    } text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
                     required
                   />
                   {errors.contactNumber && (
@@ -341,11 +388,17 @@ const StepTwelve: React.FC<
                       {errors.contactNumber}
                     </p>
                   )}
+                  {!isPhoneNumberValid && (
+                    <p className="text-sm text-red-500 mt-1">
+                      Please enter a valid 10-digit phone number starting from
+                      0.
+                    </p>
+                  )}
                 </div>
 
                 <Label
                   htmlFor="province"
-                  className="mt-2 block mb-2 text-lg font-medium font-roboto text-gray-800"
+                  className="mt-2 block mb-2 text-lg font-medium font-roboto text-gray-800 mt-2"
                 >
                   Details of the Venue
                 </Label>
@@ -356,7 +409,7 @@ const StepTwelve: React.FC<
                       htmlFor="province"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
-                      Province
+                      Province*
                     </Label>
                     <select
                       id="province"
@@ -386,7 +439,7 @@ const StepTwelve: React.FC<
                       htmlFor="district"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
-                      District
+                      District*
                     </Label>
                     <select
                       id="district"
@@ -420,7 +473,7 @@ const StepTwelve: React.FC<
                       htmlFor="city"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
-                      City
+                      City*
                     </Label>
                     <select
                       id="city"
@@ -455,13 +508,13 @@ const StepTwelve: React.FC<
                     htmlFor="googleMapLink"
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
-                    Google Map Link of the Venue
+                    Google Map Link of the Venue*
                   </Label>
                   <input
                     type="text"
                     name="googleMapLink"
                     value={formData.googleMapLink}
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                     placeholder="Enter link"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
@@ -525,6 +578,50 @@ const StepTwelve: React.FC<
               </button>
             </div>
           </div>
+
+          {/* Toast*/}
+          {toastMessage && (
+            <Toast className="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50">
+              <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500">
+                <HiExclamation className="h-5 w-5" />
+              </div>
+              <div className="ml-3 text-sm font-normal">{toastMessage}</div>
+              <Toast.Toggle onClick={() => setToastMessage(null)} />
+            </Toast>
+          )}
+          <Modal show={showModal} onClose={() => handleCloseModal()}>
+            <Modal.Header className="flex items-center gap-2 ">
+              <p className="flex items-center gap-2 text-xl text-green-600">
+                <svg
+                  className="w-6 h-6 text-green-600"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="currentColor"
+                  viewBox="0 0 512 512"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"
+                  />
+                </svg>
+                Request Submitted Successfully!
+              </p>
+            </Modal.Header>
+            <Modal.Body>
+              <p className="text-lg text-gray-700">
+                Your request for a blood donation camp has been successfully
+                submitted. Our team will review your request, and you will
+                receive a confirmation email once it has been approved or
+                rejected. Thank you for your willingness to save lives make a
+                difference!
+              </p>
+            </Modal.Body>
+          </Modal>
         </div>
       </main>
     </div>
