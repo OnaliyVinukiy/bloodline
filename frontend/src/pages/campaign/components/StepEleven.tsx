@@ -6,11 +6,12 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { StepperPropsCampaign } from "../../../types/stepper";
 import { Button, Label } from "flowbite-react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
+import { useAuthContext } from "@asgardeo/auth-react";
 
 const StepEleven: React.FC<
   StepperPropsCampaign & {
@@ -47,6 +48,11 @@ const StepEleven: React.FC<
     );
     return offsetDate.toISOString().split("T")[0];
   };
+  const { getAccessToken } = useAuthContext();
+  const memoizedGetAccessToken = useCallback(
+    () => getAccessToken(),
+    [getAccessToken]
+  );
 
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -58,9 +64,15 @@ const StepEleven: React.FC<
     if (selectedDate) {
       setIsLoading(true);
       const fetchBookedSlots = async () => {
+        const token = await memoizedGetAccessToken();
         try {
           const response = await axios.get(
-            `${backendURL}/api/appointments/${getFormattedDate(selectedDate)}`
+            `${backendURL}/api/appointments/${getFormattedDate(selectedDate)}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
           );
 
           const slots = response.data.map(
