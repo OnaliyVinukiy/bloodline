@@ -54,15 +54,14 @@ const Cards: React.FC = () => {
           Host a Blood Donation Camp
         </h5>
         <p className="font-normal text-center text-gray-700 dark:text-gray-400">
-          Register to host a blood donation camp and help save lives in your
-          community.
+          Place a request to host a blood donation camp and help save lives.
         </p>
         <Button
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
           href="/campaign-registration"
         >
-          Register Now
+          Request Now
           <svg
             className="-mr-1 ml-2 mt-1 h-4 w-4"
             fill="currentColor"
@@ -85,16 +84,16 @@ const Cards: React.FC = () => {
           className="w-40 h-45 object-cover mx-auto"
         />
         <h5 className="text-2xl text-center font-bold tracking-tight text-gray-900 dark:text-white">
-          Find a Blood Donation Camp
+          Register your Organization
         </h5>
         <p className="font-normal text-center text-gray-700 dark:text-gray-400">
-          Search for upcoming blood drives and donation events near you.
+          Register your organization and host a blood donation camp.
         </p>
         <Button
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
         >
-          Find Out
+          Register Now
           <svg
             className="-mr-1 ml-2 mt-1 h-4 w-4"
             fill="currentColor"
