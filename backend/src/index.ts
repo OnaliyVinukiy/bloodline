@@ -13,7 +13,7 @@ import cityRoutes from "./routes/cityRoutes";
 import provinceRoutes from "./routes/provinceRoutes";
 import districtRoutes from "./routes/districtRoutes";
 import dataService from "./utils/dataService";
-import donationCampRoutes from "./routes/donationCampRoutes";
+import campRoutes from "./routes/campRoutes";
 
 const app = express();
 
@@ -46,7 +46,7 @@ app.use("/api/provinces", provinceRoutes);
 app.use("/api/districts", districtRoutes);
 
 // Donation Camp Routes
-app.use("/api/camps", donationCampRoutes);
+app.use("/api/camps", campRoutes);
 
 // Home route
 app.get("/", (req: Request, res: Response): void => {
