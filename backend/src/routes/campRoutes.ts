@@ -6,14 +6,10 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import express from "express";
-import {
-  getBookedSlots,
-  registerCamp,
-} from "../controllers/donationCampController";
+import { saveCamp } from "../controllers/campController";
 
 const router = express.Router();
 
-router.post("/register", registerCamp);
-router.get("/booked-slots/:date", getBookedSlots);
+router.post("/register", saveCamp);
 
 export default router;

@@ -15,5 +15,6 @@ export const AZURE_STORAGE_CONNECTION_STRING =
   process.env.AZURE_STORAGE_CONNECTION_STRING;
 export const DATABASE_ID = "donorDB";
 export const APPOINTMENT_COLLECTION_ID = "appointments";
+export const CAMP_COLLECTION_ID = "camps";
 export const DONOR_COLLECTION_ID = "donors";
 export const CONTAINER_NAME = "profile-pictures";
