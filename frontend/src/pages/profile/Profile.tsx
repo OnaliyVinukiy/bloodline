@@ -637,7 +637,7 @@ export default function Profile() {
               />
               {!isPhoneNumberValid && (
                 <p className="text-sm text-red-500 mt-1">
-                  Please enter a valid 10-digit phone number.
+                  Please enter a valid 10-digit phone number starting from 0.
                 </p>
               )}
             </div>
