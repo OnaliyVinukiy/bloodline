@@ -8,10 +8,11 @@
 
 import React, { useEffect, useState } from "react";
 import { StepperPropsCampaign } from "../../../types/stepper";
-import { Label } from "flowbite-react";
+import { Label, Toast } from "flowbite-react";
 import axios from "axios";
 import { Camp } from "../../../types/camp";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { HiExclamation } from "react-icons/hi";
 
 const StepTwelve: React.FC<
   StepperPropsCampaign & {
@@ -54,12 +55,10 @@ const StepTwelve: React.FC<
     time: selectedSlot || "",
     googleMapLink: "",
   });
-  useEffect(() => {
-    console.log(formData);
-  }, []);
 
   const [errors, setErrors] = useState<{ [key in keyof Camp]?: string }>({});
   const [loading, setLoading] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const { getAccessToken } = useAuthContext();
 
   //Fetch provinces list
@@ -165,7 +164,6 @@ const StepTwelve: React.FC<
       try {
         setLoading(true);
         const token = await getAccessToken();
-        window.scrollTo({ top: 0, behavior: "smooth" });
 
         // Make API call to save camp data
         const response = await axios.post(
@@ -181,13 +179,16 @@ const StepTwelve: React.FC<
 
         if (response.status === 201) {
           onNextStep();
-          alert("Camp registered successfully!");
+          setToastMessage("Blood donation camp registered successfully!");
         } else {
-          alert("Failed to register camp. Please try again.");
+          setToastMessage("Failed to register camp. Please try again.");
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error saving camp:", error);
-        alert("There was an error. Please try again later.");
+        const errorMessage =
+          error.response?.data?.errors?.[0] ||
+          "There was an error. Please try again.";
+        setToastMessage(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -228,6 +229,7 @@ const StepTwelve: React.FC<
                 Every drop counts. Let’s make a difference together!
               </div>
             </div>
+            {/* Form */}
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <Label
                 htmlFor="province"
@@ -333,7 +335,7 @@ const StepTwelve: React.FC<
                     value={formData.contactNumber}
                     onChange={handleChange}
                     placeholder="Enter contact number"
-                    className="mb-8 bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
                   {errors.contactNumber && (
@@ -345,7 +347,7 @@ const StepTwelve: React.FC<
 
                 <Label
                   htmlFor="province"
-                  className="mt-2 block mb-2 text-lg font-medium font-roboto text-gray-800"
+                  className="mt-2 block mb-2 text-lg font-medium font-roboto text-gray-800 mt-2"
                 >
                   Details of the Venue
                 </Label>
@@ -525,6 +527,17 @@ const StepTwelve: React.FC<
               </button>
             </div>
           </div>
+
+          {/* Toast*/}
+          {toastMessage && (
+            <Toast className="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50">
+              <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500">
+                <HiExclamation className="h-5 w-5" />
+              </div>
+              <div className="ml-3 text-sm font-normal">{toastMessage}</div>
+              <Toast.Toggle onClick={() => setToastMessage(null)} />
+            </Toast>
+          )}
         </div>
       </main>
     </div>
