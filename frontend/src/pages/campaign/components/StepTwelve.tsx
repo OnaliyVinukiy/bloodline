@@ -13,7 +13,10 @@ import axios from "axios";
 import { Camp } from "../../../types/camp";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { HiExclamation } from "react-icons/hi";
-import { validatePhoneNumber } from "../../../utils/ValidationsUtils";
+import {
+  validateEmail,
+  validatePhoneNumber,
+} from "../../../utils/ValidationsUtils";
 
 const StepTwelve: React.FC<
   StepperPropsCampaign & {
@@ -61,6 +64,7 @@ const StepTwelve: React.FC<
   const [loading, setLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
+  const [isEmailValid, setIsEmailValid] = useState(true);
   const { getAccessToken } = useAuthContext();
 
   //Fetch provinces list
@@ -136,6 +140,11 @@ const StepTwelve: React.FC<
 
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsPhoneNumberValid(validatePhoneNumber(e.target.value));
+    handleInputChange(e);
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsEmailValid(validateEmail(e.target.value));
     handleInputChange(e);
   };
 
@@ -319,13 +328,22 @@ const StepTwelve: React.FC<
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleInputChange}
+                    onChange={handleEmailChange}
                     placeholder="Enter email address"
-                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    className={`bg-indigo-50 border ${
+                      isPhoneNumberValid
+                        ? "border-indigo-300"
+                        : "border-red-500"
+                    } text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
                     required
                   />
                   {errors.email && (
                     <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                  )}
+                  {!isEmailValid && (
+                    <p className="text-sm text-red-500 mt-1">
+                      Please enter a valid email address.
+                    </p>
                   )}
                 </div>
                 <div className="w-full">
