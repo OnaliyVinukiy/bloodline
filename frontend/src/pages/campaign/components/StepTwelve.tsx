@@ -11,6 +11,7 @@ import { StepperPropsCampaign } from "../../../types/stepper";
 import { Label } from "flowbite-react";
 import axios from "axios";
 import { Camp } from "../../../types/camp";
+import { useAuthContext } from "@asgardeo/auth-react";
 
 const StepTwelve: React.FC<
   StepperPropsCampaign & {
@@ -58,6 +59,8 @@ const StepTwelve: React.FC<
   }, []);
 
   const [errors, setErrors] = useState<{ [key in keyof Camp]?: string }>({});
+  const [loading, setLoading] = useState(false);
+  const { getAccessToken } = useAuthContext();
 
   //Fetch provinces list
   useEffect(() => {
@@ -113,7 +116,7 @@ const StepTwelve: React.FC<
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const selectedProvince = event.target.value;
-
+    setFormData((prev) => ({ ...prev, province: selectedProvince }));
     fetchDistricts(selectedProvince);
   };
 
@@ -121,12 +124,13 @@ const StepTwelve: React.FC<
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const selectedDistrict = event.target.value;
-
+    setFormData((prev) => ({ ...prev, district: selectedDistrict }));
     fetchCities(selectedDistrict);
   };
 
-  const handleCityChange = () => {
-    //const selectedCity = event.target.value;
+  const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCity = event.target.value;
+    setFormData((prev) => ({ ...prev, city: selectedCity }));
   };
 
   const handleChange = (
@@ -156,10 +160,37 @@ const StepTwelve: React.FC<
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateForm()) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      onNextStep();
+      try {
+        setLoading(true);
+        const token = await getAccessToken();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        // Make API call to save camp data
+        const response = await axios.post(
+          `${backendURL}/api/camps/register`,
+          { formData },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.status === 201) {
+          onNextStep();
+          alert("Camp registered successfully!");
+        } else {
+          alert("Failed to register camp. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error saving camp:", error);
+        alert("There was an error. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -207,7 +238,7 @@ const StepTwelve: React.FC<
               <div className="mt-4 space-y-6">
                 <div className="w-full">
                   <Label
-                    htmlFor="fullName"
+                    htmlFor="organizationName"
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
                     {" "}
@@ -217,6 +248,7 @@ const StepTwelve: React.FC<
                     type="text"
                     value={formData.organizationName}
                     onChange={handleChange}
+                    name="organizationName"
                     placeholder="Enter organization name"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
@@ -232,6 +264,7 @@ const StepTwelve: React.FC<
                   </Label>
                   <input
                     type="text"
+                    name="fullName"
                     value={formData.fullName}
                     onChange={handleChange}
                     placeholder="Enter full name"
@@ -254,6 +287,7 @@ const StepTwelve: React.FC<
                   </Label>
                   <input
                     type="text"
+                    name="nic"
                     value={formData.nic}
                     onChange={handleChange}
                     placeholder="Enter NIC number"
@@ -274,6 +308,7 @@ const StepTwelve: React.FC<
                   </Label>
                   <input
                     type="email"
+                    name="email"
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter email address"
@@ -294,6 +329,7 @@ const StepTwelve: React.FC<
                   </Label>
                   <input
                     type="text"
+                    name="contactNumber"
                     value={formData.contactNumber}
                     onChange={handleChange}
                     placeholder="Enter contact number"
@@ -459,9 +495,33 @@ const StepTwelve: React.FC<
               </button>
               <button
                 onClick={handleSubmit}
-                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
+                disabled={loading}
+                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 disabled:bg-red-500 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-300"
               >
-                Register
+                {loading ? (
+                  <>
+                    <svg
+                      aria-hidden="true"
+                      className="w-4 h-4 mr-2 text-white animate-spin"
+                      viewBox="0 0 100 101"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M100 50.5c0 27.6-22.4 50-50 50S0 78.1 0 50.5 22.4.5 50 .5s50 22.4 50 50z"
+                        fill="currentColor"
+                        opacity=".2"
+                      />
+                      <path
+                        d="M93.3 50.5c0-23.9-19.4-43.3-43.3-43.3-6.3 0-12.3 1.3-17.8 3.7-1.6.7-2.2 2.6-1.5 4.2.7 1.6 2.6 2.2 4.2 1.5 4.9-2.1 10.2-3.2 15.6-3.2 21.6 0 39.3 17.7 39.3 39.3s-17.7 39.3-39.3 39.3c-21.6 0-39.3-17.7-39.3-39.3 0-6.8 1.7-13.3 5-19.1.9-1.5.4-3.4-1-4.3s-3.4-.4-4.3 1c-3.8 6.4-5.8 13.7-5.8 21.3 0 23.9 19.4 43.3 43.3 43.3s43.3-19.4 43.3-43.3z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                    Submitting...
+                  </>
+                ) : (
+                  "Submit"
+                )}
               </button>
             </div>
           </div>
