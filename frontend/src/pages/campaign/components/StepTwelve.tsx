@@ -8,11 +8,12 @@
 
 import React, { useEffect, useState } from "react";
 import { StepperPropsCampaign } from "../../../types/stepper";
-import { Label, Toast } from "flowbite-react";
+import { Label, Modal, Toast } from "flowbite-react";
 import axios from "axios";
 import { Camp } from "../../../types/camp";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { HiExclamation } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
 import {
   validateEmail,
   validatePhoneNumber,
@@ -23,7 +24,7 @@ const StepTwelve: React.FC<
     selectedDate: Date | null;
     selectedSlot: string | null;
   }
-> = ({ onNextStep, onPreviousStep, selectedDate, selectedSlot }) => {
+> = ({ onPreviousStep, selectedDate, selectedSlot }) => {
   const handlePrevious = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
@@ -65,6 +66,8 @@ const StepTwelve: React.FC<
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
   const { getAccessToken } = useAuthContext();
 
   //Fetch provinces list
@@ -194,10 +197,20 @@ const StepTwelve: React.FC<
         );
 
         if (response.status === 201) {
-          onNextStep();
-          setToastMessage("Blood donation camp registered successfully!");
-        } else {
-          setToastMessage("Failed to register camp. Please try again.");
+          setShowModal(true);
+          setFormData({
+            organizationName: "",
+            fullName: "",
+            nic: "",
+            email: "",
+            contactNumber: "",
+            province: "",
+            district: "",
+            city: "",
+            date: selectedDate ? selectedDate.toISOString().split("T")[0] : "",
+            time: selectedSlot || "",
+            googleMapLink: "",
+          });
         }
       } catch (error: any) {
         console.error("Error saving camp:", error);
@@ -209,6 +222,11 @@ const StepTwelve: React.FC<
         setLoading(false);
       }
     }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    navigate("/");
   };
 
   return (
@@ -331,9 +349,7 @@ const StepTwelve: React.FC<
                     onChange={handleEmailChange}
                     placeholder="Enter email address"
                     className={`bg-indigo-50 border ${
-                      isPhoneNumberValid
-                        ? "border-indigo-300"
-                        : "border-red-500"
+                      isEmailValid ? "border-indigo-300" : "border-red-500"
                     } text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
                     required
                   />
@@ -393,7 +409,7 @@ const StepTwelve: React.FC<
                       htmlFor="province"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
-                      Province
+                      Province*
                     </Label>
                     <select
                       id="province"
@@ -423,7 +439,7 @@ const StepTwelve: React.FC<
                       htmlFor="district"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
-                      District
+                      District*
                     </Label>
                     <select
                       id="district"
@@ -457,7 +473,7 @@ const StepTwelve: React.FC<
                       htmlFor="city"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
-                      City
+                      City*
                     </Label>
                     <select
                       id="city"
@@ -492,7 +508,7 @@ const StepTwelve: React.FC<
                     htmlFor="googleMapLink"
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
-                    Google Map Link of the Venue
+                    Google Map Link of the Venue*
                   </Label>
                   <input
                     type="text"
@@ -573,6 +589,39 @@ const StepTwelve: React.FC<
               <Toast.Toggle onClick={() => setToastMessage(null)} />
             </Toast>
           )}
+          <Modal show={showModal} onClose={() => handleCloseModal()}>
+            <Modal.Header className="flex items-center gap-2 ">
+              <p className="flex items-center gap-2 text-xl text-green-600">
+                <svg
+                  className="w-6 h-6 text-green-600"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="currentColor"
+                  viewBox="0 0 512 512"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"
+                  />
+                </svg>
+                Request Submitted Successfully!
+              </p>
+            </Modal.Header>
+            <Modal.Body>
+              <p className="text-lg text-gray-700">
+                Your request for a blood donation camp has been successfully
+                submitted. Our team will review your request, and you will
+                receive a confirmation email once it has been approved or
+                rejected. Thank you for your willingness to save lives make a
+                difference!
+              </p>
+            </Modal.Body>
+          </Modal>
         </div>
       </main>
     </div>
