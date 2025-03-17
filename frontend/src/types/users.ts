@@ -53,7 +53,7 @@ export interface BloodDonor {
 
 export interface Organization {
   _id?: ObjectId;
-  orgName: string;
+  organizationName: string;
   repFullName: string;
   repEmail: string;
   repNIC: string;
