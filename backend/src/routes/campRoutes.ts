@@ -6,10 +6,11 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import express from "express";
-import { saveCamp } from "../controllers/campController";
+import { getCamps, saveCamp } from "../controllers/campController";
 
 const router = express.Router();
 
 router.post("/register", saveCamp);
+router.get("/fetch-camps", getCamps);
 
 export default router;
