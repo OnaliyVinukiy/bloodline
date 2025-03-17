@@ -28,13 +28,18 @@ const DonorAppointments = () => {
     const fetchAppointments = async () => {
       try {
         setIsLoading(true);
-        const token = await memoizedGetAccessToken();
+        const accessToken = await memoizedGetAccessToken();
+        const { data: userInfo } = await axios.post(
+          `${backendURL}/api/user-info`,
+          { accessToken },
+          { headers: { "Content-Type": "application/json" } }
+        );
 
         const response = await axios.get(
-          `${backendURL}/api/appointments/fetch-appointment`,
+          `${backendURL}/api/appointments/fetch-appointments/${userInfo.email}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
