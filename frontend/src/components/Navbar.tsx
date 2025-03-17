@@ -173,7 +173,9 @@ export function Navigationbar() {
                 Profile
               </Dropdown.Item>
               <Dropdown.Item>Donations</Dropdown.Item>
-              <Dropdown.Item>Appointments</Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate("/appointments")}>
+                Appointments
+              </Dropdown.Item>
               <Dropdown.Divider />
               <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
             </Dropdown>
