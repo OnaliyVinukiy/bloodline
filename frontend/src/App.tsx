@@ -17,6 +17,7 @@ import PendingAppointments from "./pages/admin/PendingAppointments";
 import CalendarPage from "./pages/admin/CalendarPage";
 import AppointmentDetails from "./pages/admin/AppointmentDetails";
 import BloodCampaignRegistration from "./pages/campaign/BloodCampRegistration";
+import OrganizationRegistration from "./pages/organization/OrganizationRegistration";
 
 function App() {
   return (
@@ -40,6 +41,10 @@ function App() {
               element={<PendingAppointments />}
             />
             <Route path="/admin/calendar" element={<CalendarPage />} />
+            <Route
+              path="/organization-registration"
+              element={<OrganizationRegistration />}
+            />
           </Routes>
         </main>
         <FooterComponent />
