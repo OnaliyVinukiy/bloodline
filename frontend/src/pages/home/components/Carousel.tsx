@@ -47,10 +47,10 @@ export function CarouselSlider() {
           className="inline-flex justify-between items-center py-1 px-1 pr-4 mb-6 text-sm text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200"
           role="alert"
         >
-          <span className="text-xs bg-red-600 rounded-full text-white px-4 py-1.5 mr-3">
+          <span className="text-[10px] md:text-xs bg-red-600 rounded-full text-white px-4 py-1.5 mr-3">
             Who we are
           </span>
-          <span className="text-sm font-medium">
+          <span className="text-xs md:text-sm font-medium">
             Learn more about Bloodline!
           </span>
           <svg

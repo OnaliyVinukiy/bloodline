@@ -24,7 +24,7 @@ const OrganizationRegistration = () => {
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
 
   const [organization, setOrganization] = useState<Organization>({
-    orgName: "",
+    organizationName: "",
     repFullName: "",
     repEmail: user?.email || "",
     repNIC: "",
@@ -304,8 +304,10 @@ const OrganizationRegistration = () => {
               </Label>
               <input
                 type="text"
-                value={organization?.orgName || ""}
-                onChange={(e) => handleInputChange("orgName", e.target.value)}
+                value={organization?.organizationName || ""}
+                onChange={(e) =>
+                  handleInputChange("organizationName", e.target.value)
+                }
                 className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
               />
             </div>
