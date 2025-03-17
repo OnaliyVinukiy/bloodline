@@ -50,3 +50,15 @@ export interface BloodDonor {
   avatar: string | null;
   gender: string;
 }
+
+export interface Organization {
+  _id?: ObjectId;
+  orgName: string;
+  repFullName: string;
+  repEmail: string;
+  repNIC: string;
+  repGender: string;
+  orgContactNumber: string;
+  repContactNumber: string;
+  avatar: string;
+}

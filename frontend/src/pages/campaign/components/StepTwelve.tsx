@@ -187,7 +187,7 @@ const StepTwelve: React.FC<
         // Make API call to save camp data
         const response = await axios.post(
           `${backendURL}/api/camps/register`,
-          { formData },
+          formData,
           {
             headers: {
               "Content-Type": "application/json",
