@@ -9,7 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useAuthContext } from "@asgardeo/auth-react";
 
-const UserAppointments = () => {
+const DonorAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { getAccessToken } = useAuthContext();
@@ -197,4 +197,4 @@ const UserAppointments = () => {
   );
 };
 
-export default UserAppointments;
+export default DonorAppointments;
