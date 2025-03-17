@@ -13,6 +13,7 @@ import {
   getAppointmentById,
   approveAppointment,
   rejectAppointment,
+  getAppointmentsByEmail,
 } from "../controllers/appointmentController";
 import { authenticateUser } from "../middleware/authMiddleware";
 
@@ -24,7 +25,11 @@ router.post("/save-appointment", authenticateUser, saveAppointment);
 //Routes to fetch appointment data
 router.get("/fetch-appointment", authenticateUser, getAppointments);
 router.get("/fetch-appointment/:id", authenticateUser, getAppointmentById);
-
+router.get(
+  "/fetch-appointments/:email",
+  authenticateUser,
+  getAppointmentsByEmail
+);
 router.get("/:date", authenticateUser, getAppointmentsByDate);
 
 // Route to approve appointment
