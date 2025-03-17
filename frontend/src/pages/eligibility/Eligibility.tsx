@@ -53,9 +53,8 @@ const EligibilityCriteria: React.FC = () => {
   ];
 
   return (
-    <section className="bg-white to-white py-16">
+    <section className="bg-gray-10 py-16">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Fixed h1 with adjusted line-height and padding */}
         <h1 className="text-5xl font-bold text-center mb-6 bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent leading-tight pb-2">
           Blood Donation Eligibility Criteria
         </h1>
@@ -121,11 +120,13 @@ const EligibilityCriteria: React.FC = () => {
             ))}
           </div>
         </div>
-
-        <p className="mt-12 text-center text-gray-700 text-lg">
-          NBTS achieved the mighty figure of 100% voluntary non-remunerated
-          blood donor base.
-        </p>
+        <div className="mb-6 p-4 bg-yellow-100 rounded-lg">
+          <p className="text-yellow-700 text-center">
+            {" "}
+            NBTS achieved the mighty figure of 100% voluntary non-remunerated
+            blood donor base.
+          </p>
+        </div>
       </div>
     </section>
   );
