@@ -137,3 +137,26 @@ export const saveCamp = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to register camp" });
   }
 };
+
+// Fetch camp data
+export const getCamps = async (req: Request, res: Response) => {
+  try {
+    // Connect to the database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(CAMP_COLLECTION_ID);
+
+    // Fetch all camps
+    const camps = await collection.find({}).toArray();
+
+    res.status(200).json(camps);
+
+    await client.close();
+  } catch (error) {
+    console.error("Error fetching camps:", error);
+    res.status(500).json({ message: "Error fetching camps", error });
+  }
+};
