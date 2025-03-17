@@ -92,6 +92,7 @@ const Cards: React.FC = () => {
         <Button
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
+          href="/organization-registration"
         >
           Register Now
           <svg
