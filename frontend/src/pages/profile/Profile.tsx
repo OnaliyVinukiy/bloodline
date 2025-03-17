@@ -610,7 +610,12 @@ export default function Profile() {
               </div>
             </div>
             <div>
-              <Label>Address</Label>
+              <Label
+                htmlFor="first_name"
+                className="block mb-2 text-sm font-medium text-indigo-900"
+              >
+                Address
+              </Label>
               <input
                 type="text"
                 value={donor?.address || ""}
@@ -643,7 +648,12 @@ export default function Profile() {
             </div>
 
             <div>
-              <Label>Blood Group</Label>
+              <Label
+                htmlFor="first_name"
+                className="block mb-2 text-sm font-medium text-indigo-900"
+              >
+                Blood Group
+              </Label>
               <select
                 value={donor?.bloodGroup || ""}
                 onChange={(e) =>
@@ -664,7 +674,12 @@ export default function Profile() {
             </div>
 
             <div>
-              <Label>Date of Birth</Label>
+              <Label
+                htmlFor="first_name"
+                className="block mb-2 text-sm font-medium text-indigo-900"
+              >
+                Date of Birth
+              </Label>
               <Datepicker
                 value={donor?.birthdate ? new Date(donor.birthdate) : undefined}
                 onChange={(date) => {
@@ -684,7 +699,12 @@ export default function Profile() {
 
             {donor?.birthdate && (
               <div>
-                <Label>Age</Label>
+                <Label
+                  htmlFor="first_name"
+                  className="block mb-2 text-sm font-medium text-indigo-900"
+                >
+                  Age
+                </Label>
                 <input
                   type="text"
                   value={calculateAge(donor.birthdate)}
