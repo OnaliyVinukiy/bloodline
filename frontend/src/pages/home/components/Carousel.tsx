@@ -31,7 +31,7 @@ export function CarouselSlider() {
   };
   return (
     <section
-      className="bg-cover bg-no-repeat bg-center h-[700px] flex items-center"
+      className="bg-cover bg-no-repeat bg-center h-[700px] flex items-start"
       style={{
         backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/heart.jpg')`,
       }}
@@ -67,17 +67,17 @@ export function CarouselSlider() {
           </svg>
         </a>
 
-        <h1 className="mb-6 text-3xl font-semibold tracking-tight leading-tight text-white sm:mb-8 sm:text-4xl md:text-5xl lg:text-6xl">
+        <h1 className="mt-2 mb-6 text-3xl font-semibold tracking-tight leading-tight text-white sm:mb-8 sm:text-4xl md:text-5xl lg:text-6xl">
           Every Drop Counts, Every Life Matters!
         </h1>
-        <p className="text-base font-normal text-white sm:text-lg md:text-xl">
+        <p className="mt-2 text-base font-normal text-white sm:text-lg md:text-xl">
           Join us in creating a world where no life is lost due to the lack of
           blood.
         </p>
         <p className="mb-8 text-base font-normal text-white sm:text-lg md:text-xl">
           Together, we save lives.
         </p>
-        <div className="flex flex-col mb-8 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
+        <div className="mt-12 flex flex-col mb-4 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
           <button
             onClick={handleAppointmentSchedule}
             className="inline-flex justify-center items-center py-2 px-4 text-sm font-medium text-center text-white rounded-lg bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 sm:py-3 sm:px-5 sm:text-base"
