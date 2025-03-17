@@ -7,6 +7,7 @@
  */
 import express from "express";
 import {
+  searchOrganizations,
   getOrganizationByEmail,
   uploadLogo,
   upsertOrganization,
@@ -20,5 +21,6 @@ const upload = multer({ storage });
 router.get("/organization/:email", getOrganizationByEmail);
 router.post("/update-organization", upsertOrganization);
 router.post("/upload-logo", upload.single("file"), uploadLogo);
+router.get("/search", searchOrganizations);
 
 export default router;
