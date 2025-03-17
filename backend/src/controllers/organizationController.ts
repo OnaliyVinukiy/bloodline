@@ -136,4 +136,30 @@ const uploadLogo = async (req: Request, res: Response) => {
   }
 };
 
-export { getOrganizationByEmail, upsertOrganization, uploadLogo };
+// Search for organizations
+const searchOrganizations = async (req: Request, res: Response) => {
+  try {
+    const { collection, client } = await connectToCosmos();
+    const searchTerm = req.query.name as string;
+
+    if (!searchTerm) {
+      return res.status(400).json({ message: "Search term is required" });
+    }
+
+    const query = { organizationName: { $regex: searchTerm, $options: "i" } };
+    const organizations = await collection.find(query).limit(10).toArray();
+
+    res.status(200).json(organizations);
+    client.close();
+  } catch (error) {
+    console.error("Error searching organizations:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export {
+  getOrganizationByEmail,
+  upsertOrganization,
+  uploadLogo,
+  searchOrganizations,
+};
