@@ -16,7 +16,7 @@ import {
   DONOR_COLLECTION_ID,
   CONTAINER_NAME,
 } from "../config/azureConfig";
-import {UserInfo} from "../types/users.js";
+import { UserInfo } from "../types/users.js";
 
 const app = express();
 app.use(express.json());
@@ -73,13 +73,13 @@ const getUserInfo = async (req: Request, res: Response) => {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          Accept: "application/json", // Added Accept header
+          Accept: "application/json",
         },
       }
     );
 
     if (!response.ok) {
-      const errorText = await response.text(); // Log the error message from the API
+      const errorText = await response.text();
       console.error("Asgardeo API Response:", errorText);
       throw new Error(`Failed to fetch user info: ${errorText}`);
     }
@@ -96,12 +96,10 @@ const getUserInfo = async (req: Request, res: Response) => {
   } catch (error) {
     const errorMessage = (error as Error).message || error;
     console.error("Error fetching user info:", errorMessage);
-    res
-      .status(500)
-      .json({
-        message: "Error fetching user info",
-        error: (error as Error).message || error,
-      });
+    res.status(500).json({
+      message: "Error fetching user info",
+      error: (error as Error).message || error,
+    });
   }
 };
 

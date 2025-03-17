@@ -6,10 +6,7 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { MongoClient } from "mongodb";
-import {
-  DATABASE_ID,
-  APPOINTMENT_COLLECTION_ID,
-} from "../config/azureConfig";
+import { DATABASE_ID, APPOINTMENT_COLLECTION_ID } from "../config/azureConfig";
 import dotenv from "dotenv";
 import { Request, Response } from "express";
 import nodemailer from "nodemailer";
@@ -125,6 +122,37 @@ export const getAppointmentById = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error fetching appointment:", error);
     res.status(500).json({ message: "Error fetching appointment", error });
+  }
+};
+
+// Fetch appointments by donor email
+export const getAppointmentsByEmail = async (req: Request, res: Response) => {
+  const { email } = req.params;
+
+  try {
+    // Connect to the database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+
+    // Find all appointments using donor email
+    const appointments = await collection
+      .find({ "donorInfo.email": email })
+      .toArray();
+
+    if (appointments.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No appointments found for this email" });
+    }
+
+    res.status(200).json(appointments);
+    await client.close();
+  } catch (error) {
+    console.error("Error fetching appointments:", error);
+    res.status(500).json({ message: "Error fetching appointments", error });
   }
 };
 
