@@ -18,6 +18,7 @@ import {
   validateEmail,
   validatePhoneNumber,
 } from "../../../utils/ValidationsUtils";
+import { Organization } from "../../../types/users";
 
 const StepTwelve: React.FC<
   StepperPropsCampaign & {
@@ -66,6 +67,7 @@ const StepTwelve: React.FC<
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const [organizationOptions, setOrganizationOptions] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { getAccessToken } = useAuthContext();
@@ -119,6 +121,29 @@ const StepTwelve: React.FC<
       console.error("Error fetching districts:", error);
     }
   };
+
+  useEffect(() => {
+    const searchOrganizations = async () => {
+      if (formData.organizationName.trim()) {
+        try {
+          const response = await axios.get<Organization[]>(
+            `${backendURL}/api/organizations/search?name=${encodeURIComponent(
+              formData.organizationName
+            )}`
+          );
+          const orgNames = response.data.map((org) => org.organizationName);
+          setOrganizationOptions([...new Set(orgNames)]);
+        } catch (error) {
+          console.error("Error fetching organizations:", error);
+        }
+      } else {
+        setOrganizationOptions([]);
+      }
+    };
+
+    const debounceTimer = setTimeout(searchOrganizations, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [formData.organizationName, backendURL]);
 
   const handleProvinceChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -282,13 +307,36 @@ const StepTwelve: React.FC<
                   </Label>
                   <input
                     type="text"
+                    name="organizationName"
                     value={formData.organizationName}
                     onChange={handleInputChange}
-                    name="organizationName"
                     placeholder="Enter organization name"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
+                    onBlur={() =>
+                      setTimeout(() => setOrganizationOptions([]), 200)
+                    }
                   />
+                  {organizationOptions.length > 0 && (
+                    <ul className="absolute z-10 w-3/4 bg-white border border-indigo-300 rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto">
+                      {organizationOptions.map((orgName, index) => (
+                        <li
+                          key={index}
+                          className="p-2 hover:bg-indigo-50 cursor-pointer text-sm text-indigo-900"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              organizationName: orgName,
+                            }));
+                            setOrganizationOptions([]);
+                          }}
+                        >
+                          {orgName}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
                 <div className="w-full">
                   <Label
