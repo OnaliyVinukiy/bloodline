@@ -5,13 +5,20 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useAuthContext } from "@asgardeo/auth-react";
 
 const RejectedAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { getAccessToken } = useAuthContext();
+
+  const memoizedGetAccessToken = useCallback(
+    () => getAccessToken(),
+    [getAccessToken]
+  );
 
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -22,8 +29,14 @@ const RejectedAppointments = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
+        const token = await memoizedGetAccessToken();
         const response = await axios.get(
-          `${backendURL}/api/appointments/fetch-appointment`
+          `${backendURL}/api/appointments/fetch-appointment`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const rejectedAppointments = response.data.filter(
           (appointment: any) => appointment.status === "Rejected"
