@@ -5,15 +5,22 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import { useAuthContext } from "@asgardeo/auth-react";
 
 const AppointmentCalendar = () => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const { getAccessToken } = useAuthContext();
+
+  const memoizedGetAccessToken = useCallback(
+    () => getAccessToken(),
+    [getAccessToken]
+  );
 
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -24,8 +31,14 @@ const AppointmentCalendar = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
+        const token = await memoizedGetAccessToken();
         const response = await axios.get(
-          `${backendURL}/api/appointments/fetch-appointment`
+          `${backendURL}/api/appointments/fetch-appointment`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setAppointments(response.data);
       } catch (error) {
