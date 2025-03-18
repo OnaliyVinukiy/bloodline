@@ -12,6 +12,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { StepperProps } from "../../../types/stepper";
 import axios from "axios";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { ValidationModal } from "../../../components/ValidationModal";
 
 const ScheduleForm: React.FC<StepperProps> = ({
   onNextStep,
@@ -20,8 +21,11 @@ const ScheduleForm: React.FC<StepperProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+  const { getBasicUserInfo } = useAuthContext();
+  const [donorAppointments, setDonorAppointments] = useState<any[]>([]);
   const { getAccessToken } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
+  const [showValidationModal, setShowValidationModal] = useState(false);
   const memoizedGetAccessToken = useCallback(
     () => getAccessToken(),
     [getAccessToken]
@@ -30,6 +34,15 @@ const ScheduleForm: React.FC<StepperProps> = ({
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
+  };
+  const [validationModalContent, setValidationModalContent] = useState({
+    title: "",
+    content: "",
+  });
+
+  const showValidationMessage = (title: string, content: string) => {
+    setValidationModalContent({ title, content });
+    setShowValidationModal(true);
   };
 
   //Convert the date format
@@ -45,7 +58,51 @@ const ScheduleForm: React.FC<StepperProps> = ({
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  //Fetch booked slots
+  // Fetch donor's previous appointments
+  useEffect(() => {
+    const fetchDonorAppointments = async () => {
+      const token = await memoizedGetAccessToken();
+      const user = await getBasicUserInfo();
+
+      try {
+        const response = await axios.get(
+          `${backendURL}/api/appointments/fetch-appointments/${user.email}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setDonorAppointments(response.data);
+      } catch (error) {
+        console.error("Error fetching donor appointments:", error);
+      }
+    };
+
+    fetchDonorAppointments();
+  }, [memoizedGetAccessToken, getBasicUserInfo, backendURL]);
+
+  // Check if the selected date is within 4 months of the last appointment
+  const checkAppointmentDate = (date: Date) => {
+    if (donorAppointments.length > 0) {
+      const lastAppointmentDate = new Date(donorAppointments[0].selectedDate);
+      const fourMonthsLater = new Date(
+        lastAppointmentDate.setMonth(lastAppointmentDate.getMonth() + 4)
+      );
+
+      if (date < fourMonthsLater) {
+        showValidationMessage(
+          "Appointment Restriction",
+          "You have already placed an appointment. You cannot place another appointment less than 4 months from your last appointment. Please cancel your existing appointment or select a date after 4 months."
+        );
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // Fetch booked slots
   useEffect(() => {
     if (selectedDate) {
       setIsLoading(true);
@@ -73,9 +130,9 @@ const ScheduleForm: React.FC<StepperProps> = ({
       };
       fetchBookedSlots();
     }
-  }, [selectedDate]);
+  }, [selectedDate, memoizedGetAccessToken, backendURL]);
 
-  //Format selected date
+  // Format selected date
   useEffect(() => {
     if (selectedDate && selectedSlot) {
       const formattedDate = getFormattedDate(selectedDate);
@@ -126,8 +183,10 @@ const ScheduleForm: React.FC<StepperProps> = ({
                 <DatePicker
                   selected={selectedDate}
                   onChange={(date) => {
-                    setSelectedDate(date);
-                    setSelectedSlot(null);
+                    if (date && checkAppointmentDate(date)) {
+                      setSelectedDate(date);
+                      setSelectedSlot(null);
+                    }
                   }}
                   inline
                   minDate={new Date()}
@@ -212,6 +271,13 @@ const ScheduleForm: React.FC<StepperProps> = ({
             </div>
           </div>
         </div>
+        {/* Validation Modal */}
+        <ValidationModal
+          show={showValidationModal}
+          onClose={() => setShowValidationModal(false)}
+          title={validationModalContent.title}
+          content={validationModalContent.content}
+        />
       </main>
     </div>
   );
