@@ -5,25 +5,51 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useAuthContext } from "@asgardeo/auth-react";
 
 const PendingAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { getAccessToken } = useAuthContext();
 
+  const memoizedGetAccessToken = useCallback(
+    () => getAccessToken(),
+    [getAccessToken]
+  );
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
+  const isMedicalConditionPresent = (appointment: any) => {
+    return (
+      appointment.fourthform?.isMedicallyAdvised === "Yes" ||
+      appointment.secondForm?.isPregnant === "Yes" ||
+      appointment.secondForm?.isTakingTreatment === "Yes" ||
+      appointment.secondForm?.isSurgeryDone === "Yes" ||
+      appointment.secondForm?.isEngageHeavyWork === "Yes" ||
+      appointment.thirdForm?.hadHepatitis === "Yes" ||
+      appointment.thirdForm?.hadTyphoid === "Yes" ||
+      appointment.fourthForm?.hadVaccination === "Yes"
+    );
+  };
+
   //Fetch pending appointments
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
+        setIsLoading(true);
+        const token = await memoizedGetAccessToken();
         const response = await axios.get(
-          `${backendURL}/api/appointments/fetch-appointment`
+          `${backendURL}/api/appointments/fetch-appointment`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const pendingAppointments = response.data.filter(
           (appointment: any) => appointment.status === "Pending"
@@ -237,10 +263,9 @@ const PendingAppointments = () => {
                 </td>
 
                 <td className="px-1 py-1">
-                  {(appointment.fourthform?.isMedicallyAdvised === "Yes" ||
-                    appointment.secondForm?.isPregnant === "Yes") && (
+                  {isMedicalConditionPresent(appointment) && (
                     <button
-                      className="text-red-500 hover:text-red-400 ml-2"
+                      className="text-red-500 hover:text-red-400 mr-2"
                       aria-label="Warning"
                     >
                       <svg
