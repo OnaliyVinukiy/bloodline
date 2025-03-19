@@ -8,7 +8,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Select } from "flowbite-react";
-import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  Marker,
+  useLoadScript,
+  InfoWindowF,
+} from "@react-google-maps/api";
 
 const Map: React.FC = () => {
   const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -34,6 +39,7 @@ const Map: React.FC = () => {
   const [selectedCity, setSelectedCity] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [noCampsFound, setNoCampsFound] = useState(false);
+  const [selectedCamp, setSelectedCamp] = useState<any>(null);
 
   //Fetch provinces list
   useEffect(() => {
@@ -130,7 +136,7 @@ const Map: React.FC = () => {
         location = await geocodeVenue(camp.venue);
       }
       if (location) {
-        newMarkers.push({ ...location, name: camp.venue });
+        newMarkers.push({ ...location, ...camp });
         totalLat += location.lat;
         totalLng += location.lng;
         count++;
@@ -239,7 +245,48 @@ const Map: React.FC = () => {
                   key={index}
                   position={{ lat: marker.lat, lng: marker.lng }}
                   title={marker.name}
-                />
+                  onClick={() => setSelectedCamp(marker)}
+                >
+                  {selectedCamp && selectedCamp._id === marker._id && (
+                    <InfoWindowF
+                      position={{ lat: marker.lat, lng: marker.lng }}
+                      onCloseClick={() => setSelectedCamp(null)}
+                    >
+                      <div className="p-2">
+                        <h2 className="font-bold text-lg">
+                          {marker.organizationName}
+                        </h2>
+                        <p className="text-sm">
+                          <strong>Date:</strong> {marker.date}
+                        </p>
+                        <p className="text-sm">
+                          <strong>Time:</strong> {marker.time}
+                        </p>
+                        <p className="text-sm">
+                          <strong> Location: </strong>{" "}
+                          <a
+                            href={marker.googleMapLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500"
+                          >
+                            {" "}
+                            {marker.venue}{" "}
+                          </a>
+                        </p>
+                        <p className="text-sm">
+                          Contact:{" "}
+                          <a
+                            href={`tel:${marker.contactNumber}`}
+                            className="text-blue-500"
+                          >
+                            {marker.contactNumber}
+                          </a>
+                        </p>
+                      </div>
+                    </InfoWindowF>
+                  )}
+                </Marker>
               ))}
             </GoogleMap>
           </div>
