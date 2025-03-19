@@ -19,6 +19,7 @@ import AppointmentDetails from "./pages/admin/AppointmentDetails";
 import BloodCampaignRegistration from "./pages/campaign/BloodCampRegistration";
 import OrganizationRegistration from "./pages/organization/OrganizationRegistration";
 import DonorAppointments from "./pages/appointment/Appointments";
+import Map from "./pages/campaign/Map";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
               element={<OrganizationRegistration />}
             />
             <Route path="/appointments" element={<DonorAppointments />} />
+            <Route path="/map" element={<Map />} />
           </Routes>
         </main>
         <FooterComponent />
