@@ -32,6 +32,8 @@ const Map: React.FC = () => {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [noCampsFound, setNoCampsFound] = useState(false);
 
   //Fetch provinces list
   useEffect(() => {
@@ -64,12 +66,26 @@ const Map: React.FC = () => {
   //Fetch camps
   useEffect(() => {
     if (selectedCity) {
+      setIsLoading(true);
+      setNoCampsFound(false);
       axios
         .get(`${backendURL}/api/camps/city/${selectedCity}`)
         .then((res) => {
-          processCampLocations(res.data);
+          if (res.data.length === 0) {
+            setNoCampsFound(true);
+          } else {
+            processCampLocations(res.data);
+          }
         })
-        .catch((err) => console.error("Error fetching camps:", err));
+        .catch((err) => {
+          console.error("Error fetching camps:", err);
+          if (err.response?.status === 404) {
+            setNoCampsFound(true);
+          }
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
   }, [selectedCity]);
 
@@ -130,63 +146,105 @@ const Map: React.FC = () => {
   };
 
   return (
-    <div className="p-4">
-      <div className="flex space-x-4 mb-4">
-        <Select
-          id="province"
-          value={selectedProvince}
-          onChange={(e) => setSelectedProvince(e.target.value)}
-        >
-          <option value="">Select Province</option>
-          {provinces.map((p) => (
-            <option key={p.province_id} value={p.province_name_en}>
-              {p.province_name_en}
-            </option>
-          ))}
-        </Select>
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="mt-4 text-4xl font-bold text-center mb-6 bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent leading-tight pb-2">
+          Find Blood Donation Camps
+        </h1>
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Select
+              id="province"
+              value={selectedProvince}
+              onChange={(e) => setSelectedProvince(e.target.value)}
+              className="w-full"
+            >
+              <option value="">Select Province</option>
+              {provinces.map((p) => (
+                <option key={p.province_id} value={p.province_name_en}>
+                  {p.province_name_en}
+                </option>
+              ))}
+            </Select>
 
-        <Select
-          id="district"
-          value={selectedDistrict}
-          onChange={(e) => setSelectedDistrict(e.target.value)}
-        >
-          <option value="">Select District</option>
-          {districts.map((d) => (
-            <option key={d.district_id} value={d.district_name_en}>
-              {d.district_name_en}
-            </option>
-          ))}
-        </Select>
+            <Select
+              id="district"
+              value={selectedDistrict}
+              onChange={(e) => setSelectedDistrict(e.target.value)}
+              className="w-full"
+            >
+              <option value="">Select District</option>
+              {districts.map((d) => (
+                <option key={d.district_id} value={d.district_name_en}>
+                  {d.district_name_en}
+                </option>
+              ))}
+            </Select>
 
-        <Select
-          id="city"
-          value={selectedCity}
-          onChange={(e) => setSelectedCity(e.target.value)}
-        >
-          <option value="">Select City</option>
-          {cities.map((c) => (
-            <option key={c.city_id} value={c.city_name_en}>
-              {c.city_name_en}
-            </option>
-          ))}
-        </Select>
+            <Select
+              id="city"
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              className="w-full"
+            >
+              <option value="">Select City</option>
+              {cities.map((c) => (
+                <option key={c.city_id} value={c.city_name_en}>
+                  {c.city_name_en}
+                </option>
+              ))}
+            </Select>
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="loading flex justify-center items-center h-64">
+            <svg width="64px" height="48px">
+              <polyline
+                points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+                id="back"
+                stroke="#e53e3e"
+                strokeWidth="2"
+                fill="none"
+              ></polyline>
+              <polyline
+                points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+                id="front"
+                stroke="#f56565"
+                strokeWidth="2"
+                fill="none"
+              ></polyline>
+            </svg>
+          </div>
+        ) : noCampsFound ? (
+          <div className="mb-6 p-4 bg-red-200 rounded-lg">
+            <p className="text-red-700 text-center font-semibold font-opensans">
+              Sorry ! There are No Blood Donation Camps Available in the
+              Selected City.
+            </p>
+          </div>
+        ) : isLoaded ? (
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <GoogleMap
+              mapContainerStyle={{
+                width: "100%",
+                height: "500px",
+                borderRadius: "8px",
+              }}
+              center={mapCenter}
+              zoom={zoom}
+            >
+              {markers.map((marker, index) => (
+                <Marker
+                  key={index}
+                  position={{ lat: marker.lat, lng: marker.lng }}
+                  title={marker.name}
+                />
+              ))}
+            </GoogleMap>
+          </div>
+        ) : null}
       </div>
-
-      {isLoaded && (
-        <GoogleMap
-          mapContainerStyle={{ width: "100%", height: "500px" }}
-          center={mapCenter}
-          zoom={zoom}
-        >
-          {markers.map((marker, index) => (
-            <Marker
-              key={index}
-              position={{ lat: marker.lat, lng: marker.lng }}
-              title={marker.name}
-            />
-          ))}
-        </GoogleMap>
-      )}
     </div>
   );
 };
