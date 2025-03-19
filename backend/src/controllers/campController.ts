@@ -99,19 +99,19 @@ export const saveCamp = async (req: Request, res: Response) => {
     errors.push("Time slot is required.");
   }
 
-  // Validate googleMapLink
-  if (!campData.googleMapLink?.trim()) {
-    errors.push("Google Map link is required.");
-  } else {
-    try {
-      const url = new URL(campData.googleMapLink);
-      if (!url.hostname.includes("goo.gl")) {
-        errors.push("Google Map link must be a valid Google Maps URL.");
-      }
-    } catch (e) {
-      errors.push("Invalid Google Map link URL.");
-    }
-  }
+  // // Validate googleMapLink
+  // if (!campData.googleMapLink?.trim()) {
+  //   errors.push("Google Map link is required.");
+  // } else {
+  //   try {
+  //     const url = new URL(campData.googleMapLink);
+  //     if (!url.hostname.includes("goo.gl")) {
+  //       errors.push("Google Map link must be a valid Google Maps URL.");
+  //     }
+  //   } catch (e) {
+  //     errors.push("Invalid Google Map link URL.");
+  //   }
+  // }
 
   if (errors.length > 0) {
     return res.status(400).json({ message: "Validation failed", errors });
@@ -158,5 +158,38 @@ export const getCamps = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error fetching camps:", error);
     res.status(500).json({ message: "Error fetching camps", error });
+  }
+};
+
+export const getCampsByCity = async (req: Request, res: Response) => {
+  const { city } = req.params;
+
+  if (!city) {
+    return res.status(400).json({ message: "City parameter is required" });
+  }
+
+  try {
+    // Connect to the database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(CAMP_COLLECTION_ID);
+
+    // Query camps by city
+    const camps = await collection.find({ city }).toArray();
+
+    if (camps.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No camps found for the specified city" });
+    }
+
+    res.status(200).json(camps);
+
+    await client.close();
+  } catch (error) {
+    console.error("Error fetching camps by city:", error);
+    res.status(500).json({ message: "Failed to fetch camps by city", error });
   }
 };
