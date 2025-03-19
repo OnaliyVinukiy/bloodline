@@ -147,10 +147,41 @@ const AppointmentDetails = () => {
   }
 
   return (
-    <div className="flex justify-center items-center bg-gray-100">
+    <div className="flex justify-center items-center bg-gray-50">
       <main className="mt-2 mb-16 flex justify-center items-center w-full max-w-4xl px-4 py-6 md:w-2/3 lg:w-3/4">
         <div className="w-full max-w-3xl bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-2xl font-bold font-roboto text-indigo-900 mb-8">
+            Donor Details
+          </h2>
+          <div className="space-y-4 font-roboto">
+            <div className="flex justify-between items-center border-b pb-2">
+              <p className="text-md font-medium text-gray-700">Full Name</p>
+              <span className="text-lg font-semibold text-red-700">
+                {appointment.donorInfo.fullName}
+              </span>
+            </div>
+            <div className="flex justify-between items-center border-b pb-2">
+              <p className="text-md font-medium text-gray-700">NIC</p>
+              <span className="text-lg font-semibold text-red-700">
+                {appointment.donorInfo.nic}
+              </span>
+            </div>
+            <div className="flex justify-between items-center border-b pb-2">
+              <p className="text-md font-medium text-gray-700">Email</p>
+              <span className="text-lg font-semibold text-red-700">
+                {appointment.donorInfo.email}
+              </span>
+            </div>
+            <div className="flex justify-between items-center border-b pb-2">
+              <p className="text-md font-medium text-gray-700">
+                Contact Number
+              </p>
+              <span className="text-lg font-semibold text-red-700">
+                {appointment.donorInfo.contactNumber}
+              </span>
+            </div>
+          </div>
+          <h2 className="mt-8 text-2xl font-bold font-roboto text-indigo-900 mb-8">
             Appointment Details
           </h2>
 
