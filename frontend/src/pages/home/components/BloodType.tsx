@@ -91,7 +91,7 @@ const BloodType: React.FC = () => {
         {/* CTA Button */}
         <div className="mt-12 sm:mt-16">
           <a
-            href="#"
+            href="/map"
             className="inline-flex items-center justify-center px-6 py-3 text-sm sm:text-lg font-medium text-white bg-red-800 rounded-lg shadow-md hover:bg-red-700 focus:ring-4 focus:ring-red-300 relative"
           >
             Find a Donation Camp
