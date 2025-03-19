@@ -6,7 +6,7 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StepperPropsCampaign } from "../../../types/stepper";
 import { Label, Modal, Toast } from "flowbite-react";
 import axios from "axios";
@@ -20,6 +20,12 @@ import {
 } from "../../../utils/ValidationsUtils";
 import { Organization } from "../../../types/users";
 
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 const StepTwelve: React.FC<
   StepperPropsCampaign & {
     selectedDate: Date | null;
@@ -30,6 +36,10 @@ const StepTwelve: React.FC<
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
   };
+  const mapRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const mapInstance = useRef<google.maps.Map | null>(null);
+  const markerInstance = useRef<google.maps.Marker | null>(null);
 
   const [province, setProvince] = useState<
     { province_id: string; province_name_en: string }[]
@@ -60,6 +70,7 @@ const StepTwelve: React.FC<
     date: selectedDate ? selectedDate.toISOString().split("T")[0] : "",
     time: selectedSlot || "",
     googleMapLink: "",
+    venue: "",
   });
 
   const [errors, setErrors] = useState<{ [key in keyof Camp]?: string }>({});
@@ -122,6 +133,7 @@ const StepTwelve: React.FC<
     }
   };
 
+  //Search for organization on type
   useEffect(() => {
     const searchOrganizations = async () => {
       if (formData.organizationName.trim()) {
@@ -203,13 +215,113 @@ const StepTwelve: React.FC<
     return Object.keys(newErrors).length === 0;
   };
 
+  //Load google map
+  useEffect(() => {
+    const loadGoogleMapsScript = () => {
+      if (!window.google || !window.google.maps || !window.google.maps.places) {
+        const script = document.createElement("script");
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${
+          import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+        }&libraries=places`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+        script.onload = initializeMap;
+      } else {
+        initializeMap();
+      }
+    };
+
+    const initializeMap = () => {
+      if (mapRef.current && searchInputRef.current) {
+        // Initialize map
+        mapInstance.current = new window.google.maps.Map(mapRef.current, {
+          center: { lat: 6.9271, lng: 79.8612 },
+          zoom: 8,
+        });
+
+        // Initialize autocomplete
+        const autocomplete = new window.google.maps.places.Autocomplete(
+          searchInputRef.current,
+          { types: ["establishment", "geocode"] }
+        );
+
+        autocomplete.addListener("place_changed", () => {
+          const place = autocomplete.getPlace();
+          if (!place.geometry?.location) return;
+
+          // Update form data with venue name and Google Maps link
+          setFormData((prev) => ({
+            ...prev,
+            venue: place.name || "",
+            googleMapLink:
+              place.url ||
+              `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
+          }));
+
+          // Update map view
+          mapInstance.current?.setCenter(place.geometry.location);
+          mapInstance.current?.setZoom(17);
+
+          // Update marker
+          if (markerInstance.current) markerInstance.current.setMap(null);
+          markerInstance.current = new window.google.maps.Marker({
+            position: place.geometry.location,
+            map: mapInstance.current,
+          });
+        });
+
+        // Add click listener for manual location selection
+        mapInstance.current?.addListener(
+          "click",
+          async (e: google.maps.MapMouseEvent) => {
+            if (!e.latLng) return;
+
+            const position = e.latLng.toJSON();
+            if (markerInstance.current) markerInstance.current.setMap(null);
+            markerInstance.current = new window.google.maps.Marker({
+              position: e.latLng,
+              map: mapInstance.current,
+            });
+
+            // Reverse Geocoding to get place name
+            const geocoder = new window.google.maps.Geocoder();
+            geocoder.geocode(
+              { location: e.latLng },
+              (results: any, status: any) => {
+                if (status === "OK" && results[0]) {
+                  setFormData((prev) => ({
+                    ...prev,
+                    venue: results[0].formatted_address,
+                    googleMapLink: `https://www.google.com/maps/@${position.lat},${position.lng},17z`,
+                  }));
+                } else {
+                  console.error("Geocoder failed due to:", status);
+                }
+              }
+            );
+          }
+        );
+      }
+    };
+
+    loadGoogleMapsScript();
+
+    return () => {
+      if (markerInstance.current) markerInstance.current.setMap(null);
+      if (mapInstance.current)
+        window.google.maps.event.clearInstanceListeners(mapInstance.current);
+    };
+  }, []);
+
+  //Handle form submission
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
         setLoading(true);
         const token = await getAccessToken();
 
-        // Make API call to save camp data
+        // Send updated formData, including the venue
         const response = await axios.post(
           `${backendURL}/api/camps/register`,
           formData,
@@ -235,14 +347,15 @@ const StepTwelve: React.FC<
             date: selectedDate ? selectedDate.toISOString().split("T")[0] : "",
             time: selectedSlot || "",
             googleMapLink: "",
+            venue: "",
           });
         }
       } catch (error: any) {
         console.error("Error saving camp:", error);
-        const errorMessage =
+        setToastMessage(
           error.response?.data?.errors?.[0] ||
-          "There was an error. Please try again.";
-        setToastMessage(errorMessage);
+            "There was an error. Please try again."
+        );
       } finally {
         setLoading(false);
       }
@@ -553,6 +666,46 @@ const StepTwelve: React.FC<
               <div className="mt-6 space-y-6">
                 <div className="w-full">
                   <Label
+                    htmlFor="searchLocation"
+                    className="block mb-2 text-sm font-medium text-indigo-900"
+                  >
+                    Search and Select Location on Map*
+                  </Label>
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    id="searchLocation"
+                    placeholder="Search for location"
+                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    value={formData.venue} // Bind to formData.venue
+                    onChange={(e) =>
+                      setFormData({ ...formData, venue: e.target.value })
+                    } // Update venue in state when typing manually
+                  />
+
+                  <div
+                    ref={mapRef}
+                    className="mt-4 h-64 w-full rounded-lg"
+                  ></div>
+                  <input
+                    type="hidden"
+                    name="googleMapLink"
+                    value={formData.googleMapLink}
+                    required
+                  />
+                  {errors.googleMapLink && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.googleMapLink}
+                    </p>
+                  )}
+                  <div className="mt-2 text-sm text-gray-500">
+                    <span>
+                      Search for the venue location and select it on the map.{" "}
+                    </span>
+                  </div>
+                </div>
+                <div className="w-full">
+                  <Label
                     htmlFor="googleMapLink"
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
@@ -564,6 +717,7 @@ const StepTwelve: React.FC<
                     value={formData.googleMapLink}
                     onChange={handleInputChange}
                     placeholder="Enter link"
+                    disabled
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
@@ -572,17 +726,6 @@ const StepTwelve: React.FC<
                       {errors.googleMapLink}
                     </p>
                   )}
-                  <div className="mt-2 text-sm text-gray-500">
-                    <span>Don't know how to get the Google Map link? </span>
-                    <a
-                      href="https://www.youtube.com/watch?v=fGWDogeZMTY"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-indigo-600 hover:text-indigo-800"
-                    >
-                      Learn how to get it here.
-                    </a>
-                  </div>
                 </div>
               </div>
             </div>
