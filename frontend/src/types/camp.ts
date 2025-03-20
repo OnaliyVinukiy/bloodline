@@ -18,4 +18,5 @@ export interface Camp {
   time: string | null;
   googleMapLink: string;
   venue: string;
+  status: string;
 }
