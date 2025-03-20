@@ -12,7 +12,7 @@ import RejectedAppointments from "./RejectedAppointments";
 import AllAppointments from "./AllAppointments";
 import CalendarPage from "./AppointmentsCalendar";
 
-const DonorDeclaration = () => {
+const Appointments = () => {
   const [activeTab, setActiveTab] = useState("tab1");
   return (
     <div className="mt-12">
@@ -92,4 +92,4 @@ const DonorDeclaration = () => {
   );
 };
 
-export default DonorDeclaration;
+export default Appointments;

@@ -7,9 +7,9 @@
  */
 
 import React from "react";
-import { StepperPropsCampaign } from "../../../types/stepper";
+import { StepperPropsCamp } from "../../../types/stepper";
 
-const StepTwo: React.FC<StepperPropsCampaign> = ({
+const StepTwo: React.FC<StepperPropsCamp> = ({
   onNextStep,
   onPreviousStep,
 }) => {

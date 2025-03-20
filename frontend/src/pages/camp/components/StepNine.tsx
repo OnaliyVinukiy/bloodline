@@ -7,9 +7,9 @@
  */
 
 import React from "react";
-import { StepperPropsCampaign } from "../../../types/stepper";
+import { StepperPropsCamps } from "../../../types/stepper";
 
-const StepTen: React.FC<StepperPropsCampaign> = ({
+const StepNine: React.FC<StepperPropsCamps> = ({
   onNextStep,
   onPreviousStep,
 }) => {
@@ -38,7 +38,7 @@ const StepTen: React.FC<StepperPropsCampaign> = ({
                   width="24"
                   height="24"
                   fill="currentColor"
-                  viewBox="0 0 384 512"
+                  viewBox="0 0 512 512"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
@@ -46,11 +46,11 @@ const StepTen: React.FC<StepperPropsCampaign> = ({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M173.8 5.5c11-7.3 25.4-7.3 36.4 0L228 17.2c6 3.9 13 5.8 20.1 5.4l21.3-1.3c13.2-.8 25.6 6.4 31.5 18.2l9.6 19.1c3.2 6.4 8.4 11.5 14.7 14.7L344.5 83c11.8 5.9 19 18.3 18.2 31.5l-1.3 21.3c-.4 7.1 1.5 14.2 5.4 20.1l11.8 17.8c7.3 11 7.3 25.4 0 36.4L366.8 228c-3.9 6-5.8 13-5.4 20.1l1.3 21.3c.8 13.2-6.4 25.6-18.2 31.5l-19.1 9.6c-6.4 3.2-11.5 8.4-14.7 14.7L301 344.5c-5.9 11.8-18.3 19-31.5 18.2l-21.3-1.3c-7.1-.4-14.2 1.5-20.1 5.4l-17.8 11.8c-11 7.3-25.4 7.3-36.4 0L156 366.8c-6-3.9-13-5.8-20.1-5.4l-21.3 1.3c-13.2 .8-25.6-6.4-31.5-18.2l-9.6-19.1c-3.2-6.4-8.4-11.5-14.7-14.7L39.5 301c-11.8-5.9-19-18.3-18.2-31.5l1.3-21.3c.4-7.1-1.5-14.2-5.4-20.1L5.5 210.2c-7.3-11-7.3-25.4 0-36.4L17.2 156c3.9-6 5.8-13 5.4-20.1l-1.3-21.3c-.8-13.2 6.4-25.6 18.2-31.5l19.1-9.6C65 70.2 70.2 65 73.4 58.6L83 39.5c5.9-11.8 18.3-19 31.5-18.2l21.3 1.3c7.1 .4 14.2-1.5 20.1-5.4L173.8 5.5zM272 192a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM1.3 441.8L44.4 339.3c.2 .1 .3 .2 .4 .4l9.6 19.1c11.7 23.2 36 37.3 62 35.8l21.3-1.3c.2 0 .5 0 .7 .2l17.8 11.8c5.1 3.3 10.5 5.9 16.1 7.7l-37.6 89.3c-2.3 5.5-7.4 9.2-13.3 9.7s-11.6-2.2-14.8-7.2L74.4 455.5l-56.1 8.3c-5.7 .8-11.4-1.5-15-6s-4.3-10.7-2.1-16zm248 60.4L211.7 413c5.6-1.8 11-4.3 16.1-7.7l17.8-11.8c.2-.1 .4-.2 .7-.2l21.3 1.3c26 1.5 50.3-12.6 62-35.8l9.6-19.1c.1-.2 .2-.3 .4-.4l43.2 102.5c2.2 5.3 1.4 11.4-2.1 16s-9.3 6.9-15 6l-56.1-8.3-32.2 49.2c-3.2 5-8.9 7.7-14.8 7.2s-11-4.3-13.3-9.7z"
+                    d="M152.1 38.2c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 113C-2.3 103.6-2.3 88.4 7 79s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zm0 160c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 273c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zM224 96c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32zm0 160c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32zM160 416c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H192c-17.7 0-32-14.3-32-32zM48 368a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Review After the Blood Donation Camp
+                  Organizing Activities of the Blood Donation Camp
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
@@ -61,33 +61,27 @@ const StepTen: React.FC<StepperPropsCampaign> = ({
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
                 <ul className="list-disc pl-6 mt-6 space-y-4">
                   <li>
-                    At the end of the blood donation camp, it's important to
-                    <strong className="text-red-700">
-                      {" "}
-                      review the program with the blood bank
-                    </strong>
-                    .
+                    Organizers should ensure a{" "}
+                    <strong className="text-red-700">calm and safe environment</strong> at the blood donation camp.
                   </li>
                   <li>
-                    A successful blood donation camp isn’t just about having a
-                    lot of donors; it’s also about having{" "}
-                    <strong className="text-red-700">
-                      fewer donors who are unsuitable for donation
-                    </strong>
-                    .
+                    The environment should be{" "}
+                    <strong className="text-red-700">free from excessive noise</strong>.
                   </li>
                   <li>
-                    A good blood donation camp also means that the blood donated
-                    doesn't contain any{" "}
-                    <strong className="text-red-700">
-                      harmful pathogens when tested
-                    </strong>
-                    .
+                    Steps should be taken to ensure the{" "}
+                    <strong className="text-red-700">safety of the officers</strong> taking part in the blood donation camp.
                   </li>
                   <li>
-                    By identifying areas for improvement, your future blood
-                    donation camps will be{" "}
-                    <strong className="text-red-700">more successful</strong>.
+                    While the organizer of the blood donation camp maintains the connection with the relevant blood bank, the sub-communities under them—such as the{" "}
+                    <strong className="text-red-700">Blood Donor Searching Community</strong>,{" "}
+                    <strong className="text-red-700">Promotion Community</strong>,{" "}
+                    <strong className="text-red-700">Venue Preparation Community</strong>, and{" "}
+                    <strong className="text-red-700">Catering Community</strong>—can take part in organizing the blood donation camp.
+                  </li>
+                  <li>
+                    In cases where the number of blood donors exceeds the number we are prepared for at a camp, it may not be possible for the National Blood Transfusion Service to collect blood from everyone. In such a case, the details of those blood donors will be gathered, and blood will be collected from them at a{" "}
+                    <strong className="text-red-700">later time</strong> by the National Blood Transfusion Service. It is important to inform the blood donors and your team about this.
                   </li>
                 </ul>
               </div>
@@ -114,4 +108,4 @@ const StepTen: React.FC<StepperPropsCampaign> = ({
   );
 };
 
-export default StepTen;
+export default StepNine;

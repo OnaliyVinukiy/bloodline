@@ -7,9 +7,9 @@
  */
 
 import React from "react";
-import { StepperPropsCampaign } from "../../../types/stepper";
+import { StepperPropsCamps } from "../../../types/stepper";
 
-const StepSix: React.FC<StepperPropsCampaign> = ({
+const StepThree: React.FC<StepperPropsCamps> = ({
   onNextStep,
   onPreviousStep,
 }) => {
@@ -41,11 +41,16 @@ const StepSix: React.FC<StepperPropsCampaign> = ({
                   fill="currentColor"
                   viewBox="0 0 512 512"
                 >
-                  <path d="M441 7l32 32 32 32c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-15-15L417.9 128l55 55c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-72-72L295 73c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l55 55L422.1 56 407 41c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0zM210.3 155.7l61.1-61.1c.3 .3 .6 .7 1 1l16 16 56 56 56 56 16 16c.3 .3 .6 .6 1 1l-191 191c-10.5 10.5-24.7 16.4-39.6 16.4H97.9L41 505c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l57-57V325.3c0-14.9 5.9-29.1 16.4-39.6l43.3-43.3 57 57c6.2 6.2 16.4 6.2 22.6 0s6.2-16.4 0-22.6l-57-57 41.4-41.4 57 57c6.2 6.2 16.4 6.2 22.6 0s6.2-16.4 0-22.6l-57-57z" />
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120V256c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2V120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"
+                  />
                 </svg>
-
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Equipments & Assets Required
+                  Selecting a Time for the Blood Donation Camp
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
@@ -55,30 +60,16 @@ const StepSix: React.FC<StepperPropsCampaign> = ({
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                When organizing a blood donation camp for{" "}
-                <strong className="text-red-700">
-                  approximately 100 donors,
-                </strong>{" "}
-                the following equipment should be arranged to ensure a smooth
-                and comfortable process:
-                <ul className="list-disc pl-6 mt-6 space-y-4">
-                  <li>5 office tables</li>
-                  <li>15 normal chairs</li>
-                  <li>
-                    Chairs or benches for donors to sit (Must accommodate at
-                    least 30 donors at once while waiting or resting after
-                    donation)
-                  </li>
-
-                  <li>7 fans</li>
-
-                  <li>
-                    All necessary medical supplies, beds and other equipment
-                    required for the blood collection process will be provided
-                    by the National Blood Transfusion Service (NBTS) or the
-                    nearest blood bank.
-                  </li>
-                </ul>
+                A blood donation camp is normally held from{" "}
+                <strong className="text-red-700">9:00 AM to 3:00 PM.</strong>{" "}
+                This time frame ensures that the collected blood can be properly
+                processed. Once donated, blood must be separated into blood
+                constituents within six hours. Therefore, blood donation camps
+                cannot exceed this time limit.
+                <br />
+                <br />
+                Planning your camp within this time frame helps ensure that
+                every donation makes the maximum impact in saving lives!
               </div>
             </div>
 
@@ -103,4 +94,4 @@ const StepSix: React.FC<StepperPropsCampaign> = ({
   );
 };
 
-export default StepSix;
+export default StepThree;

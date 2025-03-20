@@ -7,9 +7,9 @@
  */
 
 import React from "react";
-import { StepperPropsCampaign } from "../../../types/stepper";
+import { StepperPropsCamps } from "../../../types/stepper";
 
-const StepOne: React.FC<StepperPropsCampaign> = ({ onNextStep }) => {
+const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
@@ -34,7 +34,7 @@ const StepOne: React.FC<StepperPropsCampaign> = ({ onNextStep }) => {
             <div className="flex justify-center mb-8">
               <img
                 src="/bloodTube.jpg"
-                alt="Blood Donation Campaign"
+                alt="Blood Donation Camp"
                 className="rounded-lg shadow-md w-full max-w-2xl h-64 md:h-80 object-cover"
               />
             </div>
