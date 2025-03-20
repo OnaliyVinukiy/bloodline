@@ -867,7 +867,6 @@ export default function Profile() {
         title={validationModalContent.title}
         content={validationModalContent.content}
       />
-      ;
     </div>
   );
 }
