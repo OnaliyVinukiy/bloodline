@@ -12,7 +12,7 @@ export interface StepperProps {
   formData: any;
 }
 
-export interface StepperPropsCampaign {
+export interface StepperPropsCamps {
   onNextStep: () => void;
   onPreviousStep: () => void;
 }

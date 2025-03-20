@@ -11,6 +11,7 @@ import {
   getOrganizationByEmail,
   uploadLogo,
   upsertOrganization,
+  getAllOrganizations,
 } from "../controllers/organizationController";
 import multer from "multer";
 
@@ -19,6 +20,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 router.get("/organization/:email", getOrganizationByEmail);
+router.get("/all-organizations", getAllOrganizations);
 router.post("/update-organization", upsertOrganization);
 router.post("/upload-logo", upload.single("file"), uploadLogo);
 router.get("/search", searchOrganizations);
