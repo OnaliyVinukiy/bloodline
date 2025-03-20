@@ -12,14 +12,15 @@ import { Navigationbar } from "./components/Navbar";
 import EligibilityCriteria from "./pages/eligibility/Eligibility";
 import Profile from "./pages/profile/Profile";
 import DonorDeclaration from "./pages/appointment/DonorDeclarations";
-import Appointments from "./pages/admin/Appointments";
-import PendingAppointments from "./pages/admin/PendingAppointments";
-import CalendarPage from "./pages/admin/CalendarPage";
-import AppointmentDetails from "./pages/admin/AppointmentDetails";
-import BloodCampaignRegistration from "./pages/campaign/BloodCampRegistration";
+import Appointments from "./pages/admin/appointment/Appointments";
+import PendingAppointments from "./pages/admin/appointment/PendingAppointments";
+import Camps from "./pages/admin/camp/Camps";
+import CalendarPage from "./pages/admin/appointment/CalendarPage";
+import AppointmentDetails from "./pages/admin/appointment/AppointmentDetails";
+import BloodCampRegistration from "./pages/camp/BloodCampRegistration";
 import OrganizationRegistration from "./pages/organization/OrganizationRegistration";
 import DonorAppointments from "./pages/appointment/Appointments";
-import Map from "./pages/campaign/Map";
+import Map from "./pages/camp/Map";
 
 function App() {
   return (
@@ -35,8 +36,8 @@ function App() {
             <Route path="/admin/appointments" element={<Appointments />} />
             <Route path="/appointment/:id" element={<AppointmentDetails />} />
             <Route
-              path="/campaign-registration"
-              element={<BloodCampaignRegistration />}
+              path="/camp-registration"
+              element={<BloodCampRegistration />}
             />
             <Route
               path="/admin/pending-appointments"
@@ -49,6 +50,7 @@ function App() {
             />
             <Route path="/appointments" element={<DonorAppointments />} />
             <Route path="/map" element={<Map />} />
+            <Route path="/admin/camps" element={<Camps />} />
           </Routes>
         </main>
         <FooterComponent />
