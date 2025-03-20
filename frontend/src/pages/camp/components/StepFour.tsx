@@ -7,9 +7,9 @@
  */
 
 import React from "react";
-import { StepperPropsCampaign } from "../../../types/stepper";
+import { StepperPropsCamps } from "../../../types/stepper";
 
-const StepThree: React.FC<StepperPropsCampaign> = ({
+const StepFour: React.FC<StepperPropsCamps> = ({
   onNextStep,
   onPreviousStep,
 }) => {
@@ -46,11 +46,11 @@ const StepThree: React.FC<StepperPropsCampaign> = ({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120V256c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2V120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"
+                    d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM288 176c0-44.2-35.8-80-80-80s-80 35.8-80 80c0 48.8 46.5 111.6 68.6 138.6c6 7.3 16.8 7.3 22.7 0c22.1-27 68.6-89.8 68.6-138.6zm-112 0a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Selecting a Time for the Blood Donation Camp
+                  Selecting a Venue for the Blood Donation Camp
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
@@ -60,16 +60,39 @@ const StepThree: React.FC<StepperPropsCampaign> = ({
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                A blood donation camp is normally held from{" "}
-                <strong className="text-red-700">9:00 AM to 3:00 PM.</strong>{" "}
-                This time frame ensures that the collected blood can be properly
-                processed. Once donated, blood must be separated into blood
-                constituents within six hours. Therefore, blood donation camps
-                cannot exceed this time limit.
-                <br />
-                <br />
-                Planning your camp within this time frame helps ensure that
-                every donation makes the maximum impact in saving lives!
+                Selecting the right venue is essential for a smooth and
+                successful blood donation camp. Here are some key factors to consider:
+                <ul className="list-disc pl-6 mt-6 space-y-4">
+                  <li>
+                    <strong className="text-red-700">
+                      Easily Accessible Location:
+                    </strong>{" "}
+                    A well-known public place ensures better participation and
+                    ease of travel for both donors and staff.
+                  </li>
+                  <li>
+                    <strong className="text-red-700">
+                      Good Transport Access:
+                    </strong>{" "}
+                    The venue should be easily reachable by vehicles, ensuring a
+                    hassle-free experience for donors and medical teams.
+                  </li>
+                  <li>
+                    <strong className="text-red-700">
+                      Clean & Safe Environment:
+                    </strong>{" "}
+                    A permanent building with a clean and hygienic surrounding
+                    is ideal for maintaining health and safety standards.
+                  </li>
+                  <li>
+                    <strong className="text-red-700">Toilet Facilities:</strong>{" "}
+                    Proper restroom facilities must be available for donors and
+                    staff throughout the event.
+                  </li>
+                </ul>
+                <br />A well-planned venue creates a comfortable experience for
+                everyone involved and contributes to a successful blood donation
+                drive!
               </div>
             </div>
 
@@ -94,4 +117,4 @@ const StepThree: React.FC<StepperPropsCampaign> = ({
   );
 };
 
-export default StepThree;
+export default StepFour;

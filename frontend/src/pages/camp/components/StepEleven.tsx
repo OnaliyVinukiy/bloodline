@@ -7,14 +7,14 @@
  */
 
 import React, { useCallback, useEffect, useState } from "react";
-import { StepperPropsCampaign } from "../../../types/stepper";
+import { StepperPropsCamps } from "../../../types/stepper";
 import { Button, Label } from "flowbite-react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import { useAuthContext } from "@asgardeo/auth-react";
 
 const StepEleven: React.FC<
-  StepperPropsCampaign & {
+StepperPropsCamps & {
     selectedDate: Date | null;
     setSelectedDate: (date: Date | null) => void;
     selectedSlot: string | null;

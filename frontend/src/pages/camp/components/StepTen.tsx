@@ -7,9 +7,9 @@
  */
 
 import React from "react";
-import { StepperPropsCampaign } from "../../../types/stepper";
+import { StepperPropsCamps } from "../../../types/stepper";
 
-const StepFour: React.FC<StepperPropsCampaign> = ({
+const StepTen: React.FC<StepperPropsCamps> = ({
   onNextStep,
   onPreviousStep,
 }) => {
@@ -35,64 +35,61 @@ const StepFour: React.FC<StepperPropsCampaign> = ({
                 <svg
                   className="w-12 h-12 text-red-700"
                   aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
                   fill="currentColor"
-                  viewBox="0 0 512 512"
+                  viewBox="0 0 384 512"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
                     stroke="currentColor"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM288 176c0-44.2-35.8-80-80-80s-80 35.8-80 80c0 48.8 46.5 111.6 68.6 138.6c6 7.3 16.8 7.3 22.7 0c22.1-27 68.6-89.8 68.6-138.6zm-112 0a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"
+                    d="M173.8 5.5c11-7.3 25.4-7.3 36.4 0L228 17.2c6 3.9 13 5.8 20.1 5.4l21.3-1.3c13.2-.8 25.6 6.4 31.5 18.2l9.6 19.1c3.2 6.4 8.4 11.5 14.7 14.7L344.5 83c11.8 5.9 19 18.3 18.2 31.5l-1.3 21.3c-.4 7.1 1.5 14.2 5.4 20.1l11.8 17.8c7.3 11 7.3 25.4 0 36.4L366.8 228c-3.9 6-5.8 13-5.4 20.1l1.3 21.3c.8 13.2-6.4 25.6-18.2 31.5l-19.1 9.6c-6.4 3.2-11.5 8.4-14.7 14.7L301 344.5c-5.9 11.8-18.3 19-31.5 18.2l-21.3-1.3c-7.1-.4-14.2 1.5-20.1 5.4l-17.8 11.8c-11 7.3-25.4 7.3-36.4 0L156 366.8c-6-3.9-13-5.8-20.1-5.4l-21.3 1.3c-13.2 .8-25.6-6.4-31.5-18.2l-9.6-19.1c-3.2-6.4-8.4-11.5-14.7-14.7L39.5 301c-11.8-5.9-19-18.3-18.2-31.5l1.3-21.3c.4-7.1-1.5-14.2-5.4-20.1L5.5 210.2c-7.3-11-7.3-25.4 0-36.4L17.2 156c3.9-6 5.8-13 5.4-20.1l-1.3-21.3c-.8-13.2 6.4-25.6 18.2-31.5l19.1-9.6C65 70.2 70.2 65 73.4 58.6L83 39.5c5.9-11.8 18.3-19 31.5-18.2l21.3 1.3c7.1 .4 14.2-1.5 20.1-5.4L173.8 5.5zM272 192a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM1.3 441.8L44.4 339.3c.2 .1 .3 .2 .4 .4l9.6 19.1c11.7 23.2 36 37.3 62 35.8l21.3-1.3c.2 0 .5 0 .7 .2l17.8 11.8c5.1 3.3 10.5 5.9 16.1 7.7l-37.6 89.3c-2.3 5.5-7.4 9.2-13.3 9.7s-11.6-2.2-14.8-7.2L74.4 455.5l-56.1 8.3c-5.7 .8-11.4-1.5-15-6s-4.3-10.7-2.1-16zm248 60.4L211.7 413c5.6-1.8 11-4.3 16.1-7.7l17.8-11.8c.2-.1 .4-.2 .7-.2l21.3 1.3c26 1.5 50.3-12.6 62-35.8l9.6-19.1c.1-.2 .2-.3 .4-.4l43.2 102.5c2.2 5.3 1.4 11.4-2.1 16s-9.3 6.9-15 6l-56.1-8.3-32.2 49.2c-3.2 5-8.9 7.7-14.8 7.2s-11-4.3-13.3-9.7z"
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Selecting a Venue for the Blood Donation Camp
+                  Review After the Blood Donation Camp
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
                 Every drop counts. Let’s make a difference together!
               </div>
             </div>
-
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                Selecting the right venue is essential for a smooth and
-                successful blood donation camp. Here are some key factors to consider:
                 <ul className="list-disc pl-6 mt-6 space-y-4">
                   <li>
+                    At the end of the blood donation camp, it's important to
                     <strong className="text-red-700">
-                      Easily Accessible Location:
-                    </strong>{" "}
-                    A well-known public place ensures better participation and
-                    ease of travel for both donors and staff.
+                      {" "}
+                      review the program with the blood bank
+                    </strong>
+                    .
                   </li>
                   <li>
+                    A successful blood donation camp isn’t just about having a
+                    lot of donors; it’s also about having{" "}
                     <strong className="text-red-700">
-                      Good Transport Access:
-                    </strong>{" "}
-                    The venue should be easily reachable by vehicles, ensuring a
-                    hassle-free experience for donors and medical teams.
+                      fewer donors who are unsuitable for donation
+                    </strong>
+                    .
                   </li>
                   <li>
+                    A good blood donation camp also means that the blood donated
+                    doesn't contain any{" "}
                     <strong className="text-red-700">
-                      Clean & Safe Environment:
-                    </strong>{" "}
-                    A permanent building with a clean and hygienic surrounding
-                    is ideal for maintaining health and safety standards.
+                      harmful pathogens when tested
+                    </strong>
+                    .
                   </li>
                   <li>
-                    <strong className="text-red-700">Toilet Facilities:</strong>{" "}
-                    Proper restroom facilities must be available for donors and
-                    staff throughout the event.
+                    By identifying areas for improvement, your future blood
+                    donation camps will be{" "}
+                    <strong className="text-red-700">more successful</strong>.
                   </li>
                 </ul>
-                <br />A well-planned venue creates a comfortable experience for
-                everyone involved and contributes to a successful blood donation
-                drive!
               </div>
             </div>
 
@@ -117,4 +114,4 @@ const StepFour: React.FC<StepperPropsCampaign> = ({
   );
 };
 
-export default StepFour;
+export default StepTen;

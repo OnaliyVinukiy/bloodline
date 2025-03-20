@@ -7,7 +7,7 @@
  */
 
 import React, { useEffect, useRef, useState } from "react";
-import { StepperPropsCampaign } from "../../../types/stepper";
+import { StepperPropsCamps } from "../../../types/stepper";
 import { Label, Modal, Toast } from "flowbite-react";
 import axios from "axios";
 import { Camp } from "../../../types/camp";
@@ -27,7 +27,7 @@ declare global {
 }
 
 const StepTwelve: React.FC<
-  StepperPropsCampaign & {
+  StepperPropsCamps & {
     selectedDate: Date | null;
     selectedSlot: string | null;
   }
@@ -71,6 +71,7 @@ const StepTwelve: React.FC<
     time: selectedSlot || "",
     googleMapLink: "",
     venue: "",
+    status: "Pending",
   });
 
   const [errors, setErrors] = useState<{ [key in keyof Camp]?: string }>({});
@@ -79,9 +80,39 @@ const StepTwelve: React.FC<
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [organizationOptions, setOrganizationOptions] = useState<string[]>([]);
+  const [allOrganizations, setAllOrganizations] = useState<string[]>([]); // Store all organizations
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { getAccessToken } = useAuthContext();
+
+  // Fetch all organizations on page load
+  useEffect(() => {
+    const fetchAllOrganizations = async () => {
+      try {
+        const response = await axios.get<Organization[]>(
+          `${backendURL}/api/organizations/all-organizations`
+        );
+        const orgNames = response.data.map((org) => org.organizationName);
+        setAllOrganizations(orgNames);
+      } catch (error) {
+        console.error("Error fetching organizations:", error);
+      }
+    };
+
+    fetchAllOrganizations();
+  }, [backendURL]);
+
+  // Filter organizations based on user input
+  useEffect(() => {
+    if (formData.organizationName.trim()) {
+      const filteredOrgs = allOrganizations.filter((org) =>
+        org.toLowerCase().includes(formData.organizationName.toLowerCase())
+      );
+      setOrganizationOptions(filteredOrgs);
+    } else {
+      setOrganizationOptions([]);
+    }
+  }, [formData.organizationName, allOrganizations]);
 
   //Fetch provinces list
   useEffect(() => {
@@ -132,30 +163,6 @@ const StepTwelve: React.FC<
       console.error("Error fetching districts:", error);
     }
   };
-
-  //Search for organization on type
-  useEffect(() => {
-    const searchOrganizations = async () => {
-      if (formData.organizationName.trim()) {
-        try {
-          const response = await axios.get<Organization[]>(
-            `${backendURL}/api/organizations/search?name=${encodeURIComponent(
-              formData.organizationName
-            )}`
-          );
-          const orgNames = response.data.map((org) => org.organizationName);
-          setOrganizationOptions([...new Set(orgNames)]);
-        } catch (error) {
-          console.error("Error fetching organizations:", error);
-        }
-      } else {
-        setOrganizationOptions([]);
-      }
-    };
-
-    const debounceTimer = setTimeout(searchOrganizations, 300);
-    return () => clearTimeout(debounceTimer);
-  }, [formData.organizationName, backendURL]);
 
   const handleProvinceChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -348,6 +355,7 @@ const StepTwelve: React.FC<
             time: selectedSlot || "",
             googleMapLink: "",
             venue: "",
+            status: "Pending",
           });
         }
       } catch (error: any) {
