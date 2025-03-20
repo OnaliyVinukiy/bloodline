@@ -157,9 +157,25 @@ const searchOrganizations = async (req: Request, res: Response) => {
   }
 };
 
+//Fetch all organizations
+const getAllOrganizations = async (req: Request, res: Response) => {
+  try {
+    const { collection, client } = await connectToCosmos();
+
+    const organizations = await collection.find({}).toArray();
+
+    res.status(200).json(organizations);
+    client.close();
+  } catch (error) {
+    console.error("Error fetching organizations:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export {
   getOrganizationByEmail,
   upsertOrganization,
   uploadLogo,
   searchOrganizations,
+  getAllOrganizations,
 };
