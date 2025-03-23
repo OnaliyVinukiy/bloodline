@@ -122,7 +122,10 @@ const AllCamps = () => {
                 Date
               </th>
               <th scope="col" className="px-6 py-3">
-                Time
+                Start Time
+              </th>
+              <th scope="col" className="px-6 py-3">
+                End Time
               </th>
               <th scope="col" className="px-6 py-3">
                 Contact No
@@ -148,9 +151,12 @@ const AllCamps = () => {
                   {camp.organizationName}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">{camp.fullName}</td>
-                <td className="px-6 py-4">{camp.date}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{camp.date}</td>
 
-                <td className="px-6 py-4 whitespace-nowrap">{camp.time}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {camp.startTime}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">{camp.endTime}</td>
 
                 <td className="px-6 py-4 whitespace-nowrap">
                   {camp.contactNumber}
@@ -178,7 +184,7 @@ const AllCamps = () => {
                   </td>
                 )}
 
-                <td className="px-8 py-4 text-center">
+                <td className="px-6 py-4 text-center">
                   <div className="flex justify-center space-x-4">
                     <Link to={`/appointment/${camp._id}`}>
                       <button
