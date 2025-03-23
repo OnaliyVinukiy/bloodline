@@ -184,7 +184,7 @@ const AllCamps = () => {
                   </td>
                 )}
 
-                <td className="px-8 py-4 text-center">
+                <td className="px-6 py-4 text-center">
                   <div className="flex justify-center space-x-4">
                     <Link to={`/camp/${camp._id}`}>
                       <button
