@@ -19,6 +19,7 @@ import CalendarPage from "./pages/admin/appointment/CalendarPage";
 import AppointmentDetails from "./pages/admin/appointment/AppointmentDetails";
 import BloodCampRegistration from "./pages/camp/BloodCampRegistration";
 import OrganizationRegistration from "./pages/organization/OrganizationRegistration";
+import CampDetails from "./pages/admin/camp/CampDetails";
 import DonorAppointments from "./pages/appointment/Appointments";
 import Map from "./pages/camp/Map";
 
@@ -35,6 +36,7 @@ function App() {
             <Route path="/donorDeclaration" element={<DonorDeclaration />} />
             <Route path="/admin/appointments" element={<Appointments />} />
             <Route path="/appointment/:id" element={<AppointmentDetails />} />
+            <Route path="/camp/:id" element={<CampDetails />} />
             <Route
               path="/camp-registration"
               element={<BloodCampRegistration />}
