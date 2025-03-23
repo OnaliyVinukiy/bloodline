@@ -10,12 +10,22 @@ import {
   getCamps,
   getCampsByCity,
   saveCamp,
+  getCampById,
 } from "../controllers/campController";
+import { authenticateUser } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
+//Route to save camp data
 router.post("/register", saveCamp);
+
+//Route to fetch camp data
 router.get("/fetch-camps", getCamps);
+
+//Route to fetch camp data by city
 router.get("/city/:city", getCampsByCity);
+
+//Route to fetch camp data by ID
+router.get("/fetch-camp/:id", authenticateUser, getCampById);
 
 export default router;
