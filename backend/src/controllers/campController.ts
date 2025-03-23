@@ -260,3 +260,46 @@ export const approveCamp = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+//Reject pending camp
+export const rejectCamp = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    if (!reason) {
+      return res.status(400).json({ message: "Rejection reason is required" });
+    }
+
+    // Connect to the database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(CAMP_COLLECTION_ID);
+    const objectId = new ObjectId(id);
+
+    const updatedAppointment = await collection.findOneAndUpdate(
+      { _id: objectId },
+      {
+        $set: {
+          status: "Rejected",
+          reason,
+        },
+      },
+      { returnDocument: "after" }
+    );
+
+    await client.close();
+
+    if (!updatedAppointment) {
+      return res.status(404).json({ message: "Camp not found" });
+    }
+
+    res.status(200).json(updatedAppointment);
+  } catch (error) {
+    console.error("Error updating camp status:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
