@@ -8,7 +8,20 @@
 "use client";
 import React from "react";
 import { Button, Card } from "flowbite-react";
+import { useAuthContext } from "@asgardeo/auth-react";
+import { useNavigate } from "react-router-dom";
 const Cards: React.FC = () => {
+  const { state, signIn } = useAuthContext();
+  const navigate = useNavigate();
+
+  const handleCampSchedule = () => {
+    if (state?.isAuthenticated) {
+      navigate("/camp-registration");
+    } else {
+      signIn();
+    }
+  };
+
   return (
     <div className="flex flex-wrap justify-center gap-8 lg:space-x-40 lg:mt-20 mt-10">
       <Card className="max-w-sm md:w-full sm:w-72">
@@ -59,7 +72,7 @@ const Cards: React.FC = () => {
         <Button
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
-          href="/camp-registration"
+          onClick={handleCampSchedule}
         >
           Request Now
           <svg

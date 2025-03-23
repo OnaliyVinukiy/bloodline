@@ -10,7 +10,7 @@ import PendingCamps from "./PendingCamps";
 import ApprovedCamps from "./ApprovedCamps";
 import RejectedCamps from "./RejectedCamps";
 import AllCamps from "./AllCamps";
-import CalendarPage from "./CalendarPage";
+import CampsCalendar from "./CampsCalendar";
 
 const Camps = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -86,7 +86,7 @@ const Camps = () => {
         {activeTab === "tab2" && <PendingCamps />}
         {activeTab === "tab3" && <ApprovedCamps />}
         {activeTab === "tab4" && <RejectedCamps />}
-        {activeTab === "tab5" && <CalendarPage />}
+        {activeTab === "tab5" && <CampsCalendar />}
       </div>
     </div>
   );

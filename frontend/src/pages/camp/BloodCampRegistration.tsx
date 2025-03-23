@@ -5,12 +5,20 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Stepper from "./components/Stepper";
+import { useAuthContext } from "@asgardeo/auth-react";
 
 const BloodCampRegistration = () => {
   const [activeTab, setActiveTab] = useState("tab1");
   const [step, setStep] = useState(1);
+  const { state, signIn } = useAuthContext();
+
+  useEffect(() => {
+    if (!state?.isAuthenticated) {
+      signIn();
+    }
+  }, [state]);
 
   //Handle next button
   const handleNextStep = () => {
