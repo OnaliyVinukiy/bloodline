@@ -15,7 +15,8 @@ export interface Camp {
   district: string;
   city: string;
   date: string | null;
-  time: string | null;
+  startTime: string | null;
+  endTime: string | null;
   googleMapLink: string;
   venue: string;
   status: string;
