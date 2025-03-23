@@ -184,9 +184,9 @@ const AllCamps = () => {
                   </td>
                 )}
 
-                <td className="px-6 py-4 text-center">
+                <td className="px-8 py-4 text-center">
                   <div className="flex justify-center space-x-4">
-                    <Link to={`/appointment/${camp._id}`}>
+                    <Link to={`/camp/${camp._id}`}>
                       <button
                         className="font-medium text-yellow-400 dark:text-yellow-500 hover:underline"
                         aria-label="View"
@@ -208,7 +208,7 @@ const AllCamps = () => {
                         </svg>
                       </button>
                     </Link>
-                    <Link to={`/appointment/${camp._id}`}>
+                    <Link to={`/camp/${camp._id}`}>
                       <button
                         className="font-medium text-green-600 dark:text-green-500 hover:underline"
                         aria-label="Approve"
@@ -232,7 +232,7 @@ const AllCamps = () => {
                         </svg>
                       </button>
                     </Link>
-                    <Link to={`/appointment/${camp._id}`}>
+                    <Link to={`/camp/${camp._id}`}>
                       <button
                         className="font-medium text-red-600 dark:text-red-500 hover:underline"
                         aria-label="Reject"
