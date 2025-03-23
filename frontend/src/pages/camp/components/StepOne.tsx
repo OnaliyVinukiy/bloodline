@@ -6,10 +6,19 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { StepperPropsCamps } from "../../../types/stepper";
+import { useAuthContext } from "@asgardeo/auth-react";
 
 const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
+  const { state, signIn } = useAuthContext();
+
+  useEffect(() => {
+    if (!state?.isAuthenticated) {
+      signIn();
+    }
+  }, [state]);
+
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
