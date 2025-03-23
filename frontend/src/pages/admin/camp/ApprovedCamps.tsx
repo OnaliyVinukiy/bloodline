@@ -10,7 +10,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "@asgardeo/auth-react";
 
-const AllCamps = () => {
+const ApprovedCamps = () => {
   const [camps, setCamps] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { getAccessToken } = useAuthContext();
@@ -19,19 +19,17 @@ const AllCamps = () => {
     () => getAccessToken(),
     [getAccessToken]
   );
+
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  //Fetch appointments
+  //Fetch approved appointments
   useEffect(() => {
     const fetchCamps = async () => {
       try {
-        setIsLoading(true);
         const token = await memoizedGetAccessToken();
-
-        // Fetch appointments with Authorization header
         const response = await axios.get(
           `${backendURL}/api/camps/fetch-camps`,
           {
@@ -40,8 +38,11 @@ const AllCamps = () => {
             },
           }
         );
-
-        setCamps(response.data);
+        const approvedCamps = response.data.filter(
+          (camp: any) => camp.status === "Approved"
+        );
+        setCamps(approvedCamps);
+        console.log(approvedCamps);
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {
@@ -50,7 +51,7 @@ const AllCamps = () => {
     };
 
     fetchCamps();
-  }, [memoizedGetAccessToken]);
+  }, []);
 
   //Loading animation
   if (isLoading) {
@@ -105,12 +106,12 @@ const AllCamps = () => {
               type="text"
               id="table-search-users"
               className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Search for organizations"
+              placeholder="Search for donors"
             />
           </div>
         </div>
         <table className="mt-4 mb-4 w-full text-md text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead className="text- text-gray-700 uppercase bg-yellow-50 dark:bg-gray-700 dark:text-gray-400">
+          <thead className="text- text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" className="px-6 py-3">
                 Org Name
@@ -164,25 +165,11 @@ const AllCamps = () => {
 
                 <td className="px-6 py-4 whitespace-nowrap">{camp.city}</td>
 
-                {camp.status === "Rejected" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
-                      <button className="red">Rejected</button>
-                    </div>
-                  </td>
-                ) : camp.status === "Approved" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
-                      <button className="green">Approved</button>
-                    </div>
-                  </td>
-                ) : (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
-                      <button className="yellow">Pending</button>
-                    </div>
-                  </td>
-                )}
+                <td className="px-6 py-6 text-center">
+                  <div className="badges flex justify-center">
+                    <button className="green">Approved</button>
+                  </div>
+                </td>
 
                 <td className="px-6 py-4 text-center">
                   <div className="flex justify-center space-x-4">
@@ -266,7 +253,7 @@ const AllCamps = () => {
                   colSpan={6}
                   className="text-center px-6 py-4 text-gray-500 dark:text-gray-400"
                 >
-                  No appointments found.
+                  No approved camps found.
                 </td>
               </tr>
             )}
@@ -277,4 +264,4 @@ const AllCamps = () => {
   );
 };
 
-export default AllCamps;
+export default ApprovedCamps;
