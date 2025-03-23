@@ -6,27 +6,29 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 import { StepperPropsCamps } from "../../../types/stepper";
-import { Button, Label } from "flowbite-react";
-import axios from "axios";
+import { Label } from "flowbite-react";
 import DatePicker from "react-datepicker";
-import { useAuthContext } from "@asgardeo/auth-react";
 
 const StepEleven: React.FC<
-StepperPropsCamps & {
+  StepperPropsCamps & {
     selectedDate: Date | null;
     setSelectedDate: (date: Date | null) => void;
-    selectedSlot: string | null;
-    setSelectedSlot: (slot: string | null) => void;
+    startTime: string | null;
+    setStartTime: (time: string | null) => void;
+    endTime: string | null;
+    setEndTime: (time: string | null) => void;
   }
 > = ({
   onNextStep,
   onPreviousStep,
   selectedDate,
   setSelectedDate,
-  selectedSlot,
-  setSelectedSlot,
+  startTime,
+  setStartTime,
+  endTime,
+  setEndTime,
 }) => {
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -38,77 +40,50 @@ StepperPropsCamps & {
     onPreviousStep();
   };
 
-  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  //Convert the date format
-  const getFormattedDate = (date: Date) => {
-    const offsetDate = new Date(
-      date.getTime() - date.getTimezoneOffset() * 60000
-    );
-    return offsetDate.toISOString().split("T")[0];
-  };
-  const { getAccessToken } = useAuthContext();
-  const memoizedGetAccessToken = useCallback(
-    () => getAccessToken(),
-    [getAccessToken]
-  );
-
-  const backendURL =
-    import.meta.env.VITE_IS_PRODUCTION === "true"
-      ? import.meta.env.VITE_BACKEND_URL
-      : "http://localhost:5000";
-
-  //Fetch booked slots
-  useEffect(() => {
-    if (selectedDate) {
-      setIsLoading(true);
-      const fetchBookedSlots = async () => {
-        const token = await memoizedGetAccessToken();
-        try {
-          const response = await axios.get(
-            `${backendURL}/api/appointments/${getFormattedDate(selectedDate)}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          const slots = response.data.map(
-            (appointment: any) => appointment.selectedSlot
-          );
-          setBookedSlots(slots);
-          setIsLoading(false);
-        } catch (error) {
-          console.error("Error fetching booked slots:", error);
-        }
-      };
-      fetchBookedSlots();
-    }
-  }, [selectedDate]);
-
-  // Generate time slots with intervals
-  const generateTimeSlots = () => {
+  // Generate start time slots (9:00 AM - 2:00 PM)
+  const generateStartTimeSlots = () => {
     const slots = [];
     let start = new Date();
     start.setHours(9, 0, 0, 0);
     const end = new Date();
-    end.setHours(17, 0, 0, 0);
+    end.setHours(14, 0, 0, 0);
 
     while (start <= end) {
-      slots.push(
-        `${start.getHours().toString().padStart(2, "0")}:${start
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`
-      );
+      const time = start.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+      slots.push(time);
       start.setMinutes(start.getMinutes() + 30);
     }
+
     return slots;
   };
 
-  const timeSlots = generateTimeSlots();
+  // Generate end time slots
+  const generateEndTimeSlots = () => {
+    const slots = [];
+    let start = new Date();
+    start.setHours(10, 0, 0, 0);
+    const end = new Date();
+    end.setHours(15, 0, 0, 0);
+
+    while (start <= end) {
+      const time = start.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+      slots.push(time);
+      start.setMinutes(start.getMinutes() + 30);
+    }
+
+    return slots;
+  };
+
+  const startTimeSlots = generateStartTimeSlots();
+  const endTimeSlots = generateEndTimeSlots();
 
   return (
     <div className="flex justify-center bg-white min-h-screen">
@@ -168,7 +143,8 @@ StepperPropsCamps & {
                             date.getTime() + offset * 60000
                           );
                           setSelectedDate(offsetDate);
-                          setSelectedSlot(null);
+                          setStartTime(null);
+                          setEndTime(null);
                         }
                       }}
                       inline
@@ -176,67 +152,53 @@ StepperPropsCamps & {
                       className="bg-indigo-50 border border-indigo-300 text-indigo-900 rounded-lg p-2 w-full"
                     />
                   </div>
-                  {selectedDate && isLoading && (
-                    <div className="loading flex justify-center mt-4">
-                      <svg width="64px" height="48px">
-                        <polyline
-                          points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-                          id="back"
-                          stroke="#e53e3e"
-                          strokeWidth="2"
-                          fill="none"
-                        ></polyline>
-                        <polyline
-                          points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-                          id="front"
-                          stroke="#f56565"
-                          strokeWidth="2"
-                          fill="none"
-                        ></polyline>
-                      </svg>
-                    </div>
-                  )}
-
-                  {selectedDate && !isLoading && (
-                    <div>
-                      <Label
-                        htmlFor="time-slots"
-                        className="block mb-2 text-md font-semibold font-opensans"
-                      >
-                        Select an Available Time Slot
-                      </Label>
-                      <div className="mt-4 flex flex-wrap gap-5">
-                        <div className="mt-4 flex flex-wrap gap-5">
-                          {timeSlots.map((slot, index) => (
-                            <Button
-                              key={index}
-                              onClick={() => setSelectedSlot(slot)}
-                              color={
-                                selectedSlot === slot ? "success" : "light"
-                              }
-                              disabled={bookedSlots.includes(slot)}
-                            >
-                              <svg
-                                className="w-5 h-5 text-black me-2"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  stroke="currentColor"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                />
-                              </svg>
+                  {selectedDate && (
+                    <div className="w-full">
+                      <div className="mb-6">
+                        <Label
+                          htmlFor="start-time"
+                          className="block mb-2 text-md font-semibold font-opensans"
+                        >
+                          Select Start Time
+                        </Label>
+                        <select
+                          id="start-time"
+                          value={startTime || ""}
+                          onChange={(e) => setStartTime(e.target.value)}
+                          className="bg-indigo-50 border border-indigo-300 text-indigo-900 rounded-lg p-2 w-full"
+                        >
+                          <option value="" disabled>
+                            Choose a start time
+                          </option>
+                          {startTimeSlots.map((slot, index) => (
+                            <option key={index} value={slot}>
                               {slot}
-                            </Button>
+                            </option>
                           ))}
-                        </div>
+                        </select>
+                      </div>
+                      <div className="mb-6">
+                        <Label
+                          htmlFor="end-time"
+                          className="block mb-2 text-md font-semibold font-opensans"
+                        >
+                          Select End Time
+                        </Label>
+                        <select
+                          id="end-time"
+                          value={endTime || ""}
+                          onChange={(e) => setEndTime(e.target.value)}
+                          className="bg-indigo-50 border border-indigo-300 text-indigo-900 rounded-lg p-2 w-full"
+                        >
+                          <option value="" disabled>
+                            Choose an end time
+                          </option>
+                          {endTimeSlots.map((slot, index) => (
+                            <option key={index} value={slot}>
+                              {slot}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   )}
@@ -254,11 +216,11 @@ StepperPropsCamps & {
               <button
                 onClick={handleNext}
                 className={`focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ${
-                  !selectedDate || !selectedSlot
+                  !selectedDate || !startTime || !endTime
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
                 }`}
-                disabled={!selectedDate || !selectedSlot}
+                disabled={!selectedDate || !startTime || !endTime}
               >
                 Next
               </button>
