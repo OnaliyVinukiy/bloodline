@@ -7,8 +7,11 @@
  */
 import { Request, Response } from "express";
 import { MongoClient } from "mongodb";
+import nodemailer from "nodemailer";
 import { DATABASE_ID, CAMP_COLLECTION_ID } from "../config/azureConfig";
 import { ObjectId } from "mongodb";
+import { CampApproval } from "../emailTemplates/CampApproval";
+import { CampRejection } from "../emailTemplates/CampRejected";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
 
@@ -248,6 +251,9 @@ export const approveCamp = async (req: Request, res: Response) => {
       { returnDocument: "after" }
     );
 
+    // Send approval email
+    await sendApprovalEmail(updatedCamp);
+
     await client.close();
 
     if (!updatedCamp) {
@@ -280,7 +286,7 @@ export const rejectCamp = async (req: Request, res: Response) => {
     const collection = database.collection(CAMP_COLLECTION_ID);
     const objectId = new ObjectId(id);
 
-    const updatedAppointment = await collection.findOneAndUpdate(
+    const updatedCamp = await collection.findOneAndUpdate(
       { _id: objectId },
       {
         $set: {
@@ -291,15 +297,58 @@ export const rejectCamp = async (req: Request, res: Response) => {
       { returnDocument: "after" }
     );
 
+    // Send rejection email
+    await sendRejectionEmail(updatedCamp);
+
     await client.close();
 
-    if (!updatedAppointment) {
+    if (!updatedCamp) {
       return res.status(404).json({ message: "Camp not found" });
     }
 
-    res.status(200).json(updatedAppointment);
+    res.status(200).json(updatedCamp);
   } catch (error) {
     console.error("Error updating camp status:", error);
     res.status(500).json({ message: "Server error" });
   }
+};
+
+// Send approval email to the donor
+const sendApprovalEmail = async (camp: any) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: camp.email,
+    subject: "Blood Donation Camp Approved",
+    html: CampApproval(camp),
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+// Send rejection email to the donor
+const sendRejectionEmail = async (camp: any) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: camp.email,
+    subject: "Blood Donation Appointment Rejected",
+    html: CampRejection(camp),
+  };
+
+  await transporter.sendMail(mailOptions);
 };
