@@ -95,23 +95,27 @@ export const saveCamp = async (req: Request, res: Response) => {
   }
 
   // Validate time
-  if (!campData.time?.trim()) {
+  if (!campData.startTime?.trim()) {
     errors.push("Time slot is required.");
   }
 
-  // // Validate googleMapLink
-  // if (!campData.googleMapLink?.trim()) {
-  //   errors.push("Google Map link is required.");
-  // } else {
-  //   try {
-  //     const url = new URL(campData.googleMapLink);
-  //     if (!url.hostname.includes("goo.gl")) {
-  //       errors.push("Google Map link must be a valid Google Maps URL.");
-  //     }
-  //   } catch (e) {
-  //     errors.push("Invalid Google Map link URL.");
-  //   }
-  // }
+  if (!campData.endTime?.trim()) {
+    errors.push("Time slot is required.");
+  }
+
+  // Validate googleMapLink
+  if (!campData.googleMapLink?.trim()) {
+    errors.push("Google Map link is required.");
+  } else {
+    try {
+      const url = new URL(campData.googleMapLink);
+      if (!url.hostname.includes("maps.google.com")) {
+        errors.push("Google Map link must be a valid Google Maps URL.");
+      }
+    } catch (e) {
+      errors.push("Invalid Google Map link URL.");
+    }
+  }
 
   if (errors.length > 0) {
     return res.status(400).json({ message: "Validation failed", errors });
