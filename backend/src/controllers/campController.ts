@@ -12,6 +12,7 @@ import { DATABASE_ID, CAMP_COLLECTION_ID } from "../config/azureConfig";
 import { ObjectId } from "mongodb";
 import { CampApproval } from "../emailTemplates/CampApproval";
 import { CampRejection } from "../emailTemplates/CampRejected";
+import { CampConfirmation } from "../emailTemplates/CampConfirmation";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
 
@@ -138,6 +139,9 @@ export const saveCamp = async (req: Request, res: Response) => {
       message: "Camp registered successfully",
       campId: result.insertedId,
     });
+
+    // Send approval email
+    await sendConfirmationEmail(campData);
 
     await client.close();
   } catch (error) {
@@ -348,6 +352,29 @@ const sendRejectionEmail = async (camp: any) => {
     to: camp.email,
     subject: "Blood Donation Appointment Rejected",
     html: CampRejection(camp),
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+// Send confirmation email
+const sendConfirmationEmail = async (camp: any) => {
+  console.log("EMAIL_USER:", process.env.EMAIL_USER);
+  console.log("EMAIL_PASS:", process.env.COSMOS_DB_CONNECTION_STRING);
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: camp.email,
+    subject: "Blood Donation Camp Request Placed",
+    html: CampConfirmation(camp),
   };
 
   await transporter.sendMail(mailOptions);
