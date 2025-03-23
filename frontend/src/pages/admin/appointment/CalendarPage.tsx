@@ -5,8 +5,8 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import  { useState } from "react";
-import PendingAppointments from "./PendingAppointments";
+import { useState } from "react";
+import CampsCalendar from "../camp/CampsCalendar";
 import AppointmentCalendar from "./AppointmentsCalendar";
 
 const CalendarPage = () => {
@@ -44,7 +44,7 @@ const CalendarPage = () => {
 
       <div>
         {activeTab === "tab1" && <AppointmentCalendar />}
-        {activeTab === "tab2" && <PendingAppointments />}
+        {activeTab === "tab2" && <CampsCalendar />}
       </div>
     </div>
   );
