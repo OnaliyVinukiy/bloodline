@@ -29,9 +29,10 @@ declare global {
 const StepTwelve: React.FC<
   StepperPropsCamps & {
     selectedDate: Date | null;
-    selectedSlot: string | null;
+    startTime: string | null;
+    endTime: string | null;
   }
-> = ({ onPreviousStep, selectedDate, selectedSlot }) => {
+> = ({ onPreviousStep, selectedDate, startTime, endTime }) => {
   const handlePrevious = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
@@ -68,7 +69,8 @@ const StepTwelve: React.FC<
     district: "",
     city: "",
     date: selectedDate ? selectedDate.toISOString().split("T")[0] : "",
-    time: selectedSlot || "",
+    startTime: startTime || "",
+    endTime: endTime || "",
     googleMapLink: "",
     venue: "",
     status: "Pending",
@@ -352,7 +354,8 @@ const StepTwelve: React.FC<
             district: "",
             city: "",
             date: selectedDate ? selectedDate.toISOString().split("T")[0] : "",
-            time: selectedSlot || "",
+            startTime: startTime || "",
+            endTime: endTime || "",
             googleMapLink: "",
             venue: "",
             status: "Pending",
