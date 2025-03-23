@@ -12,9 +12,9 @@ import "react-calendar/dist/Calendar.css";
 import { useAuthContext } from "@asgardeo/auth-react";
 
 const CampsCalendar = () => {
-  const [appointments, setAppointments] = useState([]);
+  const [camps, setCamps] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [date, setDate] = useState(new Date());
   const { getAccessToken } = useAuthContext();
 
   const memoizedGetAccessToken = useCallback(
@@ -29,18 +29,18 @@ const CampsCalendar = () => {
 
   //Fetch appointments
   useEffect(() => {
-    const fetchAppointments = async () => {
+    const fetchCamps = async () => {
       try {
         const token = await memoizedGetAccessToken();
         const response = await axios.get(
-          `${backendURL}/api/appointments/fetch-appointment`,
+          `${backendURL}/api/camps/fetch-camps`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        setAppointments(response.data);
+        setCamps(response.data);
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {
@@ -48,14 +48,12 @@ const CampsCalendar = () => {
       }
     };
 
-    fetchAppointments();
+    fetchCamps();
   }, []);
 
   // Filter appointments by selected date
-  const filteredAppointments = appointments.filter(
-    (appointment: any) =>
-      new Date(appointment.selectedDate).toDateString() ===
-      selectedDate.toDateString()
+  const filteredCamps = camps.filter(
+    (camp: any) => new Date(camp.date).toDateString() === date.toDateString()
   );
 
   //Loading animation
@@ -85,24 +83,27 @@ const CampsCalendar = () => {
   return (
     <div className="flex flex-col items-center mt-8">
       <Calendar
-        onChange={(date) => setSelectedDate(date as Date)}
-        value={selectedDate}
+        onChange={(date) => setDate(date as Date)}
+        value={date}
         className="custom-calendar"
         tileClassName="text-center p-2 rounded-md transition duration-200 hover:bg-blue-500 hover:text-white"
       />
 
       <div className="mt-8 relative overflow-x-auto shadow-md sm:rounded-lg max-w-7xl w-full mb-20">
         <h2 className="text-lg font-semibold text-center mb-4">
-          Appointments for {selectedDate.toDateString()}
+          Appointments for {date.toDateString()}
         </h2>
         <table className="mt-4 mb-4 w-full text-md text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text- text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" className="px-6 py-3">
-                Time
+                Start Time
               </th>
               <th scope="col" className="px-6 py-3">
-                Name
+                End Time
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Org
               </th>
               <th scope="col" className="px-6 py-3">
                 NIC
@@ -116,27 +117,26 @@ const CampsCalendar = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredAppointments.map((appointment: any) => (
+            {filteredCamps.map((camp: any) => (
               <tr
-                key={appointment._id}
+                key={camp._id}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
               >
-                <td className="px-6 py-4">{appointment.selectedSlot}</td>
+                <td className="px-6 py-4">{camp.startTime}</td>
+                <td className="px-6 py-4">{camp.endTime}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {appointment.donorInfo.fullName}
+                  {camp.organizationName}
                 </td>
 
-                <td className="px-6 py-4">{appointment.donorInfo.nic}</td>
-                <td className="px-6 py-4">
-                  {appointment.donorInfo.contactNumber}
-                </td>
-                {appointment.status === "Rejected" ? (
+                <td className="px-6 py-4">{camp.fullName}</td>
+                <td className="px-6 py-4">{camp.contactNumber}</td>
+                {camp.status === "Rejected" ? (
                   <td className="px-6 py-6 text-center">
                     <div className="badges flex justify-center">
                       <button className="red">Rejected</button>
                     </div>
                   </td>
-                ) : appointment.status === "Approved" ? (
+                ) : camp.status === "Approved" ? (
                   <td className="px-6 py-6 text-center">
                     <div className="badges flex justify-center">
                       <button className="green">Approved</button>
@@ -151,10 +151,10 @@ const CampsCalendar = () => {
                 )}
               </tr>
             ))}
-            {filteredAppointments.length === 0 && (
+            {filteredCamps.length === 0 && (
               <tr>
                 <td colSpan={5} className="text-center px-6 py-4 text-gray-500">
-                  No appointments found.
+                  No camps found.
                 </td>
               </tr>
             )}

@@ -37,7 +37,8 @@ const Stepper = ({
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<string | null>(null);
+  const [endTime, setEndTime] = useState<string | null>(null);
 
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -198,8 +199,10 @@ const Stepper = ({
           onPreviousStep={onPreviousStep}
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
-          selectedSlot={selectedSlot}
-          setSelectedSlot={setSelectedSlot}
+          startTime={startTime}
+          setStartTime={setStartTime}
+          endTime={endTime}
+          setEndTime={setEndTime}
         />
       )}
       {step === 12 && (
@@ -207,7 +210,8 @@ const Stepper = ({
           onNextStep={onNextStep}
           onPreviousStep={onPreviousStep}
           selectedDate={selectedDate}
-          selectedSlot={selectedSlot}
+          startTime={startTime}
+          endTime={endTime}
         />
       )}
     </div>
