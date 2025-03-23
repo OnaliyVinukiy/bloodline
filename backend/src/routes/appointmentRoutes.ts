@@ -22,9 +22,13 @@ const router = express.Router();
 // Route to save appointment data
 router.post("/save-appointment", authenticateUser, saveAppointment);
 
-//Routes to fetch appointment data
+//Route to fetch appointment data
 router.get("/fetch-appointment", authenticateUser, getAppointments);
+
+//Route to fetch appointment from ID
 router.get("/fetch-appointment/:id", authenticateUser, getAppointmentById);
+
+//Route to fetch appointment data from email
 router.get(
   "/fetch-appointments/:email",
   authenticateUser,
