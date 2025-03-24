@@ -13,6 +13,7 @@ import {
   getCampById,
   approveCamp,
   rejectCamp,
+  allocateTeam,
 } from "../controllers/campController";
 import { authenticateUser } from "../middleware/authMiddleware";
 
@@ -35,5 +36,8 @@ router.put("/approve-camp/:id", authenticateUser, approveCamp);
 
 // Route to reject camp
 router.put("/reject-camp/:id", authenticateUser, rejectCamp);
+
+// Route to allocate a team
+router.put("/allocate-team", authenticateUser, allocateTeam);
 
 export default router;
