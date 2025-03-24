@@ -317,6 +317,42 @@ export const rejectCamp = async (req: Request, res: Response) => {
   }
 };
 
+export const allocateTeam = async (req: Request, res: Response) => {
+  try {
+    const { campId, team } = req.body;
+
+    if (!campId || !team) {
+      return res.status(400).json({ message: "Camp ID and Team are required" });
+    }
+
+    // Connect to the database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(CAMP_COLLECTION_ID);
+    const objectId = new ObjectId(campId);
+
+    // Update the camp with the allocated team
+    const updatedCamp = await collection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: { team } },
+      { returnDocument: "after" }
+    );
+
+    await client.close();
+
+    if (!updatedCamp) {
+      return res.status(404).json({ message: "Camp not found" });
+    }
+
+    res.status(200).json(updatedCamp);
+  } catch (error) {
+    console.error("Error allocating team:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 // Send approval email to the donor
 const sendApprovalEmail = async (camp: any) => {
   const transporter = nodemailer.createTransport({
