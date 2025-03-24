@@ -9,19 +9,8 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { Camp } from "../../../types/camp";
 
-interface Camp {
-  _id: string;
-  organizationName: string;
-  fullName: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  contactNumber: string;
-  city: string;
-  status: string;
-  team: string;
-}
 const AllCamps = () => {
   const [camps, setCamps] = useState<Camp[]>([]);
   const [isLoading, setIsLoading] = useState(true);
