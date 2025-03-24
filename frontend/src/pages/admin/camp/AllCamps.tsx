@@ -10,10 +10,25 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "@asgardeo/auth-react";
 
+interface Camp {
+  _id: string;
+  organizationName: string;
+  fullName: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  contactNumber: string;
+  city: string;
+  status: string;
+  team: string;
+}
 const AllCamps = () => {
-  const [camps, setCamps] = useState([]);
+  const [camps, setCamps] = useState<Camp[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { getAccessToken } = useAuthContext();
+  const [selectedCamp, setSelectedCamp] = useState<string | null>(null);
+  const [selectedTeam, setSelectedTeam] = useState<string>("");
+  const teams = ["Team 1", "Team 2", "Team 3", "Team 4"];
 
   const memoizedGetAccessToken = useCallback(
     () => getAccessToken(),
@@ -51,6 +66,29 @@ const AllCamps = () => {
 
     fetchCamps();
   }, [memoizedGetAccessToken]);
+
+  //Allocate selected team for camp
+  const allocateTeam = async () => {
+    if (!selectedCamp || !selectedTeam) return;
+
+    try {
+      const token = await memoizedGetAccessToken();
+      await axios.put(
+        `${backendURL}/api/camps/allocate-team`,
+        { campId: selectedCamp, team: selectedTeam },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setCamps(
+        camps.map((c) =>
+          c._id === selectedCamp ? { ...c, team: selectedTeam } : c
+        )
+      );
+      setSelectedCamp(null);
+    } catch (error) {
+      console.error("Error allocating team:", error);
+    }
+  };
 
   //Loading animation
   if (isLoading) {
@@ -137,6 +175,9 @@ const AllCamps = () => {
                 Status
               </th>
               <th scope="col" className="px-6 py-3 text-center">
+                Team
+              </th>
+              <th scope="col" className="px-6 py-3 text-center">
                 Action
               </th>
             </tr>
@@ -183,10 +224,31 @@ const AllCamps = () => {
                     </div>
                   </td>
                 )}
+                <td className="px-6 py-4 whitespace-nowrap text-center">
+                  {camp.team === "None" ? (
+                    <div className="badges flex justify-center">
+                      <button
+                        className=" blue text-sm hover:bg-blue-200"
+                        onClick={() => setSelectedCamp(camp._id)}
+                      >
+                        Allocate
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="badges flex justify-center">
+                      <button
+                        className=" cyan text-sm "
+                        onClick={() => setSelectedCamp(camp._id)}
+                      >
+                        {camp.team}
+                      </button>
+                    </div>
+                  )}
+                </td>
 
                 <td className="px-6 py-4 text-center">
                   <div className="flex justify-center space-x-4">
-                    <Link to={`/camp/${camp._id}`}>
+                    <Link to={`/appointment/${camp._id}`}>
                       <button
                         className="font-medium text-yellow-400 dark:text-yellow-500 hover:underline"
                         aria-label="View"
@@ -208,7 +270,7 @@ const AllCamps = () => {
                         </svg>
                       </button>
                     </Link>
-                    <Link to={`/camp/${camp._id}`}>
+                    <Link to={`/appointment/${camp._id}`}>
                       <button
                         className="font-medium text-green-600 dark:text-green-500 hover:underline"
                         aria-label="Approve"
@@ -232,7 +294,7 @@ const AllCamps = () => {
                         </svg>
                       </button>
                     </Link>
-                    <Link to={`/camp/${camp._id}`}>
+                    <Link to={`/appointment/${camp._id}`}>
                       <button
                         className="font-medium text-red-600 dark:text-red-500 hover:underline"
                         aria-label="Reject"
@@ -272,6 +334,40 @@ const AllCamps = () => {
             )}
           </tbody>
         </table>
+
+        {/* Allocate team modal */}
+        {selectedCamp && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <h2 className="text-lg font-semibold mb-4">Allocate a Team</h2>
+              <select
+                className="border p-2 rounded-md w-full"
+                onChange={(e) => setSelectedTeam(e.target.value)}
+              >
+                <option value="">Select a team</option>
+                {teams.map((team) => (
+                  <option key={team} value={team}>
+                    {team}
+                  </option>
+                ))}
+              </select>
+              <div className="flex justify-end mt-4">
+                <button
+                  className="mr-2 px-4 py-2 bg-gray-300 rounded"
+                  onClick={() => setSelectedCamp(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 bg-blue-500 text-white rounded"
+                  onClick={allocateTeam}
+                >
+                  Allocate
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
