@@ -56,7 +56,7 @@ const connectToCosmos = async () => {
 };
 
 // Fetch user info from Asgardeo API
-const getUserInfo = async (req: Request, res: Response) => {
+export const getUserInfo = async (req: Request, res: Response) => {
   const { accessToken } = req.body;
 
   // Log token for debugging
@@ -104,7 +104,7 @@ const getUserInfo = async (req: Request, res: Response) => {
 };
 
 // Handle avatar upload to Azure Blob Storage
-const uploadAvatar = async (req: Request, res: Response) => {
+export const uploadAvatar = async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -141,7 +141,7 @@ const uploadAvatar = async (req: Request, res: Response) => {
 };
 
 // Create or update donor record in DB
-const upsertDonor = async (req: Request, res: Response) => {
+export const upsertDonor = async (req: Request, res: Response) => {
   const donor = req.body;
 
   try {
@@ -164,8 +164,28 @@ const upsertDonor = async (req: Request, res: Response) => {
   }
 };
 
+//Fetch all donors
+export const getDonors = async (req: Request, res: Response) => {
+  try {
+    //Connect to database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(DONOR_COLLECTION_ID);
+
+    const donors = await collection.find({}).toArray();
+
+    res.status(200).json(donors);
+    await client.close();
+  } catch (error) {
+    console.error("Error fetching donors:", error);
+    res.status(500).json({ message: "Error fetching donors", error });
+  }
+};
+
 //Fetch donor by email
-const getDonorByEmail = async (req: Request, res: Response) => {
+export const getDonorByEmail = async (req: Request, res: Response) => {
   try {
     const { collection, client } = await connectToCosmos();
     const { email } = req.params;
@@ -183,4 +203,22 @@ const getDonorByEmail = async (req: Request, res: Response) => {
   }
 };
 
-export { getUserInfo, uploadAvatar, upsertDonor, getDonorByEmail };
+//Fetch donor count
+export const getDonorsCount = async (req: Request, res: Response) => {
+  try {
+    //Connect to database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(DONOR_COLLECTION_ID);
+
+    //Fetch donor count
+    const count = await collection.countDocuments();
+    res.status(200).json({ count });
+
+    await client.close();
+  } catch (error) {
+    console.error("Error fetching donor count:", error);
+    res.status(500).json({ message: "Error fetching donor count", error });
+  }
+};
