@@ -12,16 +12,30 @@ import {
   upsertDonor,
   uploadAvatar,
   getDonorByEmail,
+  getDonors,
+  getDonorsCount,
 } from "../controllers/userController";
 
 const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-//User routes
+//Router to fetch user info
 router.post("/user-info", getUserInfo);
+
+//Router to upload avatar
 router.post("/upload-avatar", upload.single("file"), uploadAvatar);
+
+//Router to update donor data
 router.post("/update-donor", upsertDonor);
+
+//Router to fetch donor by email
 router.get("/donor/:email", getDonorByEmail);
+
+//Router to fetch all donors
+router.get("/donors", getDonors);
+
+//Router to fetch donor count
+router.get("/donors/count", getDonorsCount);
 
 export default router;
