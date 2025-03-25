@@ -10,7 +10,6 @@ import PendingCamps from "./PendingCamps";
 import ApprovedCamps from "./ApprovedCamps";
 import RejectedCamps from "./RejectedCamps";
 import AllCamps from "./AllCamps";
-import CampsCalendar from "./CampsCalendar";
 
 const Camps = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -66,18 +65,6 @@ const Camps = () => {
               Rejected
             </button>
           </li>
-          <li className="me-2">
-            <button
-              onClick={() => setActiveTab("tab5")}
-              className={`px-6 py-3 rounded-t-lg transition-colors duration-300 ${
-                activeTab === "tab5"
-                  ? "text-white bg-red-800 border-b-0"
-                  : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
-              }`}
-            >
-              Calendar
-            </button>
-          </li>
         </ul>
       </div>
 
@@ -86,7 +73,6 @@ const Camps = () => {
         {activeTab === "tab2" && <PendingCamps />}
         {activeTab === "tab3" && <ApprovedCamps />}
         {activeTab === "tab4" && <RejectedCamps />}
-        {activeTab === "tab5" && <CampsCalendar />}
       </div>
     </div>
   );
