@@ -74,6 +74,7 @@ const StepTwelve: React.FC<
     googleMapLink: "",
     venue: "",
     status: "Pending",
+    team: "None",
   });
 
   const [errors, setErrors] = useState<{ [key in keyof Camp]?: string }>({});
@@ -359,6 +360,7 @@ const StepTwelve: React.FC<
             googleMapLink: "",
             venue: "",
             status: "Pending",
+            team: "None",
           });
         }
       } catch (error: any) {

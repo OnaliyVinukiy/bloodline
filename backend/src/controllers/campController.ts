@@ -13,6 +13,7 @@ import { ObjectId } from "mongodb";
 import { CampApproval } from "../emailTemplates/CampApproval";
 import { CampRejection } from "../emailTemplates/CampRejected";
 import { CampConfirmation } from "../emailTemplates/CampConfirmation";
+import Camp from "../models/donationCampModel";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
 
@@ -414,4 +415,78 @@ const sendConfirmationEmail = async (camp: any) => {
   };
 
   await transporter.sendMail(mailOptions);
+};
+
+// Check teams availability
+export const checkTeamAvailability = async (req: Request, res: Response) => {
+  const { date } = req.query;
+
+  if (!date) {
+    return res.status(400).json({
+      success: false,
+      message: "Date parameter is required",
+    });
+  }
+
+  // Validate date format (YYYY-MM-DD)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date as string)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid date format. Use YYYY-MM-DD",
+    });
+  }
+
+  let client: MongoClient;
+
+  try {
+    // Connect to the database
+    client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(CAMP_COLLECTION_ID);
+
+    // Find all camps for the specified date
+    const camps = await collection
+      .find({ date })
+      .project({ team: 1, status: 1 })
+      .toArray();
+
+    // Check team availability
+    const allocatedTeams = camps.map((camp) => camp.team);
+    const allTeams = ["Team 1", "Team 2", "Team 3", "Team 4"];
+    const availableTeams = allTeams.filter(
+      (team) => !allocatedTeams.includes(team)
+    );
+
+    // Check if there are pending camps
+    const pendingCamps = camps.filter(
+      (camp) => camp.status === "Pending"
+    ).length;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalCamps: camps.length,
+        allocatedTeams,
+        availableTeams,
+        pendingCamps,
+        isFullyBooked: availableTeams.length === 0,
+        hasPendingCamps: pendingCamps > 0,
+      },
+    });
+  } catch (error) {
+    console.error("Error checking camp availability:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while checking camp availability",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  } finally {
+    if (client!) {
+      await client
+        .close()
+        .catch((err) => console.error("Error closing connection:", err));
+    }
+  }
 };

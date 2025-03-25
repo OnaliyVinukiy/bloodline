@@ -109,6 +109,14 @@
   border: 1px rgb(239 68 68) solid;
 }
 
+.badges .cyan {
+  background-color: rgba(48, 213, 200, 0.1);
+  color: rgb(3, 176, 162);
+  border-radius: 9999px;
+  padding: 2px 10px;
+  border: 1px solid rgb(3, 176, 162);
+}
+
 .custom-calendar {
   border-radius: 10px;
   overflow: hidden;
