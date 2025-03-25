@@ -174,6 +174,27 @@ export const getCamps = async (req: Request, res: Response) => {
   }
 };
 
+//Fetch count of all camps
+export const getCampsCount = async (req: Request, res: Response) => {
+  try {
+    //Connect to database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(CAMP_COLLECTION_ID);
+
+    //Fetch count of all camps
+    const count = await collection.countDocuments();
+    res.status(200).json({ count });
+
+    await client.close();
+  } catch (error) {
+    console.error("Error fetching camp count:", error);
+    res.status(500).json({ message: "Error fetching camp count", error });
+  }
+};
+
 export const getCampsByCity = async (req: Request, res: Response) => {
   const { city } = req.params;
 
