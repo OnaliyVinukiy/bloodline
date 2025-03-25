@@ -35,6 +35,8 @@ const StepEleven: React.FC<
   const [availabilityMessage, setAvailabilityMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<"error" | "warning">("warning");
+  const [availabilityChecked, setAvailabilityChecked] = useState(false);
+  const [isFullyBooked, setIsFullyBooked] = useState(false);
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
@@ -61,6 +63,8 @@ const StepEleven: React.FC<
   const checkDateAvailability = async (date: Date) => {
     try {
       setLoading(true);
+      setAvailabilityChecked(false);
+      setIsFullyBooked(false);
       const formattedDate = date.toISOString().split("T")[0];
       const response = await axios.get(
         `${backendURL}/api/camps/availability?date=${formattedDate}`
@@ -69,6 +73,8 @@ const StepEleven: React.FC<
       if (response.data.success) {
         const { availableTeams, isFullyBooked, hasPendingCamps } =
           response.data.data;
+
+        setIsFullyBooked(isFullyBooked);
 
         if (isFullyBooked) {
           setAvailabilityMessage(
@@ -86,6 +92,7 @@ const StepEleven: React.FC<
           setAvailabilityMessage("");
           setShowModal(false);
         }
+        setAvailabilityChecked(true);
       } else {
         throw new Error(
           response.data.message || "Failed to check availability"
@@ -96,6 +103,7 @@ const StepEleven: React.FC<
       setAvailabilityMessage("Error checking date availability");
       setModalType("error");
       setShowModal(true);
+      setIsFullyBooked(false);
     } finally {
       setLoading(false);
     }
@@ -250,6 +258,7 @@ const StepEleven: React.FC<
                           setSelectedDate(offsetDate);
                           setStartTime(null);
                           setEndTime(null);
+                          setAvailabilityChecked(false);
                         }
                       }}
                       inline
@@ -257,7 +266,27 @@ const StepEleven: React.FC<
                       className="bg-indigo-50 border border-indigo-300 text-indigo-900 rounded-lg p-2 w-full"
                     />
                   </div>
-                  {selectedDate && (
+
+                  {loading ? (
+                    <div className=" loading flex flex-col items-center justify-center py-8">
+                      <svg width="64px" height="48px">
+                        <polyline
+                          points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+                          id="back"
+                          stroke="#e53e3e"
+                          strokeWidth="2"
+                          fill="none"
+                        ></polyline>
+                        <polyline
+                          points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+                          id="front"
+                          stroke="#f56565"
+                          strokeWidth="2"
+                          fill="none"
+                        ></polyline>
+                      </svg>
+                    </div>
+                  ) : selectedDate && availabilityChecked && !isFullyBooked ? (
                     <div className="w-full">
                       <div className="mb-6">
                         <Label
@@ -306,7 +335,7 @@ const StepEleven: React.FC<
                         </select>
                       </div>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -324,7 +353,8 @@ const StepEleven: React.FC<
                   !selectedDate ||
                   !startTime ||
                   !endTime ||
-                  availabilityMessage.includes("All teams are allocated")
+                  isFullyBooked ||
+                  !availabilityChecked
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
                 }`}
@@ -332,7 +362,8 @@ const StepEleven: React.FC<
                   !selectedDate ||
                   !startTime ||
                   !endTime ||
-                  availabilityMessage.includes("All teams are allocated")
+                  isFullyBooked ||
+                  !availabilityChecked
                 }
               >
                 Next
