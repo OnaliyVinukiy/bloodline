@@ -22,6 +22,7 @@ import OrganizationRegistration from "./pages/organization/OrganizationRegistrat
 import CampDetails from "./pages/admin/camp/CampDetails";
 import DonorAppointments from "./pages/appointment/Appointments";
 import Map from "./pages/camp/Map";
+import Dashboard from "./pages/admin/dashboard/Dashboard";
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
             <Route path="/appointments" element={<DonorAppointments />} />
             <Route path="/map" element={<Map />} />
             <Route path="/admin/camps" element={<Camps />} />
+            <Route path="/admin/dashboard" element={<Dashboard />} />
           </Routes>
         </main>
         <FooterComponent />
