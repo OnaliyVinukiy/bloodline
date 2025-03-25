@@ -111,7 +111,9 @@ const ScheduleForm: React.FC<StepperProps> = ({
         const token = await memoizedGetAccessToken();
         try {
           const response = await axios.get(
-            `${backendURL}/api/appointments/${getFormattedDate(selectedDate)}`,
+            `${backendURL}/api/appointments/fetch-appointments/${getFormattedDate(
+              selectedDate
+            )}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
