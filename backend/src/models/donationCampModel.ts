@@ -8,17 +8,21 @@
 import mongoose from "mongoose";
 
 const CampSchema = new mongoose.Schema({
-  organizerName: { type: String },
+  organizationName: { type: String },
+  fullName: { type: String },
   nic: { type: String, required: true },
   email: { type: String, required: true },
   contact: { type: String, required: true },
   date: { type: String, required: true },
-  time: { type: String, required: true },
+  startTime: { type: String, required: true },
+  endTime: { type: String, required: true },
   province: { type: String, required: true },
   district: { type: String, required: true },
   city: { type: String, required: true },
-  organization: { type: String },
+  venue: { type: String, required: true },
+  googleMapLink: { type: String, required: true },
   status: { type: String, default: "Pending" },
+  team: { type: String, default: "None" },
 });
 
 const Camp = mongoose.model("Camp", CampSchema);

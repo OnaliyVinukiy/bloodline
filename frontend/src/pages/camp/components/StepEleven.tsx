@@ -6,10 +6,11 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StepperPropsCamps } from "../../../types/stepper";
-import { Label } from "flowbite-react";
+import { Label, Modal } from "flowbite-react";
 import DatePicker from "react-datepicker";
+import axios from "axios";
 
 const StepEleven: React.FC<
   StepperPropsCamps & {
@@ -30,6 +31,15 @@ const StepEleven: React.FC<
   endTime,
   setEndTime,
 }) => {
+  const [loading, setLoading] = useState(false);
+  const [availabilityMessage, setAvailabilityMessage] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState<"error" | "warning">("warning");
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
+
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
@@ -38,6 +48,57 @@ const StepEleven: React.FC<
   const handlePrevious = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
+  };
+
+  // Fetch camps for selected date
+  useEffect(() => {
+    if (selectedDate) {
+      checkDateAvailability(selectedDate);
+    }
+  }, [selectedDate]);
+
+  //Check teams availability
+  const checkDateAvailability = async (date: Date) => {
+    try {
+      setLoading(true);
+      const formattedDate = date.toISOString().split("T")[0];
+      const response = await axios.get(
+        `${backendURL}/api/camps/availability?date=${formattedDate}`
+      );
+
+      if (response.data.success) {
+        const { availableTeams, isFullyBooked, hasPendingCamps } =
+          response.data.data;
+
+        if (isFullyBooked) {
+          setAvailabilityMessage(
+            "All medical teams are allocated on this day. Please select another date."
+          );
+          setModalType("error");
+          setShowModal(true);
+        } else if (hasPendingCamps) {
+          setAvailabilityMessage(
+            `There are pending camps on this day. ${availableTeams.length} medical team(s) available. Allocation will be on a first-come basis.`
+          );
+          setModalType("warning");
+          setShowModal(true);
+        } else {
+          setAvailabilityMessage("");
+          setShowModal(false);
+        }
+      } else {
+        throw new Error(
+          response.data.message || "Failed to check availability"
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching camps:", error);
+      setAvailabilityMessage("Error checking date availability");
+      setModalType("error");
+      setShowModal(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Generate start time slots (9:00 AM - 2:00 PM)
@@ -88,6 +149,49 @@ const StepEleven: React.FC<
   return (
     <div className="flex justify-center bg-white min-h-screen">
       <main className="mt-0 mb-8 w-full max-w-4xl px-4 py-8">
+        {/* Availability Modal */}
+        <Modal show={showModal} onClose={() => setShowModal(false)}>
+          <Modal.Header className="flex items-center gap-2 ">
+            <p
+              className={`flex items-center gap-2 text-xl ${
+                modalType === "error" ? "text-red-600" : "text-yellow-600"
+              }`}
+            >
+              <svg
+                className={`w-6 h-6 ${
+                  modalType === "error" ? "text-red-600" : "text-yellow-600"
+                }`}
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                />
+              </svg>
+              {modalType === "error" ? "No Available Teams" : "Pending Camps"}
+            </p>
+          </Modal.Header>
+          <Modal.Body>
+            <p className="text-lg text-gray-700">{availabilityMessage}</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <button
+              className="bg-red-800 ml-auto hover:bg-red-700 text-white font-medium rounded-lg px-5 py-2.5"
+              onClick={() => setShowModal(false)}
+            >
+              OK
+            </button>
+          </Modal.Footer>
+        </Modal>
+
         <div className="relative bg-white rounded-xl shadow-2xl overflow-hidden p-1">
           <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-800 rounded-xl z-0"></div>
 
@@ -116,7 +220,7 @@ const StepEleven: React.FC<
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
-                Every drop counts. Let’s make a difference together!
+                Every drop counts. Let's make a difference together!
               </div>
             </div>
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
@@ -126,6 +230,7 @@ const StepEleven: React.FC<
                     Pick a date and time slot for the blood donation camp
                   </p>
                 </div>
+
                 <div className="flex flex-col items-center p-4">
                   <div className="mb-6">
                     <Label
@@ -216,11 +321,19 @@ const StepEleven: React.FC<
               <button
                 onClick={handleNext}
                 className={`focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ${
-                  !selectedDate || !startTime || !endTime
+                  !selectedDate ||
+                  !startTime ||
+                  !endTime ||
+                  availabilityMessage.includes("All teams are allocated")
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
                 }`}
-                disabled={!selectedDate || !startTime || !endTime}
+                disabled={
+                  !selectedDate ||
+                  !startTime ||
+                  !endTime ||
+                  availabilityMessage.includes("All teams are allocated")
+                }
               >
                 Next
               </button>
