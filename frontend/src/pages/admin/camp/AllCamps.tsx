@@ -16,6 +16,7 @@ const AllCamps = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { getAccessToken } = useAuthContext();
   const [selectedCamp, setSelectedCamp] = useState<string | null>(null);
+  const [isAllocating, setIsAllocating] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<string>("");
   const teams = ["Team 1", "Team 2", "Team 3", "Team 4", "None"];
 
@@ -61,6 +62,7 @@ const AllCamps = () => {
     if (!selectedCamp || !selectedTeam) return;
 
     try {
+      setIsAllocating(true);
       const token = await memoizedGetAccessToken();
 
       //Check team allocation
@@ -100,6 +102,8 @@ const AllCamps = () => {
     } catch (error) {
       console.error("Error allocating team:", error);
       alert("Failed to allocate team. Please try again.");
+    } finally {
+      setIsAllocating(false);
     }
   };
 
@@ -358,48 +362,108 @@ const AllCamps = () => {
 
         {/* Allocate team modal */}
         {selectedCamp && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h2 className="text-lg font-semibold mb-4">Allocate a Team</h2>
-              <select
-                className="border p-2 rounded-md w-full"
-                onChange={(e) => setSelectedTeam(e.target.value)}
-                value={selectedTeam}
-              >
-                <option value="">Select a team</option>
-                {(() => {
-                  const campToAllocate = camps.find(
-                    (c) => c._id?.toString() === selectedCamp
-                  );
-                  if (!campToAllocate) return null;
-
-                  const availableTeams = campToAllocate.date
-                    ? getAvailableTeams(campToAllocate.date)
-                    : [];
-
-                  return availableTeams.map((team) => (
-                    <option key={team} value={team}>
-                      {team}
-                    </option>
-                  ));
-                })()}
-              </select>
-              <div className="flex justify-end mt-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+            <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Allocate Medical Team
+                </h2>
                 <button
-                  className="mr-2 px-4 py-2 bg-gray-300 rounded"
                   onClick={() => {
                     setSelectedCamp(null);
                     setSelectedTeam("");
                   }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Team
+                </label>
+                <select
+                  className="block w-full px-4 py-3 text-base text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-red-500 focus:border-red-500"
+                  onChange={(e) => setSelectedTeam(e.target.value)}
+                  value={selectedTeam}
+                >
+                  <option value="">Choose a medical team</option>
+                  {(() => {
+                    const campToAllocate = camps.find(
+                      (c) => c._id?.toString() === selectedCamp
+                    );
+                    if (!campToAllocate) return null;
+
+                    const availableTeams = campToAllocate.date
+                      ? getAvailableTeams(campToAllocate.date)
+                      : [];
+
+                    return availableTeams.map((team) => (
+                      <option key={team} value={team}>
+                        {team}
+                      </option>
+                    ));
+                  })()}
+                </select>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => {
+                    setSelectedCamp(null);
+                    setSelectedTeam("");
+                  }}
+                  className="px-5 py-2.5 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
                 >
                   Cancel
                 </button>
                 <button
-                  className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-blue-300"
                   onClick={allocateTeam}
-                  disabled={!selectedTeam}
+                  disabled={!selectedTeam || isAllocating}
+                  className={`px-5 py-2.5 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-4 focus:ring-red-300 ${
+                    !selectedTeam || isAllocating
+                      ? "bg-red-400 cursor-not-allowed"
+                      : "bg-red-700 hover:bg-red-800"
+                  }`}
                 >
-                  Allocate
+                  {isAllocating ? (
+                    <div className="flex items-center">
+                      <svg
+                        aria-hidden="true"
+                        className="w-4 h-4 mr-2 text-white animate-spin"
+                        viewBox="0 0 100 101"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M100 50.5c0 27.6-22.4 50-50 50S0 78.1 0 50.5 22.4.5 50 .5s50 22.4 50 50z"
+                          fill="currentColor"
+                          opacity=".2"
+                        />
+                        <path
+                          d="M93.3 50.5c0-23.9-19.4-43.3-43.3-43.3-6.3 0-12.3 1.3-17.8 3.7-1.6.7-2.2 2.6-1.5 4.2.7 1.6 2.6 2.2 4.2 1.5 4.9-2.1 10.2-3.2 15.6-3.2 21.6 0 39.3 17.7 39.3 39.3s-17.7 39.3-39.3 39.3c-21.6 0-39.3-17.7-39.3-39.3 0-6.8 1.7-13.3 5-19.1.9-1.5.4-3.4-1-4.3s-3.4-.4-4.3 1c-3.8 6.4-5.8 13.7-5.8 21.3 0 23.9 19.4 43.3 43.3 43.3s43.3-19.4 43.3-43.3z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                      Allocating...
+                    </div>
+                  ) : (
+                    "Allocate Team"
+                  )}
                 </button>
               </div>
             </div>
