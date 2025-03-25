@@ -55,7 +55,7 @@ const connectToCosmos = async () => {
 };
 
 //Fetch camp by email
-const getOrganizationByEmail = async (req: Request, res: Response) => {
+export const getOrganizationByEmail = async (req: Request, res: Response) => {
   try {
     const { collection, client } = await connectToCosmos();
     const { email } = req.params;
@@ -74,7 +74,7 @@ const getOrganizationByEmail = async (req: Request, res: Response) => {
 };
 
 // Create or update donor record in DB
-const upsertOrganization = async (req: Request, res: Response) => {
+export const upsertOrganization = async (req: Request, res: Response) => {
   const organization = req.body;
 
   try {
@@ -98,7 +98,7 @@ const upsertOrganization = async (req: Request, res: Response) => {
 };
 
 // Handle avatar upload to Azure Blob Storage
-const uploadLogo = async (req: Request, res: Response) => {
+export const uploadLogo = async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -137,7 +137,7 @@ const uploadLogo = async (req: Request, res: Response) => {
 };
 
 // Search for organizations
-const searchOrganizations = async (req: Request, res: Response) => {
+export const searchOrganizations = async (req: Request, res: Response) => {
   try {
     const { collection, client } = await connectToCosmos();
     const searchTerm = req.query.name as string;
@@ -158,7 +158,7 @@ const searchOrganizations = async (req: Request, res: Response) => {
 };
 
 //Fetch all organizations
-const getAllOrganizations = async (req: Request, res: Response) => {
+export const getAllOrganizations = async (req: Request, res: Response) => {
   try {
     const { collection, client } = await connectToCosmos();
 
@@ -172,10 +172,23 @@ const getAllOrganizations = async (req: Request, res: Response) => {
   }
 };
 
-export {
-  getOrganizationByEmail,
-  upsertOrganization,
-  uploadLogo,
-  searchOrganizations,
-  getAllOrganizations,
+export const getOrganizationsCount = async (req: Request, res: Response) => {
+  try {
+    //Connect to database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(ORGANIZATION_COLLECTION_ID);
+
+    //Fetch organization count
+    const count = await collection.countDocuments();
+    res.status(200).json({ count });
+
+    client.close();
+  } catch (error) {
+    console.error("Error fetching organization count:", error);
+    res
+      .status(500)
+      .json({ message: "Error fetching organization count", error });
+  }
 };
