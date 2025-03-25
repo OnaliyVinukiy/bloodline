@@ -213,6 +213,70 @@ export const getAppointmentsByDate = async (req: Request, res: Response) => {
   }
 };
 
+export const getAppointmentsByMonth = async (req: Request, res: Response) => {
+  try {
+    //Connect to database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+
+    // Group by month and count
+    const result = await collection
+      .aggregate([
+        {
+          $group: {
+            _id: { $month: { $toDate: "$selectedDate" } },
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            month: {
+              $let: {
+                vars: {
+                  monthsInString: [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                  ],
+                },
+                in: {
+                  $arrayElemAt: [
+                    "$$monthsInString",
+                    { $subtract: ["$_id", 1] },
+                  ],
+                },
+              },
+            },
+            count: 1,
+            _id: 0,
+          },
+        },
+        { $sort: { month: 1 } },
+      ])
+      .toArray();
+
+    res.status(200).json(result);
+    await client.close();
+  } catch (error) {
+    console.error("Error fetching monthly appointments:", error);
+    res
+      .status(500)
+      .json({ message: "Error fetching monthly appointments", error });
+  }
+};
+
 //Approve pending appointments
 export const approveAppointment = async (req: Request, res: Response) => {
   try {
