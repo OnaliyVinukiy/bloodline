@@ -298,8 +298,9 @@ export function Navigationbar() {
           ) : null
         ) : (
           <Button
-            className="bg-red-800 hover:bg-red-700 text-white text-xs md:text-base text-sm"
+            className="text-white text-xs md:text-base text-sm"
             onClick={() => signIn()}
+            color="failure"
           >
             Login
           </Button>
