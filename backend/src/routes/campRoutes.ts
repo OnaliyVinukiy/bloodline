@@ -15,6 +15,7 @@ import {
   rejectCamp,
   allocateTeam,
   checkTeamAvailability,
+  getCampsCount,
 } from "../controllers/campController";
 import { authenticateUser } from "../middleware/authMiddleware";
 
@@ -43,5 +44,8 @@ router.put("/allocate-team", authenticateUser, allocateTeam);
 
 //Route to check team availability
 router.get("/availability", checkTeamAvailability);
+
+//Route to fetch camp count
+router.get("/count", getCampsCount);
 
 export default router;
