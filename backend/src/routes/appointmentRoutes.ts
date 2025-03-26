@@ -15,6 +15,7 @@ import {
   rejectAppointment,
   getAppointmentsByEmail,
   getAppointmentsCount,
+  getAppointmentsByMonth,
 } from "../controllers/appointmentController";
 import { authenticateUser } from "../middleware/authMiddleware";
 
@@ -47,5 +48,8 @@ router.put("/reject-appointment/:id", authenticateUser, rejectAppointment);
 
 //Route to fetch appointment count
 router.get("/count", getAppointmentsCount);
+
+//Route to fetch monthly appointments
+router.get("/monthly", getAppointmentsByMonth);
 
 export default router;
