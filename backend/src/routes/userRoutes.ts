@@ -14,6 +14,7 @@ import {
   getDonorByEmail,
   getDonors,
   getDonorsCount,
+  getDonorsDaily,
 } from "../controllers/userController";
 
 const router = express.Router();
@@ -37,5 +38,8 @@ router.get("/donors", getDonors);
 
 //Router to fetch donor count
 router.get("/donors/count", getDonorsCount);
+
+//Router to fetch donors registered daily
+router.get("/donors/daily", getDonorsDaily);
 
 export default router;
