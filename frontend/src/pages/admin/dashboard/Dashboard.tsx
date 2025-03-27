@@ -7,45 +7,36 @@
  */
 import { useAuthContext } from "@asgardeo/auth-react";
 import { useEffect, useState } from "react";
-import { Bar } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
   Legend,
 } from "chart.js";
+import {
+  DailyData,
+  LoadingState,
+  MonthlyData,
+  StatCardProps,
+  Stats,
+} from "../../../types/dashboard";
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
   Legend
 );
-
-interface Stats {
-  donors: number;
-  camps: number;
-  appointments: number;
-  organizations: number;
-}
-
-interface LoadingState {
-  donors: boolean;
-  camps: boolean;
-  appointments: boolean;
-  organizations: boolean;
-  charts: boolean;
-}
-
-interface MonthlyData {
-  month: string;
-  count: number;
-}
 
 const Dashboard = () => {
   const [stats, setStats] = useState<Stats>({
@@ -67,6 +58,8 @@ const Dashboard = () => {
     []
   );
   const [campsByMonth, setCampsByMonth] = useState<MonthlyData[]>([]);
+  const [donorsByDay, setDonorsByDay] = useState<DailyData[]>([]);
+  const [organizationsByDay, setOrganizationsByDay] = useState<DailyData[]>([]);
 
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -88,6 +81,8 @@ const Dashboard = () => {
           organizationsRes,
           appointmentsMonthlyRes,
           campsMonthlyRes,
+          donorsDailyRes,
+          organizationsDailyRes,
         ] = await Promise.all([
           fetch(`${backendURL}/api/donors/count`).then((res) => res.json()),
           fetch(`${backendURL}/api/camps/count`).then((res) => res.json()),
@@ -101,6 +96,10 @@ const Dashboard = () => {
             headers: { Authorization: `Bearer ${token}` },
           }).then((res) => res.json()),
           fetch(`${backendURL}/api/camps/monthly`).then((res) => res.json()),
+          fetch(`${backendURL}/api/donors/daily`).then((res) => res.json()),
+          fetch(`${backendURL}/api/organizations/daily`).then((res) =>
+            res.json()
+          ),
         ]);
 
         setStats({
@@ -112,6 +111,8 @@ const Dashboard = () => {
 
         setAppointmentsByMonth(appointmentsMonthlyRes);
         setCampsByMonth(campsMonthlyRes);
+        setDonorsByDay(donorsDailyRes);
+        setOrganizationsByDay(organizationsDailyRes);
 
         setLoading({
           donors: false,
@@ -164,6 +165,42 @@ const Dashboard = () => {
     ],
   };
 
+  const donorsChartData = {
+    labels: donorsByDay.map((item) => item.date),
+    datasets: [
+      {
+        label: "Donors Registered",
+        data: donorsByDay.map((item) => item.count),
+        borderColor: "rgba(59, 130, 246, 1)",
+        backgroundColor: "rgba(59, 130, 246, 0.1)",
+        borderWidth: 2,
+        tension: 0.1,
+        fill: true,
+        pointBackgroundColor: "rgba(59, 130, 246, 1)",
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      },
+    ],
+  };
+
+  const organizationsChartData = {
+    labels: organizationsByDay.map((item) => item.date),
+    datasets: [
+      {
+        label: "Organizations Registered",
+        data: organizationsByDay.map((item) => item.count),
+        borderColor: "rgba(245, 158, 11, 1)",
+        backgroundColor: "rgba(245, 158, 11, 0.1)",
+        borderWidth: 2,
+        tension: 0.1,
+        fill: true,
+        pointBackgroundColor: "rgba(245, 158, 11, 1)",
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      },
+    ],
+  };
+
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -189,11 +226,10 @@ const Dashboard = () => {
       },
     },
   };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       {/* Stats Cards */}
-      <div className="mt-10 mx-40 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="mt-10 md:mx-40 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
           title="Total Donors"
           value={stats.donors}
@@ -270,17 +306,53 @@ const Dashboard = () => {
           )}
         </div>
       </div>
+
+      <div className="mb-20 sm:mx-40 mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Donors Trend Chart */}
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+          <h2 className="text-xl font-semibold text-gray-800 mb-8">
+            Donor Registration Trend
+          </h2>
+          {loading.charts ? (
+            <div className="h-64 flex items-center justify-center">
+              <div className="animate-pulse bg-gray-200 rounded h-full w-full"></div>
+            </div>
+          ) : (
+            <Line
+              data={donorsChartData}
+              options={{
+                ...chartOptions,
+                plugins: {
+                  ...chartOptions.plugins,
+                },
+              }}
+            />
+          )}
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+          <h2 className="text-xl font-semibold text-gray-800 mb-8">
+            Organization Registration Trend
+          </h2>
+          {loading.charts ? (
+            <div className="h-64 flex items-center justify-center">
+              <div className="animate-pulse bg-gray-200 rounded h-full w-full"></div>
+            </div>
+          ) : (
+            <Line
+              data={organizationsChartData}
+              options={{
+                ...chartOptions,
+                plugins: {
+                  ...chartOptions.plugins,
+                },
+              }}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 };
-
-interface StatCardProps {
-  title: string;
-  value: number;
-  icon: JSX.Element;
-  loading: boolean;
-  color: string;
-}
 
 const StatCard = ({ title, value, icon, loading, color }: StatCardProps) => {
   return (

@@ -23,7 +23,7 @@ const app = express();
 app.use(
   cors({
     origin: "*",
-    methods: ["GET", "POST", "PUT", "OPTIONS", "DELETE"],
+    methods: ["GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
