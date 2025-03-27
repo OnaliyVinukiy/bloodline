@@ -13,6 +13,7 @@ import {
   upsertOrganization,
   getAllOrganizations,
   getOrganizationsCount,
+  getOrganizationsDaily,
 } from "../controllers/organizationController";
 import multer from "multer";
 
@@ -37,5 +38,8 @@ router.get("/search", searchOrganizations);
 
 //Router to fetch organization count
 router.get("/count", getOrganizationsCount);
+
+//Router to fetch daily organization count
+router.get("/daily", getOrganizationsDaily);
 
 export default router;
