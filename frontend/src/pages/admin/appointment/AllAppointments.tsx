@@ -189,10 +189,22 @@ const AllAppointments = () => {
                       <button className="green">Approved</button>
                     </div>
                   </td>
-                ) : (
+                ) : appointment.status === "Pending" ? (
                   <td className="px-6 py-6 text-center">
                     <div className="badges flex justify-center">
                       <button className="yellow">Pending</button>
+                    </div>
+                  </td>
+                ) : appointment.status === "Confirmed" ? (
+                  <td className="px-6 py-6 text-center">
+                    <div className="badges flex justify-center">
+                      <button className="blue">Confirmed</button>
+                    </div>
+                  </td>
+                ) : (
+                  <td className="px-6 py-6 text-center">
+                    <div className="badges flex justify-center">
+                      <button className="yellow">Assessed</button>
                     </div>
                   </td>
                 )}
