@@ -18,11 +18,13 @@ import Camps from "./pages/admin/camp/Camps";
 import CalendarPage from "./pages/admin/appointment/CalendarPage";
 import AppointmentDetails from "./pages/admin/appointment/AppointmentDetails";
 import BloodCampRegistration from "./pages/camp/BloodCampRegistration";
+import BloodDonation from "./pages/admin/appointment/BloodDonation";
 import OrganizationRegistration from "./pages/organization/OrganizationRegistration";
 import CampDetails from "./pages/admin/camp/CampDetails";
 import DonorAppointments from "./pages/appointment/Appointments";
 import Map from "./pages/camp/Map";
 import Dashboard from "./pages/admin/dashboard/Dashboard";
+import Stock from "./pages/admin/stock/Stock";
 
 function App() {
   return (
@@ -55,6 +57,11 @@ function App() {
             <Route path="/map" element={<Map />} />
             <Route path="/admin/camps" element={<Camps />} />
             <Route path="/admin/dashboard" element={<Dashboard />} />
+            <Route path="/admin/stock" element={<Stock />} />
+            <Route
+              path="/admin/donation/:appointmentId"
+              element={<BloodDonation />}
+            />
           </Routes>
         </main>
         <FooterComponent />
