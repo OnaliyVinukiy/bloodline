@@ -38,8 +38,8 @@ export function CarouselSlider() {
     >
       <div className="py-8 px-4 mx-auto max-w-screen-xl text-center sm:py-12">
         <img
-          src="https://bloodlineresources.blob.core.windows.net/assets/logo.png"
-          className="w-20 h-28 mx-auto mb-8 sm:w-24 sm:h-32 sm:mb-12"
+          src="/heart.png"
+          className="w-10 h-10 mx-auto mt-16 mb-8 sm:w-20 sm:h-20 sm:mb-12"
           alt="Bloodline Logo"
         />
         <a

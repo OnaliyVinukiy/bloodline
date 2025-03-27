@@ -133,11 +133,11 @@ export function Navigationbar() {
     <Navbar fluid rounded className="shadow-lg md:py-4 py-2">
       <Navbar.Brand href="/" className="md:ml-24 md: h-6 h-4">
         <img
-          src="https://bloodlineresources.blob.core.windows.net/assets/logo.png"
-          className="mb-10 mt-2 mr-3 h-16 sm:h-16 "
+          src="/heart.png"
+          className="mb-2 mt-2 ml-1 mr-2 h-6 sm:h-8"
           alt="Bloodline Logo"
         />
-        <span className="self-center whitespace-nowrap text-red-800 text-2xl md:text-3xl font-lobster  ">
+        <span className="self-center whitespace-nowrap text-red-700 text-2xl md:text-3xl font-lobster  ">
           Bloodline
         </span>
       </Navbar.Brand>
@@ -241,7 +241,7 @@ export function Navigationbar() {
                   {user.email}
                 </span>
               </Dropdown.Header>
-              <Dropdown.Item onClick={() => navigate("/profile")}>
+              <Dropdown.Item onClick={() => navigate("/admin/dashboard")}>
                 <svg
                   className="w-[15px] h-[15px] mr-2 fill-[#8e8e8e]"
                   viewBox="0 0 512 512"
@@ -282,6 +282,16 @@ export function Navigationbar() {
                   <path d="M152 24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H64C28.7 64 0 92.7 0 128v16 48V448c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V192 144 128c0-35.3-28.7-64-64-64H344V24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H152V24zM48 192h80v56H48V192zm0 104h80v64H48V296zm128 0h96v64H176V296zm144 0h80v64H320V296zm80-48H320V192h80v56zm0 160v40c0 8.8-7.2 16-16 16H320V408h80zm-128 0v56H176V408h96zm-144 0v56H64c-8.8 0-16-7.2-16-16V408h80zM272 248H176V192h96v56z"></path>
                 </svg>
                 Calendar
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate("/admin/dashboard")}>
+                <svg
+                  className="w-[15px] h-[15px] mr-2 fill-[#8e8e8e]"
+                  viewBox="0 0 512 512"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64V400c0 44.2 35.8 80 80 80H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H80c-8.8 0-16-7.2-16-16V64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7l-57.4-57.4c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L240 221.3l57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z"></path>
+                </svg>
+                Stocks
               </Dropdown.Item>
               <Dropdown.Divider />
               <Dropdown.Item onClick={() => signOut()}>
