@@ -16,6 +16,7 @@ import {
   getAppointmentsByEmail,
   getAppointmentsCount,
   getAppointmentsByMonth,
+  updateAppointment,
 } from "../controllers/appointmentController";
 import { authenticateUser } from "../middleware/authMiddleware";
 
@@ -51,5 +52,8 @@ router.get("/count", getAppointmentsCount);
 
 //Route to fetch monthly appointments
 router.get("/monthly", getAppointmentsByMonth);
+
+// In your routes file
+router.patch("/update-appointment/:id", authenticateUser, updateAppointment);
 
 export default router;
