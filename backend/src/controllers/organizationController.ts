@@ -172,6 +172,58 @@ export const getAllOrganizations = async (req: Request, res: Response) => {
   }
 };
 
+//Fetch daily registered organizations
+export const getOrganizationsDaily = async (req: Request, res: Response) => {
+  try {
+    const { collection, client } = await connectToCosmos();
+
+    // Group by day and count organizations
+    const result = await collection
+      .aggregate([
+        {
+          $group: {
+            _id: {
+              year: { $year: { $toDate: "$_id" } },
+              month: { $month: { $toDate: "$_id" } },
+              day: { $dayOfMonth: { $toDate: "$_id" } },
+            },
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 },
+        },
+        {
+          $project: {
+            date: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: {
+                  $dateFromParts: {
+                    year: "$_id.year",
+                    month: "$_id.month",
+                    day: "$_id.day",
+                  },
+                },
+              },
+            },
+            count: 1,
+            _id: 0,
+          },
+        },
+      ])
+      .toArray();
+
+    res.status(200).json(result);
+    client.close();
+  } catch (error) {
+    console.error("Error fetching daily organizations:", error);
+    res
+      .status(500)
+      .json({ message: "Error fetching daily organizations", error });
+  }
+};
+
 export const getOrganizationsCount = async (req: Request, res: Response) => {
   try {
     //Connect to database
