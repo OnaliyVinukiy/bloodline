@@ -277,6 +277,38 @@ export const getAppointmentsByMonth = async (req: Request, res: Response) => {
   }
 };
 
+// Update appointment data
+export const updateAppointment = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const updateData = req.body;
+
+  try {
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+    const objectId = new ObjectId(id);
+
+    const updatedAppointment = await collection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: updateData },
+      { returnDocument: "after" }
+    );
+
+    await client.close();
+
+    if (!updatedAppointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    res.status(200).json(updatedAppointment);
+  } catch (error) {
+    console.error("Error updating appointment:", error);
+    res.status(500).json({ message: "Failed to update appointment" });
+  }
+};
+
 //Approve pending appointments
 export const approveAppointment = async (req: Request, res: Response) => {
   try {
