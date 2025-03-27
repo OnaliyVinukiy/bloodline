@@ -184,6 +184,60 @@ export const getDonors = async (req: Request, res: Response) => {
   }
 };
 
+//Fetch donors registered daily
+export const getDonorsDaily = async (req: Request, res: Response) => {
+  try {
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(DONOR_COLLECTION_ID);
+
+    //Group by day and count donors
+    const result = await collection
+      .aggregate([
+        {
+          $group: {
+            _id: {
+              year: { $year: { $toDate: "$_id" } },
+              month: { $month: { $toDate: "$_id" } },
+              day: { $dayOfMonth: { $toDate: "$_id" } },
+            },
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 },
+        },
+        {
+          $project: {
+            date: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: {
+                  $dateFromParts: {
+                    year: "$_id.year",
+                    month: "$_id.month",
+                    day: "$_id.day",
+                  },
+                },
+              },
+            },
+            count: 1,
+            _id: 0,
+          },
+        },
+      ])
+      .toArray();
+
+    res.status(200).json(result);
+    await client.close();
+  } catch (error) {
+    console.error("Error fetching daily donors:", error);
+    res.status(500).json({ message: "Error fetching daily donors", error });
+  }
+};
+
 //Fetch donor by email
 export const getDonorByEmail = async (req: Request, res: Response) => {
   try {
