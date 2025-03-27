@@ -16,6 +16,7 @@ import {
   allocateTeam,
   checkTeamAvailability,
   getCampsCount,
+  getCampsByMonth,
 } from "../controllers/campController";
 import { authenticateUser } from "../middleware/authMiddleware";
 
@@ -47,5 +48,8 @@ router.get("/availability", checkTeamAvailability);
 
 //Route to fetch camp count
 router.get("/count", getCampsCount);
+
+//Route to fetch monthly camps
+router.get("/monthly", getCampsByMonth);
 
 export default router;

@@ -15,6 +15,7 @@ import districtRoutes from "./routes/districtRoutes";
 import dataService from "./utils/dataService";
 import campRoutes from "./routes/campRoutes";
 import organizationRoutes from "./routes/organizationRoutes";
+import stockRoutes from "./routes/stockRoutes";
 
 const app = express();
 
@@ -51,6 +52,9 @@ app.use("/api/camps", campRoutes);
 
 // Organization Routes
 app.use("/api/organizations", organizationRoutes);
+
+// Stocks Routes
+app.use("/api/stocks", stockRoutes);
 
 // Home route
 app.get("/", (req: Request, res: Response): void => {

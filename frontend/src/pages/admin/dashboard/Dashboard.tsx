@@ -7,6 +7,25 @@
  */
 import { useAuthContext } from "@asgardeo/auth-react";
 import { useEffect, useState } from "react";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface Stats {
   donors: number;
@@ -20,6 +39,12 @@ interface LoadingState {
   camps: boolean;
   appointments: boolean;
   organizations: boolean;
+  charts: boolean;
+}
+
+interface MonthlyData {
+  month: string;
+  count: number;
 }
 
 const Dashboard = () => {
@@ -35,7 +60,13 @@ const Dashboard = () => {
     camps: true,
     appointments: true,
     organizations: true,
+    charts: true,
   });
+
+  const [appointmentsByMonth, setAppointmentsByMonth] = useState<MonthlyData[]>(
+    []
+  );
+  const [campsByMonth, setCampsByMonth] = useState<MonthlyData[]>([]);
 
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -49,19 +80,28 @@ const Dashboard = () => {
       try {
         const token = await getAccessToken();
 
-        const [donorsRes, campsRes, appointmentsRes, organizationsRes] =
-          await Promise.all([
-            fetch(`${backendURL}/api/donors/count`).then((res) => res.json()),
-            fetch(`${backendURL}/api/camps/count`).then((res) => res.json()),
-            fetch(`${backendURL}/api/appointments/count`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }).then((res) => res.json()),
-            fetch(`${backendURL}/api/organizations/count`).then((res) =>
-              res.json()
-            ),
-          ]);
+        // Fetch all stats and monthly data in parallel
+        const [
+          donorsRes,
+          campsRes,
+          appointmentsRes,
+          organizationsRes,
+          appointmentsMonthlyRes,
+          campsMonthlyRes,
+        ] = await Promise.all([
+          fetch(`${backendURL}/api/donors/count`).then((res) => res.json()),
+          fetch(`${backendURL}/api/camps/count`).then((res) => res.json()),
+          fetch(`${backendURL}/api/appointments/count`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }).then((res) => res.json()),
+          fetch(`${backendURL}/api/organizations/count`).then((res) =>
+            res.json()
+          ),
+          fetch(`${backendURL}/api/appointments/monthly`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }).then((res) => res.json()),
+          fetch(`${backendURL}/api/camps/monthly`).then((res) => res.json()),
+        ]);
 
         setStats({
           donors: donorsRes.count,
@@ -70,20 +110,24 @@ const Dashboard = () => {
           organizations: organizationsRes.count,
         });
 
-        setLoading({
-          donors: false,
-          camps: false,
-          appointments: false,
-          organizations: false,
-        });
-      } catch (error) {
-        console.error("Error fetching data:", error);
+        setAppointmentsByMonth(appointmentsMonthlyRes);
+        setCampsByMonth(campsMonthlyRes);
 
         setLoading({
           donors: false,
           camps: false,
           appointments: false,
           organizations: false,
+          charts: false,
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading({
+          donors: false,
+          camps: false,
+          appointments: false,
+          organizations: false,
+          charts: false,
         });
       }
     };
@@ -91,9 +135,65 @@ const Dashboard = () => {
     fetchStats();
   }, []);
 
+  // Prepare chart data
+  const appointmentsChartData = {
+    labels: appointmentsByMonth.map((item) => item.month),
+    datasets: [
+      {
+        label: "Appointments",
+        data: appointmentsByMonth.map((item) => item.count),
+        backgroundColor: "rgba(124, 58, 237, 0.7)",
+        borderColor: "rgba(124, 58, 237, 1)",
+        borderWidth: 1,
+        borderRadius: 4,
+      },
+    ],
+  };
+
+  const campsChartData = {
+    labels: campsByMonth.map((item) => item.month),
+    datasets: [
+      {
+        label: "Blood Camps",
+        data: campsByMonth.map((item) => item.count),
+        backgroundColor: "rgba(16, 185, 129, 0.7)",
+        borderColor: "rgba(16, 185, 129, 1)",
+        borderWidth: 1,
+        borderRadius: 4,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "bottom" as const,
+      },
+      title: {
+        display: true,
+        text: "",
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          display: false,
+        },
+      },
+      x: {
+        grid: {
+          display: false,
+        },
+      },
+    },
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-      <div className="mt-8 sm:mx-40 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Stats Cards */}
+      <div className="mt-10 mx-40 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
           title="Total Donors"
           value={stats.donors}
@@ -115,7 +215,6 @@ const Dashboard = () => {
           loading={loading.camps}
           color="from-green-500 to-green-600"
         />
-
         <StatCard
           title="Organizations"
           value={stats.organizations}
@@ -123,6 +222,53 @@ const Dashboard = () => {
           loading={loading.organizations}
           color="from-orange-500 to-orange-600"
         />
+      </div>
+
+      {/* Charts Section */}
+      <div className="sm:mx-40 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Appointments Chart */}
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+          <h2 className="text-xl font-semibold text-gray-800 mb-10">
+            Monthly Appointments
+          </h2>
+          {loading.charts ? (
+            <div className="h-64 flex items-center justify-center">
+              <div className="animate-pulse bg-gray-200 rounded h-full w-full"></div>
+            </div>
+          ) : (
+            <Bar
+              data={appointmentsChartData}
+              options={{
+                ...chartOptions,
+                plugins: {
+                  ...chartOptions.plugins,
+                },
+              }}
+            />
+          )}
+        </div>
+
+        {/* Camps Chart */}
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+          <h2 className="text-xl font-semibold text-gray-800 mb-8">
+            Monthly Blood Camps
+          </h2>
+          {loading.charts ? (
+            <div className="h-64 flex items-center justify-center">
+              <div className="animate-pulse bg-gray-200 rounded h-full w-full"></div>
+            </div>
+          ) : (
+            <Bar
+              data={campsChartData}
+              options={{
+                ...chartOptions,
+                plugins: {
+                  ...chartOptions.plugins,
+                },
+              }}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
@@ -138,7 +284,7 @@ interface StatCardProps {
 
 const StatCard = ({ title, value, icon, loading, color }: StatCardProps) => {
   return (
-    <div className="group relative overflow-hidden rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl">
+    <div className="group relative z-0 overflow-hidden rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl">
       <div className="absolute inset-0 bg-gradient-to-br opacity-10 group-hover:opacity-20 transition-opacity duration-300 ${color}"></div>
 
       <div className="relative z-10 flex items-center justify-between">

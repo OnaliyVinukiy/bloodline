@@ -174,6 +174,68 @@ export const getCamps = async (req: Request, res: Response) => {
   }
 };
 
+//Fetch monthly camps
+export const getCampsByMonth = async (req: Request, res: Response) => {
+  try {
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(CAMP_COLLECTION_ID);
+
+    // Group by month and count
+    const result = await collection
+      .aggregate([
+        {
+          $group: {
+            _id: { $month: { $toDate: "$date" } }, // Assuming there's a 'date' field
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            month: {
+              $let: {
+                vars: {
+                  monthsInString: [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                  ],
+                },
+                in: {
+                  $arrayElemAt: [
+                    "$$monthsInString",
+                    { $subtract: ["$_id", 1] },
+                  ],
+                },
+              },
+            },
+            count: 1,
+            _id: 0,
+          },
+        },
+        { $sort: { month: 1 } },
+      ])
+      .toArray();
+
+    res.status(200).json(result);
+    await client.close();
+  } catch (error) {
+    console.error("Error fetching monthly camps:", error);
+    res.status(500).json({ message: "Error fetching monthly camps", error });
+  }
+};
+
 //Fetch count of all camps
 export const getCampsCount = async (req: Request, res: Response) => {
   try {
