@@ -6,7 +6,7 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
 import { Label, Modal, Toast } from "flowbite-react";
 import { useAuthContext } from "@asgardeo/auth-react";
@@ -33,6 +33,7 @@ const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
 
   const [loading, setLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
   const appointmentId = location.pathname.split("/").pop();
   const [showModal, setShowModal] = useState(false);
@@ -43,6 +44,38 @@ const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
     setShowModal(false);
     navigate("/");
   };
+
+  //Fetch appointment data
+  useEffect(() => {
+    const fetchAppointment = async () => {
+      try {
+        const token = await getAccessToken();
+        const response = await axios.get(
+          `${backendURL}/api/appointments/fetch-appointment/${appointmentId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        //Populate form data
+        if (response.data.verification) {
+          setFormData({
+            isVerified: response.data.verification.isVerified || "",
+            officerSignature: response.data.verification.officerSignature || "",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching appointment:", error);
+        setToastMessage("Failed to load appointment data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAppointment();
+  }, [appointmentId, getAccessToken]);
 
   //Submit form data
   const handleSubmit = async () => {
@@ -97,7 +130,28 @@ const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
       [name]: value,
     }));
   };
-
+  if (isLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
   return (
     <div className="flex justify-center bg-white min-h-screen">
       <main className="mt-0 mb-8 w-full max-w-4xl px-4 py-8">
@@ -132,7 +186,7 @@ const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
             {/* Form */}
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <Label
-                htmlFor="province"
+                htmlFor="details"
                 className="block mb-6 text-lg font-roboto font-medium text-gray-800"
               >
                 Details of the Donor
