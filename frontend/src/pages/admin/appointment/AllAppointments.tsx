@@ -287,13 +287,7 @@ const AllAppointments = () => {
                         </svg>
                       </button>
                     </Link>
-                    <Link
-                      to={`/admin/donation/${appointment._id}`}
-                      state={{
-                        status: appointment.status,
-                        initialStep: appointment.status === "Confirmed" ? 2 : 1,
-                      }}
-                    >
+                    <Link to={`/admin/donation/${appointment._id}`}>
                       <button
                         className="font-medium text-green-600 dark:text-green-500 hover:underline"
                         aria-label="Donate"
