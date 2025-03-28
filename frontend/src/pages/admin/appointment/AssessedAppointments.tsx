@@ -170,7 +170,7 @@ const AssessedAppointments = () => {
                 </td>
                 <td className="px-6 py-6 text-center">
                   <div className="badges flex justify-center">
-                    <button className="cyan">Assessed</button>
+                    <button className="pink">Assessed</button>
                   </div>
                 </td>
 
