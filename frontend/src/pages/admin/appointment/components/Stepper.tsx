@@ -12,6 +12,7 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
+import StepFour from "./StepFour";
 
 const Stepper = ({
   step,
@@ -150,6 +151,9 @@ const Stepper = ({
       )}
       {step === 3 && (
         <StepThree onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
+      )}
+      {step === 4 && (
+        <StepFour onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
     </div>
   );
