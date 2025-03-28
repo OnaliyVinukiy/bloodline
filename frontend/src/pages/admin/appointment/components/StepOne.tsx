@@ -13,6 +13,7 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import { HiExclamation } from "react-icons/hi";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Appointment } from "../../../../types/appointment";
 
 declare global {
   interface Window {
@@ -34,6 +35,7 @@ const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
   const [loading, setLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [appointment, setAppointment] = useState<Appointment | null>(null);
   const location = useLocation();
   const appointmentId = location.pathname.split("/").pop();
   const [showModal, setShowModal] = useState(false);
@@ -66,6 +68,7 @@ const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
             officerSignature: response.data.verification.officerSignature || "",
           });
         }
+        setAppointment(response.data);
       } catch (error) {
         console.error("Error fetching appointment:", error);
         setToastMessage("Failed to load appointment data");
@@ -88,38 +91,40 @@ const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
       setToastMessage("Cannot proceed with unverified donor");
       return;
     }
+    if (appointment?.status === "Approved") {
+      setLoading(true);
+      try {
+        const token = await getAccessToken();
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        };
 
-    setLoading(true);
-    try {
-      const token = await getAccessToken();
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      };
+        const requestData = {
+          verification: {
+            isVerified: formData.isVerified,
+            officerSignature: formData.officerSignature,
+            verifiedAt: new Date().toISOString(),
+          },
+          status: "Confirmed",
+        };
 
-      const requestData = {
-        verification: {
-          isVerified: formData.isVerified,
-          officerSignature: formData.officerSignature,
-          verifiedAt: new Date().toISOString(),
-        },
-        status: "Confirmed",
-      };
-
-      await axios.patch(
-        `${backendURL}/api/appointments/update-appointment/${appointmentId}`,
-        requestData,
-        config
-      );
-
+        await axios.patch(
+          `${backendURL}/api/appointments/update-appointment/${appointmentId}`,
+          requestData,
+          config
+        );
+      } catch (error) {
+        console.error("Error updating appointment:", error);
+        setToastMessage("Failed to update appointment. Please try again.");
+      } finally {
+        setLoading(false);
+        onNextStep();
+      }
+    } else {
       onNextStep();
-    } catch (error) {
-      console.error("Error updating appointment:", error);
-      setToastMessage("Failed to update appointment. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
