@@ -116,7 +116,20 @@
   padding: 2px 10px;
   border: 1px solid rgb(3, 176, 162);
 }
-
+.badges .indigo {
+  background-color: rgba(99, 102, 241, 0.1);
+  color: rgb(99 102 241);
+  border-radius: 9999px;
+  padding: 2px 10px;
+  border: 1px solid rgb(99 102 241);
+}
+.badges .pink {
+  background-color: rgba(236, 72, 153, 0.1);
+  color: rgb(236 72 153);
+  border-radius: 9999px;
+  padding: 2px 10px;
+  border: 1px solid rgb(236 72 153);
+}
 .custom-calendar {
   border-radius: 10px;
   overflow: hidden;

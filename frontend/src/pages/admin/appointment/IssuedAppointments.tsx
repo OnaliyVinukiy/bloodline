@@ -10,7 +10,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "@asgardeo/auth-react";
 
-const AssessedAppointments = () => {
+const IssuedAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { getAccessToken } = useAuthContext();
@@ -39,7 +39,7 @@ const AssessedAppointments = () => {
           }
         );
         const approvedAppointments = response.data.filter(
-          (appointment: any) => appointment.status === "Assessed"
+          (appointment: any) => appointment.status === "Issued"
         );
         setAppointments(approvedAppointments);
         console.log(approvedAppointments);
@@ -170,7 +170,7 @@ const AssessedAppointments = () => {
                 </td>
                 <td className="px-6 py-6 text-center">
                   <div className="badges flex justify-center">
-                    <button className="pink">Assessed</button>
+                    <button className="indigo">Issued</button>
                   </div>
                 </td>
 
@@ -295,4 +295,4 @@ const AssessedAppointments = () => {
   );
 };
 
-export default AssessedAppointments;
+export default IssuedAppointments;
