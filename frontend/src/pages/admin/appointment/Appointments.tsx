@@ -12,6 +12,7 @@ import RejectedAppointments from "./RejectedAppointments";
 import AllAppointments from "./AllAppointments";
 import AssessedAppointments from "./AssessedAppointments";
 import ConfirmedAppointments from "./ConfirmedAppointments";
+import IssuedAppointments from "./IssuedAppointments";
 
 const Appointments = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -88,6 +89,18 @@ const Appointments = () => {
                   : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
               }`}
             >
+              Issued
+            </button>
+          </li>
+          <li className="me-2">
+            <button
+              onClick={() => setActiveTab("tab7")}
+              className={`px-6 py-3 rounded-t-lg transition-colors duration-300 ${
+                activeTab === "tab7"
+                  ? "text-white bg-red-800 border-b-0"
+                  : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}
+            >
               Rejected
             </button>
           </li>
@@ -100,7 +113,8 @@ const Appointments = () => {
         {activeTab === "tab3" && <ApprovedAppointments />}
         {activeTab === "tab4" && <ConfirmedAppointments />}
         {activeTab === "tab5" && <AssessedAppointments />}
-        {activeTab === "tab6" && <RejectedAppointments />}
+        {activeTab === "tab6" && <IssuedAppointments />}
+        {activeTab === "tab7" && <RejectedAppointments />}
       </div>
     </div>
   );
