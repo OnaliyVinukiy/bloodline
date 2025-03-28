@@ -63,13 +63,14 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [appointment, setAppointment] = useState<any | null>(null);
+   const [userEmail, setUserEmail] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  const { getAccessToken } = useAuthContext();
+  const { getAccessToken, getBasicUserInfo } = useAuthContext();
 
   //Fetch appointment data
   useEffect(() => {
@@ -77,6 +78,8 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
       try {
         setIsLoading(true);
         const token = await getAccessToken();
+        const userInfo = await getBasicUserInfo();
+        setUserEmail(userInfo.email || "");
         const response = await axios.get(
           `${backendURL}/api/appointments/fetch-appointment/${appointmentId}`,
           {
@@ -228,6 +231,7 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
             medicalOfficerSignature:
               formData.assessment.medicalOfficerSignature,
             assessedAt: new Date().toISOString(),
+            recordedBy: userEmail,
           },
           status: "Assessed",
         };

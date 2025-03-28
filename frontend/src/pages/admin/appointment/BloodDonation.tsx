@@ -47,6 +47,8 @@ const BloodDonation = () => {
           setCurrentStep(2);
         } else if (response.data.status === "Assessed") {
           setCurrentStep(3);
+        } else if (response.data.status === "Issued") {
+          setCurrentStep(4);
         }
       } catch (error) {
         console.error("Error fetching appointment:", error);
