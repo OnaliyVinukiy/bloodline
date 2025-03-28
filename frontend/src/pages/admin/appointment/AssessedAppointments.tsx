@@ -10,7 +10,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "@asgardeo/auth-react";
 
-const AllAppointments = () => {
+const AssessedAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { getAccessToken } = useAuthContext();
@@ -19,32 +19,17 @@ const AllAppointments = () => {
     () => getAccessToken(),
     [getAccessToken]
   );
+
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  const isMedicalConditionPresent = (appointment: any) => {
-    return (
-      appointment.fourthform?.isMedicallyAdvised === "Yes" ||
-      appointment.secondForm?.isPregnant === "Yes" ||
-      appointment.secondForm?.isTakingTreatment === "Yes" ||
-      appointment.secondForm?.isSurgeryDone === "Yes" ||
-      appointment.secondForm?.isEngageHeavyWork === "Yes" ||
-      appointment.thirdForm?.hadHepatitis === "Yes" ||
-      appointment.thirdForm?.hadTyphoid === "Yes" ||
-      appointment.fourthForm?.hadVaccination === "Yes"
-    );
-  };
-
-  //Fetch appointments
+  //Fetch approved appointments
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        setIsLoading(true);
         const token = await memoizedGetAccessToken();
-
-        // Fetch appointments with Authorization header
         const response = await axios.get(
           `${backendURL}/api/appointments/fetch-appointment`,
           {
@@ -53,8 +38,11 @@ const AllAppointments = () => {
             },
           }
         );
-
-        setAppointments(response.data);
+        const approvedAppointments = response.data.filter(
+          (appointment: any) => appointment.status === "Assessed"
+        );
+        setAppointments(approvedAppointments);
+        console.log(approvedAppointments);
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {
@@ -63,7 +51,7 @@ const AllAppointments = () => {
     };
 
     fetchAppointments();
-  }, [memoizedGetAccessToken]);
+  }, []);
 
   //Loading animation
   if (isLoading) {
@@ -123,9 +111,11 @@ const AllAppointments = () => {
           </div>
         </div>
         <table className="mt-4 mb-4 w-full text-md text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead className="text- text-gray-700 uppercase bg-yellow-50 dark:bg-gray-700 dark:text-gray-400">
+          <thead className="text- text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-              <th scope="col" className="px-6 py-3"></th>
+              <th scope="col" className="px-6 py-3">
+                Name
+              </th>
               <th scope="col" className="px-6 py-3">
                 Name
               </th>
@@ -144,6 +134,7 @@ const AllAppointments = () => {
               <th scope="col" className="px-6 py-3 text-center">
                 Status
               </th>
+
               <th scope="col" className="px-6 py-3 text-center">
                 Action
               </th>
@@ -171,51 +162,19 @@ const AllAppointments = () => {
                 </td>
                 <td className="px-6 py-4">{appointment.selectedSlot}</td>
 
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap">
                   {appointment.donorInfo.nic}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {appointment.donorInfo.contactNumber}
                 </td>
-                {appointment.status === "Rejected" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
-                      <button className="red">Rejected</button>
-                    </div>
-                  </td>
-                ) : appointment.status === "Approved" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
-                      <button className="green">Approved</button>
-                    </div>
-                  </td>
-                ) : appointment.status === "Pending" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
-                      <button className="yellow">Pending</button>
-                    </div>
-                  </td>
-                ) : appointment.status === "Confirmed" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
-                      <button className="blue">Confirmed</button>
-                    </div>
-                  </td>
-                ) : appointment.status === "Assessed" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
-                      <button className="cyan">Assessed</button>
-                    </div>
-                  </td>
-                ) : (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
-                      <button className="yellow">Assessed</button>
-                    </div>
-                  </td>
-                )}
+                <td className="px-6 py-6 text-center">
+                  <div className="badges flex justify-center">
+                    <button className="cyan">Assessed</button>
+                  </div>
+                </td>
 
-                <td className="px-4 py-4 text-center">
+                <td className="px-8 py-4 text-center">
                   <div className="flex justify-center space-x-4">
                     <Link to={`/appointment/${appointment._id}`}>
                       <button
@@ -287,43 +246,14 @@ const AllAppointments = () => {
                         </svg>
                       </button>
                     </Link>
-                    <Link
-                      to={`/admin/donation/${appointment._id}`}
-                      state={{
-                        status: appointment.status,
-                        initialStep: appointment.status === "Confirmed" ? 2 : 1,
-                      }}
-                    >
-                      <button
-                        className="font-medium text-green-600 dark:text-green-500 hover:underline"
-                        aria-label="Donate"
-                      >
-                        <svg
-                          className="w-5 h-6 text-blue-800 dark:text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="currentColor"
-                          viewBox="0 0 512 512"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M441 7l32 32 32 32c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-15-15L417.9 128l55 55c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-72-72L295 73c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l55 55L422.1 56 407 41c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0zM210.3 155.7l61.1-61.1c.3 .3 .6 .7 1 1l16 16 56 56 56 56 16 16c.3 .3 .6 .6 1 1l-191 191c-10.5 10.5-24.7 16.4-39.6 16.4H97.9L41 505c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l57-57V325.3c0-14.9 5.9-29.1 16.4-39.6l43.3-43.3 57 57c6.2 6.2 16.4 6.2 22.6 0s6.2-16.4 0-22.6l-57-57 41.4-41.4 57 57c6.2 6.2 16.4 6.2 22.6 0s6.2-16.4 0-22.6l-57-57z"
-                          />
-                        </svg>
-                      </button>
-                    </Link>
                   </div>
                 </td>
 
                 <td className="px-1 py-1">
-                  {isMedicalConditionPresent(appointment) && (
+                  {(appointment.fourthform?.isMedicallyAdvised === "Yes" ||
+                    appointment.secondForm?.isPregnant === "Yes") && (
                     <button
-                      className="text-red-500 hover:text-red-400 mr-2"
+                      className="text-red-500 hover:text-red-400 ml-2"
                       aria-label="Warning"
                     >
                       <svg
@@ -354,7 +284,7 @@ const AllAppointments = () => {
                   colSpan={6}
                   className="text-center px-6 py-4 text-gray-500 dark:text-gray-400"
                 >
-                  No appointments found.
+                  No approved appointments found.
                 </td>
               </tr>
             )}
@@ -365,4 +295,4 @@ const AllAppointments = () => {
   );
 };
 
-export default AllAppointments;
+export default AssessedAppointments;

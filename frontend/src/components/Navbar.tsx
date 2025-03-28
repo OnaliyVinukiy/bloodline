@@ -142,9 +142,7 @@ export function Navigationbar() {
         </span>
       </Navbar.Brand>
       <div className="flex md:order-2 md:mr-24">
-        {isLoading ? (
-          <div className="w-10 h-10 bg-gray-300 rounded-full animate-pulse"></div>
-        ) : state?.isAuthenticated ? (
+        {state?.isAuthenticated ? (
           user && !isAdmin ? (
             <Dropdown
               arrowIcon={false}
