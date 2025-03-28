@@ -10,6 +10,8 @@ import PendingAppointments from "./PendingAppointments";
 import ApprovedAppointments from "./ApprovedAppointments";
 import RejectedAppointments from "./RejectedAppointments";
 import AllAppointments from "./AllAppointments";
+import AssessedAppointments from "./AssessedAppointments";
+import ConfirmedAppointments from "./ConfirmedAppointments";
 
 const Appointments = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -62,6 +64,30 @@ const Appointments = () => {
                   : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
               }`}
             >
+              Confirmed
+            </button>
+          </li>
+          <li className="me-2">
+            <button
+              onClick={() => setActiveTab("tab5")}
+              className={`px-6 py-3 rounded-t-lg transition-colors duration-300 ${
+                activeTab === "tab5"
+                  ? "text-white bg-red-800 border-b-0"
+                  : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}
+            >
+              Assessed
+            </button>
+          </li>
+          <li className="me-2">
+            <button
+              onClick={() => setActiveTab("tab6")}
+              className={`px-6 py-3 rounded-t-lg transition-colors duration-300 ${
+                activeTab === "tab6"
+                  ? "text-white bg-red-800 border-b-0"
+                  : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}
+            >
               Rejected
             </button>
           </li>
@@ -72,7 +98,9 @@ const Appointments = () => {
         {activeTab === "tab1" && <AllAppointments />}
         {activeTab === "tab2" && <PendingAppointments />}
         {activeTab === "tab3" && <ApprovedAppointments />}
-        {activeTab === "tab4" && <RejectedAppointments />}
+        {activeTab === "tab4" && <ConfirmedAppointments />}
+        {activeTab === "tab5" && <AssessedAppointments />}
+        {activeTab === "tab6" && <RejectedAppointments />}
       </div>
     </div>
   );
