@@ -39,8 +39,9 @@ const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
   const location = useLocation();
   const appointmentId = location.pathname.split("/").pop();
   const [showModal, setShowModal] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
-  const { getAccessToken } = useAuthContext();
+  const { getAccessToken, getBasicUserInfo } = useAuthContext();
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -52,6 +53,8 @@ const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
     const fetchAppointment = async () => {
       try {
         const token = await getAccessToken();
+        const userInfo = await getBasicUserInfo();
+        setUserEmail(userInfo.email || "");
         const response = await axios.get(
           `${backendURL}/api/appointments/fetch-appointment/${appointmentId}`,
           {
@@ -107,6 +110,7 @@ const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
             isVerified: formData.isVerified,
             officerSignature: formData.officerSignature,
             verifiedAt: new Date().toISOString(),
+            recordedBy: userEmail,
           },
           status: "Confirmed",
         };
