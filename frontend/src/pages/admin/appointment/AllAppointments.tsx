@@ -201,6 +201,12 @@ const AllAppointments = () => {
                       <button className="blue">Confirmed</button>
                     </div>
                   </td>
+                ) : appointment.status === "Assessed" ? (
+                  <td className="px-6 py-6 text-center">
+                    <div className="badges flex justify-center">
+                      <button className="cyan">Assessed</button>
+                    </div>
+                  </td>
                 ) : (
                   <td className="px-6 py-6 text-center">
                     <div className="badges flex justify-center">
@@ -283,7 +289,10 @@ const AllAppointments = () => {
                     </Link>
                     <Link
                       to={`/admin/donation/${appointment._id}`}
-                      state={{ status: appointment.status }}
+                      state={{
+                        status: appointment.status,
+                        initialStep: appointment.status === "Confirmed" ? 2 : 1,
+                      }}
                     >
                       <button
                         className="font-medium text-green-600 dark:text-green-500 hover:underline"
