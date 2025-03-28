@@ -38,6 +38,7 @@ const StepThree: React.FC<StepperPropsCamps> = ({
   });
   const appointmentId = location.pathname.split("/").pop();
   const [isLoading, setIsLoading] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [appointment, setAppointment] = useState<Appointment | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -46,7 +47,7 @@ const StepThree: React.FC<StepperPropsCamps> = ({
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  const { getAccessToken } = useAuthContext();
+  const { getAccessToken, getBasicUserInfo } = useAuthContext();
 
   //Fetch appointment data
   useEffect(() => {
@@ -54,6 +55,8 @@ const StepThree: React.FC<StepperPropsCamps> = ({
       try {
         setIsLoading(true);
         const token = await getAccessToken();
+        const userInfo = await getBasicUserInfo();
+        setUserEmail(userInfo.email || "");
         const response = await axios.get(
           `${backendURL}/api/appointments/fetch-appointment/${appointmentId}`,
           {
@@ -65,7 +68,7 @@ const StepThree: React.FC<StepperPropsCamps> = ({
         setAppointment(response.data);
 
         //Populate appointment data
-        if (response.data.assessment) {
+        if (response.data.bagIssue) {
           setFormData({
             bagIssue: {
               hbLevel: response.data.bagIssue.hbLevel,
@@ -114,6 +117,7 @@ const StepThree: React.FC<StepperPropsCamps> = ({
             bloodBagType: formData.bagIssue.bloodBagType,
             officerSignature: formData.bagIssue.officerSignature,
             issuedAt: new Date().toISOString(),
+            recordedBy: userEmail,
           },
           status: "Issued",
         };
