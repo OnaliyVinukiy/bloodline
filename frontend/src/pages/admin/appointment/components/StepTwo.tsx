@@ -54,7 +54,7 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
         pdCallUp: "",
       },
       outcome: "",
-      remarks: "",
+      deferrealRemarks: "",
       medicalOfficerSignature: "",
       assessedAt: "",
     },
@@ -122,7 +122,7 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
                 pdCallUp: response.data.assessment.councelling.pdCallUp,
               },
               outcome: response.data.assessment.outcome,
-              remarks: response.data.assessment.remarks,
+              deferrealRemarks: response.data.assessment.deferrealRemarks,
               medicalOfficerSignature:
                 response.data.assessment.medicalOfficerSignature,
               assessedAt: new Date().toISOString(),
@@ -185,63 +185,68 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
 
   //Submit form data
   const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      const token = await getAccessToken();
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      };
-
-      const requestData = {
-        assessment: {
-          history: {
-            isFeelingWell: formData.assessment.history.isFeelingWell,
-            adequateSleep: formData.assessment.history.adequateSleep,
-            mealBefore4Hours: formData.assessment.history.mealBefore4Hours,
-            hadHospitalized: formData.assessment.history.hadHospitalized,
-            hasAllergyMedications:
-              formData.assessment.history.hasAllergyMedications,
-            hadRiskBehavior: formData.assessment.history.hadRiskBehavior,
+    if (appointment?.status === "Confirmed") {
+      setLoading(true);
+      try {
+        const token = await getAccessToken();
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-          examination: {
-            isLookingPale: formData.assessment.examination.isLookingPale,
-            isIcterus: formData.assessment.examination.isIcterus,
-            havingAlcoholSmell:
-              formData.assessment.examination.havingAlcoholSmell,
-            hasWounds: formData.assessment.examination.hasWounds,
-            hasVenepuncture: formData.assessment.examination.hasVenepuncture,
-            cvsPulse: formData.assessment.examination.cvsPulse,
-            bp: formData.assessment.examination.bp,
-            weight: formData.assessment.examination.weight,
-            remarks: formData.assessment.examination.remarks,
-          },
-          councelling: {
-            cueOptions: formData.assessment.councelling.cueOptions,
-            pdCallUp: formData.assessment.councelling.pdCallUp,
-          },
-          outcome: formData.assessment.outcome,
-          remarks: formData.assessment.remarks,
-          medicalOfficerSignature: formData.assessment.medicalOfficerSignature,
-          assessedAt: new Date().toISOString(),
-        },
-        status: "Assessed",
-      };
+        };
 
-      await axios.patch(
-        `${backendURL}/api/appointments/update-appointment/${appointmentId}`,
-        requestData,
-        config
-      );
+        const requestData = {
+          assessment: {
+            history: {
+              isFeelingWell: formData.assessment.history.isFeelingWell,
+              adequateSleep: formData.assessment.history.adequateSleep,
+              mealBefore4Hours: formData.assessment.history.mealBefore4Hours,
+              hadHospitalized: formData.assessment.history.hadHospitalized,
+              hasAllergyMedications:
+                formData.assessment.history.hasAllergyMedications,
+              hadRiskBehavior: formData.assessment.history.hadRiskBehavior,
+            },
+            examination: {
+              isLookingPale: formData.assessment.examination.isLookingPale,
+              isIcterus: formData.assessment.examination.isIcterus,
+              havingAlcoholSmell:
+                formData.assessment.examination.havingAlcoholSmell,
+              hasWounds: formData.assessment.examination.hasWounds,
+              hasVenepuncture: formData.assessment.examination.hasVenepuncture,
+              cvsPulse: formData.assessment.examination.cvsPulse,
+              bp: formData.assessment.examination.bp,
+              weight: formData.assessment.examination.weight,
+              remarks: formData.assessment.examination.remarks,
+            },
+            councelling: {
+              cueOptions: formData.assessment.councelling.cueOptions,
+              pdCallUp: formData.assessment.councelling.pdCallUp,
+            },
+            outcome: formData.assessment.outcome,
+            deferrealRemarks: formData.assessment.deferrealRemarks,
+            medicalOfficerSignature:
+              formData.assessment.medicalOfficerSignature,
+            assessedAt: new Date().toISOString(),
+          },
+          status: "Assessed",
+        };
 
+        await axios.patch(
+          `${backendURL}/api/appointments/update-appointment/${appointmentId}`,
+          requestData,
+          config
+        );
+
+        onNextStep();
+      } catch (error) {
+        console.error("Error updating appointment:", error);
+        setToastMessage("Failed to update appointment. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    } else {
       onNextStep();
-    } catch (error) {
-      console.error("Error updating appointment:", error);
-      setToastMessage("Failed to update appointment. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -937,7 +942,7 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
                       <input
                         type="radio"
                         name="outcome"
-                        value="TemporaryDeferral"
+                        value="Temporary Deferral"
                         checked={
                           formData.assessment.outcome === "Temporary Deferral"
                         }
@@ -953,7 +958,7 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
                       <input
                         type="radio"
                         name="outcome"
-                        value="PermanentDeferral"
+                        value="Permanent Deferral"
                         checked={
                           formData.assessment.outcome === "Permanent Deferral"
                         }
@@ -976,10 +981,10 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
                   </Label>
                   <input
                     type="text"
-                    name="remarks"
+                    name="deferrealRemarks"
                     placeholder="Enter any remarks or deferral reasons"
                     onChange={handleInputChange}
-                    value={formData.assessment.remarks}
+                    value={formData.assessment.deferrealRemarks}
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
