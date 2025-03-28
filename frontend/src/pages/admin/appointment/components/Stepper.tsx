@@ -11,33 +11,21 @@ import { User } from "../../../../types/users";
 import { useAuthContext } from "@asgardeo/auth-react";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
-import { useLocation } from "react-router-dom";
 
 const Stepper = ({
-  step: propStep,
+  step,
   onNextStep,
   onPreviousStep,
-  setStep: propSetStep,
+  setStep,
 }: {
   step: number;
   onNextStep: () => void;
   onPreviousStep: () => void;
   setStep: (step: number) => void;
 }) => {
-  const location = useLocation();
-  const [currentStep, setCurrentStep] = useState(propStep);
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (location.state?.initialStep) {
-      setCurrentStep(location.state.initialStep);
-    } else {
-      setCurrentStep(propStep);
-    }
-  }, [location.state, propStep]);
-
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
@@ -75,9 +63,7 @@ const Stepper = ({
   ];
 
   const handleStepClick = (index: number) => {
-    const newStep = index + 1;
-    setCurrentStep(newStep);
-    propSetStep(newStep);
+    setStep(index + 1);
   };
 
   // Loading animation
@@ -122,7 +108,7 @@ const Stepper = ({
               <div
                 className="h-2.5 rounded-full absolute top-0 left-0 transition-all duration-300"
                 style={{
-                  width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
+                  width: `${((step - 1) / (steps.length - 1)) * 100}%`,
                   background:
                     "linear-gradient(90deg,rgb(184, 38, 1),rgb(235, 56, 36))",
                 }}
@@ -139,7 +125,7 @@ const Stepper = ({
                 >
                   <div
                     className={`w-8 h-8 flex items-center justify-center rounded-full font-semibold transition-all duration-300 ${
-                      index + 1 <= currentStep
+                      index + 1 <= step
                         ? "bg-gradient-to-r from-red-800 to-red-600 text-white"
                         : "bg-gray-200 text-gray-500"
                     }`}
@@ -155,10 +141,10 @@ const Stepper = ({
       </div>
 
       {/* Render Step Components */}
-      {currentStep === 1 && (
+      {step === 1 && (
         <StepOne onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
-      {currentStep === 2 && (
+      {step === 2 && (
         <StepTwo onNextStep={onNextStep} onPreviousStep={onPreviousStep} />
       )}
     </div>
