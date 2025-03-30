@@ -8,11 +8,11 @@
 
 import React, { useEffect, useState } from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
-import { Label, Toast } from "flowbite-react";
+import { Button, Label, Modal, Toast } from "flowbite-react";
 import { HiExclamation } from "react-icons/hi";
 import { useAuthContext } from "@asgardeo/auth-react";
 import axios from "axios";
-import { Appointment } from "../../../../types/appointment";
+import { useNavigate } from "react-router-dom";
 
 declare global {
   interface Window {
@@ -20,10 +20,7 @@ declare global {
   }
 }
 
-const StepFour: React.FC<StepperPropsCamps> = ({
-  onPreviousStep,
-  onNextStep,
-}) => {
+const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
   const handlePrevious = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
@@ -41,7 +38,6 @@ const StepFour: React.FC<StepperPropsCamps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-  const [appointment, setAppointment] = useState<Appointment | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -49,6 +45,8 @@ const StepFour: React.FC<StepperPropsCamps> = ({
       : "http://localhost:5000";
 
   const { getAccessToken, getBasicUserInfo } = useAuthContext();
+  const navigate = useNavigate();
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   //Fetch appointment data
   useEffect(() => {
@@ -66,8 +64,6 @@ const StepFour: React.FC<StepperPropsCamps> = ({
             },
           }
         );
-        setAppointment(response.data);
-
         //Populate appointment data
         if (response.data.bloodCollection) {
           setFormData({
@@ -101,49 +97,68 @@ const StepFour: React.FC<StepperPropsCamps> = ({
     }));
   };
 
-  //Submit form data
-  const handleSubmit = async () => {
-    if (appointment?.status === "Issued") {
-      setLoading(true);
-      try {
-        const token = await getAccessToken();
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        };
-
-        const requestData = {
-          bloodCollection: {
-            startTime: formData.bloodCollection.startTime,
-            endTime: formData.bloodCollection.endTime,
-            phlebotomistSignature:
-              formData.bloodCollection.phlebotomistSignature,
-            collectedAt: new Date().toISOString(),
-            recordedBy: userEmail,
-          },
-          status: "Collected",
-        };
-
-        await axios.patch(
-          `${backendURL}/api/appointments/update-appointment/${appointmentId}`,
-          requestData,
-          config
-        );
-
-        onNextStep();
-      } catch (error) {
-        console.error("Error updating appointment:", error);
-        setToastMessage("Failed to update appointment. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      onNextStep();
-    }
+  const handleModalClose = () => {
+    setShowSuccessModal(false);
+    navigate("/admin/appointments");
   };
 
+  //Submit form data
+  const handleSubmit = async () => {
+    if (
+      !formData.bloodCollection.startTime ||
+      !formData.bloodCollection.endTime ||
+      !formData.bloodCollection.volume ||
+      !formData.bloodCollection.phlebotomistSignature
+    ) {
+      setToastMessage("Please fill all required fields");
+      return;
+    }
+
+    if (
+      new Date(formData.bloodCollection.endTime) <
+      new Date(formData.bloodCollection.startTime)
+    ) {
+      setToastMessage("End time must be after start time");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const token = await getAccessToken();
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      };
+
+      const requestData = {
+        bloodCollection: {
+          startTime: formData.bloodCollection.startTime,
+          endTime: formData.bloodCollection.endTime,
+          volume: formData.bloodCollection.volume,
+          phlebotomistSignature: formData.bloodCollection.phlebotomistSignature,
+          collectedAt: new Date().toISOString(),
+          recordedBy: userEmail,
+        },
+        status: "Collected",
+      };
+
+      await axios.patch(
+        `${backendURL}/api/appointments/update-appointment/${appointmentId}`,
+        requestData,
+        config
+      );
+
+      // Show success modal
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error("Error updating appointment:", error);
+      setToastMessage("Failed to update appointment. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
   //Loading Animation
   if (isLoading) {
     return (
@@ -322,6 +337,41 @@ const StepFour: React.FC<StepperPropsCamps> = ({
               <Toast.Toggle onClick={() => setToastMessage(null)} />
             </Toast>
           )}
+
+          <Modal show={showSuccessModal} onClose={handleModalClose}>
+            <Modal.Header className="flex items-center gap-2 ">
+              <p className="flex items-center gap-2 text-xl text-green-600">
+                <svg
+                  className="w-6 h-6 text-green-600"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="currentColor"
+                  viewBox="0 0 512 512"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"
+                  />
+                </svg>
+                Recorded!
+              </p>
+            </Modal.Header>
+            <Modal.Body>
+              <p className="text-lg text-gray-700">
+                Blood collection recorded successfully!
+              </p>
+            </Modal.Body>
+            <Modal.Footer className="flex justify-end">
+              <Button onClick={handleModalClose} color="failure">
+                Return to Appointments
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       </main>
     </div>
