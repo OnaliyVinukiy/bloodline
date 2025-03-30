@@ -13,6 +13,7 @@ import AllAppointments from "./AllAppointments";
 import AssessedAppointments from "./AssessedAppointments";
 import ConfirmedAppointments from "./ConfirmedAppointments";
 import IssuedAppointments from "./IssuedAppointments";
+import BloodCollectedAppointments from "./BloodCollectedAppointments";
 
 const Appointments = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -104,6 +105,18 @@ const Appointments = () => {
               Rejected
             </button>
           </li>
+          <li className="me-2">
+            <button
+              onClick={() => setActiveTab("tab8")}
+              className={`px-6 py-3 rounded-t-lg transition-colors duration-300 ${
+                activeTab === "tab8"
+                  ? "text-white bg-red-800 border-b-0"
+                  : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}
+            >
+              Collected
+            </button>
+          </li>
         </ul>
       </div>
 
@@ -115,6 +128,7 @@ const Appointments = () => {
         {activeTab === "tab5" && <AssessedAppointments />}
         {activeTab === "tab6" && <IssuedAppointments />}
         {activeTab === "tab7" && <RejectedAppointments />}
+        {activeTab === "tab8" && <BloodCollectedAppointments />}
       </div>
     </div>
   );
