@@ -19,6 +19,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/nodemailer": "^6.4.17",
+    "axios": "^1.8.4",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
