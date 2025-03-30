@@ -16,6 +16,7 @@ import dataService from "./utils/dataService";
 import campRoutes from "./routes/campRoutes";
 import organizationRoutes from "./routes/organizationRoutes";
 import stockRoutes from "./routes/stockRoutes";
+import chatRoutes from "./routes/chatRoutes";
 
 const app = express();
 
@@ -55,6 +56,9 @@ app.use("/api/organizations", organizationRoutes);
 
 // Stocks Routes
 app.use("/api/stocks", stockRoutes);
+
+// Chatbot Routes
+app.use("/api/chatbot", chatRoutes);
 
 // Home route
 app.get("/", (req: Request, res: Response): void => {
