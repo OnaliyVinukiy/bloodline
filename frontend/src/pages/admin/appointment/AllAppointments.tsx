@@ -213,10 +213,16 @@ const AllAppointments = () => {
                       <button className="indigo">Issued</button>
                     </div>
                   </td>
+                ) : appointment.status === "Collected" ? (
+                  <td className="px-6 py-6 text-center">
+                    <div className="badges flex justify-center">
+                      <button className="purple">Collected</button>
+                    </div>
+                  </td>
                 ) : (
                   <td className="px-6 py-6 text-center">
                     <div className="badges flex justify-center">
-                      <button className="yellow">Assessed</button>
+                      <button className="yellow">None</button>
                     </div>
                   </td>
                 )}
