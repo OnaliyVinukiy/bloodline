@@ -8,6 +8,7 @@
 import { CarouselSlider } from "./components/Carousel";
 import Cards from "./components/Cards";
 import BloodType from "./components/BloodType";
+import Chatbot from "./components/ChatBot";
 
 const Home = () => {
   return (
@@ -15,6 +16,7 @@ const Home = () => {
       <CarouselSlider />
       <Cards />
       <BloodType />
+      <Chatbot />
     </div>
   );
 };
