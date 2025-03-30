@@ -9,7 +9,11 @@ import { Request, Response } from "express";
 import axios from "axios";
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
-import { DATABASE_ID, APPOINTMENT_COLLECTION_ID } from "../config/azureConfig";
+import {
+  DATABASE_ID,
+  APPOINTMENT_COLLECTION_ID,
+  bloodBankContext,
+} from "../config/azureConfig";
 
 dotenv.config();
 
@@ -103,12 +107,12 @@ class ChatbotController {
           .toArray();
 
         return appointments.length > 0
-          ? `📅 There are **${appointments.length}** appointments scheduled on **${normalizedDate}**.`
-          : `❌ No appointments are scheduled on **${normalizedDate}**.`;
+          ? `📅 There are ${appointments.length} appointments scheduled on ${normalizedDate}.`
+          : `❌ No appointments are scheduled on ${normalizedDate}.`;
       }
 
       const totalAppointments = await collection.countDocuments();
-      return `📋 There are a total of **${totalAppointments}** appointments.`;
+      return `📋 There are a total of ${totalAppointments} appointments.`;
     } catch (error) {
       console.error("Error fetching appointments:", error);
       return "⚠️ Sorry, I couldn't fetch appointment data at the moment.";
@@ -130,8 +134,7 @@ class ChatbotController {
           messages: [
             {
               role: "system",
-              content:
-                "You are a chatbot for a blood bank. Prioritize answering blood donation eligibility and appointment-related queries. If unsure, respond naturally.",
+              content: bloodBankContext,
             },
             { role: "user", content: userMessage },
           ],
