@@ -108,7 +108,13 @@
   padding: 2px 10px;
   border: 1px rgb(239 68 68) solid;
 }
-
+.badges .purple {
+  background-color: rgba(168, 85, 247, 0.1);
+  color: rgb(168 85 247);
+  border-radius: 9999px;
+  padding: 2px 10px;
+  border: 1px solid rgb(168 85 247);
+}
 .badges .cyan {
   background-color: rgba(48, 213, 200, 0.1);
   color: rgb(3, 176, 162);
