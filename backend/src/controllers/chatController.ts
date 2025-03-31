@@ -99,8 +99,8 @@ class ChatbotController {
         const appointments = await collection
           .find({
             selectedDate: {
-              $gte: normalizedDate + "T00:00:00",
-              $lte: normalizedDate + "T23:59:59.999",
+              $gte: normalizedDate,
+              $lte: normalizedDate,
             },
           })
           .toArray();
