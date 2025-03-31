@@ -104,17 +104,13 @@ class ChatbotController {
             },
           })
           .toArray();
-        console.log("Querying appointments for:", normalizedDate);
-        console.log("Start Date:", startDate.toISOString());
-        console.log("End Date:", endDate.toISOString());
-        console.log("Appointments Found:", appointments);
         return appointments.length > 0
-          ? `\ud83d\udcc5 There are **${appointments.length}** appointments scheduled on **${normalizedDate}**.`
-          : `❌ No appointments are scheduled on **${normalizedDate}**.`;
+          ? `\ud83d\udcc5 There are ${appointments.length} appointments scheduled on ${normalizedDate}.`
+          : `❌ No appointments are scheduled on ${normalizedDate}.`;
       }
 
       const totalAppointments = await collection.countDocuments();
-      return `📋 There are a total of **${totalAppointments}** appointments.`;
+      return `📋 There are a total of ${totalAppointments} appointments.`;
     } catch (error) {
       console.error("Error fetching appointments:", error);
       return "⚠️ Sorry, I couldn't fetch appointment data at the moment.";
