@@ -13,6 +13,7 @@ import {
   DATABASE_ID,
   APPOINTMENT_COLLECTION_ID,
   bloodBankContext,
+  COSMOS_DB_CONNECTION_STRING,
 } from "../config/azureConfig";
 
 dotenv.config();
@@ -23,8 +24,9 @@ class ChatbotController {
   private static readonly deploymentName =
     process.env.AZURE_OPENAI_DEPLOYMENT_NAME;
 
-  //Normalize date format
+  // Normalize date format with enhanced debugging
   private static normalizeDateString(dateString: string): string | null {
+    console.log(`[Date Normalization] Input: ${dateString}`);
     const datePattern = /(\d{1,2})(?:st|nd|rd|th)?\s([A-Za-z]+)\s(\d{4})/;
     const match = dateString.match(datePattern);
 
@@ -60,25 +62,57 @@ class ChatbotController {
       const month = months[match[2]];
       const year = match[3];
 
-      return month
-        ? `${year}-${month.toString().padStart(2, "0")}-${day}`
-        : null;
+      if (!month) {
+        console.error(`[Date Normalization] Invalid month: ${match[2]}`);
+        return null;
+      }
+
+      const normalizedDate = `${year}-${month
+        .toString()
+        .padStart(2, "0")}-${day}`;
+      console.log(`[Date Normalization] Output: ${normalizedDate}`);
+      return normalizedDate;
     }
 
+    console.error(`[Date Normalization] No match found for: ${dateString}`);
     return null;
   }
 
-  //Fetch appointments from database
+  // Fetch appointments with enhanced debugging
   private static async fetchAppointments(query: string): Promise<string> {
-    const client = new MongoClient(
-      process.env.COSMOS_DB_CONNECTION_STRING as string
+    console.log(`[Appointments] Initializing connection to Cosmos DB`);
+    console.log(
+      `[Appointments] Connection String: ${COSMOS_DB_CONNECTION_STRING?.substring(
+        0,
+        20
+      )}...`
     );
-    await client.connect();
-    const database = client.db(DATABASE_ID);
-    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
-    console.log("Connected to the database.", collection);
-    console.log("Connected to the database.", client);
+
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING as string);
+
     try {
+      await client.connect();
+      console.log(`[Appointments] Successfully connected to Cosmos DB`);
+
+      const database = client.db(DATABASE_ID);
+      console.log(`[Appointments] Using database: ${DATABASE_ID}`);
+
+      const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+      console.log(
+        `[Appointments] Using collection: ${APPOINTMENT_COLLECTION_ID}`
+      );
+
+      // Verify collection exists
+      const collectionExists = await database
+        .listCollections({ name: APPOINTMENT_COLLECTION_ID })
+        .hasNext();
+      if (!collectionExists) {
+        console.error(
+          `[Appointments] Collection ${APPOINTMENT_COLLECTION_ID} does not exist!`
+        );
+        return "⚠️ Appointment system is currently unavailable. Please try again later.";
+      }
+
       const dateMatch = query.match(/on (\d{4}-\d{2}-\d{2})/);
       const dateMatchFormatted = query.match(
         /on (\d{1,2})(?:st|nd|rd|th)?\s([A-Za-z]+)\s(\d{4})/
@@ -87,42 +121,62 @@ class ChatbotController {
       let normalizedDate: string | null = null;
       if (dateMatch) {
         normalizedDate = dateMatch[1];
+        console.log(`[Appointments] Direct date match: ${normalizedDate}`);
       } else if (dateMatchFormatted) {
         const dateString = `${dateMatchFormatted[1]} ${dateMatchFormatted[2]} ${dateMatchFormatted[3]}`;
         normalizedDate = ChatbotController.normalizeDateString(dateString);
+        console.log(`[Appointments] Formatted date match: ${normalizedDate}`);
       }
 
       if (normalizedDate) {
-        const startDate = new Date(normalizedDate);
-        startDate.setHours(0, 0, 0, 0);
-        const endDate = new Date(normalizedDate);
-        endDate.setHours(23, 59, 59, 999);
+        // Explicit UTC dates to avoid timezone issues
+        const startDate = new Date(`${normalizedDate}T00:00:00.000Z`);
+        const endDate = new Date(`${normalizedDate}T23:59:59.999Z`);
 
-        const appointments = await collection
-          .find({
-            selectedDate: {
-              $gte: startDate.toISOString(),
-              $lte: endDate.toISOString(),
-            },
-          })
-          .toArray();
+        console.log(
+          `[Appointments] Querying between: ${startDate.toISOString()} and ${endDate.toISOString()}`
+        );
+
+        const query = {
+          selectedDate: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        };
+
+        console.log(`[Appointments] Final query:`, JSON.stringify(query));
+
+        const appointments = await collection.find(query).toArray();
+        console.log(`[Appointments] Found ${appointments.length} appointments`);
+
+        if (appointments.length > 0) {
+          console.log(
+            `[Appointments] Sample appointment:`,
+            JSON.stringify(appointments[0])
+          );
+        }
 
         return appointments.length > 0
           ? `📅 There are ${appointments.length} appointments scheduled on ${normalizedDate}.`
           : `❌ No appointments are scheduled on ${normalizedDate}.`;
       }
 
+      // If no specific date requested, return total count
       const totalAppointments = await collection.countDocuments();
+      console.log(
+        `[Appointments] Total appointments in system: ${totalAppointments}`
+      );
       return `📋 There are a total of ${totalAppointments} appointments.`;
     } catch (error) {
-      console.error("Error fetching appointments:", error);
+      console.error("[Appointments] Error fetching appointments:", error);
       return "⚠️ Sorry, I couldn't fetch appointment data at the moment.";
     } finally {
       await client.close();
+      console.log(`[Appointments] Connection closed`);
     }
   }
 
-  //Call OpenAI API with system instruction
+  // Call OpenAI API with system instruction
   public static async callAzureOpenAI(userMessage: string): Promise<string> {
     try {
       if (!this.openaiEndpoint || !this.openaiApiKey || !this.deploymentName) {
@@ -162,16 +216,18 @@ class ChatbotController {
     }
   }
 
-  //Handle incoming chatbot messages
+  // Handle incoming chatbot messages
   public async handleChat(req: Request, res: Response): Promise<Response> {
     try {
       const { message } = req.body;
-      if (!message)
+      if (!message) {
         return res.status(400).json({ reply: "⚠️ Message is required." });
+      }
 
+      console.log(`[Chat] Received message: ${message}`);
       const lowerMessage = message.toLowerCase();
 
-      //Check for eligibility related queries
+      // Check for eligibility related queries
       const eligibilityKeywords = [
         "eligibility",
         "eligible",
@@ -185,37 +241,61 @@ class ChatbotController {
       if (
         eligibilityKeywords.some((keyword) => lowerMessage.includes(keyword))
       ) {
-        if (
-          eligibilityKeywords.some((keyword) => lowerMessage.includes(keyword))
-        ) {
-          const eligibilityResponse =
-            "To donate blood, you must be between 18-60 years old with hemoglobin above 12g/dL, in good health with no serious diseases or pregnancy, and have a valid ID. You need to wait at least 4 months between donations. You cannot donate if you engage in high-risk behaviors (like drug use or unprotected sex with multiple partners) or have certain medical conditions. Want me to check your specific eligibility? Just ask! 😊";
-
-          return res.status(200).json({ reply: eligibilityResponse });
-        }
+        const eligibilityResponse =
+          "To donate blood, you must be between 18-60 years old with hemoglobin above 12g/dL, in good health with no serious diseases or pregnancy, and have a valid ID. You need to wait at least 4 months between donations. You cannot donate if you engage in high-risk behaviors (like drug use or unprotected sex with multiple partners) or have certain medical conditions. Want me to check your specific eligibility? Just ask! 😊";
+        return res.status(200).json({ reply: eligibilityResponse });
       }
 
-      //Check for appointment related queries
+      // Check for appointment related queries
       if (lowerMessage.includes("appointment")) {
+        console.log(`[Chat] Detected appointment query`);
         const appointmentResponse = await ChatbotController.fetchAppointments(
           message
         );
-        console.log(
-          "Cosmos DB Connection String:",
-          process.env.COSMOS_DB_CONNECTION_STRING
-        );
-        console.log("Database ID:", DATABASE_ID);
-        console.log("Appointment Collection ID:", APPOINTMENT_COLLECTION_ID);
-
         return res.status(200).json({ reply: appointmentResponse });
       }
 
-      //Send message to OpenAI
+      // Send message to OpenAI
       const aiResponse = await ChatbotController.callAzureOpenAI(message);
       return res.status(200).json({ reply: aiResponse });
     } catch (error) {
       console.error("Chat handler error:", error);
       return res.status(500).json({ reply: "🚨 Internal server error." });
+    }
+  }
+
+  // New endpoint for connection testing
+  public async testConnection(req: Request, res: Response): Promise<Response> {
+    try {
+      console.log(`[Test] Testing Cosmos DB connection`);
+      const client = new MongoClient(COSMOS_DB_CONNECTION_STRING as string);
+      await client.connect();
+
+      const database = client.db(DATABASE_ID);
+      const collections = await database.listCollections().toArray();
+      await client.close();
+
+      console.log(
+        `[Test] Connection successful. Collections:`,
+        collections.map((c) => c.name)
+      );
+
+      return res.status(200).json({
+        connected: true,
+        collections: collections.map((c) => c.name),
+        database: DATABASE_ID,
+        environment: process.env.NODE_ENV || "development",
+      });
+    } catch (error) {
+      console.error("[Test] Connection test failed:", error);
+      return res.status(500).json({
+        connected: false,
+        error:
+          error instanceof Error ? error.message : "An unknown error occurred",
+        connectionString: COSMOS_DB_CONNECTION_STRING
+          ? `${COSMOS_DB_CONNECTION_STRING.substring(0, 20)}...`
+          : "undefined",
+      });
     }
   }
 }
