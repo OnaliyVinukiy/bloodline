@@ -23,7 +23,7 @@ class ChatbotController {
   private static readonly deploymentName =
     process.env.AZURE_OPENAI_DEPLOYMENT_NAME;
 
-  //Normalize date format
+  // Normalize date format
   private static normalizeDateString(dateString: string): string | null {
     const datePattern = /(\d{1,2})(?:st|nd|rd|th)?\s([A-Za-z]+)\s(\d{4})/;
     const match = dateString.match(datePattern);
@@ -60,15 +60,12 @@ class ChatbotController {
       const month = months[match[2]];
       const year = match[3];
 
-      return month
-        ? `${year}-${month.toString().padStart(2, "0")}-${day}`
-        : null;
+      return month ? `${year}-${month.toString().padStart(2, "0")}-${day}` : null;
     }
-
     return null;
   }
 
-  //Fetch appointments from database
+  // Fetch appointments from database
   private static async fetchAppointments(query: string): Promise<string> {
     const client = new MongoClient(
       process.env.COSMOS_DB_CONNECTION_STRING as string
@@ -107,7 +104,7 @@ class ChatbotController {
           .toArray();
 
         return appointments.length > 0
-          ? `📅 There are **${appointments.length}** appointments scheduled on **${normalizedDate}**.`
+          ? `\ud83d\udcc5 There are **${appointments.length}** appointments scheduled on **${normalizedDate}**.`
           : `❌ No appointments are scheduled on **${normalizedDate}**.`;
       }
 
@@ -121,7 +118,7 @@ class ChatbotController {
     }
   }
 
-  //Call OpenAI API with system instruction
+  // Call OpenAI API with system instruction
   public static async callAzureOpenAI(userMessage: string): Promise<string> {
     try {
       if (!this.openaiEndpoint || !this.openaiApiKey || !this.deploymentName) {
@@ -161,7 +158,7 @@ class ChatbotController {
     }
   }
 
-  //Handle incoming chatbot messages
+  // Handle incoming chatbot messages
   public async handleChat(req: Request, res: Response): Promise<Response> {
     try {
       const { message } = req.body;
@@ -170,39 +167,23 @@ class ChatbotController {
 
       const lowerMessage = message.toLowerCase();
 
-      //Check for eligibility related queries
+      // Check for eligibility related queries
       const eligibilityKeywords = [
-        "eligibility",
-        "eligible",
-        "criteria",
-        "can i donate",
-        "who can donate",
-        "blood donation rules",
-        "donor requirements",
+        "eligibility", "eligible", "criteria", "can i donate",
+        "who can donate", "blood donation rules", "donor requirements",
       ];
 
-      if (
-        eligibilityKeywords.some((keyword) => lowerMessage.includes(keyword))
-      ) {
-        if (
-          eligibilityKeywords.some((keyword) => lowerMessage.includes(keyword))
-        ) {
-          const eligibilityResponse =
-            "To donate blood, you must be between 18-60 years old with hemoglobin above 12g/dL, in good health with no serious diseases or pregnancy, and have a valid ID. You need to wait at least 4 months between donations. You cannot donate if you engage in high-risk behaviors (like drug use or unprotected sex with multiple partners) or have certain medical conditions. Want me to check your specific eligibility? Just ask! 😊";
-
-          return res.status(200).json({ reply: eligibilityResponse });
-        }
+      if (eligibilityKeywords.some((keyword) => lowerMessage.includes(keyword))) {
+        const eligibilityResponse =
+          "To donate blood, you must be between 18-60 years old with hemoglobin above 12g/dL, in good health with no serious diseases or pregnancy, and have a valid ID. You need to wait at least 4 months between donations. You cannot donate if you engage in high-risk behaviors (like drug use or unprotected sex with multiple partners) or have certain medical conditions. Want me to check your specific eligibility? Just ask! 😊";
+        return res.status(200).json({ reply: eligibilityResponse });
       }
 
-      //Check for appointment related queries
       if (lowerMessage.includes("appointment")) {
-        const appointmentResponse = await ChatbotController.fetchAppointments(
-          message
-        );
+        const appointmentResponse = await ChatbotController.fetchAppointments(message);
         return res.status(200).json({ reply: appointmentResponse });
       }
 
-      //Send message to OpenAI
       const aiResponse = await ChatbotController.callAzureOpenAI(message);
       return res.status(200).json({ reply: aiResponse });
     } catch (error) {
