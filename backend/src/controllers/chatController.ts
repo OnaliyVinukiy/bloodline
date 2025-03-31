@@ -76,7 +76,8 @@ class ChatbotController {
     await client.connect();
     const database = client.db(DATABASE_ID);
     const collection = database.collection(APPOINTMENT_COLLECTION_ID);
-
+    console.log("Connected to the database.", collection);
+    console.log("Connected to the database.", client);
     try {
       const dateMatch = query.match(/on (\d{4}-\d{2}-\d{2})/);
       const dateMatchFormatted = query.match(
