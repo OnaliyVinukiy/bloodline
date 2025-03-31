@@ -99,19 +99,18 @@ class ChatbotController {
         const appointments = await collection
           .find({
             selectedDate: {
-              $gte: startDate.toISOString(),
-              $lte: endDate.toISOString(),
+              $gte: normalizedDate + "T00:00:00",
+              $lte: normalizedDate + "T23:59:59.999",
             },
           })
           .toArray();
-          console.log("Querying appointments for:", normalizedDate);
-          console.log("Start Date:", startDate.toISOString());
-          console.log("End Date:", endDate.toISOString());
-          console.log("Appointments Found:", appointments);
+        console.log("Querying appointments for:", normalizedDate);
+        console.log("Start Date:", startDate.toISOString());
+        console.log("End Date:", endDate.toISOString());
+        console.log("Appointments Found:", appointments);
         return appointments.length > 0
           ? `\ud83d\udcc5 There are **${appointments.length}** appointments scheduled on **${normalizedDate}**.`
           : `❌ No appointments are scheduled on **${normalizedDate}**.`;
-        
       }
 
       const totalAppointments = await collection.countDocuments();
