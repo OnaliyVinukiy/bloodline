@@ -200,6 +200,13 @@ class ChatbotController {
         const appointmentResponse = await ChatbotController.fetchAppointments(
           message
         );
+        console.log(
+          "Cosmos DB Connection String:",
+          process.env.COSMOS_DB_CONNECTION_STRING
+        );
+        console.log("Database ID:", DATABASE_ID);
+        console.log("Appointment Collection ID:", APPOINTMENT_COLLECTION_ID);
+
         return res.status(200).json({ reply: appointmentResponse });
       }
 
