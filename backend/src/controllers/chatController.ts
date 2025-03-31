@@ -60,7 +60,9 @@ class ChatbotController {
       const month = months[match[2]];
       const year = match[3];
 
-      return month ? `${year}-${month.toString().padStart(2, "0")}-${day}` : null;
+      return month
+        ? `${year}-${month.toString().padStart(2, "0")}-${day}`
+        : null;
     }
     return null;
   }
@@ -102,10 +104,14 @@ class ChatbotController {
             },
           })
           .toArray();
-
+          console.log("Querying appointments for:", normalizedDate);
+          console.log("Start Date:", startDate.toISOString());
+          console.log("End Date:", endDate.toISOString());
+          console.log("Appointments Found:", appointments);
         return appointments.length > 0
           ? `\ud83d\udcc5 There are **${appointments.length}** appointments scheduled on **${normalizedDate}**.`
           : `❌ No appointments are scheduled on **${normalizedDate}**.`;
+        
       }
 
       const totalAppointments = await collection.countDocuments();
@@ -169,18 +175,27 @@ class ChatbotController {
 
       // Check for eligibility related queries
       const eligibilityKeywords = [
-        "eligibility", "eligible", "criteria", "can i donate",
-        "who can donate", "blood donation rules", "donor requirements",
+        "eligibility",
+        "eligible",
+        "criteria",
+        "can i donate",
+        "who can donate",
+        "blood donation rules",
+        "donor requirements",
       ];
 
-      if (eligibilityKeywords.some((keyword) => lowerMessage.includes(keyword))) {
+      if (
+        eligibilityKeywords.some((keyword) => lowerMessage.includes(keyword))
+      ) {
         const eligibilityResponse =
           "To donate blood, you must be between 18-60 years old with hemoglobin above 12g/dL, in good health with no serious diseases or pregnancy, and have a valid ID. You need to wait at least 4 months between donations. You cannot donate if you engage in high-risk behaviors (like drug use or unprotected sex with multiple partners) or have certain medical conditions. Want me to check your specific eligibility? Just ask! 😊";
         return res.status(200).json({ reply: eligibilityResponse });
       }
 
       if (lowerMessage.includes("appointment")) {
-        const appointmentResponse = await ChatbotController.fetchAppointments(message);
+        const appointmentResponse = await ChatbotController.fetchAppointments(
+          message
+        );
         return res.status(200).json({ reply: appointmentResponse });
       }
 
