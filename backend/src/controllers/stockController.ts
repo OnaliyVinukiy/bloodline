@@ -12,21 +12,13 @@ import { Request, Response } from "express";
 
 dotenv.config();
 import { ObjectId } from "mongodb";
+import { BloodStock } from "../types/stocks";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
 if (!COSMOS_DB_CONNECTION_STRING) {
   throw new Error("Missing environment variable: COSMOS_DB_CONNECTION_STRING");
 }
 
-// Blood Stock Type Interface
-interface BloodStock {
-  _id?: ObjectId;
-  bloodType: string;
-  quantity: number;
-  updatedBy: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
 
 //Fetch blood stock
 export const fetchStocks = async (req: Request, res: Response) => {
@@ -127,5 +119,61 @@ export const updateStock = async (req: Request, res: Response) => {
       message: "Server error while updating blood stock",
       error: error instanceof Error ? error.message : "Unknown error",
     });
+  }
+};
+
+//Issue blood stock
+export const issueBloodStock = async (req: Request, res: Response) => {
+  let client: MongoClient | null = null;
+  try {
+    client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection<BloodStock>(
+      BLOOD_STOCK_COLLECTION_ID
+    );
+
+    const { bloodType, quantity, updatedBy, issuedTo } = req.body;
+
+    if (!bloodType || !quantity || !updatedBy || !issuedTo) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    const parsedQuantity = Number(quantity);
+    if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
+      return res
+        .status(400)
+        .json({ message: "Quantity must be a positive number." });
+    }
+
+    // Find the current stock for the given blood type
+    const stockItem = await collection.findOne({ bloodType });
+    if (!stockItem || stockItem.quantity < parsedQuantity) {
+      return res.status(400).json({ message: "Not enough stock available." });
+    }
+
+    // Deduct the issued quantity from the stock
+    const updatedQuantity = stockItem.quantity - parsedQuantity;
+
+    await collection.updateOne(
+      { _id: stockItem._id },
+      {
+        $set: {
+          quantity: updatedQuantity,
+          updatedBy,
+          updatedAt: new Date(),
+        },
+      }
+    );
+
+    res.status(200).json({ message: "Blood stock issued successfully." });
+  } catch (error) {
+    console.error("Error issuing blood stock:", error);
+    res.status(500).json({ message: "Internal server error." });
+  } finally {
+    if (client) {
+      await client.close();
+    }
   }
 };
