@@ -10,7 +10,7 @@
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { Button, Label, Select, TextInput, Alert, Table } from "flowbite-react";
-import { HiInformationCircle, HiPlus, HiCheck } from "react-icons/hi";
+import { HiInformationCircle, HiPlus, HiCheck, HiMinus } from "react-icons/hi";
 import { BloodStock } from "../../../types/stock";
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -24,6 +24,11 @@ export default function BloodStockManagement() {
   const [formData, setFormData] = useState({
     bloodType: "",
     quantity: "",
+  });
+  const [issueFormData, setIssueFormData] = useState({
+    bloodType: "",
+    quantity: "",
+    issuedTo: "",
   });
   const [userEmail, setUserEmail] = useState("");
 
@@ -63,6 +68,17 @@ export default function BloodStockManagement() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  //
+  const handleIssueInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setIssueFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -119,6 +135,71 @@ export default function BloodStockManagement() {
     }
   };
 
+  //Issue stock
+  const handleIssueSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
+    if (
+      !issueFormData.bloodType ||
+      !issueFormData.quantity ||
+      !issueFormData.issuedTo
+    ) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    const parsedQuantity = Number(issueFormData.quantity);
+    if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
+      setError("Quantity must be a positive number.");
+      return;
+    }
+
+    // Check if enough stock is available
+    const currentStock = stocks.find(
+      (s) => s.bloodType === issueFormData.bloodType
+    );
+    if (!currentStock || currentStock.quantity < parsedQuantity) {
+      setError("Not enough stock available for this blood type.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const token = await getAccessToken();
+      const response = await fetch(`${backendURL}/api/stocks/issue-stock`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          bloodType: issueFormData.bloodType,
+          quantity: parsedQuantity,
+          updatedBy: userEmail,
+          issuedTo: issueFormData.issuedTo,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Response:", data);
+
+      if (!response.ok)
+        throw new Error(data.message || "Failed to issue blood stock");
+
+      setSuccess("Blood stock issued successfully!");
+      setIssueFormData({ bloodType: "", quantity: "", issuedTo: "" });
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
+    } finally {
+      fetchData();
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="mt-10 mb-10 p-6 max-w-7xl mx-auto">
       {success && (
@@ -134,7 +215,7 @@ export default function BloodStockManagement() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Add Stock Form */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-6">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
               Add Blood Stock
@@ -171,11 +252,6 @@ export default function BloodStockManagement() {
                 />
               </div>
 
-              <div>
-                <Label value="Updated By" />
-                <TextInput value={userEmail} readOnly disabled />
-              </div>
-
               <Button
                 type="submit"
                 color="failure"
@@ -184,6 +260,68 @@ export default function BloodStockManagement() {
               >
                 <HiPlus className="mr-2 h-5 w-5" />
                 {loading ? "Adding..." : "Add to Stock"}
+              </Button>
+            </form>
+          </div>
+
+          {/* Issue Stock Form */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              Issue Blood Stock
+            </h2>
+            <form className="space-y-4" onSubmit={handleIssueSubmit}>
+              <div>
+                <Label htmlFor="issueBloodType" value="Blood Type" />
+                <Select
+                  id="issueBloodType"
+                  name="bloodType"
+                  value={issueFormData.bloodType}
+                  onChange={handleIssueInputChange}
+                  required
+                >
+                  <option value="">Select blood type</option>
+                  {bloodTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="issueQuantity" value="Quantity (units)" />
+                <TextInput
+                  id="issueQuantity"
+                  name="quantity"
+                  type="number"
+                  value={issueFormData.quantity}
+                  onChange={handleIssueInputChange}
+                  placeholder="Enter quantity to issue"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="issuedTo" value="Issued To" />
+                <TextInput
+                  id="issuedTo"
+                  name="issuedTo"
+                  type="text"
+                  value={issueFormData.issuedTo}
+                  onChange={handleIssueInputChange}
+                  placeholder="Enter recipient name"
+                  required
+                />
+              </div>
+
+              <Button
+                type="submit"
+                color="blue"
+                className="w-full"
+                disabled={loading}
+              >
+                <HiMinus className="mr-2 h-5 w-5" />
+                {loading ? "Issuing..." : "Issue Stock"}
               </Button>
             </form>
           </div>
