@@ -25,3 +25,15 @@ export interface BloodStock {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface StockAdditionHistory {
+  _id?: ObjectId;
+  bloodType: string;
+  quantityAdded: number;
+  previousQuantity: number;
+  newQuantity: number;
+  updatedBy: string;
+  updatedAt: Date;
+  operationType: "addition" | "issuance";
+  issuedTo?: string;
+}

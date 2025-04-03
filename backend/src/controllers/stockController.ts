@@ -6,19 +6,21 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { MongoClient } from "mongodb";
-import { DATABASE_ID, BLOOD_STOCK_COLLECTION_ID } from "../config/azureConfig";
+import {
+  DATABASE_ID,
+  BLOOD_STOCK_COLLECTION_ID,
+  BLOOD_STOCK_HISTORY_COLLECTION_ID,
+} from "../config/azureConfig";
 import dotenv from "dotenv";
 import { Request, Response } from "express";
+import { BloodStock, StockAdditionHistory } from "../types/stocks";
 
 dotenv.config();
-import { ObjectId } from "mongodb";
-import { BloodStock } from "../types/stocks";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
 if (!COSMOS_DB_CONNECTION_STRING) {
   throw new Error("Missing environment variable: COSMOS_DB_CONNECTION_STRING");
 }
-
 
 //Fetch blood stock
 export const fetchStocks = async (req: Request, res: Response) => {
@@ -52,6 +54,136 @@ export const fetchStocks = async (req: Request, res: Response) => {
     console.error("Error fetching blood stocks:", error);
     res.status(500).json({
       message: "Server error while fetching blood stocks",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  } finally {
+    if (client) await client.close();
+  }
+};
+
+//Track stock change
+export const trackStockChange = async (
+  bloodType: string,
+  quantityChange: number,
+  updatedBy: string,
+  operationType: "addition" | "issuance",
+  previousQuantity: number,
+  issuedTo?: string
+) => {
+  let client: MongoClient | null = null;
+  try {
+    client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection<StockAdditionHistory>(
+      BLOOD_STOCK_HISTORY_COLLECTION_ID
+    );
+
+    const newQuantity = previousQuantity + quantityChange;
+
+    const historyRecord: StockAdditionHistory = {
+      bloodType,
+      quantityAdded:
+        operationType === "addition" ? quantityChange : -quantityChange,
+      previousQuantity,
+      newQuantity,
+      updatedBy,
+      updatedAt: new Date(),
+      operationType,
+      ...(operationType === "issuance" && { issuedTo }),
+    };
+
+    await collection.insertOne(historyRecord);
+  } catch (error) {
+    console.error("Error tracking stock change:", error);
+    throw error;
+  } finally {
+    if (client) await client.close();
+  }
+};
+
+// Fetch stock addition history
+export const getStockAdditionHistory = async (req: Request, res: Response) => {
+  let client: MongoClient | null = null;
+  try {
+    client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection<StockAdditionHistory>(
+      BLOOD_STOCK_HISTORY_COLLECTION_ID
+    );
+
+    //Fetch all history records
+    const history = await collection
+      .find({ operationType: "addition" })
+      .toArray();
+    history.sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    );
+
+    //Format the response
+    const formattedHistory = history.map((record) => ({
+      _id: record._id?.toString(),
+      bloodType: record.bloodType,
+      quantityAdded: record.quantityAdded,
+      updatedBy: record.updatedBy,
+      updatedAt: record.updatedAt.toISOString(),
+    }));
+
+    res.status(200).json(formattedHistory);
+  } catch (error) {
+    console.error("Error fetching stock addition history:", error);
+    res.status(500).json({
+      message: "Server error while fetching stock addition history",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  } finally {
+    if (client) await client.close();
+  }
+};
+
+//Fetch complete stock history
+export const getStockHistory = async (req: Request, res: Response) => {
+  let client: MongoClient | null = null;
+  try {
+    client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection<StockAdditionHistory>(
+      BLOOD_STOCK_HISTORY_COLLECTION_ID
+    );
+
+    //Fetch all history records
+    const history = await collection
+      .find({ operationType: "addition" })
+      .toArray();
+    history.sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    );
+
+    //Format the response
+    const formattedHistory = history.map((record) => ({
+      _id: record._id?.toString(),
+      bloodType: record.bloodType,
+      quantityChange: record.quantityAdded,
+      previousQuantity: record.previousQuantity,
+      newQuantity: record.newQuantity,
+      operationType: record.operationType,
+      updatedBy: record.updatedBy,
+      updatedAt: record.updatedAt.toISOString(),
+      ...(record.operationType === "issuance" && { issuedTo: record.issuedTo }),
+    }));
+
+    res.status(200).json(formattedHistory);
+  } catch (error) {
+    console.error("Error fetching stock history:", error);
+    res.status(500).json({
+      message: "Server error while fetching stock history",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   } finally {
@@ -101,6 +233,14 @@ export const updateStock = async (req: Request, res: Response) => {
     if (!result) {
       throw new Error("Failed to update blood stock");
     }
+
+    await trackStockChange(
+      bloodType,
+      parsedQuantity,
+      updatedBy,
+      "addition",
+      result.quantity - parsedQuantity
+    );
 
     res.status(200).json({
       message: "Blood stock updated successfully",
@@ -167,7 +307,25 @@ export const issueBloodStock = async (req: Request, res: Response) => {
       }
     );
 
-    res.status(200).json({ message: "Blood stock issued successfully." });
+    //Track stock change
+    await trackStockChange(
+      bloodType,
+      -parsedQuantity,
+      updatedBy,
+      "issuance",
+      stockItem.quantity,
+      issuedTo
+    );
+
+    res.status(200).json({
+      message: "Blood stock issued successfully.",
+      issuedDetails: {
+        bloodType,
+        quantity: parsedQuantity,
+        issuedTo,
+        remainingStock: updatedQuantity,
+      },
+    });
   } catch (error) {
     console.error("Error issuing blood stock:", error);
     res.status(500).json({ message: "Internal server error." });
