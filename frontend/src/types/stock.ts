@@ -11,3 +11,11 @@ export interface BloodStock {
   lastUpdated: string;
   updatedBy: string;
 }
+
+export interface StockAddition {
+  _id: string;
+  bloodType: string;
+  quantityAdded: number;
+  updatedBy: string;
+  updatedAt: string;
+}

@@ -5,13 +5,13 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-"use client";
 
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { Button, Label, Select, TextInput, Alert, Table } from "flowbite-react";
 import { HiInformationCircle, HiPlus, HiCheck, HiMinus } from "react-icons/hi";
 import { BloodStock } from "../../../types/stock";
+import { useNavigate } from "react-router-dom";
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -31,7 +31,10 @@ export default function BloodStockManagement() {
     issuedTo: "",
   });
   const [userEmail, setUserEmail] = useState("");
-
+  const [showHistory, setShowHistory] = useState<"issue" | "addition" | null>(
+    null
+  );
+  const navigate = useNavigate();
   const backendURL =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
@@ -200,6 +203,17 @@ export default function BloodStockManagement() {
     }
   };
 
+  //Handle show history buttons
+  const handleShowHistory = (type: "issue" | "addition") => {
+    setShowHistory(type);
+    if (type === "addition") {
+      navigate("/admin/stock/addition-history");
+    }
+    if (type === "issue") {
+      navigate("/stock-issue-history");
+    }
+  };
+
   return (
     <div className="mt-10 mb-10 p-6 max-w-7xl mx-auto">
       {success && (
@@ -316,7 +330,7 @@ export default function BloodStockManagement() {
 
               <Button
                 type="submit"
-                color="blue"
+                color="failure"
                 className="w-full"
                 disabled={loading}
               >
@@ -330,10 +344,6 @@ export default function BloodStockManagement() {
         {/* Stock Table */}
         <div className="lg:col-span-2">
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Current Blood Inventory
-            </h2>
-
             {loading ? (
               <div className=" loading flex justify-center items-center h-40">
                 <svg width="64px" height="48px">
@@ -354,52 +364,73 @@ export default function BloodStockManagement() {
                 </svg>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <Table hoverable>
-                  <Table.Head>
-                    <Table.HeadCell>Blood Type</Table.HeadCell>
-                    <Table.HeadCell>Quantity (units)</Table.HeadCell>
-                    <Table.HeadCell>Last Updated</Table.HeadCell>
-                    <Table.HeadCell>Updated By</Table.HeadCell>
-                  </Table.Head>
-                  <Table.Body className="divide-y">
-                    {stocks.length > 0 ? (
-                      stocks.map((stock, index) => (
-                        <Table.Row key={index} className="bg-white">
-                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900">
-                            {stock.bloodType}
-                          </Table.Cell>
-                          <Table.Cell>
-                            <span
-                              className={`font-bold ${
-                                stock.quantity < 10
-                                  ? "text-red-600"
-                                  : "text-green-600"
-                              }`}
-                            >
-                              {stock.quantity}
-                            </span>
-                          </Table.Cell>
-                          <Table.Cell>
-                            {new Date(stock.lastUpdated).toLocaleString()}
-                          </Table.Cell>
-                          <Table.Cell className="text-blue-600 hover:underline">
-                            <a href={`mailto:${stock.updatedBy}`}>
-                              {stock.updatedBy}
-                            </a>
+              <>
+                <div className="flex space-x-2">
+                  <Button
+                    color="gray"
+                    onClick={() => handleShowHistory("issue")}
+                    disabled={loading}
+                  >
+                    Issue History
+                  </Button>
+                  <Button
+                    color="failure"
+                    onClick={() => handleShowHistory("addition")}
+                    disabled={loading}
+                  >
+                    Addition History
+                  </Button>
+                </div>
+                <h2 className="mt-9 ml-2 text-xl font-semibold text-gray-800 mb-4">
+                  Current Blood Inventory
+                </h2>
+                <div className="mt-8 overflow-x-auto">
+                  <Table hoverable>
+                    <Table.Head>
+                      <Table.HeadCell>Blood Type</Table.HeadCell>
+                      <Table.HeadCell>Quantity (units)</Table.HeadCell>
+                      <Table.HeadCell>Last Updated</Table.HeadCell>
+                      <Table.HeadCell>Updated By</Table.HeadCell>
+                    </Table.Head>
+                    <Table.Body className="divide-y">
+                      {stocks.length > 0 ? (
+                        stocks.map((stock, index) => (
+                          <Table.Row key={index} className="bg-white">
+                            <Table.Cell className="whitespace-nowrap font-medium text-gray-900">
+                              {stock.bloodType}
+                            </Table.Cell>
+                            <Table.Cell>
+                              <span
+                                className={`font-bold ${
+                                  stock.quantity < 10
+                                    ? "text-red-600"
+                                    : "text-green-600"
+                                }`}
+                              >
+                                {stock.quantity}
+                              </span>
+                            </Table.Cell>
+                            <Table.Cell>
+                              {new Date(stock.lastUpdated).toLocaleString()}
+                            </Table.Cell>
+                            <Table.Cell className="text-blue-600 hover:underline">
+                              <a href={`mailto:${stock.updatedBy}`}>
+                                {stock.updatedBy}
+                              </a>
+                            </Table.Cell>
+                          </Table.Row>
+                        ))
+                      ) : (
+                        <Table.Row>
+                          <Table.Cell colSpan={4} className="text-center py-4">
+                            No blood stock data available
                           </Table.Cell>
                         </Table.Row>
-                      ))
-                    ) : (
-                      <Table.Row>
-                        <Table.Cell colSpan={4} className="text-center py-4">
-                          No blood stock data available
-                        </Table.Cell>
-                      </Table.Row>
-                    )}
-                  </Table.Body>
-                </Table>
-              </div>
+                      )}
+                    </Table.Body>
+                  </Table>
+                </div>
+              </>
             )}
           </div>
         </div>
