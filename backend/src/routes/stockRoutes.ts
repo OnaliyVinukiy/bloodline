@@ -10,6 +10,8 @@ import {
   fetchStocks,
   issueBloodStock,
   updateStock,
+  getStockAdditionHistory,
+  getStockHistory,
 } from "../controllers/stockController";
 import { authenticateUser } from "../middleware/authMiddleware";
 
@@ -23,5 +25,11 @@ router.post("/update-stock", authenticateUser, updateStock);
 
 //Issue blood stock
 router.post("/issue-stock", authenticateUser, issueBloodStock);
+
+//Fetch blood stock addition history
+router.get("/addition-history", getStockAdditionHistory);
+
+//Fetch blood stock history
+router.get("/history", getStockHistory);
 
 export default router;
