@@ -25,6 +25,7 @@ import DonorAppointments from "./pages/appointment/Appointments";
 import Map from "./pages/camp/Map";
 import Dashboard from "./pages/admin/dashboard/Dashboard";
 import Stock from "./pages/admin/stock/Stock";
+import StockAdditionHistory from "./pages/admin/stock/StockAdditionHistory";
 
 function App() {
   return (
@@ -58,6 +59,10 @@ function App() {
             <Route path="/admin/camps" element={<Camps />} />
             <Route path="/admin/dashboard" element={<Dashboard />} />
             <Route path="/admin/stock" element={<Stock />} />
+            <Route
+              path="/admin/stock/addition-history"
+              element={<StockAdditionHistory />}
+            />
             <Route
               path="/admin/donation/:appointmentId"
               element={<BloodDonation />}
