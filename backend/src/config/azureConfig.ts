@@ -19,6 +19,7 @@ export const CAMP_COLLECTION_ID = "camps";
 export const DONOR_COLLECTION_ID = "donors";
 export const ORGANIZATION_COLLECTION_ID = "organization";
 export const BLOOD_STOCK_COLLECTION_ID = "stock";
+export const BLOOD_STOCK_HISTORY_COLLECTION_ID = "bloodStockHistory";
 export const CONTAINER_NAME = "profile-pictures";
 export const LOGO_CONTAINER_NAME = "logos";
 export const azureOpenAIConfig = {
