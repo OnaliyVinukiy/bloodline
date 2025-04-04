@@ -128,7 +128,7 @@ const StepSeven: React.FC<StepperProps> = ({
                       value="Yes"
                       checked={formSixData.isInformed === "Yes"}
                       onChange={handleRadioChange("isInformed")}
-                      className="mr-2"
+                      className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
                     Yes
                   </label>
@@ -139,7 +139,7 @@ const StepSeven: React.FC<StepperProps> = ({
                       value="No"
                       checked={formSixData.isInformed === "No"}
                       onChange={handleRadioChange("isInformed")}
-                      className="mr-2"
+                      className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
                     No
                   </label>
@@ -166,7 +166,7 @@ const StepSeven: React.FC<StepperProps> = ({
                         value="Yes"
                         checked={formSixData.isHarmfulCategory === "Yes"}
                         onChange={handleRadioChange("isHarmfulCategory")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Yes
                     </label>
@@ -177,7 +177,7 @@ const StepSeven: React.FC<StepperProps> = ({
                         value="No"
                         checked={formSixData.isHarmfulCategory === "No"}
                         onChange={handleRadioChange("isHarmfulCategory")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       No
                     </label>
@@ -207,7 +207,7 @@ const StepSeven: React.FC<StepperProps> = ({
                         value="Yes"
                         checked={formSixData.hadPersistentFever === "Yes"}
                         onChange={handleRadioChange("hadPersistentFever")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Yes
                     </label>
@@ -218,7 +218,7 @@ const StepSeven: React.FC<StepperProps> = ({
                         value="No"
                         checked={formSixData.hadPersistentFever === "No"}
                         onChange={handleRadioChange("hadPersistentFever")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       No
                     </label>
