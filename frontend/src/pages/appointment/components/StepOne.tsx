@@ -13,6 +13,7 @@ import { StepperProps } from "../../../types/stepper";
 import { BloodDonor, User } from "../../../types/users";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { validatePhoneNumber } from "../../../utils/ValidationsUtils";
+import { ValidationModal } from "../../../components/ValidationModal";
 
 const StepOne: React.FC<StepperProps> = ({
   onNextStep,
@@ -28,6 +29,7 @@ const StepOne: React.FC<StepperProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showValidationModal, setShowValidationModal] = useState(false);
 
   //Structure for donor information
   const [donor, setDonor] = useState<BloodDonor>({
@@ -120,6 +122,14 @@ const StepOne: React.FC<StepperProps> = ({
     }
     return age;
   };
+  const [validationModalContent, setValidationModalContent] = useState({
+    title: "",
+    content: "",
+  });
+  const showValidationMessage = (title: string, content: string) => {
+    setValidationModalContent({ title, content });
+    setShowValidationModal(true);
+  };
 
   // Handle file selection for avatar
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -179,7 +189,7 @@ const StepOne: React.FC<StepperProps> = ({
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   //Save donor information to the form data
-  const handleNext = () => {
+  const handleNext = async () => {
     // Check if necessary fields are filled
     const newErrors: { [key in keyof BloodDonor]?: string } = {};
 
@@ -218,12 +228,43 @@ const StepOne: React.FC<StepperProps> = ({
     setErrors({});
     setShowErrorMessage(false);
 
-    onFormDataChange({
-      ...formData,
-      donorInfo: donor,
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    onNextStep();
+    try {
+      // Calculate age if not already set
+      const age = calculateAge(donor.birthdate);
+      const donorWithAge = { ...donor, age };
+      if (age < 18) {
+        showValidationMessage(
+          "Age Restriction",
+          "You cannot place an appointment as a donor unless you are aged 18 or above."
+        );
+        return;
+      }
+      try {
+        // Check if donor exists
+        await axios.get(`${backendURL}/api/donor/${user?.email}`);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 404) {
+            await axios.post(`${backendURL}/api/update-donor`, donorWithAge);
+          } else {
+            throw error;
+          }
+        } else {
+          throw error;
+        }
+      }
+
+      // Update form data and proceed to next step
+      onFormDataChange({
+        ...formData,
+        donorInfo: donorWithAge,
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      onNextStep();
+    } catch (error) {
+      console.error("Error handling donor data:", error);
+      alert("Error saving donor information. Please try again.");
+    }
   };
 
   //Loading animation
@@ -485,6 +526,11 @@ const StepOne: React.FC<StepperProps> = ({
                   }
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
+                {errors.contactNumberHome && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.contactNumberHome}
+                  </p>
+                )}
               </div>
               <div className="w-full">
                 <Label
@@ -505,6 +551,11 @@ const StepOne: React.FC<StepperProps> = ({
                   }
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
+                {errors.contactNumberOffice && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.contactNumberOffice}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -608,6 +659,12 @@ const StepOne: React.FC<StepperProps> = ({
               </div>
             </div>
           </div>
+          <ValidationModal
+            show={showValidationModal}
+            onClose={() => setShowValidationModal(false)}
+            title={validationModalContent.title}
+            content={validationModalContent.content}
+          />
         </main>
       </div>
     </div>
