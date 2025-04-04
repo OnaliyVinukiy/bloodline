@@ -39,7 +39,11 @@ router.get(
 );
 
 //Route to fetch appointment data from date
-router.get("fetch-appointments/:date", authenticateUser, getAppointmentsByDate);
+router.get(
+  "/fetch-appointments/date/:date",
+  authenticateUser,
+  getAppointmentsByDate
+);
 
 // Route to approve appointment
 router.put("/approve-appointment/:id", authenticateUser, approveAppointment);
@@ -53,7 +57,7 @@ router.get("/count", getAppointmentsCount);
 //Route to fetch monthly appointments
 router.get("/monthly", getAppointmentsByMonth);
 
-// In your routes file
+//Route to update appointment
 router.patch("/update-appointment/:id", authenticateUser, updateAppointment);
 
 export default router;
