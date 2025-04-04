@@ -99,7 +99,7 @@ const StepSix: React.FC<StepperProps> = ({
                       value="Yes"
                       checked={formFiveData.hadDengue === "Yes"}
                       onChange={handleRadioChange("hadDengue")}
-                      className="mr-2"
+                      className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
                     Yes
                   </label>
@@ -110,7 +110,7 @@ const StepSix: React.FC<StepperProps> = ({
                       value="No"
                       checked={formFiveData.hadDengue === "No"}
                       onChange={handleRadioChange("hadDengue")}
-                      className="mr-2"
+                      className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
                     No
                   </label>
@@ -138,7 +138,7 @@ const StepSix: React.FC<StepperProps> = ({
                         value="Yes"
                         checked={formFiveData.hadOtherFever === "Yes"}
                         onChange={handleRadioChange("hadOtherFever")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Yes
                     </label>
@@ -149,7 +149,7 @@ const StepSix: React.FC<StepperProps> = ({
                         value="No"
                         checked={formFiveData.hadOtherFever === "No"}
                         onChange={handleRadioChange("hadOtherFever")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       No
                     </label>
@@ -178,7 +178,7 @@ const StepSix: React.FC<StepperProps> = ({
                         value="Yes"
                         checked={formFiveData.hadDentalExtraction === "Yes"}
                         onChange={handleRadioChange("hadDentalExtraction")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Yes
                     </label>
@@ -189,7 +189,7 @@ const StepSix: React.FC<StepperProps> = ({
                         value="No"
                         checked={formFiveData.hadDentalExtraction === "No"}
                         onChange={handleRadioChange("hadDentalExtraction")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       No
                     </label>
@@ -218,7 +218,7 @@ const StepSix: React.FC<StepperProps> = ({
                         value="Yes"
                         checked={formFiveData.hadAntibiotic === "Yes"}
                         onChange={handleRadioChange("hadAntibiotic")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Yes
                     </label>
@@ -229,7 +229,7 @@ const StepSix: React.FC<StepperProps> = ({
                         value="No"
                         checked={formFiveData.hadAntibiotic === "No"}
                         onChange={handleRadioChange("hadAntibiotic")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       No
                     </label>
