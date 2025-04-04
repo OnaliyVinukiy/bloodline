@@ -177,7 +177,7 @@ const StepEight: React.FC<StepperProps> = ({
                         value="four"
                         checked={formSevenData.donatingMonth === "four"}
                         onChange={handleRadioChange("donatingMonth")}
-                        className="mr-2"
+                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Once in a 4 months
                     </label>
@@ -188,7 +188,7 @@ const StepEight: React.FC<StepperProps> = ({
                         value="six"
                         checked={formSevenData.donatingMonth === "six"}
                         onChange={handleRadioChange("donatingMonth")}
-                        className="mr-2"
+                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Once in a 6 months
                     </label>
@@ -199,7 +199,7 @@ const StepEight: React.FC<StepperProps> = ({
                         value="twelve"
                         checked={formSevenData.donatingMonth === "twelve"}
                         onChange={handleRadioChange("donatingMonth")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Once a year
                     </label>
