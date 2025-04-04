@@ -101,7 +101,7 @@ const StepThree: React.FC<StepperProps> = ({
                       value="Yes"
                       checked={formTwoData.isFeelingWell === "Yes"}
                       onChange={handleRadioChange("isFeelingWell")}
-                      className="mr-2"
+                      className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
                     Yes
                   </label>
@@ -112,7 +112,7 @@ const StepThree: React.FC<StepperProps> = ({
                       value="No"
                       checked={formTwoData.isFeelingWell === "No"}
                       onChange={handleRadioChange("isFeelingWell")}
-                      className="mr-2"
+                      className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
                     No
                   </label>
@@ -166,7 +166,7 @@ const StepThree: React.FC<StepperProps> = ({
                               }
                             });
                           }}
-                          className="mr-2"
+                          className="mr-2 text-red-600 focus:ring-red-500"
                         />
                         {disease}
                       </label>
@@ -191,7 +191,7 @@ const StepThree: React.FC<StepperProps> = ({
                         value="Yes"
                         checked={formTwoData.isTakingTreatment === "Yes"}
                         onChange={handleRadioChange("isTakingTreatment")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Yes
                     </label>
@@ -202,7 +202,7 @@ const StepThree: React.FC<StepperProps> = ({
                         value="No"
                         checked={formTwoData.isTakingTreatment === "No"}
                         onChange={handleRadioChange("isTakingTreatment")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       No
                     </label>
@@ -230,7 +230,7 @@ const StepThree: React.FC<StepperProps> = ({
                         value="Yes"
                         checked={formTwoData.isSurgeryDone === "Yes"}
                         onChange={handleRadioChange("isSurgeryDone")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Yes
                     </label>
@@ -241,7 +241,7 @@ const StepThree: React.FC<StepperProps> = ({
                         value="No"
                         checked={formTwoData.isSurgeryDone === "No"}
                         onChange={handleRadioChange("isSurgeryDone")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       No
                     </label>
@@ -271,7 +271,7 @@ const StepThree: React.FC<StepperProps> = ({
                         value="Yes"
                         checked={formTwoData.isEngageHeavyWork === "Yes"}
                         onChange={handleRadioChange("isEngageHeavyWork")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Yes
                     </label>
@@ -282,7 +282,7 @@ const StepThree: React.FC<StepperProps> = ({
                         value="No"
                         checked={formTwoData.isEngageHeavyWork === "No"}
                         onChange={handleRadioChange("isEngageHeavyWork")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       No
                     </label>
@@ -312,7 +312,7 @@ const StepThree: React.FC<StepperProps> = ({
                         value="Yes"
                         checked={formTwoData.isPregnant === "Yes"}
                         onChange={handleRadioChange("isPregnant")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Yes
                     </label>
@@ -323,7 +323,7 @@ const StepThree: React.FC<StepperProps> = ({
                         value="No"
                         checked={formTwoData.isPregnant === "No"}
                         onChange={handleRadioChange("isPregnant")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       No
                     </label>

@@ -91,7 +91,7 @@ const StepFour: React.FC<StepperProps> = ({
                       value="Yes"
                       checked={formThreeData.hadHepatitis === "Yes"}
                       onChange={handleRadioChange("hadHepatitis")}
-                      className="mr-2"
+                      className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
                     Yes
                   </label>
@@ -102,7 +102,7 @@ const StepFour: React.FC<StepperProps> = ({
                       value="No"
                       checked={formThreeData.hadHepatitis === "No"}
                       onChange={handleRadioChange("hadHepatitis")}
-                      className="mr-2"
+                      className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
                     No
                   </label>
@@ -129,7 +129,7 @@ const StepFour: React.FC<StepperProps> = ({
                         value="Yes"
                         checked={formThreeData.hadTyphoid === "Yes"}
                         onChange={handleRadioChange("hadTyphoid")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Yes
                     </label>
@@ -140,7 +140,7 @@ const StepFour: React.FC<StepperProps> = ({
                         value="No"
                         checked={formThreeData.hadTyphoid === "No"}
                         onChange={handleRadioChange("hadTyphoid")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       No
                     </label>

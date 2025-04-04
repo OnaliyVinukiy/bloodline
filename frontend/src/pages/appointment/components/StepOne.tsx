@@ -347,7 +347,7 @@ const StepOne: React.FC<StepperProps> = ({
                     onChange={(e) =>
                       handleInputChange("gender", e.target.value)
                     }
-                    className="mr-2"
+                    className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                   />
                   <Label
                     htmlFor="male"
@@ -365,7 +365,7 @@ const StepOne: React.FC<StepperProps> = ({
                     onChange={(e) =>
                       handleInputChange("gender", e.target.value)
                     }
-                    className="mr-2"
+                    className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                   />
                   <Label htmlFor="female" className="text-sm text-indigo-900">
                     Female
