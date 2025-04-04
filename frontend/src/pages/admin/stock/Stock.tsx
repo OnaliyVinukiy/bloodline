@@ -31,9 +31,6 @@ export default function BloodStockManagement() {
     issuedTo: "",
   });
   const [userEmail, setUserEmail] = useState("");
-  const [showHistory, setShowHistory] = useState<"issue" | "addition" | null>(
-    null
-  );
   const navigate = useNavigate();
   const backendURL =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
@@ -205,7 +202,6 @@ export default function BloodStockManagement() {
 
   //Handle show history buttons
   const handleShowHistory = (type: "issue" | "addition") => {
-    setShowHistory(type);
     if (type === "addition") {
       navigate("/admin/stock/addition-history");
     }
