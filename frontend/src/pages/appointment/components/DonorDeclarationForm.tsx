@@ -19,7 +19,7 @@ import StepSeven from "./StepSeven";
 import StepEight from "./StepEight";
 import ScheduleForm from "./ScheduleForm";
 
-const BasicInfo = ({
+const DonorDeclarationForm = ({
   step,
   onNextStep,
   onPreviousStep,
@@ -136,18 +136,15 @@ const BasicInfo = ({
 
   // Stepper labels
   const steps = [
-    "Slot",
-    "Info",
-    "Time",
-    "Venue",
-    "Building",
-    "Assets",
-    "Food",
-    "Promotion",
-    "Organize",
-    "Review",
-    "Slot",
-    "Registration",
+    "First",
+    "Second",
+    "Third",
+    "Fourth",
+    "Fifth",
+    "Sixth",
+    "Seventh",
+    "Eigth",
+    "Nineth",
   ];
 
   //Loading animation
@@ -191,14 +188,14 @@ const BasicInfo = ({
               <div
                 className="h-2.5 rounded-full absolute top-0 left-0 transition-all duration-300"
                 style={{
-                  width: `${((step - 1) / 11) * 100}%`,
+                  width: `${((step - 1) / 8) * 100}%`,
                   background:
                     "linear-gradient(90deg,rgb(184, 38, 1),rgb(235, 56, 36))",
                 }}
               ></div>
             </div>
             <div className="flex flex-wrap justify-center gap-4 md:justify-between">
-              {steps.map((label, index) => (
+              {steps.map((_, index) => (
                 <div
                   key={index}
                   className="text-center flex flex-col items-center cursor-pointer"
@@ -212,14 +209,6 @@ const BasicInfo = ({
                   >
                     {index + 1}
                   </div>
-
-                  <span
-                    className={`text-sm mt-2 ${
-                      index + 1 <= step ? "text-gray-800" : "text-gray-500"
-                    }`}
-                  >
-                    {label}
-                  </span>
                 </div>
               ))}
             </div>
@@ -302,4 +291,4 @@ const BasicInfo = ({
   );
 };
 
-export default BasicInfo;
+export default DonorDeclarationForm;
