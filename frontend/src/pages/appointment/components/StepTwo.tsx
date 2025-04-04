@@ -130,7 +130,7 @@ const StepTwo: React.FC<StepperProps> = ({
                       value="Yes"
                       checked={formOneData.isDonatedBefore === "Yes"}
                       onChange={handleRadioChange("isDonatedBefore")}
-                      className="mr-2"
+                      className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
                     Yes
                   </label>
@@ -141,7 +141,7 @@ const StepTwo: React.FC<StepperProps> = ({
                       value="No"
                       checked={formOneData.isDonatedBefore === "No"}
                       onChange={handleRadioChange("isDonatedBefore")}
-                      className="mr-2"
+                      className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
                     No
                   </label>
@@ -221,7 +221,7 @@ const StepTwo: React.FC<StepperProps> = ({
                           value="Yes"
                           checked={formOneData.isAnyDifficulty === "Yes"}
                           onChange={handleRadioChange("isAnyDifficulty")}
-                          className="mr-2"
+                          className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                         />
                         Yes
                       </label>
@@ -232,7 +232,7 @@ const StepTwo: React.FC<StepperProps> = ({
                           value="No"
                           checked={formOneData.isAnyDifficulty === "No"}
                           onChange={handleRadioChange("isAnyDifficulty")}
-                          className="mr-2"
+                          className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                         />
                         No
                       </label>
@@ -286,7 +286,7 @@ const StepTwo: React.FC<StepperProps> = ({
                         value="Yes"
                         checked={formOneData.isMedicallyAdvised === "Yes"}
                         onChange={handleRadioChange("isMedicallyAdvised")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Yes
                     </label>
@@ -297,7 +297,7 @@ const StepTwo: React.FC<StepperProps> = ({
                         value="No"
                         checked={formOneData.isMedicallyAdvised === "No"}
                         onChange={handleRadioChange("isMedicallyAdvised")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       No
                     </label>
@@ -327,7 +327,7 @@ const StepTwo: React.FC<StepperProps> = ({
                         value="Yes"
                         checked={formOneData.isLeafletRead === "Yes"}
                         onChange={handleRadioChange("isLeafletRead")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Yes
                     </label>
@@ -338,7 +338,7 @@ const StepTwo: React.FC<StepperProps> = ({
                         value="No"
                         checked={formOneData.isLeafletRead === "No"}
                         onChange={handleRadioChange("isLeafletRead")}
-                        className="mr-2"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       No
                     </label>
