@@ -12,6 +12,7 @@ import { UserIcon } from "@heroicons/react/24/solid";
 import { StepperProps } from "../../../types/stepper";
 import { BloodDonor, User } from "../../../types/users";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { validatePhoneNumber } from "../../../utils/ValidationsUtils";
 
 const StepOne: React.FC<StepperProps> = ({
   onNextStep,
@@ -24,6 +25,9 @@ const StepOne: React.FC<StepperProps> = ({
   const [errors, setErrors] = useState<{ [key in keyof BloodDonor]?: string }>(
     {}
   );
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   //Structure for donor information
   const [donor, setDonor] = useState<BloodDonor>({
@@ -56,10 +60,6 @@ const StepOne: React.FC<StepperProps> = ({
       }));
     }
   };
-
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -133,6 +133,21 @@ const StepOne: React.FC<StepperProps> = ({
     }
   };
 
+  // Handle phone number validation
+  const handlePhoneNumberFieldChange = (
+    field: keyof BloodDonor,
+    value: string
+  ) => {
+    const isValid = validatePhoneNumber(value);
+
+    setErrors((prev) => ({
+      ...prev,
+      [field]: isValid ? "" : "Invalid phone number format.",
+    }));
+
+    handleInputChange(field, value);
+  };
+
   // Handle avatar upload
   const handleAvatarUpdate = async () => {
     if (!selectedFile || !user?.email) return;
@@ -173,6 +188,22 @@ const StepOne: React.FC<StepperProps> = ({
     if (!donor.email) newErrors.email = "Email is required.";
     if (!donor.contactNumber)
       newErrors.contactNumber = "Contact number is required.";
+    if (
+      donor.contactNumberHome &&
+      !validatePhoneNumber(donor.contactNumberHome)
+    ) {
+      newErrors.contactNumberHome = "Invalid home number.";
+    }
+
+    if (
+      donor.contactNumberOffice &&
+      !validatePhoneNumber(donor.contactNumberOffice)
+    ) {
+      newErrors.contactNumberOffice = "Invalid office number.";
+    }
+    if (!validatePhoneNumber(donor.contactNumber)) {
+      newErrors.contactNumber = "Invalid mobile number.";
+    }
     if (!donor.address) newErrors.address = "Address is required.";
     if (!donor.birthdate) newErrors.birthdate = "Birthdate is required.";
     if (!donor.bloodGroup) newErrors.bloodGroup = "Blood Group is required.";
@@ -422,7 +453,10 @@ const StepOne: React.FC<StepperProps> = ({
                   type="text"
                   value={donor?.contactNumber || ""}
                   onChange={(e) =>
-                    handleInputChange("contactNumber", e.target.value)
+                    handlePhoneNumberFieldChange(
+                      "contactNumber",
+                      e.target.value
+                    )
                   }
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
@@ -444,7 +478,10 @@ const StepOne: React.FC<StepperProps> = ({
                   type="text"
                   value={donor?.contactNumberHome || ""}
                   onChange={(e) =>
-                    handleInputChange("contactNumberHome", e.target.value)
+                    handlePhoneNumberFieldChange(
+                      "contactNumberHome",
+                      e.target.value
+                    )
                   }
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
@@ -461,7 +498,10 @@ const StepOne: React.FC<StepperProps> = ({
                   type="text"
                   value={donor?.contactNumberOffice || ""}
                   onChange={(e) =>
-                    handleInputChange("contactNumberOffice", e.target.value)
+                    handlePhoneNumberFieldChange(
+                      "contactNumberOffice",
+                      e.target.value
+                    )
                   }
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
