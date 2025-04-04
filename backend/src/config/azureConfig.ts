@@ -13,7 +13,7 @@ export const COSMOS_DB_CONNECTION_STRING =
   process.env.COSMOS_DB_CONNECTION_STRING;
 export const AZURE_STORAGE_CONNECTION_STRING =
   process.env.AZURE_STORAGE_CONNECTION_STRING;
-export const DATABASE_ID = "donorDB";
+export const DATABASE_ID = "bloodline";
 export const APPOINTMENT_COLLECTION_ID = "appointments";
 export const CAMP_COLLECTION_ID = "camps";
 export const DONOR_COLLECTION_ID = "donors";
