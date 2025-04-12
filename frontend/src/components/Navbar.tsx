@@ -323,7 +323,7 @@ export function Navigationbar() {
           Home
         </Navbar.Link>
         <Navbar.Link
-          href="#"
+          href="/about"
           className="text-xl font-medium font-roboto hover:!text-red-700"
         >
           About

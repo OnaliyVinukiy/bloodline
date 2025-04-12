@@ -22,6 +22,14 @@ const Cards: React.FC = () => {
     }
   };
 
+  const handleOrgRegistration = () => {
+    if (state?.isAuthenticated) {
+      navigate("/organization-registration");
+    } else {
+      signIn();
+    }
+  };
+
   return (
     <div className="flex flex-wrap justify-center gap-8 lg:space-x-40 lg:mt-20 mt-10">
       <Card className="max-w-sm md:w-full sm:w-72">
@@ -105,7 +113,7 @@ const Cards: React.FC = () => {
         <Button
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
-          href="/organization-registration"
+          onClick={handleOrgRegistration}
         >
           Register Now
           <svg
