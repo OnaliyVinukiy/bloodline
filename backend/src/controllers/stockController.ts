@@ -145,6 +145,50 @@ export const getStockAdditionHistory = async (req: Request, res: Response) => {
   }
 };
 
+// Fetch stock issuance history
+export const getStockIssuanceHistory = async (req: Request, res: Response) => {
+  let client: MongoClient | null = null;
+  try {
+    client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection<StockAdditionHistory>(
+      BLOOD_STOCK_HISTORY_COLLECTION_ID
+    );
+
+    //Fetch all issuance records
+    const history = await collection
+      .find({ operationType: "issuance" })
+      .toArray();
+
+    history.sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    );
+
+    //Format the response
+    const formattedHistory = history.map((record) => ({
+      _id: record._id?.toString(),
+      bloodType: record.bloodType,
+      quantityIssued: Math.abs(record.quantityAdded),
+      issuedTo: record.issuedTo,
+      updatedBy: record.updatedBy,
+      updatedAt: record.updatedAt.toISOString(),
+    }));
+
+    res.status(200).json(formattedHistory);
+  } catch (error) {
+    console.error("Error fetching stock issuance history:", error);
+    res.status(500).json({
+      message: "Server error while fetching stock issuance history",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  } finally {
+    if (client) await client.close();
+  }
+};
+
 //Fetch complete stock history
 export const getStockHistory = async (req: Request, res: Response) => {
   let client: MongoClient | null = null;
