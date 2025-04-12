@@ -46,10 +46,7 @@ const ContactUs: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800">Phone</h3>
-                  <p className="text-gray-600">(+94) 11 2 294 563</p>
-                  <p className="text-gray-500 text-sm mt-1">
-                    Emergency: (+94) 11 2 369 931
-                  </p>
+                  <p className="text-gray-600">(+94) 11 2 369 931</p>
                 </div>
               </div>
 
@@ -59,8 +56,7 @@ const ContactUs: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800">Email</h3>
-                  <p className="text-gray-600">contact@bloodline.org</p>
-                  <p className="text-gray-600">support@bloodline.org</p>
+                  <p className="text-gray-600">info@nbts.health.gov.lk</p>
                 </div>
               </div>
 
@@ -258,7 +254,7 @@ const ContactUs: React.FC = () => {
           </div>
           <div className="p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              NBTS Headquarters Location
+              National Blood Transfusion Service Location
             </h3>
             <p className="text-gray-600">
               Visit us at our main office located at No. 05, Elvitigala Mawatha,
@@ -293,7 +289,7 @@ const ContactUs: React.FC = () => {
             </div>
             <div className="flex items-center">
               <FaEnvelope className="h-5 w-5 mr-2" />
-              <span className="font-semibold">emergency@bloodline.org</span>
+              <span className="font-semibold">info@nbts.health.gov.lk</span>
             </div>
           </div>
         </div>
