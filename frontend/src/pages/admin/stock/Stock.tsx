@@ -206,9 +206,33 @@ export default function BloodStockManagement() {
       navigate("/admin/stock/addition-history");
     }
     if (type === "issue") {
-      navigate("/stock-issue-history");
+      navigate("/admin/stock/issuance-history");
     }
   };
+
+  //Loading Animation
+  if (loading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-10 mb-10 p-6 max-w-7xl mx-auto">
