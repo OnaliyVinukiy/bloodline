@@ -25,9 +25,10 @@ export function FooterComponent() {
       <div className="w-full px-4 py-8 mx-auto max-w-7xl">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div className="space-y-4">
-            <span className="self-center text-2xl font-bold whitespace-nowrap text-white">
-              <FaHeartbeat className="h-8 w-8 text-white" /> Bloodline
-            </span>
+            <div className="flex items-center space-x-2">
+              <FaHeartbeat className="h-8 w-8 text-white" />
+              <span className="text-2xl font-bold text-white">Bloodline</span>
+            </div>
 
             <p className="text-red-100 text-sm">
               Saving lives through blood donation. Join our mission to ensure no
