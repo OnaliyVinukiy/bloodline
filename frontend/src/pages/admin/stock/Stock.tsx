@@ -19,6 +19,8 @@ export default function BloodStockManagement() {
   const { getAccessToken, getBasicUserInfo } = useAuthContext();
   const [stocks, setStocks] = useState<BloodStock[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAdditionLoading, setIsAdditionLoading] = useState(false);
+  const [isIssuanceLoading, setIsIssuanceLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -73,7 +75,6 @@ export default function BloodStockManagement() {
     }));
   };
 
-  //
   const handleIssueInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -102,7 +103,7 @@ export default function BloodStockManagement() {
     }
 
     try {
-      setLoading(true);
+      setIsAdditionLoading(true);
       const token = await getAccessToken();
       const response = await fetch(`${backendURL}/api/stocks/update-stock`, {
         method: "POST",
@@ -131,7 +132,7 @@ export default function BloodStockManagement() {
       );
     } finally {
       fetchData();
-      setLoading(false);
+      setIsAdditionLoading(false);
     }
   };
 
@@ -166,7 +167,7 @@ export default function BloodStockManagement() {
     }
 
     try {
-      setLoading(true);
+      setIsIssuanceLoading(true);
       const token = await getAccessToken();
       const response = await fetch(`${backendURL}/api/stocks/issue-stock`, {
         method: "POST",
@@ -196,7 +197,7 @@ export default function BloodStockManagement() {
       );
     } finally {
       fetchData();
-      setLoading(false);
+      setIsIssuanceLoading(false);
     }
   };
 
@@ -290,10 +291,10 @@ export default function BloodStockManagement() {
                 type="submit"
                 color="failure"
                 className="w-full"
-                disabled={loading}
+                disabled={isAdditionLoading}
               >
                 <HiPlus className="mr-2 h-5 w-5" />
-                {loading ? "Adding..." : "Add to Stock"}
+                {isAdditionLoading ? "Adding..." : "Add to Stock"}
               </Button>
             </form>
           </div>
@@ -352,10 +353,10 @@ export default function BloodStockManagement() {
                 type="submit"
                 color="failure"
                 className="w-full"
-                disabled={loading}
+                disabled={isIssuanceLoading}
               >
                 <HiMinus className="mr-2 h-5 w-5" />
-                {loading ? "Issuing..." : "Issue Stock"}
+                {isIssuanceLoading ? "Issuing..." : "Issue Stock"}
               </Button>
             </form>
           </div>
