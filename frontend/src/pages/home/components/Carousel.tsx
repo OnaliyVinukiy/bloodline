@@ -43,7 +43,7 @@ export function CarouselSlider() {
           alt="Bloodline Logo"
         />
         <a
-          href="#"
+          href="/about"
           className="inline-flex justify-between items-center py-1 px-1 pr-4 mb-6 text-sm text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200"
           role="alert"
         >
