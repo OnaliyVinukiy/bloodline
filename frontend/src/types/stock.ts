@@ -12,10 +12,19 @@ export interface BloodStock {
   updatedBy: string;
 }
 
-export interface StockAddition {
+export interface StockAddedHistory {
   _id: string;
   bloodType: string;
   quantityAdded: number;
+  updatedBy: string;
+  updatedAt: string;
+}
+
+export interface StockIssuedHistory {
+  _id: string;
+  bloodType: string;
+  quantityIssued: number;
+  issuedTo: string;
   updatedBy: string;
   updatedAt: string;
 }

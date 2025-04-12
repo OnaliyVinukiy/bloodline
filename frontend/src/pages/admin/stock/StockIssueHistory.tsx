@@ -10,32 +10,31 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import { Button, Table, Alert } from "flowbite-react";
 import { HiInformationCircle, HiArrowLeft } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
-import { StockAddedHistory } from "../../../types/stock";
+import { StockIssuedHistory } from "../../../types/stock";
 
-export default function StockAdditionHistory() {
+export default function StockIssueHistory() {
   const { getAccessToken } = useAuthContext();
-  const [history, setHistory] = useState<StockAddedHistory[]>([]);
+  const [history, setHistory] = useState<StockIssuedHistory[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const backendURL =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
-  //Fetch stock addition history
+  //Fetch stock issuance history
   useEffect(() => {
-    const fetchAdditionHistory = async () => {
+    const fetchIssuanceHistory = async () => {
       try {
         const token = await getAccessToken();
         const response = await fetch(
-          `${backendURL}/api/stocks/addition-history`,
+          `${backendURL}/api/stocks/issuance-history`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
 
-        if (!response.ok) throw new Error("Failed to fetch addition history");
+        if (!response.ok) throw new Error("Failed to fetch issuance history");
 
         const data = await response.json();
         setHistory(data);
@@ -48,14 +47,14 @@ export default function StockAdditionHistory() {
       }
     };
 
-    fetchAdditionHistory();
+    fetchIssuanceHistory();
   }, [backendURL, getAccessToken]);
 
   return (
     <div className="mt-10 mb-10 p-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">
-          Stock Addition History
+          Stock Issuance History
         </h1>
         <Button color="gray" onClick={() => navigate(-1)}>
           <HiArrowLeft className="mr-2 h-5 w-5" />
@@ -94,9 +93,10 @@ export default function StockAdditionHistory() {
             <Table hoverable>
               <Table.Head>
                 <Table.HeadCell>Blood Type</Table.HeadCell>
-                <Table.HeadCell>Quantity Added</Table.HeadCell>
-                <Table.HeadCell>Date Added</Table.HeadCell>
-                <Table.HeadCell>Added By</Table.HeadCell>
+                <Table.HeadCell>Quantity Issued</Table.HeadCell>
+                <Table.HeadCell>Issued To</Table.HeadCell>
+                <Table.HeadCell>Date Issued</Table.HeadCell>
+                <Table.HeadCell>Issued By</Table.HeadCell>
               </Table.Head>
               <Table.Body className="divide-y">
                 {history.length > 0 ? (
@@ -106,7 +106,10 @@ export default function StockAdditionHistory() {
                         {item.bloodType}
                       </Table.Cell>
                       <Table.Cell className="text-green-600 font-bold">
-                        +{item.quantityAdded}
+                        -{item.quantityIssued}
+                      </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900">
+                        {item.issuedTo}
                       </Table.Cell>
                       <Table.Cell>
                         {new Date(item.updatedAt).toLocaleString()}
@@ -121,7 +124,7 @@ export default function StockAdditionHistory() {
                 ) : (
                   <Table.Row>
                     <Table.Cell colSpan={4} className="text-center py-4">
-                      No addition history available
+                      No issuance history available
                     </Table.Cell>
                   </Table.Row>
                 )}

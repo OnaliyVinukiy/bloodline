@@ -29,6 +29,7 @@ import Services from "./pages/services/Services";
 import ContactUs from "./pages/contact/ContactUs";
 import Stock from "./pages/admin/stock/Stock";
 import StockAdditionHistory from "./pages/admin/stock/StockAdditionHistory";
+import StockIssueHistory from "./pages/admin/stock/StockIssueHistory";
 
 function App() {
   return (
@@ -68,6 +69,10 @@ function App() {
             <Route
               path="/admin/stock/addition-history"
               element={<StockAdditionHistory />}
+            />
+            <Route
+              path="/admin/stock/issuance-history"
+              element={<StockIssueHistory />}
             />
             <Route
               path="/admin/donation/:appointmentId"

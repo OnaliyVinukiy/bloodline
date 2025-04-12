@@ -19,6 +19,8 @@ export default function BloodStockManagement() {
   const { getAccessToken, getBasicUserInfo } = useAuthContext();
   const [stocks, setStocks] = useState<BloodStock[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAdditionLoading, setIsAdditionLoading] = useState(false);
+  const [isIssuanceLoading, setIsIssuanceLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -73,7 +75,6 @@ export default function BloodStockManagement() {
     }));
   };
 
-  //
   const handleIssueInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -102,7 +103,7 @@ export default function BloodStockManagement() {
     }
 
     try {
-      setLoading(true);
+      setIsAdditionLoading(true);
       const token = await getAccessToken();
       const response = await fetch(`${backendURL}/api/stocks/update-stock`, {
         method: "POST",
@@ -131,7 +132,7 @@ export default function BloodStockManagement() {
       );
     } finally {
       fetchData();
-      setLoading(false);
+      setIsAdditionLoading(false);
     }
   };
 
@@ -166,7 +167,7 @@ export default function BloodStockManagement() {
     }
 
     try {
-      setLoading(true);
+      setIsIssuanceLoading(true);
       const token = await getAccessToken();
       const response = await fetch(`${backendURL}/api/stocks/issue-stock`, {
         method: "POST",
@@ -196,7 +197,7 @@ export default function BloodStockManagement() {
       );
     } finally {
       fetchData();
-      setLoading(false);
+      setIsIssuanceLoading(false);
     }
   };
 
@@ -206,9 +207,33 @@ export default function BloodStockManagement() {
       navigate("/admin/stock/addition-history");
     }
     if (type === "issue") {
-      navigate("/stock-issue-history");
+      navigate("/admin/stock/issuance-history");
     }
   };
+
+  //Loading Animation
+  if (loading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-10 mb-10 p-6 max-w-7xl mx-auto">
@@ -266,10 +291,10 @@ export default function BloodStockManagement() {
                 type="submit"
                 color="failure"
                 className="w-full"
-                disabled={loading}
+                disabled={isAdditionLoading}
               >
                 <HiPlus className="mr-2 h-5 w-5" />
-                {loading ? "Adding..." : "Add to Stock"}
+                {isAdditionLoading ? "Adding..." : "Add to Stock"}
               </Button>
             </form>
           </div>
@@ -328,10 +353,10 @@ export default function BloodStockManagement() {
                 type="submit"
                 color="failure"
                 className="w-full"
-                disabled={loading}
+                disabled={isIssuanceLoading}
               >
                 <HiMinus className="mr-2 h-5 w-5" />
-                {loading ? "Issuing..." : "Issue Stock"}
+                {isIssuanceLoading ? "Issuing..." : "Issue Stock"}
               </Button>
             </form>
           </div>
