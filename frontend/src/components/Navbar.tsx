@@ -335,7 +335,7 @@ export function Navigationbar() {
           Services
         </Navbar.Link>
         <Navbar.Link
-          href="#"
+          href="/contact"
           className="text-xl font-medium font-roboto hover:!text-red-700"
         >
           Contact Us
