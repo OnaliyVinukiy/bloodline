@@ -11,6 +11,7 @@ import {
   issueBloodStock,
   updateStock,
   getStockAdditionHistory,
+  getStockIssuanceHistory,
   getStockHistory,
 } from "../controllers/stockController";
 import { authenticateUser } from "../middleware/authMiddleware";
@@ -28,6 +29,9 @@ router.post("/issue-stock", authenticateUser, issueBloodStock);
 
 //Fetch blood stock addition history
 router.get("/addition-history", getStockAdditionHistory);
+
+//Fetch blood stock issuance history
+router.get("/issuance-history", getStockIssuanceHistory);
 
 //Fetch blood stock history
 router.get("/history", getStockHistory);
