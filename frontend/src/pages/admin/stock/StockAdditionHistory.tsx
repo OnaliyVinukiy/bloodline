@@ -10,12 +10,13 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import { Button, Table, Alert } from "flowbite-react";
 import { HiInformationCircle, HiArrowLeft } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
-import { StockAddition } from "../../../types/stock";
+import { StockAddedHistory } from "../../../types/stock";
 
 export default function StockAdditionHistory() {
   const { getAccessToken } = useAuthContext();
-  const [history, setHistory] = useState<StockAddition[]>([]);
+  const [history, setHistory] = useState<StockAddedHistory[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
