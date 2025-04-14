@@ -34,6 +34,5 @@ export interface StatCardProps {
   title: string;
   value: number;
   icon: JSX.Element;
-  loading: boolean;
   color: string;
 }

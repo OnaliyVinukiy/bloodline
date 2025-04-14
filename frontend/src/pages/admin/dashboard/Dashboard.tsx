@@ -21,7 +21,6 @@ import {
 } from "chart.js";
 import {
   DailyData,
-  LoadingState,
   MonthlyData,
   StatCardProps,
   Stats,
@@ -46,13 +45,7 @@ const Dashboard = () => {
     organizations: 0,
   });
 
-  const [loading, setLoading] = useState<LoadingState>({
-    donors: true,
-    camps: true,
-    appointments: true,
-    organizations: true,
-    charts: true,
-  });
+  const [isLoading, seIsLoading] = useState(true);
 
   const [appointmentsByMonth, setAppointmentsByMonth] = useState<MonthlyData[]>(
     []
@@ -114,22 +107,10 @@ const Dashboard = () => {
         setDonorsByDay(donorsDailyRes);
         setOrganizationsByDay(organizationsDailyRes);
 
-        setLoading({
-          donors: false,
-          camps: false,
-          appointments: false,
-          organizations: false,
-          charts: false,
-        });
+        seIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
-        setLoading({
-          donors: false,
-          camps: false,
-          appointments: false,
-          organizations: false,
-          charts: false,
-        });
+        seIsLoading(false);
       }
     };
 
@@ -226,6 +207,31 @@ const Dashboard = () => {
       },
     },
   };
+
+  //Loading Animation
+  if (isLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       {/* Stats Cards */}
@@ -234,28 +240,24 @@ const Dashboard = () => {
           title="Total Donors"
           value={stats.donors}
           icon={<DonorsIcon />}
-          loading={loading.donors}
           color="from-blue-500 to-blue-600"
         />
         <StatCard
           title="Appointments"
           value={stats.appointments}
           icon={<AppointmentsIcon />}
-          loading={loading.appointments}
           color="from-purple-500 to-purple-600"
         />
         <StatCard
           title="Blood Camps"
           value={stats.camps}
           icon={<CampsIcon />}
-          loading={loading.camps}
           color="from-green-500 to-green-600"
         />
         <StatCard
           title="Organizations"
           value={stats.organizations}
           icon={<OrganizationsIcon />}
-          loading={loading.organizations}
           color="from-orange-500 to-orange-600"
         />
       </div>
@@ -267,21 +269,16 @@ const Dashboard = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-10">
             Monthly Appointments
           </h2>
-          {loading.charts ? (
-            <div className="h-64 flex items-center justify-center">
-              <div className="animate-pulse bg-gray-200 rounded h-full w-full"></div>
-            </div>
-          ) : (
-            <Bar
-              data={appointmentsChartData}
-              options={{
-                ...chartOptions,
-                plugins: {
-                  ...chartOptions.plugins,
-                },
-              }}
-            />
-          )}
+
+          <Bar
+            data={appointmentsChartData}
+            options={{
+              ...chartOptions,
+              plugins: {
+                ...chartOptions.plugins,
+              },
+            }}
+          />
         </div>
 
         {/* Camps Chart */}
@@ -289,21 +286,16 @@ const Dashboard = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-8">
             Monthly Blood Camps
           </h2>
-          {loading.charts ? (
-            <div className="h-64 flex items-center justify-center">
-              <div className="animate-pulse bg-gray-200 rounded h-full w-full"></div>
-            </div>
-          ) : (
-            <Bar
-              data={campsChartData}
-              options={{
-                ...chartOptions,
-                plugins: {
-                  ...chartOptions.plugins,
-                },
-              }}
-            />
-          )}
+
+          <Bar
+            data={campsChartData}
+            options={{
+              ...chartOptions,
+              plugins: {
+                ...chartOptions.plugins,
+              },
+            }}
+          />
         </div>
       </div>
 
@@ -313,48 +305,38 @@ const Dashboard = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-8">
             Donor Registration Trend
           </h2>
-          {loading.charts ? (
-            <div className="h-64 flex items-center justify-center">
-              <div className="animate-pulse bg-gray-200 rounded h-full w-full"></div>
-            </div>
-          ) : (
-            <Line
-              data={donorsChartData}
-              options={{
-                ...chartOptions,
-                plugins: {
-                  ...chartOptions.plugins,
-                },
-              }}
-            />
-          )}
+
+          <Line
+            data={donorsChartData}
+            options={{
+              ...chartOptions,
+              plugins: {
+                ...chartOptions.plugins,
+              },
+            }}
+          />
         </div>
         <div className="bg-white p-6 rounded-xl shadow-lg">
           <h2 className="text-xl font-semibold text-gray-800 mb-8">
             Organization Registration Trend
           </h2>
-          {loading.charts ? (
-            <div className="h-64 flex items-center justify-center">
-              <div className="animate-pulse bg-gray-200 rounded h-full w-full"></div>
-            </div>
-          ) : (
-            <Line
-              data={organizationsChartData}
-              options={{
-                ...chartOptions,
-                plugins: {
-                  ...chartOptions.plugins,
-                },
-              }}
-            />
-          )}
+
+          <Line
+            data={organizationsChartData}
+            options={{
+              ...chartOptions,
+              plugins: {
+                ...chartOptions.plugins,
+              },
+            }}
+          />
         </div>
       </div>
     </div>
   );
 };
 
-const StatCard = ({ title, value, icon, loading, color }: StatCardProps) => {
+const StatCard = ({ title, value, icon, color }: StatCardProps) => {
   return (
     <div className="group relative z-0 overflow-hidden rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl">
       <div className="absolute inset-0 bg-gradient-to-br opacity-10 group-hover:opacity-20 transition-opacity duration-300 ${color}"></div>
@@ -362,13 +344,10 @@ const StatCard = ({ title, value, icon, loading, color }: StatCardProps) => {
       <div className="relative z-10 flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-500 mb-1">{title}</p>
-          {loading ? (
-            <div className="h-8 w-16 mt-2 bg-gray-200 rounded-lg animate-pulse"></div>
-          ) : (
-            <p className="text-3xl font-bold text-gray-800">
-              {value >= 0 ? value.toLocaleString() : "Error"}
-            </p>
-          )}
+
+          <p className="text-3xl font-bold text-gray-800">
+            {value >= 0 ? value.toLocaleString() : "Error"}
+          </p>
         </div>
         <div
           className={`p-3 rounded-lg bg-gradient-to-br ${color} text-white shadow-md`}
