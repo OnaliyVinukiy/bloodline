@@ -281,7 +281,7 @@ export function Navigationbar() {
                 </svg>
                 Calendar
               </Dropdown.Item>
-              <Dropdown.Item onClick={() => navigate("/admin/dashboard")}>
+              <Dropdown.Item onClick={() => navigate("/admin/stock")}>
                 <svg
                   className="w-[15px] h-[15px] mr-2 fill-[#8e8e8e]"
                   viewBox="0 0 512 512"
