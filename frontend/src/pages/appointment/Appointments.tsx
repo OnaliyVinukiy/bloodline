@@ -115,6 +115,11 @@ const DonorAppointments = () => {
   return (
     <div className="flex justify-center mt-8">
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-w-7xl w-full mb-20">
+        <div className="text-center mb-10">
+          <h1 className="mt-2 text-4xl font-bold text-center mb-6 bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent leading-tight pb-2">
+            Scheduled Appointments
+          </h1>
+        </div>
         <table className="mt-4 mb-4 w-full text-md text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-gray-700 uppercase bg-yellow-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
