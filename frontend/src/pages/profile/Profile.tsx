@@ -21,6 +21,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
   const [showErrorModal, setErrorModal] = useState(false);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [showAvatarUpdateModel, setShowAvatarUpdateModel] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
 
@@ -215,7 +216,6 @@ export default function Profile() {
   const handleAvatarUpdate = async () => {
     if (!selectedFile || !user?.email) return;
     setIsUploading(true);
-
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("email", user.email);
@@ -230,12 +230,13 @@ export default function Profile() {
       // Update the donor record with new avatar URL
       setDonor((prev) => ({ ...prev, avatar: data.avatarUrl }));
 
-      alert("Avatar updated successfully!");
+      setShowAvatarUpdateModel(true);
     } catch (error) {
       console.error("Error uploading avatar:", error);
       alert("Error updating avatar.");
     } finally {
       setIsUploading(false);
+      window.location.reload();
     }
   };
 
@@ -860,6 +861,49 @@ export default function Profile() {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Avatar Update Confirmation Modal */}
+      <Modal
+        show={showAvatarUpdateModel}
+        onClose={() => setShowAvatarUpdateModel(false)}
+      >
+        <Modal.Header className="flex items-center gap-2 ">
+          <p className="flex items-center gap-2 text-xl text-green-600">
+            <svg
+              className="w-6 h-6 text-green-600"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              viewBox="0 0 512 512"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"
+              />
+            </svg>
+            Uploaded Successfully!
+          </p>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-lg text-gray-700">
+            Your profile picture got uploaded successfully.
+          </p>
+        </Modal.Body>
+        <Modal.Footer className="flex justify-end">
+          <Button
+            color="failure"
+            onClick={() => setShowAvatarUpdateModel(false)}
+          >
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       {/* Validation Modal */}
       <ValidationModal
         show={showValidationModal}
