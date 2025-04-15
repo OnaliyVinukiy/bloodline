@@ -26,6 +26,7 @@ import Map from "./pages/camp/Map";
 import Dashboard from "./pages/admin/dashboard/Dashboard";
 import AboutUs from "./pages/about/AboutUs";
 import Services from "./pages/services/Services";
+import DonorDonations from "./pages/appointment/Donations";
 import ContactUs from "./pages/contact/ContactUs";
 import Stock from "./pages/admin/stock/Stock";
 import StockAdditionHistory from "./pages/admin/stock/StockAdditionHistory";
@@ -62,6 +63,7 @@ function App() {
               element={<OrganizationRegistration />}
             />
             <Route path="/appointments" element={<DonorAppointments />} />
+            <Route path="/donor-donations" element={<DonorDonations />} />
             <Route path="/map" element={<Map />} />
             <Route path="/admin/camps" element={<Camps />} />
             <Route path="/admin/dashboard" element={<Dashboard />} />
