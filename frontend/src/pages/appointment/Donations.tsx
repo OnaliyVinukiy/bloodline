@@ -9,7 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useAuthContext } from "@asgardeo/auth-react";
 
-const DonorAppointments = () => {
+const DonorDonations = () => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { getAccessToken } = useAuthContext();
@@ -62,32 +62,6 @@ const DonorAppointments = () => {
     fetchAppointments();
   }, [memoizedGetAccessToken]);
 
-  const handleCancelAppointment = async (appointmentId: string) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to cancel this appointment?"
-    );
-    if (!isConfirmed) return;
-
-    try {
-      const token = await memoizedGetAccessToken();
-      await axios.delete(
-        `${backendURL}/api/appointments/cancel-appointment/${appointmentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      // Update the appointments list
-      setAppointments((prev) =>
-        prev.filter((appointment: any) => appointment._id !== appointmentId)
-      );
-    } catch (error) {
-      console.error("Error canceling appointment:", error);
-    }
-  };
-
   //Loading animation
   if (isLoading) {
     return (
@@ -111,13 +85,16 @@ const DonorAppointments = () => {
       </div>
     );
   }
+  const collectedAppointments = appointments.filter(
+    (appointment: any) => appointment.status === "Collected"
+  );
 
   return (
     <div className="flex justify-center mt-8">
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-w-7xl w-full mb-20">
         <div className="text-center mb-10">
           <h1 className="mt-2 text-4xl font-bold text-center mb-6 bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent leading-tight pb-2">
-            Scheduled Appointments
+            Blood Donations
           </h1>
         </div>
         <table className="mt-4 mb-4 w-full text-md text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -133,15 +110,11 @@ const DonorAppointments = () => {
               <th scope="col" className="px-6 py-3 text-center">
                 Status
               </th>
-
-              <th scope="col" className="px-6 py-3 text-center">
-                Action
-              </th>
               <th scope="col" className="px-1 py-1"></th>
             </tr>
           </thead>
           <tbody>
-            {appointments.map((appointment: any) => (
+            {collectedAppointments.map((appointment: any) => (
               <tr
                 key={appointment._id}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -150,53 +123,21 @@ const DonorAppointments = () => {
                   {appointment.selectedDate}
                 </td>
                 <td className="px-6 py-4">{appointment.selectedSlot}</td>
-
-                {appointment.status === "Rejected" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
-                      <button className="red">Rejected</button>
-                    </div>
-                  </td>
-                ) : appointment.status === "Approved" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
-                      <button className="green">Approved</button>
-                    </div>
-                  </td>
-                ) : (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
-                      <button className="yellow ">Pending</button>
-                    </div>
-                  </td>
-                )}
-
-                <td className="px-3 py-2 text-center">
-                  <button
-                    onClick={() => handleCancelAppointment(appointment._id)}
-                    className={`text-red-800 border border-red-800 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2 transition-all duration-300 ${
-                      appointment.status === "Rejected" ||
-                      new Date(appointment.selectedDate) < new Date()
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:text-white hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300"
-                    }`}
-                    disabled={
-                      appointment.status === "Rejected" ||
-                      new Date(appointment.selectedDate) < new Date()
-                    }
-                  >
-                    Cancel Appointment
-                  </button>
+                <td className="px-6 py-6 text-center">
+                  <div className="badges flex justify-center">
+                    <button className="blue">Collected</button>
+                  </div>
                 </td>
               </tr>
             ))}
-            {appointments.length === 0 && (
+
+            {collectedAppointments.length === 0 && (
               <tr>
                 <td
                   colSpan={6}
                   className="text-center px-6 py-4 text-gray-500 dark:text-gray-400"
                 >
-                  No appointments found.
+                  No blood donations found.
                 </td>
               </tr>
             )}
@@ -207,4 +148,4 @@ const DonorAppointments = () => {
   );
 };
 
-export default DonorAppointments;
+export default DonorDonations;
