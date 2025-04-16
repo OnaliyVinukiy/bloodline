@@ -22,9 +22,11 @@ const OrganizationRegistration = () => {
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
+  const [isOrgPhoneNumberValid, setIsOrgPhoneNumberValid] = useState(true);
 
   const [organization, setOrganization] = useState<Organization>({
     organizationName: "",
+    organizationEmail: "",
     repFullName: "",
     repEmail: user?.email || "",
     repNIC: "",
@@ -42,9 +44,14 @@ const OrganizationRegistration = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showValidationModal, setShowValidationModal] = useState(false);
 
-  const handlePhoneNumberChange = (value: string) => {
+  const handleRepContactNumber = (value: string) => {
     setIsPhoneNumberValid(validatePhoneNumber(value));
     handleInputChange("repContactNumber", value);
+  };
+
+  const handleOrgContactNumber = (value: string) => {
+    setIsOrgPhoneNumberValid(validatePhoneNumber(value));
+    handleInputChange("orgContactNumber", value);
   };
 
   const [validationModalContent, setValidationModalContent] = useState({
@@ -79,7 +86,7 @@ const OrganizationRegistration = () => {
           // Set email when user info is fetched
           setOrganization((prev) => ({
             ...prev,
-            email: userInfo.email || "",
+            repEmail: userInfo.email || "",
           }));
 
           // Fetch donor info if user exists
@@ -291,9 +298,7 @@ const OrganizationRegistration = () => {
                 )}
               </div>
             </div>
-
             {/* Form Fields */}
-
             <div className="w-full">
               <Label
                 htmlFor="fullName"
@@ -313,6 +318,23 @@ const OrganizationRegistration = () => {
             </div>
             <div className="w-full">
               <Label
+                htmlFor="fullName"
+                className="block mb-2 text-sm font-medium text-indigo-900"
+              >
+                {" "}
+                Email of the Organization
+              </Label>
+              <input
+                type="text"
+                value={organization?.organizationEmail || ""}
+                onChange={(e) =>
+                  handleInputChange("organizationEmail", e.target.value)
+                }
+                className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+              />
+            </div>
+            <div className="w-full">
+              <Label
                 htmlFor="first_name"
                 className="block mb-2 text-sm font-medium text-indigo-900"
               >
@@ -322,11 +344,11 @@ const OrganizationRegistration = () => {
               <input
                 type="email"
                 value={user.email}
+                name="repEmail"
                 className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 disabled
               />
             </div>
-
             <div className="w-full">
               <Label
                 htmlFor="fullName"
@@ -404,7 +426,6 @@ const OrganizationRegistration = () => {
                 </div>
               </div>
             </div>
-
             <div>
               <Label
                 htmlFor="first_name"
@@ -415,13 +436,17 @@ const OrganizationRegistration = () => {
               <input
                 type="text"
                 value={organization?.orgContactNumber || ""}
-                onChange={(e) =>
-                  handleInputChange("orgContactNumber", e.target.value)
-                }
-                className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                onChange={(e) => handleOrgContactNumber(e.target.value)}
+                className={`bg-indigo-50 border ${
+                  isOrgPhoneNumberValid ? "border-indigo-300" : "border-red-500"
+                } text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
               />
+              {!isOrgPhoneNumberValid && (
+                <p className="text-sm text-red-500 mt-1">
+                  Please enter a valid 10-digit phone number starting from 0.
+                </p>
+              )}
             </div>
-
             <div className="mb-2 sm:mb-6">
               <Label
                 htmlFor="first_name"
@@ -433,7 +458,7 @@ const OrganizationRegistration = () => {
               <input
                 type="text"
                 value={organization?.repContactNumber || ""}
-                onChange={(e) => handlePhoneNumberChange(e.target.value)}
+                onChange={(e) => handleRepContactNumber(e.target.value)}
                 className={`bg-indigo-50 border ${
                   isPhoneNumberValid ? "border-indigo-300" : "border-red-500"
                 } text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
@@ -444,7 +469,6 @@ const OrganizationRegistration = () => {
                 </p>
               )}
             </div>
-
             <div className="flex justify-end mt-6">
               <button
                 onClick={handleUpdate}

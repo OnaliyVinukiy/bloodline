@@ -58,8 +58,8 @@ const connectToCosmos = async () => {
 export const getOrganizationByEmail = async (req: Request, res: Response) => {
   try {
     const { collection, client } = await connectToCosmos();
-    const { email } = req.params;
-    const camp = await collection.findOne({ email });
+    const { repEmail } = req.params;
+    const camp = await collection.findOne({ repEmail });
 
     if (!camp) {
       return res.status(404).json({ message: "Organization not found" });
@@ -80,7 +80,7 @@ export const upsertOrganization = async (req: Request, res: Response) => {
   try {
     const { collection, client } = await connectToCosmos();
     const upsertResult = await collection.updateOne(
-      { email: organization.email },
+      { repEmail: organization.repEmail },
       { $set: organization },
       { upsert: true }
     );
