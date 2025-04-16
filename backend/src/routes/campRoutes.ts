@@ -17,6 +17,7 @@ import {
   checkTeamAvailability,
   getCampsCount,
   getCampsByMonth,
+  getCampByEmail
 } from "../controllers/campController";
 import { authenticateUser } from "../middleware/authMiddleware";
 
@@ -33,6 +34,9 @@ router.get("/city/:city", getCampsByCity);
 
 //Route to fetch camp data by ID
 router.get("/fetch-camp/:id", authenticateUser, getCampById);
+
+//Route to fetch camp data by email
+router.get("/fetch-camp-email/:email", authenticateUser, getCampByEmail);
 
 // Route to approve camp
 router.put("/approve-camp/:id", authenticateUser, approveCamp);
