@@ -22,7 +22,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 //Router to fetch organization by email
-router.get("/organization/:email", getOrganizationByEmail);
+router.get("/organization/:repEmail", getOrganizationByEmail);
 
 //Router to fetch all organizations
 router.get("/all-organizations", getAllOrganizations);
