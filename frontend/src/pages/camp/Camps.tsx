@@ -10,7 +10,7 @@ import axios from "axios";
 import { useAuthContext } from "@asgardeo/auth-react";
 
 const DonorCamps = () => {
-  const [appointments, setAppointments] = useState([]);
+  const [camps, setCamps] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { getAccessToken } = useAuthContext();
 
@@ -50,7 +50,7 @@ const DonorCamps = () => {
             new Date(b.date).getTime() - new Date(a.date).getTime()
         );
 
-        setAppointments(sortedCamps);
+        setCamps(sortedCamps);
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {
@@ -84,7 +84,7 @@ const DonorCamps = () => {
       </div>
     );
   }
-  const collectedAppointments = appointments.filter(
+  const collectedAppointments = camps.filter(
     (appointment: any) => appointment.status === "Collected"
   );
 
