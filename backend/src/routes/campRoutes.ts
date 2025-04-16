@@ -36,7 +36,7 @@ router.get("/city/:city", getCampsByCity);
 router.get("/fetch-camp/:id", authenticateUser, getCampById);
 
 //Route to fetch camp data by email
-router.get("/fetch-camp-email/:email", authenticateUser, getCampByEmail);
+router.get("/fetch-camp-email/:repEmail", authenticateUser, getCampByEmail);
 
 // Route to approve camp
 router.put("/approve-camp/:id", authenticateUser, approveCamp);
