@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 import { UserIcon } from "@heroicons/react/24/solid";
-import { Donor, User } from "../types/users";
+import { Donor, Organization, User } from "../types/users";
 import axios from "axios";
 
 export function Navigationbar() {
@@ -33,6 +33,17 @@ export function Navigationbar() {
     bloodGroup: "",
     avatar: "",
     gender: "",
+  });
+  const [org, setOrg] = useState<Organization>({
+    organizationName: "",
+    organizationEmail: "",
+    repFullName: "",
+    repEmail: user?.email || "",
+    repNIC: "",
+    repGender: "",
+    orgContactNumber: "",
+    repContactNumber: "",
+    avatar: "",
   });
 
   const backendURL =
@@ -93,6 +104,12 @@ export function Navigationbar() {
 
           if (donorInfo) {
             setDonor(donorInfo);
+          }
+          const { data: orgInfo } = await axios.get(
+            `${backendURL}/api/organizations/organization/${user.email}`
+          );
+          if (orgInfo) {
+            setOrg(orgInfo);
           }
         } catch (error) {
           console.error("Error fetching donor info:", error);
@@ -179,7 +196,38 @@ export function Navigationbar() {
                   <span>Profile</span>
                 </div>
               </Dropdown.Item>
-
+              {org?.organizationName && (
+                <>
+                  <Dropdown.Item
+                    onClick={() => navigate("/organization-registration")}
+                  >
+                    <div className="flex items-center">
+                      <svg
+                        className="w-[15px] h-[15px] mr-2 fill-[#8e8e8e]"
+                        viewBox="0 0 384 512"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M48 0C21.5 0 0 21.5 0 48V464c0 26.5 21.5 48 48 48h96V432c0-26.5 21.5-48 48-48s48 21.5 48 48v80h96c26.5 0 48-21.5 48-48V48c0-26.5-21.5-48-48-48H48zM64 240c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V240zm112-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V240c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V240zM80 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V112zM272 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16z"></path>
+                      </svg>
+                      <span>Organization</span>
+                    </div>
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={() => navigate("/organization-registration")}
+                  >
+                    <div className="flex items-center">
+                      <svg
+                        className="w-[16px] h-[16px] mr-2 fill-[#8e8e8e]"
+                        viewBox="0 0 576 512"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c.2 35.5-28.5 64.3-64 64.3H128.1c-35.3 0-64-28.7-64-64V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L416 100.7V64c0-17.7 14.3-32 32-32h32c17.7 0 32 14.3 32 32V185l52.8 46.4c8 7 12 15 11 24zM272 192c-8.8 0-16 7.2-16 16v48H208c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h48v48c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V320h48c8.8 0 16-7.2 16-16V272c0-8.8-7.2-16-16-16H320V208c0-8.8-7.2-16-16-16H272z"></path>
+                      </svg>
+                      <span>Camps</span>
+                    </div>
+                  </Dropdown.Item>
+                </>
+              )}
               <Dropdown.Item>
                 <div className="flex items-center">
                   <svg
@@ -206,7 +254,6 @@ export function Navigationbar() {
               </Dropdown.Item>
               <Dropdown.Divider />
               <Dropdown.Item onClick={() => signOut()}>
-                {" "}
                 <svg
                   className="w-[15px] h-[15px] mr-2 fill-[#8e8e8e]"
                   viewBox="0 0 512 512"
@@ -218,6 +265,7 @@ export function Navigationbar() {
               </Dropdown.Item>
             </Dropdown>
           ) : user && isAdmin ? (
+            // Admin dropdown remains unchanged
             <Dropdown
               arrowIcon={false}
               inline
@@ -250,7 +298,6 @@ export function Navigationbar() {
                 Admin Dashboard
               </Dropdown.Item>
               <Dropdown.Item onClick={() => navigate("/admin/appointments")}>
-                {" "}
                 <svg
                   className="w-[15px] h-[15px] mr-2 fill-[#8e8e8e]"
                   viewBox="0 0 448 512"
@@ -271,7 +318,6 @@ export function Navigationbar() {
                 Camps
               </Dropdown.Item>
               <Dropdown.Item onClick={() => navigate("/admin/calendar")}>
-                {" "}
                 <svg
                   className="w-[16px] h-[16px] mr-2 fill-[#8e8e8e]"
                   viewBox="0 0 448 512"
