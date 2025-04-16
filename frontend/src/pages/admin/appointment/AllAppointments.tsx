@@ -303,9 +303,18 @@ const AllAppointments = () => {
                       <button
                         className="font-medium text-green-600 dark:text-green-500 hover:underline"
                         aria-label="Donate"
+                        disabled={
+                          appointment.status === "Pending" ||
+                          appointment.status === "Rejected"
+                        }
                       >
                         <svg
-                          className="w-5 h-6 text-blue-800 dark:text-white"
+                          className={`w-5 h-6 ${
+                            appointment.status === "Pending" ||
+                            appointment.status === "Rejected"
+                              ? "text-gray-400 dark:text-gray-500"
+                              : "text-blue-800 dark:text-white"
+                          }`}
                           aria-hidden="true"
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"

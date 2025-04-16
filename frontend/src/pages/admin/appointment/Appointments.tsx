@@ -93,18 +93,7 @@ const Appointments = () => {
               Issued
             </button>
           </li>
-          <li className="me-2">
-            <button
-              onClick={() => setActiveTab("tab7")}
-              className={`px-6 py-3 rounded-t-lg transition-colors duration-300 ${
-                activeTab === "tab7"
-                  ? "text-white bg-red-800 border-b-0"
-                  : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
-              }`}
-            >
-              Rejected
-            </button>
-          </li>
+
           <li className="me-2">
             <button
               onClick={() => setActiveTab("tab8")}
@@ -115,6 +104,18 @@ const Appointments = () => {
               }`}
             >
               Collected
+            </button>
+          </li>
+          <li className="me-2">
+            <button
+              onClick={() => setActiveTab("tab7")}
+              className={`px-6 py-3 rounded-t-lg transition-colors duration-300 ${
+                activeTab === "tab7"
+                  ? "text-white bg-red-800 border-b-0"
+                  : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}
+            >
+              Rejected
             </button>
           </li>
         </ul>

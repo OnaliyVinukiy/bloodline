@@ -319,6 +319,35 @@ export const getCampById = async (req: Request, res: Response) => {
   }
 };
 
+// Fetch a single camp by Email
+export const getCampByEmail = async (req: Request, res: Response) => {
+  const { repEmail } = req.params;
+
+  try {
+    // Connect to the database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(CAMP_COLLECTION_ID);
+
+    // Find the camp by ID
+    const camp = await collection.findOne({ repEmail: repEmail });
+
+    if (!camp) {
+      return res.status(404).json({ message: "Camp is found" });
+    }
+
+    res.status(200).json(camp);
+
+    await client.close();
+  } catch (error) {
+    console.error("Error fetching camp:", error);
+    res.status(500).json({ message: "Error fetching camp", error });
+  }
+};
+
 //Approve pending camp
 export const approveCamp = async (req: Request, res: Response) => {
   try {
