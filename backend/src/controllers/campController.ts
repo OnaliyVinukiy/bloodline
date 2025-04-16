@@ -321,7 +321,7 @@ export const getCampById = async (req: Request, res: Response) => {
 
 // Fetch a single camp by Email
 export const getCampByEmail = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { repEmail } = req.params;
 
   try {
     // Connect to the database
@@ -333,7 +333,7 @@ export const getCampByEmail = async (req: Request, res: Response) => {
     const collection = database.collection(CAMP_COLLECTION_ID);
 
     // Find the camp by ID
-    const camp = await collection.findOne({ _id: new ObjectId(id) });
+    const camp = await collection.findOne({ repEmail: repEmail });
 
     if (!camp) {
       return res.status(404).json({ message: "Camp is found" });
