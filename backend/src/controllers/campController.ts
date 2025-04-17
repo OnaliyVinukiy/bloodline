@@ -323,10 +323,10 @@ export const getCampByEmail = async (req: Request, res: Response) => {
     const collection = database.collection(CAMP_COLLECTION_ID);
 
     // Find the camp by ID
-    const camp = await collection.findOne({ repEmail: repEmail });
+    const camp = await collection.findOne({ email: repEmail });
 
     if (!camp) {
-      return res.status(404).json({ message: "Camp is found" });
+      return res.status(404).json({ message: "Camp is not found" });
     }
 
     res.status(200).json(camp);
