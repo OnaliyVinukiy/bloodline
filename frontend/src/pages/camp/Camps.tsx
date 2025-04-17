@@ -84,9 +84,6 @@ const DonorCamps = () => {
       </div>
     );
   }
-  const collectedAppointments = camps.filter(
-    (appointment: any) => appointment.status === "Collected"
-  );
 
   return (
     <div className="flex justify-center mt-8">
@@ -103,9 +100,14 @@ const DonorCamps = () => {
                 Date
               </th>
               <th scope="col" className="px-6 py-3">
-                Time
+                Start Time
               </th>
-
+              <th scope="col" className="px-6 py-3">
+                End Time
+              </th>
+              <th scope="col" className="px-6 py-3">
+                City
+              </th>
               <th scope="col" className="px-6 py-3 text-center">
                 Status
               </th>
@@ -113,30 +115,44 @@ const DonorCamps = () => {
             </tr>
           </thead>
           <tbody>
-            {collectedAppointments.map((appointment: any) => (
+            {camps.map((camp: any) => (
               <tr
-                key={appointment._id}
+                key={camp._id}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
               >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {appointment.selectedDate}
-                </td>
-                <td className="px-6 py-4">{appointment.selectedSlot}</td>
-                <td className="px-6 py-6 text-center">
-                  <div className="badges flex justify-center">
-                    <button className="blue">Collected</button>
-                  </div>
-                </td>
+                <td className="px-6 py-4 whitespace-nowrap">{camp.date}</td>
+                <td className="px-6 py-4">{camp.startTime}</td>
+                <td className="px-6 py-4">{camp.endTime}</td>
+                <td className="px-6 py-4">{camp.city}</td>
+                {camp.status === "Rejected" ? (
+                  <td className="px-6 py-6 text-center">
+                    <div className="badges flex justify-center">
+                      <button className="red">Rejected</button>
+                    </div>
+                  </td>
+                ) : camp.status === "Approved" ? (
+                  <td className="px-6 py-6 text-center">
+                    <div className="badges flex justify-center">
+                      <button className="green">Approved</button>
+                    </div>
+                  </td>
+                ) : (
+                  <td className="px-6 py-6 text-center">
+                    <div className="badges flex justify-center">
+                      <button className="yellow">Pending</button>
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
 
-            {collectedAppointments.length === 0 && (
+            {camps.length === 0 && (
               <tr>
                 <td
                   colSpan={6}
                   className="text-center px-6 py-4 text-gray-500 dark:text-gray-400"
                 >
-                  No blood donations found.
+                  No blood donation camps found.
                 </td>
               </tr>
             )}
