@@ -8,9 +8,10 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { Appointment } from "../../types/appointment";
 
 const DonorAppointments = () => {
-  const [appointments, setAppointments] = useState([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { getAccessToken } = useAuthContext();
 
@@ -43,9 +44,15 @@ const DonorAppointments = () => {
             },
           }
         );
+        // Normalize response data to an array
+        const appointmentData = Array.isArray(response.data)
+          ? response.data
+          : response.data && typeof response.data === "object"
+          ? [response.data]
+          : [];
 
         // Sort appointments by date
-        const sortedAppointments = response.data.sort(
+        const sortedAppointments = appointmentData.sort(
           (a: any, b: any) =>
             new Date(b.selectedDate).getTime() -
             new Date(a.selectedDate).getTime()
