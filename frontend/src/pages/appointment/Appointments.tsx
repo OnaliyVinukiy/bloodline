@@ -9,10 +9,16 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { Appointment } from "../../types/appointment";
+import { Button, Modal } from "flowbite-react";
 
 const DonorAppointments = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<
+    string | null
+  >(null);
+  const [isCancelling, setIsCancelling] = useState(false);
   const { getAccessToken } = useAuthContext();
 
   const memoizedGetAccessToken = useCallback(
@@ -24,7 +30,7 @@ const DonorAppointments = () => {
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  //Fetch appointments
+  // Fetch appointments
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
@@ -36,6 +42,12 @@ const DonorAppointments = () => {
           { headers: { "Content-Type": "application/json" } }
         );
 
+        if (!userInfo.email) {
+          console.error("No email found in userInfo");
+          setAppointments([]);
+          return;
+        }
+
         const response = await axios.get(
           `${backendURL}/api/appointments/fetch-appointments/${userInfo.email}`,
           {
@@ -44,8 +56,9 @@ const DonorAppointments = () => {
             },
           }
         );
+
         // Normalize response data to an array
-        const appointmentData = Array.isArray(response.data)
+        const appointmentData: Appointment[] = Array.isArray(response.data)
           ? response.data
           : response.data && typeof response.data === "object"
           ? [response.data]
@@ -53,7 +66,7 @@ const DonorAppointments = () => {
 
         // Sort appointments by date
         const sortedAppointments = appointmentData.sort(
-          (a: any, b: any) =>
+          (a: Appointment, b: Appointment) =>
             new Date(b.selectedDate).getTime() -
             new Date(a.selectedDate).getTime()
         );
@@ -61,41 +74,61 @@ const DonorAppointments = () => {
         setAppointments(sortedAppointments);
       } catch (error) {
         console.error("Error fetching appointments:", error);
+        setAppointments([]);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchAppointments();
-  }, [memoizedGetAccessToken]);
+  }, [memoizedGetAccessToken, backendURL]);
 
-  const handleCancelAppointment = async (appointmentId: string) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to cancel this appointment?"
-    );
-    if (!isConfirmed) return;
+  const handleCancelAppointment = (appointmentId: string) => {
+    setSelectedAppointmentId(appointmentId);
+    setIsCancelModalOpen(true);
+  };
+
+  // Confirm cancellation
+  const confirmCancelAppointment = async () => {
+    if (!selectedAppointmentId) return;
 
     try {
+      setIsCancelling(true);
       const token = await memoizedGetAccessToken();
-      await axios.delete(
-        `${backendURL}/api/appointments/cancel-appointment/${appointmentId}`,
+      await axios.put(
+        `${backendURL}/api/appointments/cancel-appointment/${selectedAppointmentId}`,
+        { status: "Cancelled" },
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
 
       // Update the appointments list
       setAppointments((prev) =>
-        prev.filter((appointment: any) => appointment._id !== appointmentId)
+        prev.map((appointment) =>
+          appointment._id === selectedAppointmentId
+            ? { ...appointment, status: "Cancelled" }
+            : appointment
+        )
       );
+
+      setIsCancelModalOpen(true);
+      setTimeout(() => {
+        window.location.href = "http://localhost:5173/appointments";
+      }, 1500);
     } catch (error) {
       console.error("Error canceling appointment:", error);
+    } finally {
+      setIsCancelling(false);
+      setIsCancelModalOpen(false);
+      setSelectedAppointmentId(null);
     }
   };
 
-  //Loading animation
+  // Loading animation
   if (isLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
@@ -136,11 +169,9 @@ const DonorAppointments = () => {
               <th scope="col" className="px-6 py-3">
                 Time
               </th>
-
               <th scope="col" className="px-6 py-3 text-center">
                 Status
               </th>
-
               <th scope="col" className="px-6 py-3 text-center">
                 Action
               </th>
@@ -148,7 +179,7 @@ const DonorAppointments = () => {
             </tr>
           </thead>
           <tbody>
-            {appointments.map((appointment: any) => (
+            {appointments.map((appointment: Appointment) => (
               <tr
                 key={appointment._id}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -157,7 +188,6 @@ const DonorAppointments = () => {
                   {appointment.selectedDate}
                 </td>
                 <td className="px-6 py-4">{appointment.selectedSlot}</td>
-
                 {appointment.status === "Rejected" ? (
                   <td className="px-6 py-6 text-center">
                     <div className="badges flex justify-center">
@@ -170,26 +200,33 @@ const DonorAppointments = () => {
                       <button className="green">Approved</button>
                     </div>
                   </td>
+                ) : appointment.status === "Cancelled" ? (
+                  <td className="px-6 py-6 text-center">
+                    <div className="badges flex justify-center">
+                      <button className="red">Cancelled</button>
+                    </div>
+                  </td>
                 ) : (
                   <td className="px-6 py-6 text-center">
                     <div className="badges flex justify-center">
-                      <button className="yellow ">Pending</button>
+                      <button className="yellow">Pending</button>
                     </div>
                   </td>
                 )}
-
                 <td className="px-3 py-2 text-center">
                   <button
                     onClick={() => handleCancelAppointment(appointment._id)}
                     className={`text-red-800 border border-red-800 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2 transition-all duration-300 ${
                       appointment.status === "Rejected" ||
+                      appointment.status === "Cancelled" ||
                       new Date(appointment.selectedDate) < new Date()
                         ? "opacity-50 cursor-not-allowed"
                         : "hover:text-white hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300"
                     }`}
                     disabled={
                       appointment.status === "Rejected" ||
-                      new Date(appointment.selectedDate) < new Date()
+                      new Date(appointment.selectedDate) < new Date() ||
+                      appointment.status === "Cancelled"
                     }
                   >
                     Cancel Appointment
@@ -200,7 +237,7 @@ const DonorAppointments = () => {
             {appointments.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={5}
                   className="text-center px-6 py-4 text-gray-500 dark:text-gray-400"
                 >
                   No appointments found.
@@ -210,6 +247,68 @@ const DonorAppointments = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Confirmation Modal */}
+      <Modal
+        show={isCancelModalOpen}
+        onClose={() => {
+          if (!isCancelling) {
+            setIsCancelModalOpen(false);
+            setSelectedAppointmentId(null);
+          }
+        }}
+      >
+        <Modal.Header>Cancel Appointment</Modal.Header>
+        <Modal.Body>
+          <p className="text-lg text-gray-700">
+            Are you sure you want to cancel this appointment?
+          </p>
+        </Modal.Body>
+        <Modal.Footer className="flex justify-end">
+          <Button
+            color="failure"
+            onClick={confirmCancelAppointment}
+            disabled={isCancelling}
+          >
+            {isCancelling ? (
+              <>
+                <svg
+                  aria-hidden="true"
+                  className="w-4 h-4 mr-2 text-white animate-spin"
+                  viewBox="0 0 100 101"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M100 50.5c0 27.6-22.4 50-50 50S0 78.1 0 50.5 22.4.5 50 .5s50 22.4 50 50z"
+                    fill="currentColor"
+                    opacity=".2"
+                  />
+                  <path
+                    d="M93.3 50.5c0-23.9-19.4-43.3-43.3-43.3-6.3 0-12.3 1.3-17.8 3.7-1.6.7-2.2 2.6-1.5 4.2.7 1.6 2.6 2.2 4.2 1.5 4.9-2.1 10.2-3.2 15.6-3.2 21.6 0 39.3 17.7 39.3 39.3s-17.7 39.3-39.3 39.3c-21.6 0-39.3-17.7-39.3-39.3 0-6.8 1.7-13.3 5-19.1.9-1.5.4-3.4-1-4.3s-3.4-.4-4.3 1c-3.8 6.4-5.8 13.7-5.8 21.3 0 23.9 19.4 43.3 43.3 43.3s43.3-19.4 43.3-43.3z"
+                    fill="currentColor"
+                  />
+                </svg>
+                Cancelling...
+              </>
+            ) : (
+              "Yes"
+            )}
+          </Button>
+          <Button
+            color="failure"
+            outline
+            onClick={() => {
+              setIsCancelModalOpen(false);
+              setSelectedAppointmentId(null);
+            }}
+            disabled={isCancelling}
+            className="border-red-700 text-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300"
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
