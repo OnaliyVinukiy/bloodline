@@ -64,7 +64,7 @@ function App() {
               element={<OrganizationRegistration />}
             />
             <Route path="/appointments" element={<DonorAppointments />} />
-            <Route path="/donor-donations" element={<DonorDonations />} />
+            <Route path="/donations" element={<DonorDonations />} />
             <Route path="/map" element={<Map />} />
             <Route path="/organized-camps" element={<OrganizedCamps />} />
             <Route path="/admin/camps" element={<Camps />} />
