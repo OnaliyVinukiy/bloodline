@@ -430,3 +430,59 @@ const sendRejectionEmail = async (appointment: any) => {
 
   await transporter.sendMail(mailOptions);
 };
+
+//Cancel appointments
+export const cancelAppointment = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Connect to the database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+    const objectId = new ObjectId(id);
+
+    const updatedAppointment = await collection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: { status: "Cancelled" } },
+      { returnDocument: "after" }
+    );
+
+    // Send approval email
+    await sendCancellationEmail(updatedAppointment);
+
+    await client.close();
+
+    if (!updatedAppointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    res.status(200).json(updatedAppointment);
+  } catch (error) {
+    console.error("Error updating appointment status:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Send cancellation email to the donor
+const sendCancellationEmail = async (appointment: any) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: appointment.donorInfo.email,
+    subject: "Blood Donation Appointment Cancelled",
+    html: AppointmentApproval(appointment),
+  };
+
+  await transporter.sendMail(mailOptions);
+};

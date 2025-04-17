@@ -17,6 +17,7 @@ import {
   getAppointmentsCount,
   getAppointmentsByMonth,
   updateAppointment,
+  cancelAppointment,
 } from "../controllers/appointmentController";
 import { authenticateUser } from "../middleware/authMiddleware";
 
@@ -50,6 +51,9 @@ router.put("/approve-appointment/:id", authenticateUser, approveAppointment);
 
 // Route to reject appointment
 router.put("/reject-appointment/:id", authenticateUser, rejectAppointment);
+
+// Route to cancel appointment
+router.put("/cancel-appointment/:id", authenticateUser, cancelAppointment);
 
 //Route to fetch appointment count
 router.get("/count", getAppointmentsCount);
