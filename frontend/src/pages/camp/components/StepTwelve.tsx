@@ -63,7 +63,6 @@ const StepTwelve: React.FC<
   const [user, setUser] = useState<User | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
-  const [isEmailValid, setIsEmailValid] = useState(true);
   const [organizationOptions, setOrganizationOptions] = useState<string[]>([]);
   const [allOrganizations, setAllOrganizations] = useState<string[]>([]); 
   const [showModal, setShowModal] = useState(false);
