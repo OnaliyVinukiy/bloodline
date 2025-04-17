@@ -480,7 +480,7 @@ const sendCancellationEmail = async (appointment: any) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: appointment.donorInfo.email,
-    subject: "Blood Donation Appointment Approved",
+    subject: "Blood Donation Appointment Cancelled",
     html: AppointmentApproval(appointment),
   };
 
