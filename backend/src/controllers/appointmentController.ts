@@ -466,3 +466,23 @@ export const cancelAppointment = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// Send cancellation email to the donor
+const sendCancellationEmail = async (appointment: any) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: appointment.donorInfo.email,
+    subject: "Blood Donation Appointment Approved",
+    html: AppointmentApproval(appointment),
+  };
+
+  await transporter.sendMail(mailOptions);
+};
