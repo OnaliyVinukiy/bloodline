@@ -8,9 +8,10 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { Appointment } from "../../types/appointment";
 
 const DonorDonations = () => {
-  const [appointments, setAppointments] = useState([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { getAccessToken } = useAuthContext();
 
@@ -22,6 +23,20 @@ const DonorDonations = () => {
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
+
+  const formatTime = (isoTime: string | undefined): string => {
+    if (!isoTime) return "N/A";
+    try {
+      const date = new Date(isoTime);
+      return date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+    } catch {
+      return "N/A";
+    }
+  };
 
   //Fetch appointments
   useEffect(() => {
@@ -104,9 +119,14 @@ const DonorDonations = () => {
                 Date
               </th>
               <th scope="col" className="px-6 py-3">
-                Time
+                Slot
               </th>
-
+              <th scope="col" className="px-6 py-3">
+                Start Time
+              </th>
+              <th scope="col" className="px-6 py-3">
+                End Time
+              </th>
               <th scope="col" className="px-6 py-3 text-center">
                 Status
               </th>
@@ -114,7 +134,7 @@ const DonorDonations = () => {
             </tr>
           </thead>
           <tbody>
-            {collectedAppointments.map((appointment: any) => (
+            {collectedAppointments.map((appointment: Appointment) => (
               <tr
                 key={appointment._id}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -123,6 +143,12 @@ const DonorDonations = () => {
                   {appointment.selectedDate}
                 </td>
                 <td className="px-6 py-4">{appointment.selectedSlot}</td>
+                <td className="px-6 py-4">
+                  {formatTime(appointment.bloodCollection?.startTime)}
+                </td>
+                <td className="px-6 py-4">
+                  {formatTime(appointment.bloodCollection?.endTime)}
+                </td>
                 <td className="px-6 py-6 text-center">
                   <div className="badges flex justify-center">
                     <button className="blue">Collected</button>
@@ -130,11 +156,10 @@ const DonorDonations = () => {
                 </td>
               </tr>
             ))}
-
             {collectedAppointments.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={6} 
                   className="text-center px-6 py-4 text-gray-500 dark:text-gray-400"
                 >
                   No blood donations found.

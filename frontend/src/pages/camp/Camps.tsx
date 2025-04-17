@@ -8,9 +8,10 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { Camp } from "../../types/camp";
 
 const OrganizedCamps = () => {
-  const [camps, setCamps] = useState([]);
+  const [camps, setCamps] = useState<Camp[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { getAccessToken } = useAuthContext();
 
@@ -34,9 +35,16 @@ const OrganizedCamps = () => {
           { accessToken },
           { headers: { "Content-Type": "application/json" } }
         );
+        console.log("Fetched userInfo:", userInfo);
+
+        if (!userInfo.email) {
+          console.error("No email found in userInfo");
+          setCamps([]);
+          return;
+        }
 
         const response = await axios.get(
-          `${backendURL}/api/organizations/organization/${userInfo.email}`,
+          `${backendURL}/api/camps/fetch-camp-email/${userInfo.email}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -44,22 +52,31 @@ const OrganizedCamps = () => {
           }
         );
 
+        // Normalize data to an array
+        const campsData = Array.isArray(response.data)
+          ? response.data
+          : response.data && typeof response.data === "object"
+          ? [response.data]
+          : [];
+
         // Sort camps by date
-        const sortedCamps = response.data.sort(
+        const sortedCamps = campsData.sort(
           (a: any, b: any) =>
             new Date(b.date).getTime() - new Date(a.date).getTime()
         );
 
         setCamps(sortedCamps);
+        console.log("Sorted camps:", sortedCamps);
       } catch (error) {
-        console.error("Error fetching appointments:", error);
+        console.error("Error fetching camps:", error);
+        setCamps([]);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchCamps();
-  }, [memoizedGetAccessToken]);
+  }, [memoizedGetAccessToken, backendURL]);
 
   //Loading animation
   if (isLoading) {

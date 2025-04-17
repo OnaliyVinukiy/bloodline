@@ -5,10 +5,9 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { ObjectId } from "mongodb";
 
 export interface Appointment {
-  _id?: ObjectId;
+  _id?: string;
   selectedDate: string;
   selectedSlot: string;
   status: string;
@@ -30,5 +29,17 @@ export interface Appointment {
     remarks: string;
     medicalOfficerSignature: string;
     assessedAt: string;
+  };
+  bagIssue: {
+    hbLevel: string;
+    bloodBagType: string;
+    officerSignature: string;
+    issuedAt: string;
+  };
+  bloodCollection: {
+    startTime: string;
+    endTime: string;
+    phlebotomistSignature: string;
+    collectedAt: string;
   };
 }
