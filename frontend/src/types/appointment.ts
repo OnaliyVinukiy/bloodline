@@ -7,7 +7,7 @@
  */
 
 export interface Appointment {
-  _id?: string;
+  _id: string;
   selectedDate: string;
   selectedSlot: string;
   status: string;
