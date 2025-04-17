@@ -66,7 +66,7 @@ const StepTwelve: React.FC<
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [organizationOptions, setOrganizationOptions] = useState<string[]>([]);
-  const [allOrganizations, setAllOrganizations] = useState<string[]>([]); // Store all organizations
+  const [allOrganizations, setAllOrganizations] = useState<string[]>([]); 
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { getAccessToken } = useAuthContext();
