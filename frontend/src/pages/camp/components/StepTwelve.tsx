@@ -535,9 +535,7 @@ const StepTwelve: React.FC<
                     value={formData.email}
                     disabled
                     placeholder="Enter email address"
-                    className={`bg-indigo-50 border ${
-                      isEmailValid ? "border-indigo-300" : "border-red-500"
-                    } text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
+                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
                 </div>
