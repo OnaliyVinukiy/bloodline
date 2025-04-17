@@ -6,7 +6,7 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { StepperPropsCamps } from "../../../types/stepper";
 import { Label, Modal, Toast } from "flowbite-react";
 import axios from "axios";
@@ -15,10 +15,9 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import { HiExclamation } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import {
-  validateEmail,
   validatePhoneNumber,
 } from "../../../utils/ValidationsUtils";
-import { Organization } from "../../../types/users";
+import { Organization, User } from "../../../types/users";
 
 declare global {
   interface Window {
@@ -59,11 +58,58 @@ const StepTwelve: React.FC<
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
+  const [errors, setErrors] = useState<{ [key in keyof Camp]?: string }>({});
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
+  const [organizationOptions, setOrganizationOptions] = useState<string[]>([]);
+  const [allOrganizations, setAllOrganizations] = useState<string[]>([]); 
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
+  const { getAccessToken } = useAuthContext();
+
+  const memoizedGetAccessToken = useCallback(
+    () => getAccessToken(),
+    [getAccessToken]
+  );
+
+  // Fetch all organizations on page load
+  useEffect(() => {
+    const fetchAllOrganizations = async () => {
+      try {
+        const response = await axios.get<Organization[]>(
+          `${backendURL}/api/organizations/all-organizations`
+        );
+        const orgNames = response.data.map((org) => org.organizationName);
+        setAllOrganizations(orgNames);
+
+        const accessToken = await memoizedGetAccessToken();
+        const { data: userInfo } = await axios.post(
+          `${backendURL}/api/user-info`,
+          { accessToken },
+          { headers: { "Content-Type": "application/json" } }
+        );
+        setUser(userInfo);
+
+        // Set email when user info is fetched
+        setFormData((prev) => ({
+          ...prev,
+          email: userInfo.email || "",
+        }));
+      } catch (error) {
+        console.error("Error fetching organizations:", error);
+      }
+    };
+
+    fetchAllOrganizations();
+  }, [backendURL]);
+
   const [formData, setFormData] = useState<Camp>({
     organizationName: "",
     fullName: "",
     nic: "",
-    email: "",
+    email: user?.email || "",
     contactNumber: "",
     province: "",
     district: "",
@@ -76,34 +122,6 @@ const StepTwelve: React.FC<
     status: "Pending",
     team: "None",
   });
-
-  const [errors, setErrors] = useState<{ [key in keyof Camp]?: string }>({});
-  const [loading, setLoading] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
-  const [isEmailValid, setIsEmailValid] = useState(true);
-  const [organizationOptions, setOrganizationOptions] = useState<string[]>([]);
-  const [allOrganizations, setAllOrganizations] = useState<string[]>([]); // Store all organizations
-  const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
-  const { getAccessToken } = useAuthContext();
-
-  // Fetch all organizations on page load
-  useEffect(() => {
-    const fetchAllOrganizations = async () => {
-      try {
-        const response = await axios.get<Organization[]>(
-          `${backendURL}/api/organizations/all-organizations`
-        );
-        const orgNames = response.data.map((org) => org.organizationName);
-        setAllOrganizations(orgNames);
-      } catch (error) {
-        console.error("Error fetching organizations:", error);
-      }
-    };
-
-    fetchAllOrganizations();
-  }, [backendURL]);
 
   // Filter organizations based on user input
   useEffect(() => {
@@ -193,11 +211,6 @@ const StepTwelve: React.FC<
     handleInputChange(e);
   };
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsEmailValid(validateEmail(e.target.value));
-    handleInputChange(e);
-  };
-
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -212,7 +225,7 @@ const StepTwelve: React.FC<
     if (!formData.fullName.trim())
       newErrors.fullName = "Full Name is required.";
     if (!formData.nic.trim()) newErrors.nic = "NIC Number is required.";
-    if (!formData.email.trim()) newErrors.email = "Email is required.";
+
     if (!formData.contactNumber.trim())
       newErrors.contactNumber = "Contact Number is required.";
     if (!formData.province.trim()) newErrors.province = "Province is required.";
@@ -349,7 +362,7 @@ const StepTwelve: React.FC<
             organizationName: "",
             fullName: "",
             nic: "",
-            email: "",
+            email: user?.email || "",
             contactNumber: "",
             province: "",
             district: "",
@@ -407,7 +420,7 @@ const StepTwelve: React.FC<
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Finding Blood Donors
+                  Registration
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
@@ -520,21 +533,11 @@ const StepTwelve: React.FC<
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleEmailChange}
+                    disabled
                     placeholder="Enter email address"
-                    className={`bg-indigo-50 border ${
-                      isEmailValid ? "border-indigo-300" : "border-red-500"
-                    } text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
+                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
-                  {errors.email && (
-                    <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-                  )}
-                  {!isEmailValid && (
-                    <p className="text-sm text-red-500 mt-1">
-                      Please enter a valid email address.
-                    </p>
-                  )}
                 </div>
                 <div className="w-full">
                   <Label

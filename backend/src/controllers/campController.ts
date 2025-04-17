@@ -45,16 +45,6 @@ export const saveCamp = async (req: Request, res: Response) => {
     }
   }
 
-  // Validate email
-  if (!campData.email?.trim()) {
-    errors.push("Email is required.");
-  } else {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(campData.email.trim())) {
-      errors.push("Invalid email format.");
-    }
-  }
-
   // Validate contactNumber
   if (!campData.contactNumber?.trim()) {
     errors.push("Contact number is required.");
