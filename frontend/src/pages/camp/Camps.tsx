@@ -9,7 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useAuthContext } from "@asgardeo/auth-react";
 
-const DonorCamps = () => {
+const OrganizedCamps = () => {
   const [camps, setCamps] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { getAccessToken } = useAuthContext();
@@ -163,4 +163,4 @@ const DonorCamps = () => {
   );
 };
 
-export default DonorCamps;
+export default OrganizedCamps;
