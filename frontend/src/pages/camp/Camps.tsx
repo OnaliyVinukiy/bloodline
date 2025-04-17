@@ -125,6 +125,9 @@ const OrganizedCamps = () => {
               <th scope="col" className="px-6 py-3">
                 City
               </th>
+              <th scope="col" className="px-6 py-3">
+                Venue
+              </th>
               <th scope="col" className="px-6 py-3 text-center">
                 Status
               </th>
@@ -141,6 +144,7 @@ const OrganizedCamps = () => {
                 <td className="px-6 py-4">{camp.startTime}</td>
                 <td className="px-6 py-4">{camp.endTime}</td>
                 <td className="px-6 py-4">{camp.city}</td>
+                <td className="px-6 py-4">{camp.venue}</td>
                 {camp.status === "Rejected" ? (
                   <td className="px-6 py-6 text-center">
                     <div className="badges flex justify-center">
