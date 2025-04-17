@@ -226,7 +226,7 @@ export function Navigationbar() {
                   </Dropdown.Item>
                 </>
               )}
-              <Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate("/donations")}>
                 <div className="flex items-center">
                   <svg
                     className="w-[18px] h-[18px] mr-1 fill-[#8e8e8e]"
