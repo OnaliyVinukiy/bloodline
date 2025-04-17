@@ -78,6 +78,30 @@ const OrganizedCamps = () => {
     fetchCamps();
   }, [memoizedGetAccessToken, backendURL]);
 
+  const handleCancelCamp = async (campId: string) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to cancel this camp?"
+    );
+    if (!isConfirmed) return;
+
+    try {
+      const token = await memoizedGetAccessToken();
+      await axios.delete(
+        `${backendURL}/api/appointments/cancel-appointment/${campId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update the camps list
+      setCamps((prev) => prev.filter((camp: any) => camp._id !== campId));
+    } catch (error) {
+      console.error("Error canceling appointment:", error);
+    }
+  };
+
   //Loading animation
   if (isLoading) {
     return (
@@ -125,6 +149,9 @@ const OrganizedCamps = () => {
               <th scope="col" className="px-6 py-3">
                 City
               </th>
+              <th scope="col" className="px-6 py-3">
+                Venue
+              </th>
               <th scope="col" className="px-6 py-3 text-center">
                 Status
               </th>
@@ -141,6 +168,7 @@ const OrganizedCamps = () => {
                 <td className="px-6 py-4">{camp.startTime}</td>
                 <td className="px-6 py-4">{camp.endTime}</td>
                 <td className="px-6 py-4">{camp.city}</td>
+                <td className="px-6 py-4">{camp.venue}</td>
                 {camp.status === "Rejected" ? (
                   <td className="px-6 py-6 text-center">
                     <div className="badges flex justify-center">
@@ -160,6 +188,23 @@ const OrganizedCamps = () => {
                     </div>
                   </td>
                 )}
+                <td className="px-3 py-2 text-center">
+                  <button
+                    onClick={() => handleCancelCamp(camp._id)}
+                    className={`text-red-800 border border-red-800 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2 transition-all duration-300 ${
+                      camp.status === "Rejected" ||
+                      new Date(camp.date) < new Date()
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:text-white hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300"
+                    }`}
+                    disabled={
+                      camp.status === "Rejected" ||
+                      new Date(camp.date) < new Date()
+                    }
+                  >
+                    Cancel Appointment
+                  </button>
+                </td>
               </tr>
             ))}
 

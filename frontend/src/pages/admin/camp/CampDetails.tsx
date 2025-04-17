@@ -156,7 +156,7 @@ const CampDetails = () => {
       <main className="mt-2 mb-16 flex justify-center items-center w-full max-w-4xl px-4 py-6 md:w-2/3 lg:w-3/4">
         <div className="w-full max-w-3xl bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-2xl font-bold font-roboto text-indigo-900 mb-8">
-            Camp Details
+            Organizer's Details
           </h2>
           <div className="space-y-4 font-roboto">
             <div className="flex justify-between items-center border-b pb-2">
