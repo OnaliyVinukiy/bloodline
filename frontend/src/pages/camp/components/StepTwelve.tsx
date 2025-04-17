@@ -15,7 +15,6 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import { HiExclamation } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import {
-  validateEmail,
   validatePhoneNumber,
 } from "../../../utils/ValidationsUtils";
 import { Organization, User } from "../../../types/users";
