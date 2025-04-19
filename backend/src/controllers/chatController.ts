@@ -69,6 +69,8 @@ class ChatbotController {
 
   // Fetch appointments from database
   private static async fetchAppointments(query: string): Promise<string> {
+    const MAX_APPOINTMENTS_PER_DAY = 10;
+
     const client = new MongoClient(
       process.env.COSMOS_DB_CONNECTION_STRING as string
     );
@@ -104,9 +106,17 @@ class ChatbotController {
             },
           })
           .toArray();
-        return appointments.length > 0
-          ? `\ud83d\udcc5 There are ${appointments.length} appointments scheduled on ${normalizedDate}.`
-          : `❌ No appointments are scheduled on ${normalizedDate}.`;
+
+        const count = appointments.length;
+        const remainingSlots = MAX_APPOINTMENTS_PER_DAY - count;
+
+        if (count >= MAX_APPOINTMENTS_PER_DAY) {
+          return `❌ All appointment slots are fully booked for ${normalizedDate}.`;
+        } else if (count > 0) {
+          return `✅ ${remainingSlots} appointment slot(s) available on ${normalizedDate}. There are currently ${count} appointments scheduled by other donors.`;
+        } else {
+          return `🗓️ All slots are currently available on ${normalizedDate}. No appointments have been scheduled yet.`;
+        }
       }
 
       const totalAppointments = await collection.countDocuments();
@@ -179,6 +189,16 @@ class ChatbotController {
         "donor requirements",
       ];
 
+      const appointmentKeywords = [
+        "appointment",
+        "book appointment",
+        "appointment slot",
+        "slots",
+        "available slots",
+        "slot",
+        "are there any slots available",
+      ];
+
       if (
         eligibilityKeywords.some((keyword) => lowerMessage.includes(keyword))
       ) {
@@ -187,7 +207,9 @@ class ChatbotController {
         return res.status(200).json({ reply: eligibilityResponse });
       }
 
-      if (lowerMessage.includes("appointment")) {
+      if (
+        appointmentKeywords.some((keyword) => lowerMessage.includes(keyword))
+      ) {
         const appointmentResponse = await ChatbotController.fetchAppointments(
           message
         );
