@@ -189,6 +189,16 @@ class ChatbotController {
         "donor requirements",
       ];
 
+      const appointmentKeywords = [
+        "appointment",
+        "book appointment",
+        "appointment slot",
+        "slots",
+        "available slots",
+        "slot",
+        "are there any slots available",
+      ];
+
       if (
         eligibilityKeywords.some((keyword) => lowerMessage.includes(keyword))
       ) {
@@ -197,7 +207,9 @@ class ChatbotController {
         return res.status(200).json({ reply: eligibilityResponse });
       }
 
-      if (lowerMessage.includes("appointment")) {
+      if (
+        appointmentKeywords.some((keyword) => lowerMessage.includes(keyword))
+      ) {
         const appointmentResponse = await ChatbotController.fetchAppointments(
           message
         );
