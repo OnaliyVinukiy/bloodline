@@ -8,7 +8,7 @@ import "./index.css";
 const isProduction = window.location.hostname !== "localhost";
 
 const signInSignOutRedirectURL = isProduction
-  ? "https://bloodline-gxfvfrfyg7bqbahz.southeastasia-01.azurewebsites.net/"
+  ? "https://bloodlinesrilanka.com/"
   : "http://localhost:5173/";
 
 createRoot(document.getElementById("root")!).render(
