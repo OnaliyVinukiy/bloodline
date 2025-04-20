@@ -25,7 +25,7 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
   };
-
+ 
   const [formData, setFormData] = useState({
     bloodCollection: {
       startTime: "",
@@ -34,6 +34,7 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
       phlebotomistSignature: "",
     },
   });
+  const [appointment, setAppointment] = useState<any>(null);
   const appointmentId = location.pathname.split("/").pop();
   const [isLoading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -48,7 +49,7 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
   const navigate = useNavigate();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  //Fetch appointment data
+  // Fetch appointment data
   useEffect(() => {
     const fetchAppointment = async () => {
       try {
@@ -64,7 +65,9 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
             },
           }
         );
-        //Populate appointment data
+        // Store appointment data
+        setAppointment(response.data);
+        // Populate form data
         if (response.data.bloodCollection) {
           setFormData({
             bloodCollection: {
@@ -72,12 +75,13 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
               endTime: response.data.bloodCollection.endTime,
               volume: response.data.bloodCollection.volume,
               phlebotomistSignature:
-                response.data.bagIssue.phlebotomistSignature,
+                response.data.bloodCollection.phlebotomistSignature,
             },
           });
         }
       } catch (error) {
         console.error("Error fetching appointment:", error);
+        setToastMessage("Failed to fetch appointment data.");
       } finally {
         setIsLoading(false);
       }
@@ -102,7 +106,7 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
     navigate("/admin/appointments");
   };
 
-  //Submit form data
+  // Submit form data and update blood stock
   const handleSubmit = async () => {
     if (
       !formData.bloodCollection.startTime ||
@@ -144,22 +148,41 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
         status: "Collected",
       };
 
+      // Update appointment
       await axios.patch(
         `${backendURL}/api/appointments/update-appointment/${appointmentId}`,
         requestData,
         config
       );
 
+      // Update blood stock
+      const bloodGroup = appointment?.donorInfo?.bloodGroup;
+      const volume = parseInt(formData.bloodCollection.volume);
+      if (!bloodGroup || isNaN(volume)) {
+        throw new Error("Invalid blood group or volume");
+      }
+
+      await axios.post(
+        `${backendURL}/api/stocks/update-stock`,
+        {
+          bloodType: bloodGroup,
+          quantity: volume,
+          updatedBy: userEmail,
+        },
+        config
+      );
+
       // Show success modal
       setShowSuccessModal(true);
     } catch (error) {
-      console.error("Error updating appointment:", error);
-      setToastMessage("Failed to update appointment. Please try again.");
+      console.error("Error updating appointment or stock:", error);
+      setToastMessage("Failed to update appointment or stock. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-  //Loading Animation
+
+  // Loading Animation
   if (isLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
@@ -219,7 +242,7 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
               <div className="mt-4 space-y-6">
                 <div className="w-full">
                   <Label
-                    htmlFor="fullName"
+                    htmlFor="startTime"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
                     Start Time
@@ -235,7 +258,7 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
                 </div>
                 <div className="w-full">
                   <Label
-                    htmlFor="fullName"
+                    htmlFor="endTime"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
                     End Time
@@ -251,7 +274,7 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
                 </div>
                 <div className="w-full">
                   <Label
-                    htmlFor="NIC"
+                    htmlFor="volume"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
                     Volume
@@ -259,7 +282,7 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
                   <input
                     type="text"
                     name="volume"
-                    placeholder="Enter volume(ml)"
+                    placeholder="Enter volume (ml)"
                     value={formData.bloodCollection.volume}
                     onChange={handleInputChange}
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
@@ -268,10 +291,9 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
                 </div>
                 <div className="w-full">
                   <Label
-                    htmlFor="NIC"
+                    htmlFor="phlebotomistSignature"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    {" "}
                     Phlebotomist's signature (Enter full name)
                   </Label>
                   <input
@@ -327,7 +349,7 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
             </div>
           </div>
 
-          {/* Toast*/}
+          {/* Toast */}
           {toastMessage && (
             <Toast className="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50">
               <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500">
@@ -339,7 +361,7 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
           )}
 
           <Modal show={showSuccessModal} onClose={handleModalClose}>
-            <Modal.Header className="flex items-center gap-2 ">
+            <Modal.Header className="flex items-center gap-2">
               <p className="flex items-center gap-2 text-xl text-green-600">
                 <svg
                   className="w-6 h-6 text-green-600"
