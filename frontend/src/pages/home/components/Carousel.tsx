@@ -215,7 +215,7 @@ export function CarouselSlider() {
                       fill="currentColor"
                     />
                   </svg>
-                  Logging in...
+                  Loading...
                 </>
               ) : (
                 "Login"
