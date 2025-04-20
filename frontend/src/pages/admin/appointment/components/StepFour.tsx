@@ -25,7 +25,7 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
   };
-  
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -179,7 +179,9 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error updating appointment or stock:", error);
-      setToastMessage("Failed to update appointment or stock. Please try again.");
+      setToastMessage(
+        "Failed to update appointment or stock. Please try again."
+      );
     } finally {
       setLoading(false);
     }
