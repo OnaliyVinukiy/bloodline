@@ -27,7 +27,7 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
   };
-  
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -188,6 +188,39 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
           : prev.assessment[name as keyof typeof prev.assessment],
       },
     }));
+  };
+  const isFormValid = () => {
+    const {
+      history,
+      examination,
+      councelling,
+      outcome,
+      deferrealRemarks,
+      medicalOfficerSignature,
+    } = formData.assessment;
+
+    const isHistoryValid = Object.values(history).every((val) => val !== "");
+    const isExaminationValid =
+      examination.isLookingPale !== "" &&
+      examination.isIcterus !== "" &&
+      examination.havingAlcoholSmell !== "" &&
+      examination.hasWounds !== "" &&
+      examination.hasVenepuncture !== "" &&
+      examination.cvsPulse !== "" &&
+      examination.bp !== "" &&
+      examination.weight !== "";
+
+    const isCouncellingValid = Object.values(councelling).every(
+      (val) => val !== ""
+    );
+    return (
+      isHistoryValid &&
+      isExaminationValid &&
+      isCouncellingValid &&
+      outcome !== "" &&
+      deferrealRemarks !== "" &&
+      medicalOfficerSignature !== ""
+    );
   };
 
   //Submit form data
@@ -1029,8 +1062,8 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
               </button>
               <button
                 onClick={handleSubmit}
-                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 disabled:bg-red-500 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-300"
-                disabled={loading}
+                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-300"
+                disabled={loading || !isFormValid()}
               >
                 {loading ? (
                   <>
