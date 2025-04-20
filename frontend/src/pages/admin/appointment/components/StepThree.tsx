@@ -102,6 +102,14 @@ const StepThree: React.FC<StepperPropsCamps> = ({
     }));
   };
 
+  const isFormValid = () => {
+    return (
+      formData.bagIssue.bloodBagType &&
+      formData.bagIssue.hbLevel &&
+      formData.bagIssue.officerSignature
+    );
+  };
+
   //Submit form data
   const handleSubmit = async () => {
     if (appointment?.status === "Assessed") {
@@ -324,8 +332,8 @@ const StepThree: React.FC<StepperPropsCamps> = ({
               </button>
               <button
                 onClick={handleSubmit}
-                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 disabled:bg-red-500 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-300"
-                disabled={loading}
+                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-300"
+                disabled={loading || !isFormValid()}
               >
                 {loading ? (
                   <>
