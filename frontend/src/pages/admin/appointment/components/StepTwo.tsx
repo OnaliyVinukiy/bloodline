@@ -27,6 +27,10 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
   };
+  
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const [formData, setFormData] = useState({
     assessment: {
@@ -63,7 +67,7 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [appointment, setAppointment] = useState<any | null>(null);
-   const [userEmail, setUserEmail] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -346,6 +350,8 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
                     type="text"
                     name="weight"
                     placeholder="Enter donor's weight"
+                    onChange={handleInputChange}
+                    value={formData.assessment.examination.weight}
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
