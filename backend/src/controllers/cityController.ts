@@ -3,28 +3,45 @@
  * licensed under the MIT License.
  *
  * Original Copyright (c) 2025 Dineth Siriwardana
- * 
+ *
  * ----
  *
  * Bloodline Blood Bank Management System
  * Copyright (c) 2025 Onaliy Jayawardana. All rights reserved.
  *
- * Unauthorized copying, modification, or distribution of this software, 
+ * Unauthorized copying, modification, or distribution of this software,
  * in whole or in part, is strictly prohibited.
  */
 import { Request, Response } from "express";
 import dataService from "../utils/dataService";
 
 export const getCities = (req: Request, res: Response) => {
-    console.log("getCities endpoint hit!");
+  console.log("getCities endpoint hit!");
   res.json(dataService.getCities());
 };
 
 export const getCitiesByDistrict = (req: Request, res: Response) => {
-  const cities = dataService.getCitiesByDistrict(req.params.districtName);
-  return cities.length
-    ? res.json(cities)
-    : res.status(404).json({ message: "No cities found in this district" });
+  const { districtName } = req.params;
+  const lang = (req.query.lang as "en" | "si" | "ta") || "en";
+
+  // Check if the language is valid
+  if (!["en", "si", "ta"].includes(lang)) {
+    return res.status(400).json({ message: "Invalid language parameter" });
+  }
+
+  try {
+    const cities = dataService.getCitiesByDistrict(districtName, lang);
+
+    return cities.length
+      ? res.json(cities)
+      : res.status(404).json({ message: "No cities found in this district" });
+  } catch (error) {
+    console.error("Error fetching cities:", error);
+    res.status(500).json({
+      message:
+        error instanceof Error ? error.message : "An unknown error occurred",
+    });
+  }
 };
 
 export const getCitiesByProvince = (req: Request, res: Response) => {
@@ -56,12 +73,10 @@ export const searchCities = (req: Request, res: Response) => {
           .status(404)
           .json({ message: "No cities found matching search criteria" });
   } catch (error) {
-    return res
-      .status(400)
-      .json({
-        message:
-          error instanceof Error ? error.message : "An unknown error occurred",
-      });
+    return res.status(400).json({
+      message:
+        error instanceof Error ? error.message : "An unknown error occurred",
+    });
   }
 };
 

@@ -66,6 +66,7 @@ class DataService {
     }
     return this.citiesData;
   }
+
   getDistricts(): District[] {
     if (!this.districts) {
       throw new Error("Data not loaded");
@@ -100,34 +101,45 @@ class DataService {
     const province = this.provinces.find((p) => {
       switch (language) {
         case "si":
+          console.log("Checking SI Province:", p.province_name_si);
           return (
-            p.province_name_si.toLowerCase() === provinceName.toLowerCase()
+            p.province_name_si?.toLowerCase().normalize() ===
+            provinceName.toLowerCase().normalize()
           );
         case "ta":
           return (
-            p.province_name_ta.toLowerCase() === provinceName.toLowerCase()
+            p.province_name_ta?.toLowerCase().normalize() ===
+            provinceName.toLowerCase().normalize()
           );
         default:
           return (
-            p.province_name_en.toLowerCase() === provinceName.toLowerCase()
+            p.province_name_en?.toLowerCase().normalize() ===
+            provinceName.toLowerCase().normalize()
           );
       }
     });
 
     if (!province) {
+      console.warn("No matching province found!");
       return [];
     }
 
+    console.log("Matched Province:", province.province_id);
     return this.getDistrictsByProvince(province.province_id);
   }
 
-  getCitiesByDistrict(districtName: string): City[] {
+  getCitiesByDistrict(
+    districtName: string,
+    language: "en" | "si" | "ta" = "en"
+  ): City[] {
     if (!this.citiesData) {
       throw new Error("Data not loaded");
     }
+
     return this.citiesData.filter(
       (city) =>
-        city.district_name_en.toLowerCase() === districtName.toLowerCase()
+        city[`district_name_${language}`]?.toLowerCase().normalize() ===
+        districtName.toLowerCase().normalize()
     );
   }
 
@@ -155,26 +167,32 @@ class DataService {
     if (!this.citiesData) {
       throw new Error("Data not loaded");
     }
-    console.log("searchTerm:  " + searchTerm);
-    const term = searchTerm.toLowerCase();
+
+    const term = searchTerm.toLowerCase().normalize();
     try {
       switch (language) {
         case "si":
-          return this.citiesData!.filter((city) => {
-            const cityName = (city.city_name_si || "").toLowerCase();
-            const subName = (city.sub_name_si || "").toLowerCase();
+          return this.citiesData.filter((city) => {
+            const cityName = (city.city_name_si || "")
+              .toLowerCase()
+              .normalize();
+            const subName = (city.sub_name_si || "").toLowerCase().normalize();
             return cityName.includes(term) || subName.includes(term);
           });
         case "ta":
-          return this.citiesData!.filter((city) => {
-            const cityName = (city.city_name_ta || "").toLowerCase();
-            const subName = (city.sub_name_ta || "").toLowerCase();
+          return this.citiesData.filter((city) => {
+            const cityName = (city.city_name_ta || "")
+              .toLowerCase()
+              .normalize();
+            const subName = (city.sub_name_ta || "").toLowerCase().normalize();
             return cityName.includes(term) || subName.includes(term);
           });
-        default: // 'en'
-          return this.citiesData!.filter((city) => {
-            const cityName = (city.city_name_en || "").toLowerCase();
-            const subName = (city.sub_name_en || "").toLowerCase();
+        default:
+          return this.citiesData.filter((city) => {
+            const cityName = (city.city_name_en || "")
+              .toLowerCase()
+              .normalize();
+            const subName = (city.sub_name_en || "").toLowerCase().normalize();
             return cityName.includes(term) || subName.includes(term);
           });
       }
@@ -195,7 +213,7 @@ class DataService {
       lat2: number,
       lon2: number
     ): number => {
-      const R = 6371; // Earth's radius in kilometers
+      const R = 6371;
       const dLat = ((lat2 - lat1) * Math.PI) / 180;
       const dLon = ((lon2 - lon1) * Math.PI) / 180;
       const a =
