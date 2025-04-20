@@ -29,6 +29,10 @@ const StepThree: React.FC<StepperPropsCamps> = ({
     onPreviousStep();
   };
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const [formData, setFormData] = useState({
     bagIssue: {
       hbLevel: "",
