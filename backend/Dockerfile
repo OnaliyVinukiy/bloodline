@@ -21,6 +21,7 @@ EXPOSE 5000
 
 # Set the environment variable
 ENV PORT=5000
+ENV ASGARDEO_TENANT=onaliy
 
 # Start the server using ts-node to run TypeScript directly
 CMD ["npx", "ts-node", "src/index.ts"]
