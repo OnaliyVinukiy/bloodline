@@ -25,7 +25,10 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
   };
- 
+  
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
   const [formData, setFormData] = useState({
     bloodCollection: {
       startTime: "",
