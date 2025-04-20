@@ -1,15 +1,26 @@
+# Use the Node.js LTS image as the base
 FROM node:lts
 
+# Set working directory
 WORKDIR /usr/src/backend
 
+# Copy package.json and package-lock.json
 COPY package*.json ./
-RUN npm install --omit=dev
 
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the code
 COPY . .
 
-RUN npm install --save-dev typescript
-RUN npx tsc
+# Compile TypeScript to JavaScript
+RUN npm run build
 
+# Expose your app's port
 EXPOSE 5000
 
+# Set environment variable
+ENV PORT=5000
+
+# Run the compiled JavaScript
 CMD ["node", "dist/index.js"]
