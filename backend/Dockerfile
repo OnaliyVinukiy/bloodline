@@ -1,4 +1,3 @@
-# Use the Node.js LTS image as the base
 FROM node:lts
 
 # Set working directory
