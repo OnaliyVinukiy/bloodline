@@ -6,13 +6,14 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
 import { Button, Label, Modal, Toast } from "flowbite-react";
 import { HiExclamation } from "react-icons/hi";
 import { useAuthContext } from "@asgardeo/auth-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import JsBarcode from "jsbarcode";
 
 declare global {
   interface Window {
@@ -43,6 +44,8 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
   const [loading, setLoading] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [barcodeGenerated, setBarcodeGenerated] = useState(false);
+  const barcodeRef = useRef<HTMLCanvasElement>(null);
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
@@ -68,7 +71,7 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
             },
           }
         );
-        // Store appointment data
+
         setAppointment(response.data);
         // Populate form data
         if (response.data.bloodCollection) {
@@ -116,6 +119,143 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
       formData.bloodCollection.volume &&
       formData.bloodCollection.phlebotomistSignature
     );
+  };
+
+  // Generate barcode
+  const handleGenerateBarcode = () => {
+    if (!appointment || !appointment.donorInfo) {
+      setToastMessage("No donor information available to generate barcode.");
+      return;
+    }
+
+    try {
+      const barcodeData = [
+        appointment._id.slice(-8),
+        appointment.donorInfo.bloodGroup,
+        formData.bloodCollection.volume,
+        appointment.donorInfo.nic,
+        formData.bloodCollection.endTime,
+      ].join("|");
+
+      if (barcodeRef.current) {
+        // Clear previous barcode if any
+        const ctx = barcodeRef.current.getContext("2d");
+        if (ctx)
+          ctx.clearRect(
+            0,
+            0,
+            barcodeRef.current.width,
+            barcodeRef.current.height
+          );
+
+        // Generate new barcode
+        JsBarcode(barcodeRef.current, barcodeData, {
+          format: "CODE128",
+          width: 2,
+          height: 60,
+          displayValue: true,
+          margin: 10,
+          background: "#ffffff",
+          lineColor: "#000000",
+          fontSize: 12,
+        });
+        setBarcodeGenerated(true);
+      }
+    } catch (error) {
+      console.error("Error generating barcode:", error);
+      setToastMessage("Failed to generate scannable barcode.");
+    }
+  };
+
+  // Print barcode
+  const handlePrintBarcode = () => {
+    if (!barcodeRef.current) {
+      setToastMessage("Barcode not generated yet");
+      return;
+    }
+
+    try {
+      const canvas = barcodeRef.current;
+      const barcodeDataUrl = canvas.toDataURL("image/png");
+
+      // Create a temporary iframe for printing
+      const printFrame = document.createElement("iframe");
+      printFrame.style.position = "absolute";
+      printFrame.style.width = "1px";
+      printFrame.style.height = "1px";
+      printFrame.style.left = "-9999px";
+      printFrame.style.top = "-9999px";
+
+      printFrame.onload = () => {
+        const printDoc =
+          printFrame.contentDocument || printFrame.contentWindow?.document;
+        if (!printDoc) return;
+
+        printDoc.open();
+        printDoc.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Print Barcode</title>
+              <style>
+                @page { size: auto; margin: 5mm; }
+                body { 
+                  display: flex; 
+                  justify-content: center; 
+                  align-items: center; 
+                  height: 100vh; 
+                  margin: 0; 
+                  font-family: Arial, sans-serif;
+                }
+                .barcode-container {
+                  text-align: center;
+                  padding: 10px;
+                  width: 300px; /* Match your canvas width */
+                }
+                .barcode-image {
+                  width: 300px; /* Fixed width to match canvas */
+                  height: 100px; /* Fixed height to match canvas */
+                }
+                .barcode-info {
+                  margin-top: 10px;
+                  font-size: 14px;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="barcode-container">
+                <img 
+                  src="${barcodeDataUrl}" 
+                  alt="Barcode" 
+                  class="barcode-image"
+                  onload="window.focus(); window.print();"
+                />
+                <div class="barcode-info">
+                  <p>${appointment?.donorInfo?.fullName || "Donor"}</p>
+                  <p>${appointment?.donorInfo?.bloodGroup || "Blood Group"} • ${
+          formData.bloodCollection.volume || "0"
+        }ml</p>
+                  <p>${new Date().toLocaleDateString()}</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `);
+        printDoc.close();
+      };
+
+      document.body.appendChild(printFrame);
+
+      // Clean up after printing
+      const cleanup = () => {
+        document.body.removeChild(printFrame);
+        window.removeEventListener("afterprint", cleanup);
+      };
+      window.addEventListener("afterprint", cleanup);
+    } catch (error) {
+      console.error("Print error:", error);
+      setToastMessage("Failed to prepare print document");
+    }
   };
 
   // Submit form data and update blood stock
@@ -319,6 +459,63 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-sm">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Donor Barcode
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Generate a barcode for this donation record
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleGenerateBarcode}
+                    color="red"
+                    size="sm"
+                    className="focus:outline-none font-medium rounded-lg text-sm px-4 py-2"
+                  >
+                    {barcodeGenerated ? "Regenerate" : "Generate"}
+                  </Button>
+                  {barcodeGenerated && (
+                    <Button
+                      onClick={handlePrintBarcode}
+                      color="green"
+                      size="sm"
+                      className="focus:outline-none font-medium rounded-lg text-sm px-4 py-2"
+                    >
+                      Print
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center bg-white p-4 rounded border border-gray-300">
+                <div className="mb-2 text-center">
+                  <p className="text-xs font-medium text-gray-700">
+                    {appointment?.donorInfo?.fullName || "Donor"} •{" "}
+                    {appointment?.donorInfo?.bloodGroup || "Blood Group"}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {new Date().toLocaleDateString()}
+                  </p>
+                </div>
+                <canvas
+                  ref={barcodeRef}
+                  id="barcode"
+                  width="300"
+                  height="100"
+                  className="w-full max-w-xs h-16"
+                />
+                <div className="mt-2 flex items-center gap-1">
+                  <span className="text-xs font-medium text-gray-700">
+                    BLOODLINE BLOOD BANK MANAGEMENT SYSTEM
+                  </span>
                 </div>
               </div>
             </div>
