@@ -6,8 +6,9 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { useEffect, useState } from "react";
-import Stepper from "./components/Stepper";
+import StepperEnglish from "./components/English/Stepper";
 import { useAuthContext } from "@asgardeo/auth-react";
+import StepperSinhala from "./components/Sinhala/Stepper";
 
 const BloodCampRegistration = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -75,14 +76,21 @@ const BloodCampRegistration = () => {
 
       <div>
         {activeTab === "tab1" && (
-          <Stepper
+          <StepperEnglish
             step={step}
             setStep={setStep}
             onNextStep={handleNextStep}
             onPreviousStep={handlePreviousStep}
           />
         )}
-        {activeTab === "tab2" && <p>Sinhala Form</p>}
+        {activeTab === "tab2" && (
+          <StepperSinhala
+            step={step}
+            setStep={setStep}
+            onNextStep={handleNextStep}
+            onPreviousStep={handlePreviousStep}
+          />
+        )}
         {activeTab === "tab3" && <p>Tamil Form</p>}
       </div>
     </div>
