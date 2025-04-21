@@ -68,7 +68,7 @@ const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700  focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                ඉදිරියට
               </button>
             </div>
           </div>
