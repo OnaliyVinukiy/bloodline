@@ -29,6 +29,7 @@ import Services from "./pages/services/Services";
 import DonorDonations from "./pages/appointment/Donations";
 import ContactUs from "./pages/contact/ContactUs";
 import OrganizedCamps from "./pages/camp/Camps";
+import Organizations from "./pages/admin/organization/Organizations";
 import Stock from "./pages/admin/stock/Stock";
 import StockAdditionHistory from "./pages/admin/stock/StockAdditionHistory";
 import StockIssueHistory from "./pages/admin/stock/StockIssueHistory";
@@ -82,6 +83,7 @@ function App() {
               path="/admin/donation/:appointmentId"
               element={<BloodDonation />}
             />
+            <Route path="/admin/organizations" element={<Organizations />} />
           </Routes>
         </main>
         <FooterComponent />
