@@ -12,7 +12,7 @@ import {
   updateStock,
   getStockAdditionHistory,
   getStockIssuanceHistory,
-  getStockHistory,
+  getAvailableStockEntries,
 } from "../controllers/stockController";
 import { authenticateUser } from "../middleware/authMiddleware";
 
@@ -34,6 +34,6 @@ router.get("/addition-history", getStockAdditionHistory);
 router.get("/issuance-history", getStockIssuanceHistory);
 
 //Fetch blood stock history
-router.get("/history", getStockHistory);
+router.get("/history", getAvailableStockEntries);
 
 export default router;
