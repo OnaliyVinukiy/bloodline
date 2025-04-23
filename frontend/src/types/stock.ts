@@ -10,14 +10,23 @@ export interface BloodStock {
   quantity: number;
   lastUpdated: string;
   updatedBy: string;
+  expiryDate: string;
+  labelId: string;
 }
 
 export interface StockAddedHistory {
-  _id: string;
+  _id?: any;
   bloodType: string;
   quantityAdded: number;
+  previousQuantity: number;
+  remainingQuantity: number;
+  newQuantity: number;
   updatedBy: string;
-  updatedAt: string;
+  updatedAt: Date;
+  operationType: "addition" | "issuance";
+  issuedTo?: string;
+  labelId?: string;
+  expiryDate?: string;
 }
 
 export interface StockIssuedHistory {
@@ -27,4 +36,17 @@ export interface StockIssuedHistory {
   issuedTo: string;
   updatedBy: string;
   updatedAt: string;
+}
+export interface StockAdditionHistory {
+  _id: string;
+  bloodType: string;
+  quantityAdded: number;
+  remainingQuantity: number;
+  labelId?: string;
+  expiryDate?: string;
+  updatedBy: string;
+  updatedAt: Date;
+  operationType: "addition" | "issuance";
+  issuedTo?: string;
+  issuedEntries?: string[];
 }
