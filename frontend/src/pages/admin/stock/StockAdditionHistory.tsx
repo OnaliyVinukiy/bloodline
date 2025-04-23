@@ -10,6 +10,7 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import { Button, Table, Alert } from "flowbite-react";
 import { HiInformationCircle, HiArrowLeft } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "flowbite-react";
 import { StockAddedHistory } from "../../../types/stock";
 
 export default function StockAdditionHistory() {
@@ -50,6 +51,19 @@ export default function StockAdditionHistory() {
 
     fetchAdditionHistory();
   }, [backendURL, getAccessToken]);
+
+  const getExpirationStatus = (expiryDate?: string) => {
+    if (!expiryDate) return { status: "Unknown", color: "gray" };
+
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    const timeDiff = expiry.getTime() - today.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+    if (daysDiff < 0) return { status: "Expired", color: "failure" };
+    if (daysDiff <= 30) return { status: "Near Expiry", color: "warning" };
+    return { status: "Valid", color: "success" };
+  };
 
   return (
     <div className="mt-10 mb-10 p-6 max-w-7xl mx-auto">
@@ -95,32 +109,54 @@ export default function StockAdditionHistory() {
               <Table.Head>
                 <Table.HeadCell>Blood Type</Table.HeadCell>
                 <Table.HeadCell>Quantity Added</Table.HeadCell>
+                <Table.HeadCell>Label ID</Table.HeadCell>
+                <Table.HeadCell>Expiry Date</Table.HeadCell>
+                <Table.HeadCell>Status</Table.HeadCell>
                 <Table.HeadCell>Date Added</Table.HeadCell>
                 <Table.HeadCell>Added By</Table.HeadCell>
               </Table.Head>
+
               <Table.Body className="divide-y">
                 {history.length > 0 ? (
-                  history.map((item) => (
-                    <Table.Row key={item._id} className="bg-white">
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900">
-                        {item.bloodType}
-                      </Table.Cell>
-                      <Table.Cell className="text-green-600 font-bold">
-                        +{item.quantityAdded}
-                      </Table.Cell>
-                      <Table.Cell>
-                        {new Date(item.updatedAt).toLocaleString()}
-                      </Table.Cell>
-                      <Table.Cell className="text-blue-600 hover:underline">
-                        <a href={`mailto:${item.updatedBy}`}>
-                          {item.updatedBy}
-                        </a>
-                      </Table.Cell>
-                    </Table.Row>
-                  ))
+                  history.map((item) => {
+                    const { status, color } = getExpirationStatus(
+                      item.expiryDate
+                    );
+                    return (
+                      <Table.Row key={item._id} className="bg-white">
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900">
+                          {item.bloodType}
+                        </Table.Cell>
+                        <Table.Cell className="text-green-600 font-bold">
+                          +{item.quantityAdded}
+                        </Table.Cell>
+                        <Table.Cell className="font-mono">
+                          {item.labelId || "N/A"}
+                        </Table.Cell>
+                        <Table.Cell>
+                          {item.expiryDate
+                            ? new Date(item.expiryDate).toLocaleDateString()
+                            : "N/A"}
+                        </Table.Cell>
+                        <Table.Cell>
+                          <Badge color={color} className="w-fit">
+                            {status}
+                          </Badge>
+                        </Table.Cell>
+                        <Table.Cell>
+                          {new Date(item.updatedAt).toLocaleString()}
+                        </Table.Cell>
+                        <Table.Cell className="text-blue-600 hover:underline">
+                          <a href={`mailto:${item.updatedBy}`}>
+                            {item.updatedBy}
+                          </a>
+                        </Table.Cell>
+                      </Table.Row>
+                    );
+                  })
                 ) : (
                   <Table.Row>
-                    <Table.Cell colSpan={4} className="text-center py-4">
+                    <Table.Cell colSpan={7} className="text-center py-4">
                       No addition history available
                     </Table.Cell>
                   </Table.Row>
