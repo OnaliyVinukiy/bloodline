@@ -5,7 +5,7 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { ObjectId } from "mongoose";
+import { ObjectId } from "mongodb";
 
 export interface BloodTransaction {
   _id?: ObjectId;
@@ -24,16 +24,38 @@ export interface BloodStock {
   updatedBy: string;
   createdAt?: Date;
   updatedAt?: Date;
+  expiryDate: Date;
+  labelId: string;
 }
 
+export interface BloodStockEntry {
+  labelId: string;
+  quantity: number;
+  expiryDate: string;
+  updatedBy: string;
+  updatedAt: Date;
+}
+
+export interface BloodStock {
+  bloodType: string;
+  entries: BloodStockEntry[];
+  totalQuantity: number;
+  lastUpdated: Date;
+  updatedBy: string;
+}
+
+// types/stocks.ts
 export interface StockAdditionHistory {
   _id?: ObjectId;
   bloodType: string;
   quantityAdded: number;
+  remainingQuantity?: number;
   previousQuantity: number;
   newQuantity: number;
   updatedBy: string;
   updatedAt: Date;
   operationType: "addition" | "issuance";
   issuedTo?: string;
+  labelId?: string;
+  expiryDate?: string;
 }
