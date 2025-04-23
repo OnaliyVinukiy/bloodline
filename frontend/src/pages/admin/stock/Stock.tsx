@@ -8,9 +8,19 @@
 
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@asgardeo/auth-react";
-import { Button, Label, Select, TextInput, Alert, Table } from "flowbite-react";
+import {
+  Button,
+  Label,
+  Select,
+  TextInput,
+  Alert,
+  Table,
+  Modal,
+  Checkbox,
+  Badge,
+} from "flowbite-react";
 import { HiInformationCircle, HiPlus, HiCheck, HiMinus } from "react-icons/hi";
-import { BloodStock } from "../../../types/stock";
+import { BloodStock, StockAddedHistory } from "../../../types/stock";
 import { useNavigate } from "react-router-dom";
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -26,6 +36,8 @@ export default function BloodStockManagement() {
   const [formData, setFormData] = useState({
     bloodType: "",
     quantity: "",
+    expiryDate: "",
+    labelId: "",
   });
   const [issueFormData, setIssueFormData] = useState({
     bloodType: "",
@@ -33,11 +45,16 @@ export default function BloodStockManagement() {
     issuedTo: "",
   });
   const [userEmail, setUserEmail] = useState("");
+  const [showStockHistoryModal, setShowStockHistoryModal] = useState(false);
+  const [stockHistory, setStockHistory] = useState<StockAddedHistory[]>([]);
+  const [selectedStockEntries, setSelectedStockEntries] = useState<string[]>(
+    []
+  );
   const navigate = useNavigate();
   const backendURL =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
-  //Fetch stock data
+  // Fetch stock data
   const fetchData = async () => {
     try {
       const token = await getAccessToken();
@@ -58,6 +75,30 @@ export default function BloodStockManagement() {
         err instanceof Error ? err.message : "An unknown error occurred"
       );
       setLoading(false);
+    }
+  };
+
+  // Fetch stock history for selected blood type
+  const fetchStockHistory = async (bloodType: string) => {
+    try {
+      const token = await getAccessToken();
+      const response = await fetch(
+        `${backendURL}/api/stocks/history?bloodType=${encodeURIComponent(
+          bloodType
+        )}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch stock history");
+
+      const data = await response.json();
+      setStockHistory(data);
+      setShowStockHistoryModal(true);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
     }
   };
 
@@ -85,13 +126,18 @@ export default function BloodStockManagement() {
     }));
   };
 
-  //Add stock
+  // Add stock
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
 
-    if (!formData.bloodType || !formData.quantity) {
+    if (
+      !formData.bloodType ||
+      !formData.quantity ||
+      !formData.expiryDate ||
+      !formData.labelId
+    ) {
       setError("Please fill in all fields.");
       return;
     }
@@ -99,6 +145,13 @@ export default function BloodStockManagement() {
     const parsedQuantity = Number(formData.quantity);
     if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
       setError("Quantity must be a positive number.");
+      return;
+    }
+
+    const today = new Date();
+    const expiryDate = new Date(formData.expiryDate);
+    if (expiryDate <= today) {
+      setError("Expiry date must be in the future.");
       return;
     }
 
@@ -115,17 +168,22 @@ export default function BloodStockManagement() {
           bloodType: formData.bloodType,
           quantity: parsedQuantity,
           updatedBy: userEmail,
+          expiryDate: formData.expiryDate,
+          labelId: formData.labelId,
         }),
       });
 
       const data = await response.json();
-      console.log("Response:", data);
-
       if (!response.ok)
         throw new Error(data.message || "Failed to add blood stock");
 
       setSuccess("Blood stock added successfully!");
-      setFormData({ bloodType: "", quantity: "" });
+      setFormData({
+        bloodType: "",
+        quantity: "",
+        expiryDate: "",
+        labelId: "",
+      });
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unknown error occurred"
@@ -136,11 +194,10 @@ export default function BloodStockManagement() {
     }
   };
 
-  //Issue stock
-  const handleIssueSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  // Validate and show stock history for issuance
+  const validateAndShowStockHistory = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    setSuccess(null);
 
     if (
       !issueFormData.bloodType ||
@@ -157,12 +214,42 @@ export default function BloodStockManagement() {
       return;
     }
 
-    // Check if enough stock is available
     const currentStock = stocks.find(
       (s) => s.bloodType === issueFormData.bloodType
     );
     if (!currentStock || currentStock.quantity < parsedQuantity) {
       setError("Not enough stock available for this blood type.");
+      return;
+    }
+
+    fetchStockHistory(issueFormData.bloodType);
+  };
+
+  // Handle stock entry selection
+  const handleStockEntrySelection = (entryId: string) => {
+    setSelectedStockEntries((prev) =>
+      prev.includes(entryId)
+        ? prev.filter((id) => id !== entryId)
+        : [...prev, entryId]
+    );
+  };
+
+  // Issue stock with selected entries
+  const handleIssueStockWithEntries = async () => {
+    setError(null);
+    setSuccess(null);
+
+    const parsedQuantity = Number(issueFormData.quantity);
+    const selectedEntries = stockHistory.filter((entry) =>
+      selectedStockEntries.includes(entry._id)
+    );
+    const totalSelectedQuantity = selectedEntries.reduce(
+      (sum, entry) => sum + entry.quantityAdded,
+      0
+    );
+
+    if (totalSelectedQuantity < parsedQuantity) {
+      setError("Selected stock entries do not cover the requested quantity.");
       return;
     }
 
@@ -180,17 +267,18 @@ export default function BloodStockManagement() {
           quantity: parsedQuantity,
           updatedBy: userEmail,
           issuedTo: issueFormData.issuedTo,
+          selectedEntries: selectedStockEntries,
         }),
       });
 
       const data = await response.json();
-      console.log("Response:", data);
-
       if (!response.ok)
         throw new Error(data.message || "Failed to issue blood stock");
 
       setSuccess("Blood stock issued successfully!");
       setIssueFormData({ bloodType: "", quantity: "", issuedTo: "" });
+      setSelectedStockEntries([]);
+      setShowStockHistoryModal(false);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unknown error occurred"
@@ -201,7 +289,7 @@ export default function BloodStockManagement() {
     }
   };
 
-  //Handle show history buttons
+  // Handle show history buttons
   const handleShowHistory = (type: "issue" | "addition") => {
     if (type === "addition") {
       navigate("/admin/stock/addition-history");
@@ -211,7 +299,21 @@ export default function BloodStockManagement() {
     }
   };
 
-  //Loading Animation
+  // Get expiration status for stock history
+  const getExpirationStatus = (expiryDate?: string) => {
+    if (!expiryDate) return { status: "Unknown", color: "gray" };
+
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    const timeDiff = expiry.getTime() - today.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+    if (daysDiff < 0) return { status: "Expired", color: "failure" };
+    if (daysDiff <= 30) return { status: "Near Expiry", color: "warning" };
+    return { status: "Valid", color: "success" };
+  };
+
+  // Loading Animation
   if (loading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
@@ -286,6 +388,29 @@ export default function BloodStockManagement() {
                   required
                 />
               </div>
+              <div>
+                <Label htmlFor="expiryDate" value="Expiry Date" />
+                <TextInput
+                  id="expiryDate"
+                  name="expiryDate"
+                  type="date"
+                  value={formData.expiryDate}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="labelId" value="Label ID" />
+                <TextInput
+                  id="labelId"
+                  name="labelId"
+                  type="text"
+                  value={formData.labelId}
+                  onChange={handleInputChange}
+                  placeholder="Enter unique label ID"
+                  required
+                />
+              </div>
 
               <Button
                 type="submit"
@@ -304,7 +429,7 @@ export default function BloodStockManagement() {
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
               Issue Blood Stock
             </h2>
-            <form className="space-y-4" onSubmit={handleIssueSubmit}>
+            <form className="space-y-4" onSubmit={validateAndShowStockHistory}>
               <div>
                 <Label htmlFor="issueBloodType" value="Blood Type" />
                 <Select
@@ -356,7 +481,7 @@ export default function BloodStockManagement() {
                 disabled={isIssuanceLoading}
               >
                 <HiMinus className="mr-2 h-5 w-5" />
-                {isIssuanceLoading ? "Issuing..." : "Issue Stock"}
+                {isIssuanceLoading ? "Issuing..." : "Select Stock Entries"}
               </Button>
             </form>
           </div>
@@ -366,7 +491,7 @@ export default function BloodStockManagement() {
         <div className="lg:col-span-2">
           <div className="bg-white p-6 rounded-lg shadow-md">
             {loading ? (
-              <div className=" loading flex justify-center items-center h-40">
+              <div className="loading flex justify-center items-center h-40">
                 <svg width="64px" height="48px">
                   <polyline
                     points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
@@ -409,7 +534,7 @@ export default function BloodStockManagement() {
                   <Table hoverable>
                     <Table.Head>
                       <Table.HeadCell>Blood Type</Table.HeadCell>
-                      <Table.HeadCell>Quantity (units)</Table.HeadCell>
+                      <Table.HeadCell>Quantity (ml)</Table.HeadCell>
                       <Table.HeadCell>Last Updated</Table.HeadCell>
                       <Table.HeadCell>Updated By</Table.HeadCell>
                     </Table.Head>
@@ -443,7 +568,7 @@ export default function BloodStockManagement() {
                         ))
                       ) : (
                         <Table.Row>
-                          <Table.Cell colSpan={4} className="text-center py-4">
+                          <Table.Cell colSpan={6} className="text-center py-4">
                             No blood stock data available
                           </Table.Cell>
                         </Table.Row>
@@ -456,6 +581,87 @@ export default function BloodStockManagement() {
           </div>
         </div>
       </div>
+
+      {/* Stock History Modal */}
+      <Modal
+        show={showStockHistoryModal}
+        onClose={() => setShowStockHistoryModal(false)}
+      >
+        <Modal.Header>Select Stock Entries</Modal.Header>
+        <Modal.Body>
+          <div className="space-y-6">
+            <p>
+              Select stock entries to issue {issueFormData.quantity} units of{" "}
+              {issueFormData.bloodType} blood.
+            </p>
+            <Table hoverable>
+              <Table.Head>
+                <Table.HeadCell>Select</Table.HeadCell>
+                <Table.HeadCell>Label ID</Table.HeadCell>
+                <Table.HeadCell>Available Quantity (ml)</Table.HeadCell>
+                <Table.HeadCell>Expiry Date</Table.HeadCell>
+                <Table.HeadCell>Status</Table.HeadCell>
+                <Table.HeadCell>Date Added</Table.HeadCell>
+              </Table.Head>
+              <Table.Body className="divide-y">
+                {stockHistory.length > 0 ? (
+                  stockHistory.map((entry) => {
+                    const { status, color } = getExpirationStatus(
+                      entry.expiryDate
+                    );
+                    return (
+                      <Table.Row key={entry._id} className="bg-white">
+                        <Table.Cell>
+                          <Checkbox
+                            checked={selectedStockEntries.includes(entry._id)}
+                            onChange={() =>
+                              handleStockEntrySelection(entry._id)
+                            }
+                            disabled={status === "Expired"}
+                          />
+                        </Table.Cell>
+                        <Table.Cell>{entry.labelId}</Table.Cell>
+                        <Table.Cell>
+                          {entry.remainingQuantity ?? entry.quantityAdded}
+                        </Table.Cell>
+                        <Table.Cell>
+                          {entry.expiryDate
+                            ? new Date(entry.expiryDate).toLocaleDateString()
+                            : "N/A"}
+                        </Table.Cell>
+                        <Table.Cell>
+                          <Badge color={color}>{status}</Badge>
+                        </Table.Cell>
+                        <Table.Cell>
+                          {new Date(entry.updatedAt).toLocaleString()}
+                        </Table.Cell>
+                      </Table.Row>
+                    );
+                  })
+                ) : (
+                  <Table.Row>
+                    <Table.Cell colSpan={6} className="text-center py-4">
+                      No stock entries available
+                    </Table.Cell>
+                  </Table.Row>
+                )}
+              </Table.Body>
+            </Table>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            color="failure"
+            onClick={handleIssueStockWithEntries}
+            disabled={isIssuanceLoading || selectedStockEntries.length === 0}
+          >
+            {isIssuanceLoading ? "Issuing..." : "Issue Selected Entries"}
+          </Button>
+          <Button color="gray" onClick={() => setShowStockHistoryModal(false)}>
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
