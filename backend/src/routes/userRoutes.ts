@@ -15,6 +15,7 @@ import {
   getDonors,
   getDonorsCount,
   getDonorsDaily,
+  getDonorsByNIC,
 } from "../controllers/userController";
 
 const router = express.Router();
@@ -32,6 +33,9 @@ router.post("/update-donor", upsertDonor);
 
 //Router to fetch donor by email
 router.get("/donor/:email", getDonorByEmail);
+
+//Router to fetch donor by nic
+router.get("/donor/nic/:nic", getDonorsByNIC);
 
 //Router to fetch all donors
 router.get("/donors", getDonors);
