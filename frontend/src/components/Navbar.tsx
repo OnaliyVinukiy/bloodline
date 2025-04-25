@@ -33,6 +33,7 @@ export function Navigationbar() {
     bloodGroup: "",
     avatar: "",
     gender: "",
+    status: "",
   });
   const [org, setOrg] = useState<Organization>({
     organizationName: "",
