@@ -25,7 +25,7 @@ const BloodCollectedAppointments = () => {
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  //Fetch approved appointments
+  //Fetch collected appointments
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
@@ -38,11 +38,16 @@ const BloodCollectedAppointments = () => {
             },
           }
         );
-        const approvedAppointments = response.data.filter(
-          (appointment: any) => appointment.status === "Collected"
+        const collectedAppointments = response.data.filter(
+          (appointment: any) =>
+            appointment.status === "Collected" ||
+            appointment.status === "Processed" ||
+            appointment.status === "Tested" ||
+            appointment.status === "Labelled" ||
+            appointment.status === "Diseased"
         );
-        setAppointments(approvedAppointments);
-        console.log(approvedAppointments);
+        setAppointments(collectedAppointments);
+        console.log(collectedAppointments);
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {
@@ -198,50 +203,24 @@ const BloodCollectedAppointments = () => {
                         </svg>
                       </button>
                     </Link>
-                    <Link to={`/appointment/${appointment._id}`}>
+                    <Link to={`/admin/testing/${appointment._id}`}>
                       <button
-                        className="font-medium text-green-600 dark:text-green-500 hover:underline"
-                        aria-label="Approve"
+                        className="font-medium text-black-400 dark:text-yellow-500 hover:underline"
+                        aria-label="View"
                       >
                         <svg
-                          className="w-6 h-6 text-green-600 dark:text-white"
+                          className="w-6 h-6 text-black-400 dark:text-white"
                           aria-hidden="true"
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
                           height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          viewBox="0 0 448 512"
                         >
                           <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 11.917L9.724 16.5 19 7.5"
-                          />
-                        </svg>
-                      </button>
-                    </Link>
-                    <Link to={`/appointment/${appointment._id}`}>
-                      <button
-                        className="font-medium text-red-600 dark:text-red-500 hover:underline"
-                        aria-label="Reject"
-                      >
-                        <svg
-                          className="w-6 h-6 text-red-600 dark:text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M6 18 17.94 6M18 18 6.06 6"
+                            fillRule="evenodd"
+                            d="M288 0H160 128C110.3 0 96 14.3 96 32s14.3 32 32 32V196.8c0 11.8-3.3 23.5-9.5 33.5L10.3 406.2C3.6 417.2 0 429.7 0 442.6C0 480.9 31.1 512 69.4 512H378.6c38.3 0 69.4-31.1 69.4-69.4c0-12.8-3.6-25.4-10.3-36.4L329.5 230.4c-6.2-10.1-9.5-21.7-9.5-33.5V64c17.7 0 32-14.3 32-32s-14.3-32-32-32H288zM192 196.8V64h64V196.8c0 23.7 6.6 46.9 19 67.1L309.5 320h-171L173 263.9c12.4-20.2 19-43.4 19-67.1z"
+                            clipRule="evenodd"
                           />
                         </svg>
                       </button>
@@ -284,7 +263,7 @@ const BloodCollectedAppointments = () => {
                   colSpan={6}
                   className="text-center px-6 py-4 text-gray-500 dark:text-gray-400"
                 >
-                  No approved appointments found.
+                  No collected appointments found.
                 </td>
               </tr>
             )}
