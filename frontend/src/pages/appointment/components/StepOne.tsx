@@ -26,6 +26,7 @@ const StepOne: React.FC<StepperProps> = ({
   const [errors, setErrors] = useState<{ [key in keyof BloodDonor]?: string }>(
     {}
   );
+  const [isNextLoading, setIsNextLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -227,8 +228,22 @@ const StepOne: React.FC<StepperProps> = ({
 
     setErrors({});
     setShowErrorMessage(false);
+    setIsNextLoading(true);
 
     try {
+      // First check if donor with this NIC exists and is deferred
+      const { data: existingDonor } = await axios.get(
+        `${backendURL}/api/donor/nic/${donor.nic}`
+      );
+
+      if (existingDonor && existingDonor.status === "Deferred") {
+        showValidationMessage(
+          "Donation Restricted",
+          "You cannot donate as your donor status is currently deferred. Please contact the blood bank for more information."
+        );
+        return;
+      }
+
       // Calculate age if not already set
       const age = calculateAge(donor.birthdate);
       const donorWithAge = { ...donor, age };
@@ -239,8 +254,9 @@ const StepOne: React.FC<StepperProps> = ({
         );
         return;
       }
+
       try {
-        // Check if donor exists
+        // Check if donor exists by email
         await axios.get(`${backendURL}/api/donor/${user?.email}`);
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -264,6 +280,8 @@ const StepOne: React.FC<StepperProps> = ({
     } catch (error) {
       console.error("Error handling donor data:", error);
       alert("Error saving donor information. Please try again.");
+    } finally {
+      setIsNextLoading(false);
     }
   };
 
@@ -652,9 +670,33 @@ const StepOne: React.FC<StepperProps> = ({
 
                 <button
                   onClick={handleNext}
-                  className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
+                  disabled={isNextLoading}
+                  className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 disabled:bg-red-500 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-300"
                 >
-                  Next
+                  {isNextLoading ? (
+                    <>
+                      <svg
+                        aria-hidden="true"
+                        className="w-4 h-4 mr-2 text-white animate-spin"
+                        viewBox="0 0 100 101"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M100 50.5c0 27.6-22.4 50-50 50S0 78.1 0 50.5 22.4.5 50 .5s50 22.4 50 50z"
+                          fill="currentColor"
+                          opacity=".2"
+                        />
+                        <path
+                          d="M93.3 50.5c0-23.9-19.4-43.3-43.3-43.3-6.3 0-12.3 1.3-17.8 3.7-1.6.7-2.2 2.6-1.5 4.2.7 1.6 2.6 2.2 4.2 1.5 4.9-2.1 10.2-3.2 15.6-3.2 21.6 0 39.3 17.7 39.3 39.3s-17.7 39.3-39.3 39.3c-21.6 0-39.3-17.7-39.3-39.3 0-6.8 1.7-13.3 5-19.1.9-1.5.4-3.4-1-4.3s-3.4-.4-4.3 1c-3.8 6.4-5.8 13.7-5.8 21.3 0 23.9 19.4 43.3 43.3 43.3s43.3-19.4 43.3-43.3z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                      Loading...
+                    </>
+                  ) : (
+                    "Next"
+                  )}
                 </button>
               </div>
             </div>

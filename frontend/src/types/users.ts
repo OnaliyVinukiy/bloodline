@@ -32,6 +32,7 @@ export interface Donor {
   bloodGroup: string;
   avatar: string | null;
   gender: string;
+  status: string;
 }
 
 export interface BloodDonor {

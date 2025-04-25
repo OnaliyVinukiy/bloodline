@@ -257,6 +257,25 @@ export const getDonorByEmail = async (req: Request, res: Response) => {
   }
 };
 
+//Fetch donor by email
+export const getDonorsByNIC = async (req: Request, res: Response) => {
+  try {
+    const { collection, client } = await connectToCosmos();
+    const { nic } = req.params;
+    const donor = await collection.findOne({ nic });
+
+    if (!donor) {
+      return res.status(404).json({ message: "Donor not found" });
+    }
+
+    res.status(200).json(donor);
+    client.close();
+  } catch (error) {
+    console.error("Error fetching donor:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 //Fetch donor count
 export const getDonorsCount = async (req: Request, res: Response) => {
   try {
