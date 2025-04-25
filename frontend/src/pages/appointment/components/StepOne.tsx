@@ -31,6 +31,22 @@ const StepOne: React.FC<StepperProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showValidationModal, setShowValidationModal] = useState(false);
+  const [province, setProvince] = useState<
+    { province_id: string; province_name_en: string }[]
+  >([]);
+
+  const [district, setDistrict] = useState<
+    { district_id: string; district_name_en: string; province_id: string }[]
+  >([]);
+
+  const [city, setCity] = useState<
+    { city_id: string; city_name_en: string; district_id: string }[]
+  >([]);
+
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
 
   //Structure for donor information
   const [donor, setDonor] = useState<BloodDonor>({
@@ -40,6 +56,9 @@ const StepOne: React.FC<StepperProps> = ({
     contactNumber: "",
     contactNumberHome: "",
     contactNumberOffice: "",
+    province: "",
+    district: "",
+    city: "",
     address: "",
     addressOffice: "",
     birthdate: "",
@@ -47,11 +66,82 @@ const StepOne: React.FC<StepperProps> = ({
     bloodGroup: "",
     avatar: "",
     gender: "",
+    status: "active",
   });
 
   const handlePrevious = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
+  };
+  //Fetch provinces list
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      try {
+        const response = await axios.get(
+          `${backendURL}/api/provinces/provinces-list`
+        );
+        setProvince(response.data);
+      } catch (error) {
+        console.error("Error fetching provinces:", error);
+      }
+    };
+
+    fetchProvinces();
+  }, [backendURL]);
+
+  //Fetch districts list
+  const fetchDistricts = async (provinceName: string) => {
+    try {
+      const response = await fetch(
+        `${backendURL}/api/districts/province-name/${provinceName}`
+      );
+      const districts = await response.json();
+      if (response.ok) {
+        setDistrict(districts);
+      } else {
+        setDistrict([]);
+      }
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+    }
+  };
+
+  const handleProvinceChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedProvince = event.target.value;
+    setDonor((prev) => ({ ...prev, province: selectedProvince }));
+    fetchDistricts(selectedProvince);
+  };
+
+  const handleDistrictChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedDistrict = event.target.value;
+    setDonor((prev) => ({ ...prev, district: selectedDistrict }));
+    fetchCities(selectedDistrict);
+  };
+
+  const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCity = event.target.value;
+    setDonor((prev) => ({ ...prev, city: selectedCity }));
+  };
+
+  //Fetch districts list
+  const fetchCities = async (districtName: string) => {
+    try {
+      const response = await fetch(
+        `${backendURL}/api/city/district/${districtName}`
+      );
+      const cities = await response.json();
+      if (response.ok) {
+        setCity(cities);
+      } else {
+        setCity([]);
+      }
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+    }
   };
 
   //Handle input change
@@ -63,11 +153,6 @@ const StepOne: React.FC<StepperProps> = ({
       }));
     }
   };
-
-  const backendURL =
-    import.meta.env.VITE_IS_PRODUCTION === "true"
-      ? import.meta.env.VITE_BACKEND_URL
-      : "http://localhost:5000";
 
   // Fetch user info from Asgardeo
   useEffect(() => {
@@ -231,17 +316,27 @@ const StepOne: React.FC<StepperProps> = ({
     setIsNextLoading(true);
 
     try {
-      // First check if donor with this NIC exists and is deferred
-      const { data: existingDonor } = await axios.get(
-        `${backendURL}/api/donor/nic/${donor.nic}`
-      );
-
-      if (existingDonor && existingDonor.status === "Deferred") {
-        showValidationMessage(
-          "Donation Restricted",
-          "You cannot donate as your donor status is currently deferred. Please contact the blood bank for more information."
+      // Check if donor exists by NIC
+      try {
+        const { data: existingDonor } = await axios.get(
+          `${backendURL}/api/donor/nic/${donor.nic}`
         );
-        return;
+
+        if (existingDonor && existingDonor.status === "Deferred") {
+          showValidationMessage(
+            "Donation Restricted",
+            "You cannot donate as your donor status is currently deferred. Please contact the blood bank for more information."
+          );
+          return;
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status !== 404) {
+            throw error;
+          }
+        } else {
+          throw error;
+        }
       }
 
       // Calculate age if not already set
@@ -463,6 +558,91 @@ const StepOne: React.FC<StepperProps> = ({
                   {errors.gender && (
                     <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
                   )}
+                </div>
+              </div>
+              {/* Provinces, District and Cities Section */}
+              <div className="flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0 mb-6">
+                <div className="w-full md:w-1/3">
+                  <Label
+                    htmlFor="province"
+                    className="block mb-2 text-sm font-medium text-indigo-900"
+                  >
+                    Province
+                  </Label>
+                  <select
+                    id="province"
+                    value={donor.province}
+                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    onChange={handleProvinceChange}
+                  >
+                    <option value="">Select a province</option>
+                    {province.map((prov) => (
+                      <option
+                        key={prov.province_id}
+                        value={prov.province_name_en}
+                      >
+                        {prov.province_name_en}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="w-full md:w-1/3">
+                  <Label
+                    htmlFor="district"
+                    className="block mb-2 text-sm font-medium text-indigo-900"
+                  >
+                    District
+                  </Label>
+                  <select
+                    id="district"
+                    value={donor.district}
+                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    onChange={handleDistrictChange}
+                  >
+                    <option value="">Select a district</option>
+                    {district.length > 0 ? (
+                      district.map((districtItem) => (
+                        <option
+                          key={districtItem.district_id}
+                          value={districtItem.district_name_en}
+                        >
+                          {districtItem.district_name_en}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="">Please select a province first</option>
+                    )}
+                  </select>
+                </div>
+
+                <div className="w-full md:w-1/3">
+                  <Label
+                    htmlFor="city"
+                    className="block mb-2 text-sm font-medium text-indigo-900"
+                  >
+                    City
+                  </Label>
+                  <select
+                    id="city"
+                    value={donor.city}
+                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    onChange={handleCityChange}
+                  >
+                    <option value="">Select a city</option>
+                    {city.length > 0 ? (
+                      city.map((cityItem) => (
+                        <option
+                          key={cityItem.city_id}
+                          value={cityItem.city_name_en}
+                        >
+                          {cityItem.city_name_en}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="">Please select a district first</option>
+                    )}
+                  </select>
                 </div>
               </div>
 
