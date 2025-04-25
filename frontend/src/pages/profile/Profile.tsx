@@ -51,6 +51,7 @@ export default function Profile() {
     bloodGroup: "",
     avatar: "",
     gender: "",
+    status: "active",
   });
 
   const [isProfileComplete, setIsProfileComplete] = useState(false);
