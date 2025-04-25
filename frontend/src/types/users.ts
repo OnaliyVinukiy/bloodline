@@ -43,6 +43,9 @@ export interface BloodDonor {
   contactNumber: string;
   contactNumberHome: string;
   contactNumberOffice: string;
+  province: string;
+  district: string;
+  city: string;
   address: string;
   addressOffice: string;
   birthdate: string;
@@ -50,6 +53,7 @@ export interface BloodDonor {
   bloodGroup: string;
   avatar: string | null;
   gender: string;
+  status: string;
 }
 
 export interface Organization {

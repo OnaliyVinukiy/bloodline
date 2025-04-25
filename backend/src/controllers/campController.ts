@@ -8,12 +8,16 @@
 import { Request, Response } from "express";
 import { MongoClient } from "mongodb";
 import nodemailer from "nodemailer";
-import { DATABASE_ID, CAMP_COLLECTION_ID } from "../config/azureConfig";
+import {
+  DATABASE_ID,
+  CAMP_COLLECTION_ID,
+  DONOR_COLLECTION_ID,
+} from "../config/azureConfig";
 import { ObjectId } from "mongodb";
 import { CampApproval } from "../emailTemplates/CampApproval";
 import { CampRejection } from "../emailTemplates/CampRejected";
 import { CampConfirmation } from "../emailTemplates/CampConfirmation";
-import Camp from "../models/donationCampModel";
+import { DonorCampNotification } from "../emailTemplates/DonorCampNotification";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
 
@@ -131,7 +135,7 @@ export const saveCamp = async (req: Request, res: Response) => {
       campId: result.insertedId,
     });
 
-    // Send approval email
+    // Send confirmation email
     await sendConfirmationEmail(campData);
 
     await client.close();
@@ -164,7 +168,7 @@ export const getCamps = async (req: Request, res: Response) => {
   }
 };
 
-//Fetch monthly camps
+// Fetch monthly camps
 export const getCampsByMonth = async (req: Request, res: Response) => {
   try {
     const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
@@ -178,7 +182,7 @@ export const getCampsByMonth = async (req: Request, res: Response) => {
       .aggregate([
         {
           $group: {
-            _id: { $month: { $toDate: "$date" } }, // Assuming there's a 'date' field
+            _id: { $month: { $toDate: "$date" } },
             count: { $sum: 1 },
           },
         },
@@ -226,17 +230,17 @@ export const getCampsByMonth = async (req: Request, res: Response) => {
   }
 };
 
-//Fetch count of all camps
+// Fetch count of all camps
 export const getCampsCount = async (req: Request, res: Response) => {
   try {
-    //Connect to database
+    // Connect to database
     const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
     await client.connect();
 
     const database = client.db(DATABASE_ID);
     const collection = database.collection(CAMP_COLLECTION_ID);
 
-    //Fetch count of all camps
+    // Fetch count of all camps
     const count = await collection.countDocuments();
     res.status(200).json({ count });
 
@@ -297,7 +301,7 @@ export const getCampById = async (req: Request, res: Response) => {
     const camp = await collection.findOne({ _id: new ObjectId(id) });
 
     if (!camp) {
-      return res.status(404).json({ message: "Camp is found" });
+      return res.status(404).json({ message: "Camp not found" });
     }
 
     res.status(200).json(camp);
@@ -322,11 +326,11 @@ export const getCampByEmail = async (req: Request, res: Response) => {
     const database = client.db(DATABASE_ID);
     const collection = database.collection(CAMP_COLLECTION_ID);
 
-    // Find the camp by ID
+    // Find the camp by email
     const camp = await collection.findOne({ email: repEmail });
 
     if (!camp) {
-      return res.status(404).json({ message: "Camp is not found" });
+      return res.status(404).json({ message: "Camp not found" });
     }
 
     res.status(200).json(camp);
@@ -338,43 +342,70 @@ export const getCampByEmail = async (req: Request, res: Response) => {
   }
 };
 
-//Approve pending camp
+// Approve pending camp
 export const approveCamp = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
     // Connect to the database
     const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
-
     await client.connect();
 
     const database = client.db(DATABASE_ID);
-    const collection = database.collection(CAMP_COLLECTION_ID);
+    const campCollection = database.collection(CAMP_COLLECTION_ID);
+    const donorCollection = database.collection(DONOR_COLLECTION_ID);
     const objectId = new ObjectId(id);
 
-    const updatedCamp = await collection.findOneAndUpdate(
+    // Update camp status to Approved
+    const updatedCamp = await campCollection.findOneAndUpdate(
       { _id: objectId },
       { $set: { status: "Approved" } },
       { returnDocument: "after" }
     );
 
-    // Send approval email
-    await sendApprovalEmail(updatedCamp);
-
-    await client.close();
-
     if (!updatedCamp) {
+      await client.close();
       return res.status(404).json({ message: "Camp not found" });
     }
 
+    // Send approval email to camp organizer
+    await sendApprovalEmail(updatedCamp);
+
+    // Fetch donors in the same city
+    const donors = await donorCollection
+      .find({ city: updatedCamp.city, status: "active" })
+      .toArray();
+
+    // Send notification email to each donor
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    for (const donor of donors) {
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: donor.email,
+        subject: "Blood Donation Camp in Your City",
+        html: DonorCampNotification(donor, updatedCamp),
+      };
+
+      await transporter.sendMail(mailOptions);
+    }
+
+    await client.close();
+
     res.status(200).json(updatedCamp);
   } catch (error) {
-    console.error("Error updating appointment status:", error);
+    console.error("Error approving camp:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-//Reject pending camp
+// Reject pending camp
 export const rejectCamp = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -456,7 +487,7 @@ export const allocateTeam = async (req: Request, res: Response) => {
   }
 };
 
-// Send approval email to the donor
+// Send approval email to the camp organizer
 const sendApprovalEmail = async (camp: any) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -476,7 +507,7 @@ const sendApprovalEmail = async (camp: any) => {
   await transporter.sendMail(mailOptions);
 };
 
-// Send rejection email to the donor
+// Send rejection email to the camp organizer
 const sendRejectionEmail = async (camp: any) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -489,7 +520,7 @@ const sendRejectionEmail = async (camp: any) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: camp.email,
-    subject: "Blood Donation Appointment Rejected",
+    subject: "Blood Donation Camp Rejected",
     html: CampRejection(camp),
   };
 
@@ -498,9 +529,6 @@ const sendRejectionEmail = async (camp: any) => {
 
 // Send confirmation email
 const sendConfirmationEmail = async (camp: any) => {
-  console.log("EMAIL_USER:", process.env.EMAIL_USER);
-  console.log("EMAIL_PASS:", process.env.COSMOS_DB_CONNECTION_STRING);
-
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {

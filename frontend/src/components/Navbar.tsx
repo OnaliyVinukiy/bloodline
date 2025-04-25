@@ -264,7 +264,6 @@ export function Navigationbar() {
               </Dropdown.Item>
             </Dropdown>
           ) : user && isAdmin ? (
-            // Admin dropdown remains unchanged
             <Dropdown
               arrowIcon={false}
               inline

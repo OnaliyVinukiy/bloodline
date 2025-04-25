@@ -9,7 +9,7 @@ export const CampConfirmation = (camp: any) => {
   return `
       <div style="font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; border-radius: 10px; max-width: 600px; margin: 0 auto;">
         <div style="background-color: #e2e8f0; padding: 10px; border-radius: 5px; text-align: center;">
-          <h2 style="color: #2d3748;">Blood Donation Camp Requesy Confirmation</h2>
+          <h2 style="color: #2d3748;">Blood Donation Camp Request Confirmation</h2>
         </div>
         <div style="margin-top: 20px;">
           <p style="font-size: 16px; color: #4a5568;">Dear ${camp.fullName},</p>
