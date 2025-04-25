@@ -307,23 +307,6 @@ const StepFour: React.FC<StepperPropsCamps> = ({ onPreviousStep }) => {
         config
       );
 
-      // Update blood stock
-      const bloodGroup = appointment?.donorInfo?.bloodGroup;
-      const volume = parseInt(formData.bloodCollection.volume);
-      if (!bloodGroup || isNaN(volume)) {
-        throw new Error("Invalid blood group or volume");
-      }
-
-      await axios.post(
-        `${backendURL}/api/stocks/update-stock`,
-        {
-          bloodType: bloodGroup,
-          quantity: volume,
-          updatedBy: userEmail,
-        },
-        config
-      );
-
       // Show success modal
       setShowSuccessModal(true);
     } catch (error) {

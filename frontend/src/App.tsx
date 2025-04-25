@@ -31,6 +31,7 @@ import ContactUs from "./pages/contact/ContactUs";
 import OrganizedCamps from "./pages/camp/Camps";
 import Organizations from "./pages/admin/organization/Organizations";
 import Stock from "./pages/admin/stock/Stock";
+import BloodTesting from "./pages/admin/appointment/BloodTesting";
 import StockAdditionHistory from "./pages/admin/stock/StockAdditionHistory";
 import StockIssueHistory from "./pages/admin/stock/StockIssueHistory";
 
@@ -82,6 +83,10 @@ function App() {
             <Route
               path="/admin/donation/:appointmentId"
               element={<BloodDonation />}
+            />
+            <Route
+              path="/admin/testing/:appointmentId"
+              element={<BloodTesting />}
             />
             <Route path="/admin/organizations" element={<Organizations />} />
           </Routes>

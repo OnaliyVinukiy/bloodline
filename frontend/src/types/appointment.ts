@@ -11,7 +11,21 @@ export interface Appointment {
   selectedDate: string;
   selectedSlot: string;
   status: string;
-  donorInfo: {};
+  donorInfo: {
+    nic: string;
+    fullName: string;
+    email: string;
+    contactNumber: string;
+    contactNumberHome: string;
+    contactNumberOffice: string;
+    address: string;
+    addressOffice: string;
+    birthdate: string;
+    age: string;
+    bloodGroup: string;
+    avatar: string;
+    gender: string;
+  };
   firstForm: {};
   secondForm: {};
   thirdForm: {};
@@ -40,6 +54,7 @@ export interface Appointment {
     startTime: string;
     endTime: string;
     phlebotomistSignature: string;
+    volume: string;
     collectedAt: string;
   };
 }
