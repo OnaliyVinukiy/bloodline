@@ -281,9 +281,33 @@ export default function Profile() {
       );
       return;
     }
-
     try {
       setLoading(true);
+
+      // Check if donor with this NIC already exists
+      const { data: existingDonor } = await axios.get(
+        `${backendURL}/api/donor/nic/${donor.nic}`
+      );
+
+      // If donor exists and it's not the current user
+      if (existingDonor && existingDonor.email !== user.email) {
+        showValidationMessage(
+          "Already Registered",
+          "A donor with this NIC is already registered in the system."
+        );
+        setLoading(false);
+        return;
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status !== 404) {
+          throw error;
+        }
+      } else {
+        throw error;
+      }
+    }
+    try {
       const { _id, ...donorData } = donor;
 
       await axios.post(`${backendURL}/api/update-donor`, donorData);

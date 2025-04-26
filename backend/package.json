@@ -27,7 +27,7 @@
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
     "mongodb": "^6.16.0",
-    "mongoose": "^8.10.0",
+    "mongoose": "^8.14.0",
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^3.3.2",
     "nodemailer": "^6.10.0",
