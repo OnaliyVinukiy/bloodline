@@ -281,9 +281,24 @@ export default function Profile() {
       );
       return;
     }
-
     try {
       setLoading(true);
+
+      // Check if donor with this NIC already exists
+      const { data: existingDonor } = await axios.get(
+        `${backendURL}/api/donor/nic/${donor.nic}`
+      );
+
+      // If donor exists and it's not the current user
+      if (existingDonor && existingDonor.email !== user.email) {
+        showValidationMessage(
+          "Already Registered",
+          "A donor with this NIC is already registered in the system."
+        );
+        setLoading(false);
+        return;
+      }
+
       const { _id, ...donorData } = donor;
 
       await axios.post(`${backendURL}/api/update-donor`, donorData);
