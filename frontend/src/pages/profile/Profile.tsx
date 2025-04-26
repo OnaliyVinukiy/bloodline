@@ -298,7 +298,16 @@ export default function Profile() {
         setLoading(false);
         return;
       }
-
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status !== 404) {
+          throw error;
+        }
+      } else {
+        throw error;
+      }
+    }
+    try {
       const { _id, ...donorData } = donor;
 
       await axios.post(`${backendURL}/api/update-donor`, donorData);
