@@ -34,11 +34,6 @@ if (!COSMOS_DB_CONNECTION_STRING) {
   throw new Error("Missing environment variable: COSMOS_DB_CONNECTION_STRING");
 }
 
-const blobServiceClient = BlobServiceClient.fromConnectionString(
-  AZURE_STORAGE_CONNECTION_STRING
-);
-const containerClient = blobServiceClient.getContainerClient(CONTAINER_NAME);
-
 // Connect to DB using MongoClient.
 const connectToCosmos = async () => {
   try {
@@ -47,7 +42,6 @@ const connectToCosmos = async () => {
     const db = client.db(DATABASE_ID);
     const collection = db.collection(DONOR_COLLECTION_ID);
 
-    console.log("Connected to Cosmos DB");
     return { db, collection, client };
   } catch (error) {
     console.error("Error connecting to Cosmos DB:", error);
@@ -58,9 +52,6 @@ const connectToCosmos = async () => {
 // Fetch user info from Asgardeo API
 export const getUserInfo = async (req: Request, res: Response) => {
   const { accessToken } = req.body;
-
-  // Log token for debugging
-  console.log("Access Token:", accessToken);
 
   if (!accessToken) {
     return res.status(400).json({ message: "Access token is missing" });
@@ -105,6 +96,10 @@ export const getUserInfo = async (req: Request, res: Response) => {
 
 // Handle avatar upload to Azure Blob Storage
 export const uploadAvatar = async (req: Request, res: Response) => {
+  const blobServiceClient = BlobServiceClient.fromConnectionString(
+    AZURE_STORAGE_CONNECTION_STRING
+  );
+  const containerClient = blobServiceClient.getContainerClient(CONTAINER_NAME);
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
