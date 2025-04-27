@@ -34,6 +34,7 @@ import Stock from "./pages/admin/stock/Stock";
 import BloodTesting from "./pages/admin/appointment/BloodTesting";
 import StockAdditionHistory from "./pages/admin/stock/StockAdditionHistory";
 import StockIssueHistory from "./pages/admin/stock/StockIssueHistory";
+import Donors from "./pages/admin/donor/Donors";
 
 function App() {
   return (
@@ -89,6 +90,7 @@ function App() {
               element={<BloodTesting />}
             />
             <Route path="/admin/organizations" element={<Organizations />} />
+            <Route path="/admin/donors" element={<Donors />} />
           </Routes>
         </main>
         <FooterComponent />
