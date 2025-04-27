@@ -9,6 +9,7 @@ import { Button, Datepicker, Label, Modal } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/stepper";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@asgardeo/auth-react";
 
 const StepEight: React.FC<StepperProps> = ({
@@ -40,6 +41,7 @@ const StepEight: React.FC<StepperProps> = ({
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const navigate = useNavigate();
 
   const handlePrevious = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -114,6 +116,11 @@ const StepEight: React.FC<StepperProps> = ({
     }
   };
 
+  const handleModalClose = () => {
+    setShowModal(false);
+    navigate("/appointments");
+  };
+
   return (
     <div>
       <div className="flex justify-center items-center bg-gray-100">
@@ -177,7 +184,7 @@ const StepEight: React.FC<StepperProps> = ({
                         value="four"
                         checked={formSevenData.donatingMonth === "four"}
                         onChange={handleRadioChange("donatingMonth")}
-                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Once in a 4 months
                     </label>
@@ -188,7 +195,7 @@ const StepEight: React.FC<StepperProps> = ({
                         value="six"
                         checked={formSevenData.donatingMonth === "six"}
                         onChange={handleRadioChange("donatingMonth")}
-                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
+                        className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
                       Once in a 6 months
                     </label>
@@ -308,7 +315,28 @@ const StepEight: React.FC<StepperProps> = ({
           </div>
         </main>
         <Modal show={showModal} onClose={() => setShowModal(false)}>
-          <Modal.Header>Appointment Request Submitted</Modal.Header>
+          <Modal.Header className="flex items-center gap-2 ">
+            <p className="flex items-center gap-2 text-xl text-green-600">
+              <svg
+                className="w-6 h-6 text-green-600"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="currentColor"
+                viewBox="0 0 512 512"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"
+                />
+              </svg>
+              Appointment Request Placed Successfully!
+            </p>
+          </Modal.Header>
           <Modal.Body>
             <p className="text-lg text-gray-700">
               Your blood donation appointment request has been successfully
@@ -318,7 +346,7 @@ const StepEight: React.FC<StepperProps> = ({
             </p>
           </Modal.Body>
           <Modal.Footer className="flex justify-end">
-            <Button color="failure" onClick={() => setShowModal(false)}>
+            <Button color="failure" onClick={handleModalClose}>
               OK
             </Button>
           </Modal.Footer>
