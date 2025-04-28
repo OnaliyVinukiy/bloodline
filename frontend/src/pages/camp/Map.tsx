@@ -260,7 +260,7 @@ const Map: React.FC = () => {
                           <strong>Date:</strong> {marker.date}
                         </p>
                         <p className="text-sm">
-                          <strong>Time:</strong> {marker.time}
+                          <strong>Time:</strong> {marker.startTime}
                         </p>
                         <p className="text-sm">
                           <strong> Location: </strong>{" "}

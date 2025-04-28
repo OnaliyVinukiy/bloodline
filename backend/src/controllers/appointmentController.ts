@@ -16,6 +16,7 @@ dotenv.config();
 import { ObjectId } from "mongodb";
 import { AppointmentRejection } from "../emailTemplates/AppointmentRejection";
 import { AppointmentApproval } from "../emailTemplates/AppointmentApproval";
+import { AppointmentCancellation } from "../emailTemplates/AppointmentCancellation";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
 if (!COSMOS_DB_CONNECTION_STRING) {
@@ -481,7 +482,7 @@ const sendCancellationEmail = async (appointment: any) => {
     from: process.env.EMAIL_USER,
     to: appointment.donorInfo.email,
     subject: "Blood Donation Appointment Cancelled",
-    html: AppointmentApproval(appointment),
+    html: AppointmentCancellation(appointment),
   };
 
   await transporter.sendMail(mailOptions);
