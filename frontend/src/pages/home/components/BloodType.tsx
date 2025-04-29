@@ -54,7 +54,7 @@ const BloodType: React.FC = () => {
     <section
       className="bg-cover bg-no-repeat bg-center h-auto lg:h-[700px] flex items-center mt-28 mb-12"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/bloodinventory.jpg')`,
+        backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://bloodlineresources.blob.core.windows.net/assets/bloodinventory.jpg')`,
       }}
     >
       <div className="px-4 mx-auto max-w-screen-xl text-center py-12 lg:py-24">
