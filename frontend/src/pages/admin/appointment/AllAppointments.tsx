@@ -14,6 +14,8 @@ const AllAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { getAccessToken } = useAuthContext();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   const memoizedGetAccessToken = useCallback(
     () => getAccessToken(),
@@ -64,6 +66,17 @@ const AllAppointments = () => {
 
     fetchAppointments();
   }, [memoizedGetAccessToken]);
+
+  // Get current appointments
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentAppointments = appointments.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  // Change page
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   //Loading animation
   if (isLoading) {
@@ -151,7 +164,7 @@ const AllAppointments = () => {
             </tr>
           </thead>
           <tbody>
-            {appointments.map((appointment: any) => (
+            {currentAppointments.map((appointment: any) => (
               <tr
                 key={appointment._id}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -353,6 +366,68 @@ const AllAppointments = () => {
             )}
           </tbody>
         </table>
+
+        {/* Pagination */}
+        {appointments.length > itemsPerPage && (
+          <div className="flex justify-between items-center px-4 py-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+            <div className="text-sm text-gray-700 dark:text-gray-400">
+              Showing{" "}
+              <span className="font-medium">{indexOfFirstItem + 1}</span> to{" "}
+              <span className="font-medium">
+                {Math.min(indexOfLastItem, appointments.length)}
+              </span>{" "}
+              of <span className="font-medium">{appointments.length}</span>{" "}
+              results
+            </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 text-sm font-medium rounded-md ${
+                  currentPage === 1
+                    ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                    : "bg-yellow-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-yellow-100 dark:hover:bg-gray-600"
+                }`}
+              >
+                Previous
+              </button>
+              {Array.from({
+                length: Math.ceil(appointments.length / itemsPerPage),
+              }).map((_, index) => (
+                <button
+                  key={index + 1}
+                  onClick={() => paginate(index + 1)}
+                  className={`px-4 py-2 text-sm font-medium rounded-md ${
+                    currentPage === index + 1
+                      ? "bg-yellow-200 dark:bg-gray-600 text-gray-700 dark:text-white"
+                      : "bg-yellow-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-yellow-100 dark:hover:bg-gray-600"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+              <button
+                onClick={() =>
+                  paginate(
+                    currentPage < Math.ceil(appointments.length / itemsPerPage)
+                      ? currentPage + 1
+                      : currentPage
+                  )
+                }
+                disabled={
+                  currentPage === Math.ceil(appointments.length / itemsPerPage)
+                }
+                className={`px-4 py-2 text-sm font-medium rounded-md ${
+                  currentPage === Math.ceil(appointments.length / itemsPerPage)
+                    ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                    : "bg-yellow-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-yellow-100 dark:hover:bg-gray-600"
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
