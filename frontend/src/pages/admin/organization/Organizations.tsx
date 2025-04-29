@@ -10,23 +10,35 @@ import axios from "axios";
 
 const Organizations = () => {
   const [org, setOrg] = useState([]);
+  const [filteredOrg, setFilteredOrg] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterField, setFilterField] = useState("all");
 
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  //Fetch approved appointments
+  // Filter options
+  const filterOptions = [
+    { value: "all", label: "All Fields" },
+    { value: "organizationName", label: "Organization Name" },
+    { value: "organizationEmail", label: "Organization Email" },
+    { value: "repFullName", label: "Representative Name" },
+    { value: "repEmail", label: "Representative Email" },
+    { value: "repNIC", label: "Representative NIC" },
+  ];
+
+  //Fetch organizations
   useEffect(() => {
     const fetchOrganizations = async () => {
       try {
         const response = await axios.get(
           `${backendURL}/api/organizations/all-organizations`
         );
-
         setOrg(response.data);
-        console.log(response.data);
+        setFilteredOrg(response.data);
       } catch (error) {
         console.error("Error fetching organizations:", error);
       } finally {
@@ -36,6 +48,33 @@ const Organizations = () => {
 
     fetchOrganizations();
   }, []);
+
+  // Filter organizations
+  useEffect(() => {
+    if (!searchTerm) {
+      setFilteredOrg(org);
+      return;
+    }
+
+    const term = searchTerm.toLowerCase();
+    const results = org.filter((organization: any) => {
+      if (filterField === "all") {
+        return (
+          organization.organizationName.toLowerCase().includes(term) ||
+          organization.organizationEmail.toLowerCase().includes(term) ||
+          organization.repFullName.toLowerCase().includes(term) ||
+          organization.repEmail.toLowerCase().includes(term) ||
+          organization.repNIC.toLowerCase().includes(term) ||
+          organization.orgContactNumber.toLowerCase().includes(term) ||
+          organization.repContactNumber.toLowerCase().includes(term)
+        );
+      } else {
+        return organization[filterField]?.toLowerCase().includes(term);
+      }
+    });
+
+    setFilteredOrg(results);
+  }, [searchTerm, filterField, org]);
 
   //Loading animation
   if (isLoading) {
@@ -65,33 +104,50 @@ const Organizations = () => {
     <div className="flex justify-center mt-8">
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-w-7xl w-full mb-20">
         <div className="mt-4 ml-4 flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
-          <label htmlFor="table-search" className="sr-only">
-            Search
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <svg
-                className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                />
-              </svg>
+          <div className="flex flex-wrap gap-4">
+            {/* Search Input */}
+            <div className="relative">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                <svg
+                  className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                  />
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="table-search-organizations"
+                className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Search organizations"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <input
-              type="text"
-              id="table-search-users"
-              className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Search for organizations"
-            />
+
+            {/* Filter Field Selector */}
+            <div className="relative">
+              <select
+                className="block p-2 text-sm text-gray-900 border border-gray-300 rounded-lg w-48 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                value={filterField}
+                onChange={(e) => setFilterField(e.target.value)}
+              >
+                {filterOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
         <table className="mt-4 mb-4 w-full text-md text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -121,7 +177,7 @@ const Organizations = () => {
             </tr>
           </thead>
           <tbody>
-            {org.map((org: any) => (
+            {filteredOrg.map((org: any) => (
               <tr
                 key={org._id}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -135,10 +191,8 @@ const Organizations = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {org.repFullName}
                 </td>
-
                 <td className="px-6 py-4 whitespace-nowrap">{org.repEmail}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{org.repNIC}</td>
-
                 <td className="px-6 py-4 whitespace-nowrap">
                   {org.orgContactNumber}
                 </td>
@@ -147,13 +201,15 @@ const Organizations = () => {
                 </td>
               </tr>
             ))}
-            {org.length === 0 && (
+            {filteredOrg.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="text-center px-6 py-4 text-gray-500 dark:text-gray-400"
                 >
-                  No organizations found.
+                  {org.length === 0
+                    ? "No organizations found."
+                    : "No organizations match your search criteria."}
                 </td>
               </tr>
             )}
