@@ -198,54 +198,6 @@ const RejectedAppointments = () => {
                         </svg>
                       </button>
                     </Link>
-                    <Link to={`/appointment/${appointment._id}`}>
-                      <button
-                        className="font-medium text-green-600 dark:text-green-500 hover:underline"
-                        aria-label="Approve"
-                      >
-                        <svg
-                          className="w-6 h-6 text-green-600 dark:text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 11.917L9.724 16.5 19 7.5"
-                          />
-                        </svg>
-                      </button>
-                    </Link>
-                    <Link to={`/appointment/${appointment._id}`}>
-                      <button
-                        className="font-medium text-red-600 dark:text-red-500 hover:underline"
-                        aria-label="Reject"
-                      >
-                        <svg
-                          className="w-6 h-6 text-red-600 dark:text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M6 18 17.94 6M18 18 6.06 6"
-                          />
-                        </svg>
-                      </button>
-                    </Link>
                   </div>
                 </td>
 
