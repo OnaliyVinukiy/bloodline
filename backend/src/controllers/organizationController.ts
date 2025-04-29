@@ -45,8 +45,6 @@ const connectToCosmos = async () => {
 
     const db = client.db(DATABASE_ID);
     const collection = db.collection(ORGANIZATION_COLLECTION_ID);
-
-    console.log("Connected to Cosmos DB");
     return { db, collection, client };
   } catch (error) {
     console.error("Error connecting to Cosmos DB:", error);
