@@ -12,9 +12,13 @@ import { useAuthContext } from "@asgardeo/auth-react";
 
 const ApprovedAppointments = () => {
   const [appointments, setAppointments] = useState([]);
+  const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+  const [filterType, setFilterType] = useState("all");
   const { getAccessToken } = useAuthContext();
 
   const memoizedGetAccessToken = useCallback(
@@ -31,6 +35,7 @@ const ApprovedAppointments = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
+        setIsLoading(true);
         const token = await memoizedGetAccessToken();
         const response = await axios.get(
           `${backendURL}/api/appointments/fetch-appointment`,
@@ -44,6 +49,7 @@ const ApprovedAppointments = () => {
           (appointment: any) => appointment.status === "Approved"
         );
         setAppointments(approvedAppointments);
+        setFilteredAppointments(approvedAppointments);
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {
@@ -54,10 +60,52 @@ const ApprovedAppointments = () => {
     fetchAppointments();
   }, []);
 
+  useEffect(() => {
+    let results = [...appointments];
+
+    // Apply search filter
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      results = results.filter(
+        (appointment: any) =>
+          appointment.donorInfo.fullName.toLowerCase().includes(term) ||
+          appointment.donorInfo.nic.toLowerCase().includes(term)
+      );
+    }
+
+    // Apply date filter
+    if (dateFilter && filterType !== "all") {
+      results = results.filter((appointment: any) => {
+        const appointmentDate = new Date(appointment.selectedDate);
+
+        switch (filterType) {
+          case "day":
+            return appointment.selectedDate === dateFilter;
+          case "month":
+            const [year, month] = dateFilter.split("-");
+            return (
+              appointmentDate.getFullYear() === parseInt(year) &&
+              appointmentDate.getMonth() + 1 === parseInt(month)
+            );
+          case "year":
+            return appointmentDate.getFullYear() === parseInt(dateFilter);
+          default:
+            return true;
+        }
+      });
+    }
+
+    setFilteredAppointments(results);
+    setCurrentPage(1);
+  }, [appointments, searchTerm, dateFilter, filterType]);
+
   // Get current appointments
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentAppointments = appointments.slice(indexOfFirstItem, indexOfLastItem);
+  const currentAppointments = filteredAppointments.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
   // Change page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
@@ -90,35 +138,75 @@ const ApprovedAppointments = () => {
     <div className="flex justify-center mt-8">
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-w-7xl w-full mb-20">
         <div className="mt-4 ml-4 flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
-          <label htmlFor="table-search" className="sr-only">
-            Search
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <svg
-                className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                />
-              </svg>
+          <div className="flex flex-col md:flex-row gap-4 w-full">
+            <div className="relative flex-1">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                <svg
+                  className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                  />
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="table-search-users"
+                className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Search by name or NIC"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <input
-              type="text"
-              id="table-search-users"
-              className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Search for donors"
-            />
+
+            {/* Date filter dropdown */}
+            <div className="flex gap-2">
+              <select
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+              >
+                <option value="all">All Dates</option>
+                <option value="day">Specific Date</option>
+                <option value="month">Month</option>
+                <option value="year">Year</option>
+              </select>
+
+              {filterType !== "all" && (
+                <input
+                  type={
+                    filterType === "year"
+                      ? "number"
+                      : filterType === "month"
+                      ? "month"
+                      : "date"
+                  }
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  placeholder={
+                    filterType === "year"
+                      ? "YYYY"
+                      : filterType === "month"
+                      ? "YYYY-MM"
+                      : "YYYY-MM-DD"
+                  }
+                  min="2000"
+                  max={new Date().getFullYear() + 5}
+                />
+              )}
+            </div>
           </div>
         </div>
+
         <table className="mt-4 mb-4 w-full text-md text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text- text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
@@ -271,13 +359,13 @@ const ApprovedAppointments = () => {
                 </td>
               </tr>
             ))}
-            {appointments.length === 0 && (
+            {filteredAppointments.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={9}
                   className="text-center px-6 py-4 text-gray-500 dark:text-gray-400"
                 >
-                  No approved appointments found.
+                  No approved appointments found matching your criteria.
                 </td>
               </tr>
             )}
@@ -285,14 +373,17 @@ const ApprovedAppointments = () => {
         </table>
 
         {/* Pagination */}
-        {appointments.length > itemsPerPage && (
+        {filteredAppointments.length > itemsPerPage && (
           <div className="flex justify-between items-center px-4 py-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
             <div className="text-sm text-gray-700 dark:text-gray-400">
-              Showing <span className="font-medium">{indexOfFirstItem + 1}</span> to{" "}
+              Showing{" "}
+              <span className="font-medium">{indexOfFirstItem + 1}</span> to{" "}
               <span className="font-medium">
-                {Math.min(indexOfLastItem, appointments.length)}
+                {Math.min(indexOfLastItem, filteredAppointments.length)}
               </span>{" "}
-              of <span className="font-medium">{appointments.length}</span> results
+              of{" "}
+              <span className="font-medium">{filteredAppointments.length}</span>{" "}
+              results
             </div>
             <div className="flex space-x-2">
               <button
@@ -306,7 +397,9 @@ const ApprovedAppointments = () => {
               >
                 Previous
               </button>
-              {Array.from({ length: Math.ceil(appointments.length / itemsPerPage) }).map((_, index) => (
+              {Array.from({
+                length: Math.ceil(filteredAppointments.length / itemsPerPage),
+              }).map((_, index) => (
                 <button
                   key={index + 1}
                   onClick={() => paginate(index + 1)}
@@ -320,10 +413,21 @@ const ApprovedAppointments = () => {
                 </button>
               ))}
               <button
-                onClick={() => paginate(currentPage < Math.ceil(appointments.length / itemsPerPage) ? currentPage + 1 : currentPage)}
-                disabled={currentPage === Math.ceil(appointments.length / itemsPerPage)}
+                onClick={() =>
+                  paginate(
+                    currentPage <
+                      Math.ceil(filteredAppointments.length / itemsPerPage)
+                      ? currentPage + 1
+                      : currentPage
+                  )
+                }
+                disabled={
+                  currentPage ===
+                  Math.ceil(filteredAppointments.length / itemsPerPage)
+                }
                 className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  currentPage === Math.ceil(appointments.length / itemsPerPage)
+                  currentPage ===
+                  Math.ceil(filteredAppointments.length / itemsPerPage)
                     ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                     : "bg-yellow-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-yellow-100 dark:hover:bg-gray-600"
                 }`}
