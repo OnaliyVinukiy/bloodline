@@ -28,8 +28,8 @@ jobs:
           docker tag bloodline-frontend:latest onaliy/bloodline-frontend:latest
           docker push onaliy/bloodline-frontend:latest
 
-      # - name: Deploy Frontend to Azure App Service
-      #   uses: azure/webapps-deploy@v2
-      #   with:
-      #     app-name: bloodline
-      #     images: onaliy/bloodline-frontend:latest
+      - name: Deploy Frontend to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: bloodline
+          images: onaliy/bloodline-frontend:latest
