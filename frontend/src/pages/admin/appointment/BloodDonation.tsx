@@ -16,7 +16,6 @@ const BloodDonation = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [appointmentStatus, setAppointmentStatus] = useState("");
 
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -73,8 +72,6 @@ const BloodDonation = () => {
           }
         );
 
-        setAppointmentStatus(response.data.status);
-
         //Set initial step based on status
         if (response.data.status === "Approved") {
           setCurrentStep(1);
@@ -89,8 +86,6 @@ const BloodDonation = () => {
         console.error("Error fetching appointment:", error);
       } finally {
         setIsLoading(false);
-        console.log(appointmentStatus);
-        console.log(currentStep);
       }
     };
 
