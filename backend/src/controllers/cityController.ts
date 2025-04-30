@@ -16,7 +16,6 @@ import { Request, Response } from "express";
 import dataService from "../utils/dataService";
 
 export const getCities = (req: Request, res: Response) => {
-  console.log("getCities endpoint hit!");
   res.json(dataService.getCities());
 };
 
