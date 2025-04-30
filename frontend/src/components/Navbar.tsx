@@ -59,7 +59,6 @@ export function Navigationbar() {
         try {
           setIsLoading(true);
           const accessToken = await getAccessToken();
-          console.log("acess", accessToken);
           const response = await axios.post(
             `${backendURL}/api/user-info`,
             { accessToken },
@@ -67,13 +66,11 @@ export function Navigationbar() {
           );
 
           setUser(response.data);
-          console.log(response.data);
           if (
             response.data.role &&
             response.data.role.includes("Internal/Admin")
           ) {
             setIsAdmin(true);
-            console.log("Admin");
           } else {
             setIsAdmin(false);
           }
