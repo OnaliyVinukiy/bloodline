@@ -5,7 +5,7 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PendingAppointments from "./PendingAppointments";
 import ApprovedAppointments from "./ApprovedAppointments";
 import RejectedAppointments from "./RejectedAppointments";
@@ -14,9 +14,76 @@ import AssessedAppointments from "./AssessedAppointments";
 import ConfirmedAppointments from "./ConfirmedAppointments";
 import IssuedAppointments from "./IssuedAppointments";
 import BloodCollectedAppointments from "./BloodCollectedAppointments";
+import { useAuthContext } from "@asgardeo/auth-react";
+import axios from "axios";
 
 const Appointments = () => {
   const [activeTab, setActiveTab] = useState("tab1");
+  const { state, getAccessToken } = useAuthContext();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
+
+  // Fetch user info and check admin role
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (state?.isAuthenticated) {
+        try {
+          const accessToken = await getAccessToken();
+          const response = await axios.post(
+            `${backendURL}/api/user-info`,
+            { accessToken },
+            { headers: { "Content-Type": "application/json" } }
+          );
+
+          if (
+            response.data.role &&
+            response.data.role.includes("Internal/Admin")
+          ) {
+            setIsAdmin(true);
+          } else {
+            setIsAdmin(false);
+          }
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+        }
+      }
+    };
+
+    fetchUserInfo();
+  }, [state?.isAuthenticated, getAccessToken]);
+
+  if (!isAdmin) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+          <svg
+            className="w-16 h-16 mx-auto text-red-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <h2 className="text-2xl font-bold mt-4 text-gray-800 dark:text-white">
+            Access Denied
+          </h2>
+          <p className="mt-2 text-gray-600 dark:text-gray-300">
+            You don't have permission to view this page. Only administrators can
+            access this content.
+          </p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="mt-12">
       <div className="flex justify-center border-b border-gray-200 dark:border-gray-700">
