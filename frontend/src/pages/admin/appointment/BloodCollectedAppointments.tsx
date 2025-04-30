@@ -82,7 +82,6 @@ const BloodCollectedAppointments = () => {
             appointment.status === "Diseased"
         );
         setAppointments(collectedAppointments);
-        console.log(collectedAppointments);
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {
