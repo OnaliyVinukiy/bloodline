@@ -35,7 +35,6 @@ const OrganizedCamps = () => {
           { accessToken },
           { headers: { "Content-Type": "application/json" } }
         );
-        console.log("Fetched userInfo:", userInfo);
 
         if (!userInfo.email) {
           console.error("No email found in userInfo");
@@ -66,7 +65,6 @@ const OrganizedCamps = () => {
         );
 
         setCamps(sortedCamps);
-        console.log("Sorted camps:", sortedCamps);
       } catch (error) {
         console.error("Error fetching camps:", error);
         setCamps([]);
