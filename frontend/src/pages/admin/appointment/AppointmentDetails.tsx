@@ -81,7 +81,6 @@ const AppointmentDetails = () => {
           }
         );
         setAppointment(response.data);
-        console.log("response", response.data);
       } catch (error) {
         console.error("Error fetching appointment:", error);
         setError("Failed to fetch appointment details.");
