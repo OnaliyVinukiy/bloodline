@@ -15,7 +15,8 @@ const AppointmentCalendar = () => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const { getAccessToken } = useAuthContext();
+  const { state, getAccessToken } = useAuthContext();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const memoizedGetAccessToken = useCallback(
     () => getAccessToken(),
@@ -26,6 +27,40 @@ const AppointmentCalendar = () => {
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
+
+  // Fetch user info and check admin role
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (state?.isAuthenticated) {
+        try {
+          setIsLoading(true);
+          const accessToken = await getAccessToken();
+          const response = await axios.post(
+            `${backendURL}/api/user-info`,
+            { accessToken },
+            { headers: { "Content-Type": "application/json" } }
+          );
+
+          if (
+            response.data.role &&
+            response.data.role.includes("Internal/Admin")
+          ) {
+            setIsAdmin(true);
+          } else {
+            setIsAdmin(false);
+          }
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserInfo();
+  }, [state?.isAuthenticated, getAccessToken]);
 
   //Fetch appointments
   useEffect(() => {
@@ -57,7 +92,35 @@ const AppointmentCalendar = () => {
       new Date(appointment.selectedDate).toDateString() ===
       selectedDate.toDateString()
   );
-
+  if (!isAdmin) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+          <svg
+            className="w-16 h-16 mx-auto text-red-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <h2 className="text-2xl font-bold mt-4 text-gray-800 dark:text-white">
+            Access Denied
+          </h2>
+          <p className="mt-2 text-gray-600 dark:text-gray-300">
+            You don't have permission to view this page. Only administrators can
+            access this content.
+          </p>
+        </div>
+      </div>
+    );
+  }
   //Loading animation
   if (isLoading) {
     return (
