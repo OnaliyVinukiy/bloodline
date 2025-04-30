@@ -18,7 +18,6 @@ export function Navigationbar() {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
   const [donor, setDonor] = useState<Donor>({
     nic: "",
     fullName: "",
@@ -57,7 +56,6 @@ export function Navigationbar() {
     const fetchUserInfo = async () => {
       if (state?.isAuthenticated) {
         try {
-          setIsLoading(true);
           const accessToken = await getAccessToken();
           const response = await axios.post(
             `${backendURL}/api/user-info`,
@@ -76,12 +74,9 @@ export function Navigationbar() {
           }
         } catch (error) {
           console.error("Error fetching user info:", error);
-        } finally {
-          setIsLoading(false);
         }
       } else {
         setUser(null);
-        setIsLoading(false);
       }
     };
 
@@ -93,8 +88,6 @@ export function Navigationbar() {
     const fetchDonorInfo = async () => {
       if (user) {
         try {
-          setIsLoading(true);
-
           // Fetch donor info using the user's email
           const { data: donorInfo } = await axios.get(
             `${backendURL}/api/donor/${user.email}`
@@ -111,38 +104,12 @@ export function Navigationbar() {
           }
         } catch (error) {
           console.error("Error fetching donor info:", error);
-        } finally {
-          setIsLoading(false);
         }
       }
     };
 
     fetchDonorInfo();
   }, [user]);
-
-  //Loading Animation
-  if (isLoading) {
-    return (
-      <div className="loading flex justify-center items-center h-screen">
-        <svg width="64px" height="48px">
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="back"
-            stroke="#e53e3e"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="front"
-            stroke="#f56565"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-        </svg>
-      </div>
-    );
-  }
 
   return (
     <Navbar fluid rounded className="shadow-lg md:py-4 py-2">

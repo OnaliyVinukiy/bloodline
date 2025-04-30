@@ -35,8 +35,44 @@ import BloodTesting from "./pages/admin/appointment/BloodTesting";
 import StockAdditionHistory from "./pages/admin/stock/StockAdditionHistory";
 import StockIssueHistory from "./pages/admin/stock/StockIssueHistory";
 import Donors from "./pages/admin/donor/Donors";
+import { useState, useEffect } from "react";
+import { useAuthContext } from "@asgardeo/auth-react";
 
 function App() {
+  const { state } = useAuthContext();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [state?.isAuthenticated]);
+
+  if (isLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <Router>
