@@ -81,7 +81,6 @@ const CampDetails = () => {
           }
         );
         setCamp(response.data);
-        console.log("response", response.data);
       } catch (error) {
         console.error("Error fetching camp:", error);
         setError("Failed to fetch camp details.");

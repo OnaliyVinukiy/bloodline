@@ -77,7 +77,6 @@ const RejectedCamps = () => {
           (camp: any) => camp.status === "Rejected"
         );
         setCamps(rejectedCamps);
-        console.log(rejectedCamps);
       } catch (error) {
         console.error("Error fetching camps:", error);
       } finally {

@@ -77,7 +77,6 @@ const ApprovedCamps = () => {
           (camp: any) => camp.status === "Approved"
         );
         setCamps(approvedCamps);
-        console.log(approvedCamps);
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {

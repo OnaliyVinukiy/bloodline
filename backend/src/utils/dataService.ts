@@ -16,7 +16,6 @@ class DataService {
 
       this.initializeDistrictsAndProvinces();
 
-      console.log("Data loaded successfully");
     } catch (error) {
       console.error("Error loading data:", error);
       throw error;
@@ -101,7 +100,6 @@ class DataService {
     const province = this.provinces.find((p) => {
       switch (language) {
         case "si":
-          console.log("Checking SI Province:", p.province_name_si);
           return (
             p.province_name_si?.toLowerCase().normalize() ===
             provinceName.toLowerCase().normalize()
@@ -124,7 +122,6 @@ class DataService {
       return [];
     }
 
-    console.log("Matched Province:", province.province_id);
     return this.getDistrictsByProvince(province.province_id);
   }
 

@@ -77,7 +77,6 @@ const PendingCamps = () => {
           (camp: any) => camp.status === "Pending"
         );
         setCamps(pendingCamps);
-        console.log(pendingCamps);
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {

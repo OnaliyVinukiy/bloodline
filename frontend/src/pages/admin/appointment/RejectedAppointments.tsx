@@ -77,7 +77,6 @@ const RejectedAppointments = () => {
           (appointment: any) => appointment.status === "Rejected"
         );
         setAppointments(rejectedAppointments);
-        console.log(rejectedAppointments);
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {

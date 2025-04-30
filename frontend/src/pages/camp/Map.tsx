@@ -17,10 +17,7 @@ import {
 
 const Map: React.FC = () => {
   const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  console.log("Google API Key:", googleApiKey);
-  if (!googleApiKey) {
-    console.log("Google API Key is not defined.");
-  }
+
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: googleApiKey!,
     libraries: ["places"],
