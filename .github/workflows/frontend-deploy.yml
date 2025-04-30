@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     paths:
-      - 'frontend/**'
+      - "frontend/**"
 
 jobs:
   build-and-deploy:
@@ -21,6 +21,14 @@ jobs:
       - name: Log in to Docker Hub
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Create .env.production
+        run: |
+          echo "VITE_CLIENT_ID=${{ secrets.VITE_CLIENT_ID }}" >> frontend/.env.production
+          echo "VITE_BASE_URL=${{ secrets.VITE_BASE_URL }}" >> frontend/.env.production
+          echo "VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }}" >> frontend/.env.production
+          echo "VITE_IS_PRODUCTION=true" >> frontend/.env.production
+          echo "VITE_GOOGLE_MAPS_API_KEY=${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}" >> frontend/.env.production
 
       - name: Build and Push Docker Image
         run: |
