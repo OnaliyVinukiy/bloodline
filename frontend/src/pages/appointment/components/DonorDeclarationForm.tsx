@@ -130,10 +130,6 @@ const DonorDeclarationForm = ({
     setFormData((prevData) => ({ ...prevData, ...newData }));
   };
 
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
-
   // Stepper labels
   const steps = [
     "First",
