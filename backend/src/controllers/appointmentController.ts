@@ -53,9 +53,6 @@ export const saveAppointment = async (req: Request, res: Response) => {
 
 // Send confirmation email to the donor
 const sendConfirmationEmail = async (appointment: any) => {
-  console.log("EMAIL_USER:", process.env.EMAIL_USER);
-  console.log("EMAIL_PASS:", process.env.COSMOS_DB_CONNECTION_STRING);
-
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
