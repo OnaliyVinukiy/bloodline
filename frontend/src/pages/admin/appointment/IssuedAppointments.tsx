@@ -77,7 +77,6 @@ const IssuedAppointments = () => {
           (appointment: any) => appointment.status === "Issued"
         );
         setAppointments(approvedAppointments);
-        console.log(approvedAppointments);
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {
