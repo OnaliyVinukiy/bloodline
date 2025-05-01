@@ -84,9 +84,9 @@ const Donors = () => {
   const fetchCitySuggestions = async (query: string) => {
     try {
       const response = await axios.get(
-        `${backendURL}/api/cities/search?q=${query}`
+        `${backendURL}/api/city/search?q=${query}`
       );
-      setCitySuggestions(response.data.map((city: any) => city.name));
+      setCitySuggestions(response.data.map((city: any) => city.city_name_en));
     } catch (error) {
       console.error("Error fetching city suggestions:", error);
       setCitySuggestions([]);
