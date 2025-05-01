@@ -16,6 +16,7 @@ import axios from "axios";
 const Camps = () => {
   const [activeTab, setActiveTab] = useState("tab1");
   const { state, getAccessToken } = useAuthContext();
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -27,6 +28,7 @@ const Camps = () => {
     const fetchUserInfo = async () => {
       if (state?.isAuthenticated) {
         try {
+          setIsAuthLoading(true);
           const accessToken = await getAccessToken();
           const response = await axios.post(
             `${backendURL}/api/user-info`,
@@ -44,12 +46,40 @@ const Camps = () => {
           }
         } catch (error) {
           console.error("Error fetching user info:", error);
+        } finally {
+          setIsAuthLoading(false);
         }
+      } else {
+        setIsAuthLoading(false);
       }
     };
 
     fetchUserInfo();
   }, [state?.isAuthenticated, getAccessToken]);
+
+  //Loading animation
+  if (isAuthLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
 
   if (!isAdmin) {
     return (
