@@ -46,8 +46,9 @@ const Dashboard = () => {
     organizations: 0,
   });
 
-  const [isLoading, setIsLoading] = useState(true);
-
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const isLoading = isAuthLoading || isDataLoading;
   const [appointmentsByMonth, setAppointmentsByMonth] = useState<MonthlyData[]>(
     []
   );
@@ -68,7 +69,6 @@ const Dashboard = () => {
     const fetchUserInfo = async () => {
       if (state?.isAuthenticated) {
         try {
-          setIsLoading(true);
           const accessToken = await getAccessToken();
           const response = await axios.post(
             `${backendURL}/api/user-info`,
@@ -87,10 +87,10 @@ const Dashboard = () => {
         } catch (error) {
           console.error("Error fetching user info:", error);
         } finally {
-          setIsLoading(false);
+          setIsAuthLoading(false);
         }
       } else {
-        setIsLoading(false);
+        setIsAuthLoading(false);
       }
     };
 
@@ -143,10 +143,10 @@ const Dashboard = () => {
         setDonorsByDay(donorsDailyRes);
         setOrganizationsByDay(organizationsDailyRes);
 
-        setIsLoading(false);
+        setIsDataLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
-        setIsLoading(false);
+        setIsDataLoading(false);
       }
     };
 
@@ -244,7 +244,32 @@ const Dashboard = () => {
     },
   };
 
-  if (!isAdmin) {
+  // Loading animation
+  if (isLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
+
+  // Loading Animation
+  if (!isAdmin && !isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
@@ -270,30 +295,6 @@ const Dashboard = () => {
             access this content.
           </p>
         </div>
-      </div>
-    );
-  }
-
-  //Loading Animation
-  if (isLoading) {
-    return (
-      <div className="loading flex justify-center items-center h-screen">
-        <svg width="64px" height="48px">
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="back"
-            stroke="#e53e3e"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="front"
-            stroke="#f56565"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-        </svg>
       </div>
     );
   }

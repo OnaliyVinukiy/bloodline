@@ -21,6 +21,7 @@ const Appointments = () => {
   const [activeTab, setActiveTab] = useState("tab1");
   const { state, getAccessToken } = useAuthContext();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
@@ -48,14 +49,18 @@ const Appointments = () => {
           }
         } catch (error) {
           console.error("Error fetching user info:", error);
+        } finally {
+          setIsAuthLoading(false);
         }
+      } else {
+        setIsAuthLoading(false);
       }
     };
 
     fetchUserInfo();
   }, [state?.isAuthenticated, getAccessToken]);
 
-  if (!isAdmin) {
+  if (!isAdmin && !isAuthLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
