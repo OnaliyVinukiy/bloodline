@@ -348,12 +348,10 @@ export const issueBloodStock = async (req: Request, res: Response) => {
       !selectedEntries ||
       !Array.isArray(selectedEntries)
     ) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "All fields are required, and selectedEntries must be an array.",
-        });
+      return res.status(400).json({
+        message:
+          "All fields are required, and selectedEntries must be an array.",
+      });
     }
 
     const parsedQuantity = Number(quantity);
@@ -377,11 +375,9 @@ export const issueBloodStock = async (req: Request, res: Response) => {
       .toArray();
 
     if (entries.length !== selectedEntries.length) {
-      return res
-        .status(400)
-        .json({
-          message: "One or more selected entries are invalid or unavailable.",
-        });
+      return res.status(400).json({
+        message: "One or more selected entries are invalid or unavailable.",
+      });
     }
 
     // Calculate total available quantity from selected entries
