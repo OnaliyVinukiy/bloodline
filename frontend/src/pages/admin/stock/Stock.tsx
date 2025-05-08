@@ -30,7 +30,9 @@ export default function BloodStockManagement() {
   const { getAccessToken, getBasicUserInfo, state } = useAuthContext();
   const [isAdmin, setIsAdmin] = useState(false);
   const [stocks, setStocks] = useState<BloodStock[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const isLoading = isAuthLoading || isDataLoading;
   const [isAdditionLoading, setIsAdditionLoading] = useState(false);
   const [isIssuanceLoading, setIsIssuanceLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +63,7 @@ export default function BloodStockManagement() {
     const fetchUserInfo = async () => {
       if (state?.isAuthenticated) {
         try {
-          setLoading(true);
+          setIsAuthLoading(true);
           const accessToken = await getAccessToken();
           const response = await axios.post(
             `${backendURL}/api/user-info`,
@@ -80,10 +82,10 @@ export default function BloodStockManagement() {
         } catch (error) {
           console.error("Error fetching user info:", error);
         } finally {
-          setLoading(false);
+          setIsAuthLoading(false);
         }
       } else {
-        setLoading(false);
+        setIsAuthLoading(false);
       }
     };
 
@@ -105,12 +107,12 @@ export default function BloodStockManagement() {
 
       const data = await response.json();
       setStocks(data);
-      setLoading(false);
+      setIsDataLoading(false);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unknown error occurred"
       );
-      setLoading(false);
+      setIsDataLoading(false);
     }
   };
 
@@ -348,8 +350,32 @@ export default function BloodStockManagement() {
     if (daysDiff <= 30) return { status: "Near Expiry", color: "warning" };
     return { status: "Valid", color: "success" };
   };
+  // Loading animation
+  if (isLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
 
-  if (!isAdmin) {
+  // Loading Animation
+  if (!isAdmin && !isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
@@ -375,30 +401,6 @@ export default function BloodStockManagement() {
             access this content.
           </p>
         </div>
-      </div>
-    );
-  }
-
-  // Loading Animation
-  if (loading) {
-    return (
-      <div className="loading flex justify-center items-center h-screen">
-        <svg width="64px" height="48px">
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="back"
-            stroke="#e53e3e"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="front"
-            stroke="#f56565"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-        </svg>
       </div>
     );
   }
@@ -556,7 +558,7 @@ export default function BloodStockManagement() {
         {/* Stock Table */}
         <div className="lg:col-span-2">
           <div className="bg-white p-6 rounded-lg shadow-md">
-            {loading ? (
+            {isLoading ? (
               <div className="loading flex justify-center items-center h-40">
                 <svg width="64px" height="48px">
                   <polyline
@@ -581,14 +583,14 @@ export default function BloodStockManagement() {
                   <Button
                     color="gray"
                     onClick={() => handleShowHistory("issue")}
-                    disabled={loading}
+                    disabled={isLoading}
                   >
                     Issue History
                   </Button>
                   <Button
                     color="failure"
                     onClick={() => handleShowHistory("addition")}
-                    disabled={loading}
+                    disabled={isLoading}
                   >
                     Addition History
                   </Button>
