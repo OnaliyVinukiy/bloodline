@@ -18,7 +18,9 @@ const AppointmentDetails = () => {
   const { state, getAccessToken } = useAuthContext();
   const [isAdmin, setIsAdmin] = useState(false);
   const [appointment, setAppointment] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const isLoading = isAuthLoading || isDataLoading;
   const [isApproving, setIsApproving] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +40,6 @@ const AppointmentDetails = () => {
     const fetchUserInfo = async () => {
       if (state?.isAuthenticated) {
         try {
-          setIsLoading(true);
           const accessToken = await getAccessToken();
           const response = await axios.post(
             `${backendURL}/api/user-info`,
@@ -57,10 +58,10 @@ const AppointmentDetails = () => {
         } catch (error) {
           console.error("Error fetching user info:", error);
         } finally {
-          setIsLoading(false);
+          setIsAuthLoading(false);
         }
       } else {
-        setIsLoading(false);
+        setIsAuthLoading(false);
       }
     };
 
@@ -85,7 +86,7 @@ const AppointmentDetails = () => {
         console.error("Error fetching appointment:", error);
         setError("Failed to fetch appointment details.");
       } finally {
-        setIsLoading(false);
+        setIsDataLoading(false);
       }
     };
 
@@ -156,7 +157,7 @@ const AppointmentDetails = () => {
     }
   };
 
-  //Loading animation
+  // Loading animation
   if (isLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
@@ -180,7 +181,8 @@ const AppointmentDetails = () => {
     );
   }
 
-  if (!isAdmin) {
+  // Loading Animation
+  if (!isAdmin && !isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
