@@ -460,8 +460,8 @@ export const cancelAppointment = async (req: Request, res: Response) => {
 
     res.status(200).json(updatedAppointment);
   } catch (error) {
-    console.error("Error updating appointment status:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error cancelling appointment:", error);
+    res.status(500).json({ message: "Failed to cancel appointment" });
   }
 };
 
