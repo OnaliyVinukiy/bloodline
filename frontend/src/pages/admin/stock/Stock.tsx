@@ -350,6 +350,7 @@ export default function BloodStockManagement() {
     if (daysDiff <= 30) return { status: "Near Expiry", color: "warning" };
     return { status: "Valid", color: "success" };
   };
+
   // Loading animation
   if (isLoading) {
     return (
