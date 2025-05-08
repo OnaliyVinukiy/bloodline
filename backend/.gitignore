@@ -27,3 +27,14 @@ dist/
 
 #others
 package-lock.json
+
+# Ignore test files
+tests/
+test/
+__tests__/
+**/__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
