@@ -12,7 +12,9 @@ import { useAuthContext } from "@asgardeo/auth-react";
 
 const RejectedAppointments = () => {
   const [appointments, setAppointments] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const isLoading = isAuthLoading || isDataLoading;
   const { state, getAccessToken } = useAuthContext();
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -31,7 +33,7 @@ const RejectedAppointments = () => {
     const fetchUserInfo = async () => {
       if (state?.isAuthenticated) {
         try {
-          setIsLoading(true);
+          setIsAuthLoading(true);
           const accessToken = await getAccessToken();
           const response = await axios.post(
             `${backendURL}/api/user-info`,
@@ -50,10 +52,10 @@ const RejectedAppointments = () => {
         } catch (error) {
           console.error("Error fetching user info:", error);
         } finally {
-          setIsLoading(false);
+          setIsAuthLoading(false);
         }
       } else {
-        setIsLoading(false);
+        setIsAuthLoading(false);
       }
     };
 
@@ -80,14 +82,39 @@ const RejectedAppointments = () => {
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {
-        setIsLoading(false);
+        setIsDataLoading(false);
       }
     };
 
     fetchAppointments();
   }, []);
 
-  if (!isAdmin) {
+  // Loading animation
+  if (isLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
+
+  // Loading Animation
+  if (!isAdmin && !isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
@@ -113,30 +140,6 @@ const RejectedAppointments = () => {
             access this content.
           </p>
         </div>
-      </div>
-    );
-  }
-
-  //Loading animation
-  if (isLoading) {
-    return (
-      <div className="loading flex justify-center items-center h-screen">
-        <svg width="64px" height="48px">
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="back"
-            stroke="#e53e3e"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="front"
-            stroke="#f56565"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-        </svg>
       </div>
     );
   }

@@ -15,7 +15,9 @@ const BloodTesting = () => {
   const { state, getAccessToken } = useAuthContext();
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const isLoading = isAuthLoading || isDataLoading;
 
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -27,7 +29,6 @@ const BloodTesting = () => {
     const fetchUserInfo = async () => {
       if (state?.isAuthenticated) {
         try {
-          setIsLoading(true);
           const accessToken = await getAccessToken();
           const response = await axios.post(
             `${backendURL}/api/user-info`,
@@ -46,10 +47,10 @@ const BloodTesting = () => {
         } catch (error) {
           console.error("Error fetching user info:", error);
         } finally {
-          setIsLoading(false);
+          setIsAuthLoading(false);
         }
       } else {
-        setIsLoading(false);
+        setIsAuthLoading(false);
       }
     };
 
@@ -60,7 +61,6 @@ const BloodTesting = () => {
   useEffect(() => {
     const fetchAppointmentStatus = async () => {
       try {
-        setIsLoading(true);
         const token = await getAccessToken();
 
         const response = await axios.get(
@@ -85,7 +85,7 @@ const BloodTesting = () => {
       } catch (error) {
         console.error("Error fetching appointment:", error);
       } finally {
-        setIsLoading(false);
+        setIsDataLoading(false);
       }
     };
 
@@ -102,7 +102,32 @@ const BloodTesting = () => {
     setCurrentStep((prev) => prev - 1);
   };
 
-  if (!isAdmin) {
+  // Loading animation
+  if (isLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
+
+  // Loading Animation
+  if (!isAdmin && !isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
@@ -128,29 +153,6 @@ const BloodTesting = () => {
             access this content.
           </p>
         </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="loading flex justify-center items-center h-screen">
-        <svg width="64px" height="48px">
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="back"
-            stroke="#e53e3e"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="front"
-            stroke="#f56565"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-        </svg>
       </div>
     );
   }
