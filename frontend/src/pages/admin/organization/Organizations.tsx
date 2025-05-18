@@ -12,7 +12,6 @@ import { useUser } from "../../../contexts/UserContext";
 const Organizations = () => {
   const [org, setOrg] = useState([]);
   const [filteredOrg, setFilteredOrg] = useState([]);
-
   const [isDataLoading, setIsDataLoading] = useState(true);
   const { isAdmin, isLoading } = useUser();
   const [searchTerm, setSearchTerm] = useState("");
