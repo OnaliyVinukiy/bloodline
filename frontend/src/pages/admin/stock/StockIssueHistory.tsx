@@ -11,53 +11,18 @@ import { Button, Table, Alert } from "flowbite-react";
 import { HiInformationCircle, HiArrowLeft } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import { StockIssuedHistory } from "../../../types/stock";
-import axios from "axios";
+import { useUser } from "../../../contexts/UserContext";
 
 export default function StockIssueHistory() {
-  const { state, getAccessToken } = useAuthContext();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { getAccessToken } = useAuthContext();
   const [history, setHistory] = useState<StockIssuedHistory[]>([]);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isDataLoading, setIsDataLoading] = useState(true);
-  const isLoading = isAuthLoading || isDataLoading;
+  const { isAdmin, isLoading } = useUser();
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const backendURL =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-
-  // Fetch user info and check admin role
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (state?.isAuthenticated) {
-        try {
-          const accessToken = await getAccessToken();
-          const response = await axios.post(
-            `${backendURL}/api/user-info`,
-            { accessToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
-
-          if (
-            response.data.role &&
-            response.data.role.includes("Internal/Admin")
-          ) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-        } finally {
-          setIsAuthLoading(false);
-        }
-      } else {
-        setIsAuthLoading(false);
-      }
-    };
-
-    fetchUserInfo();
-  }, [state?.isAuthenticated, getAccessToken]);
 
   //Fetch stock issuance history
   useEffect(() => {
@@ -88,7 +53,7 @@ export default function StockIssueHistory() {
   }, [backendURL, getAccessToken]);
 
   // Loading animation
-  if (isLoading) {
+  if (isLoading || isDataLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
         <svg width="64px" height="48px">
@@ -112,7 +77,7 @@ export default function StockIssueHistory() {
   }
 
   // Loading Animation
-  if (!isAdmin && !isLoading) {
+  if (!isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
@@ -141,7 +106,6 @@ export default function StockIssueHistory() {
       </div>
     );
   }
-
   return (
     <div className="mt-10 mb-10 p-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">

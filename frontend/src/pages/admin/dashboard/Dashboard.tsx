@@ -25,7 +25,7 @@ import {
   StatCardProps,
   Stats,
 } from "../../../types/dashboard";
-import axios from "axios";
+import { useUser } from "../../../contexts/UserContext";
 
 ChartJS.register(
   CategoryScale,
@@ -46,9 +46,8 @@ const Dashboard = () => {
     organizations: 0,
   });
 
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isDataLoading, setIsDataLoading] = useState(true);
-  const isLoading = isAuthLoading || isDataLoading;
+  const { isAdmin, isLoading } = useUser();
   const [appointmentsByMonth, setAppointmentsByMonth] = useState<MonthlyData[]>(
     []
   );
@@ -61,41 +60,7 @@ const Dashboard = () => {
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  const { state, getAccessToken } = useAuthContext();
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  // Fetch user info and check admin role
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (state?.isAuthenticated) {
-        try {
-          const accessToken = await getAccessToken();
-          const response = await axios.post(
-            `${backendURL}/api/user-info`,
-            { accessToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
-
-          if (
-            response.data.role &&
-            response.data.role.includes("Internal/Admin")
-          ) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-        } finally {
-          setIsAuthLoading(false);
-        }
-      } else {
-        setIsAuthLoading(false);
-      }
-    };
-
-    fetchUserInfo();
-  }, [state?.isAuthenticated, getAccessToken]);
+  const { getAccessToken } = useAuthContext();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -245,7 +210,7 @@ const Dashboard = () => {
   };
 
   // Loading animation
-  if (isLoading) {
+  if (isLoading || isDataLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
         <svg width="64px" height="48px">
@@ -269,7 +234,7 @@ const Dashboard = () => {
   }
 
   // Loading Animation
-  if (!isAdmin && !isLoading) {
+  if (!isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">

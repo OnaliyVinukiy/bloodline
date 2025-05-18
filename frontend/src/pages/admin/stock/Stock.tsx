@@ -22,17 +22,15 @@ import {
 import { HiInformationCircle, HiPlus, HiCheck, HiMinus } from "react-icons/hi";
 import { BloodStock, StockAddedHistory } from "../../../types/stock";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useUser } from "../../../contexts/UserContext";
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 export default function BloodStockManagement() {
-  const { getAccessToken, getBasicUserInfo, state } = useAuthContext();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { getAccessToken, getBasicUserInfo } = useAuthContext();
   const [stocks, setStocks] = useState<BloodStock[]>([]);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isDataLoading, setIsDataLoading] = useState(true);
-  const isLoading = isAuthLoading || isDataLoading;
+  const { isAdmin, isLoading } = useUser();
   const [isAdditionLoading, setIsAdditionLoading] = useState(false);
   const [isIssuanceLoading, setIsIssuanceLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,40 +55,6 @@ export default function BloodStockManagement() {
   const navigate = useNavigate();
   const backendURL =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-
-  // Fetch user info and check admin role
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (state?.isAuthenticated) {
-        try {
-          setIsAuthLoading(true);
-          const accessToken = await getAccessToken();
-          const response = await axios.post(
-            `${backendURL}/api/user-info`,
-            { accessToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
-
-          if (
-            response.data.role &&
-            response.data.role.includes("Internal/Admin")
-          ) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-        } finally {
-          setIsAuthLoading(false);
-        }
-      } else {
-        setIsAuthLoading(false);
-      }
-    };
-
-    fetchUserInfo();
-  }, [state?.isAuthenticated, getAccessToken]);
 
   // Fetch stock data
   const fetchData = async () => {
@@ -352,7 +316,7 @@ export default function BloodStockManagement() {
   };
 
   // Loading animation
-  if (isLoading) {
+  if (isLoading || isDataLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
         <svg width="64px" height="48px">
@@ -376,7 +340,7 @@ export default function BloodStockManagement() {
   }
 
   // Loading Animation
-  if (!isAdmin && !isLoading) {
+  if (!isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
