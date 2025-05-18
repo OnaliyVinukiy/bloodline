@@ -10,13 +10,14 @@ import axios from "axios";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { useUser } from "../../../contexts/UserContext";
 
 const CampsCalendar = () => {
   const [camps, setCamps] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const { isAdmin, isLoading } = useUser();
   const [date, setDate] = useState(new Date());
-  const { state, getAccessToken } = useAuthContext();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { getAccessToken } = useAuthContext();
 
   const memoizedGetAccessToken = useCallback(
     () => getAccessToken(),
@@ -27,40 +28,6 @@ const CampsCalendar = () => {
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
-
-  // Fetch user info and check admin role
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (state?.isAuthenticated) {
-        try {
-          setIsLoading(true);
-          const accessToken = await getAccessToken();
-          const response = await axios.post(
-            `${backendURL}/api/user-info`,
-            { accessToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
-
-          if (
-            response.data.role &&
-            response.data.role.includes("Internal/Admin")
-          ) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserInfo();
-  }, [state?.isAuthenticated, getAccessToken]);
 
   //Fetch camps
   useEffect(() => {
@@ -79,7 +46,7 @@ const CampsCalendar = () => {
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {
-        setIsLoading(false);
+        setIsDataLoading(false);
       }
     };
 
@@ -91,6 +58,31 @@ const CampsCalendar = () => {
     (camp: any) => new Date(camp.date).toDateString() === date.toDateString()
   );
 
+  // Loading animation
+  if (isLoading || isDataLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
+
+  // Loading Animation
   if (!isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -117,30 +109,6 @@ const CampsCalendar = () => {
             access this content.
           </p>
         </div>
-      </div>
-    );
-  }
-
-  //Loading animation
-  if (isLoading) {
-    return (
-      <div className="loading flex justify-center items-center h-screen">
-        <svg width="64px" height="48px">
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="back"
-            stroke="#e53e3e"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="front"
-            stroke="#f56565"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-        </svg>
       </div>
     );
   }
