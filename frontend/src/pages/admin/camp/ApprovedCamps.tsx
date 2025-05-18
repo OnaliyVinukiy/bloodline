@@ -5,88 +5,40 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
+
 import { Link } from "react-router-dom";
-import { useAuthContext } from "@asgardeo/auth-react";
 
-const ApprovedCamps = () => {
-  const [camps, setCamps] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { state, getAccessToken } = useAuthContext();
-  const [isAdmin, setIsAdmin] = useState(false);
+import { useUser } from "../../../contexts/UserContext";
 
-  const memoizedGetAccessToken = useCallback(
-    () => getAccessToken(),
-    [getAccessToken]
-  );
+const ApprovedCamps = ({ camps }: { camps: any[] }) => {
+  const { isAdmin, isLoading } = useUser();
+  const approvedCamps = camps.filter((camp) => camp.status === "Approved");
 
-  const backendURL =
-    import.meta.env.VITE_IS_PRODUCTION === "true"
-      ? import.meta.env.VITE_BACKEND_URL
-      : "http://localhost:5000";
+  // Loading animation
+  if (isLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
 
-  // Fetch user info and check admin role
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (state?.isAuthenticated) {
-        try {
-          setIsLoading(true);
-          const accessToken = await getAccessToken();
-          const response = await axios.post(
-            `${backendURL}/api/user-info`,
-            { accessToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
-
-          if (
-            response.data.role &&
-            response.data.role.includes("Internal/Admin")
-          ) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserInfo();
-  }, [state?.isAuthenticated, getAccessToken]);
-
-  //Fetch approved appointments
-  useEffect(() => {
-    const fetchCamps = async () => {
-      try {
-        const token = await memoizedGetAccessToken();
-        const response = await axios.get(
-          `${backendURL}/api/camps/fetch-camps`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const approvedCamps = response.data.filter(
-          (camp: any) => camp.status === "Approved"
-        );
-        setCamps(approvedCamps);
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCamps();
-  }, []);
-
+  // Loading Animation
   if (!isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -113,30 +65,6 @@ const ApprovedCamps = () => {
             access this content.
           </p>
         </div>
-      </div>
-    );
-  }
-
-  //Loading animation
-  if (isLoading) {
-    return (
-      <div className="loading flex justify-center items-center h-screen">
-        <svg width="64px" height="48px">
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="back"
-            stroke="#e53e3e"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="front"
-            stroke="#f56565"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-        </svg>
       </div>
     );
   }
@@ -207,7 +135,7 @@ const ApprovedCamps = () => {
             </tr>
           </thead>
           <tbody>
-            {camps.map((camp: any) => (
+            {approvedCamps.map((camp: any) => (
               <tr
                 key={camp._id}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
