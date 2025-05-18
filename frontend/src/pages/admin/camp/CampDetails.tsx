@@ -12,13 +12,14 @@ import { Toast } from "flowbite-react";
 import { HiCheck } from "react-icons/hi";
 import { Button, Modal } from "flowbite-react";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { useUser } from "../../../contexts/UserContext";
 
 const CampDetails = () => {
   const { id } = useParams();
-  const { state, getAccessToken } = useAuthContext();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { getAccessToken } = useAuthContext();
+  const { isAdmin, isLoading } = useUser();
   const [camp, setCamp] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
   const [isApproving, setIsApproving] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,40 +33,6 @@ const CampDetails = () => {
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
-
-  // Fetch user info and check admin role
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (state?.isAuthenticated) {
-        try {
-          setIsLoading(true);
-          const accessToken = await getAccessToken();
-          const response = await axios.post(
-            `${backendURL}/api/user-info`,
-            { accessToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
-
-          if (
-            response.data.role &&
-            response.data.role.includes("Internal/Admin")
-          ) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserInfo();
-  }, [state?.isAuthenticated, getAccessToken]);
 
   //Fetch camp data
   useEffect(() => {
@@ -85,7 +52,7 @@ const CampDetails = () => {
         console.error("Error fetching camp:", error);
         setError("Failed to fetch camp details.");
       } finally {
-        setIsLoading(false);
+        setIsDataLoading(false);
       }
     };
 
@@ -161,6 +128,31 @@ const CampDetails = () => {
     }
   };
 
+  // Loading animation
+  if (isLoading || isDataLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
+
+  // Loading Animation
   if (!isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -190,31 +182,6 @@ const CampDetails = () => {
       </div>
     );
   }
-
-  //Loading animation
-  if (isLoading) {
-    return (
-      <div className="loading flex justify-center items-center h-screen">
-        <svg width="64px" height="48px">
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="back"
-            stroke="#e53e3e"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-          <polyline
-            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
-            id="front"
-            stroke="#f56565"
-            strokeWidth="2"
-            fill="none"
-          ></polyline>
-        </svg>
-      </div>
-    );
-  }
-
   return (
     <div className="flex justify-center items-center bg-gray-50">
       <main className="mt-2 mb-16 flex justify-center items-center w-full max-w-4xl px-4 py-6 md:w-2/3 lg:w-3/4">

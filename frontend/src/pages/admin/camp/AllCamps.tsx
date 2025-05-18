@@ -10,15 +10,17 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { Camp } from "../../../types/camp";
+import { useUser } from "../../../contexts/UserContext";
 
-const AllCamps = () => {
-  const [camps, setCamps] = useState<Camp[]>([]);
+interface AllCampsProps {
+  camps: Camp[];
+  onTeamAllocated: (campId: string, team: string) => void;
+}
+
+const AllCamps = ({ camps, onTeamAllocated }: AllCampsProps) => {
+  const { isAdmin, isLoading } = useUser();
   const [filteredCamps, setFilteredCamps] = useState<Camp[]>([]);
-  const { state, getAccessToken } = useAuthContext();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
-  const [isDataLoading, setIsDataLoading] = useState(true);
-  const isLoading = isAuthLoading || isDataLoading;
+  const { getAccessToken } = useAuthContext();
   const [selectedCamp, setSelectedCamp] = useState<string | null>(null);
   const [isAllocating, setIsAllocating] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<string>("");
@@ -42,67 +44,10 @@ const AllCamps = () => {
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  // Fetch user info and check admin role
+  // Initialize filtered camps when camps prop changes
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (state?.isAuthenticated) {
-        try {
-          setIsAuthLoading(true);
-          const accessToken = await getAccessToken();
-          const response = await axios.post(
-            `${backendURL}/api/user-info`,
-            { accessToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
-
-          if (
-            response.data.role &&
-            response.data.role.includes("Internal/Admin")
-          ) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-        } finally {
-          setIsAuthLoading(false);
-        }
-      } else {
-        setIsAuthLoading(false);
-      }
-    };
-
-    fetchUserInfo();
-  }, [state?.isAuthenticated, getAccessToken]);
-
-  // Fetch camps
-  useEffect(() => {
-    const fetchCamps = async () => {
-      try {
-        setIsDataLoading(true);
-        const token = await memoizedGetAccessToken();
-
-        const response = await axios.get(
-          `${backendURL}/api/camps/fetch-camps`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        setCamps(response.data);
-        setFilteredCamps(response.data);
-      } catch (error) {
-        console.error("Error fetching camps:", error);
-      } finally {
-        setIsDataLoading(false);
-      }
-    };
-
-    fetchCamps();
-  }, [memoizedGetAccessToken]);
+    setFilteredCamps(camps);
+  }, [camps]);
 
   // Fetch city suggestions
   const fetchCitySuggestions = async (query: string) => {
@@ -148,7 +93,7 @@ const AllCamps = () => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       results = results.filter(
-        (camp: any) =>
+        (camp) =>
           camp.organizationName.toLowerCase().includes(term) ||
           camp.fullName.toLowerCase().includes(term)
       );
@@ -156,15 +101,18 @@ const AllCamps = () => {
 
     // Apply city filter
     if (cityFilter) {
-      results = results.filter((donor: any) =>
-        donor.city.toLowerCase().includes(cityFilter.toLowerCase())
+      results = results.filter((camp) =>
+        camp.city.toLowerCase().includes(cityFilter.toLowerCase())
       );
     }
 
     // Apply date filter
     if (dateFilter && filterType !== "all") {
-      results = results.filter((camp: any) => {
+      results = results.filter((camp) => {
+        if (!camp.date) return false;
+
         const campDate = new Date(camp.date);
+        if (isNaN(campDate.getTime())) return false;
 
         switch (filterType) {
           case "day":
@@ -223,18 +171,16 @@ const AllCamps = () => {
         return;
       }
 
-      // Proceed with allocation if team is available
+      // Update on server
       await axios.put(
         `${backendURL}/api/camps/allocate-team`,
         { campId: selectedCamp, team: selectedTeam },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setCamps(
-        camps.map((c) =>
-          c._id?.toString() === selectedCamp ? { ...c, team: selectedTeam } : c
-        )
-      );
+      // Update parent component
+      onTeamAllocated(selectedCamp, selectedTeam);
+
       setSelectedCamp(null);
       setSelectedTeam("");
     } catch (error) {
@@ -277,7 +223,8 @@ const AllCamps = () => {
     );
   }
 
-  if (!isAdmin && !isLoading) {
+  // Loading Animation
+  if (!isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
