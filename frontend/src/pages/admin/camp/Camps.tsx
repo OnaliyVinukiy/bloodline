@@ -10,55 +10,54 @@ import PendingCamps from "./PendingCamps";
 import ApprovedCamps from "./ApprovedCamps";
 import RejectedCamps from "./RejectedCamps";
 import AllCamps from "./AllCamps";
+import { useUser } from "../../../contexts/UserContext";
 import { useAuthContext } from "@asgardeo/auth-react";
 import axios from "axios";
+import { Camp } from "../../../types/camp";
 
 const Camps = () => {
   const [activeTab, setActiveTab] = useState("tab1");
-  const { state, getAccessToken } = useAuthContext();
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { isAdmin, isLoading } = useUser();
+  const [allCamps, setAllCamps] = useState<Camp[]>([]);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const { getAccessToken } = useAuthContext();
+
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  // Fetch user info and check admin role
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (state?.isAuthenticated) {
-        try {
-          setIsAuthLoading(true);
-          const accessToken = await getAccessToken();
-          const response = await axios.post(
-            `${backendURL}/api/user-info`,
-            { accessToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
-
-          if (
-            response.data.role &&
-            response.data.role.includes("Internal/Admin")
-          ) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
+    const fetchAllCamps = async () => {
+      try {
+        const token = await getAccessToken();
+        const response = await axios.get(
+          `${backendURL}/api/camps/fetch-camps`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-        } finally {
-          setIsAuthLoading(false);
-        }
-      } else {
-        setIsAuthLoading(false);
+        );
+        setAllCamps(response.data);
+      } catch (error) {
+        console.error("Error fetching camps:", error);
+      } finally {
+        setIsDataLoading(false);
       }
     };
 
-    fetchUserInfo();
-  }, [state?.isAuthenticated, getAccessToken]);
+    fetchAllCamps();
+  }, []);
 
-  //Loading animation
-  if (isAuthLoading) {
+  const handleTeamAllocated = (campId: string, team: string) => {
+    setAllCamps((prevCamps) =>
+      prevCamps.map((camp) => (camp._id === campId ? { ...camp, team } : camp))
+    );
+  };
+
+  // Loading animation
+  if (isLoading || isDataLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
         <svg width="64px" height="48px">
@@ -81,6 +80,7 @@ const Camps = () => {
     );
   }
 
+  // Loading Animation
   if (!isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -167,10 +167,12 @@ const Camps = () => {
       </div>
 
       <div>
-        {activeTab === "tab1" && <AllCamps />}
-        {activeTab === "tab2" && <PendingCamps />}
-        {activeTab === "tab3" && <ApprovedCamps />}
-        {activeTab === "tab4" && <RejectedCamps />}
+        {activeTab === "tab1" && (
+          <AllCamps camps={allCamps} onTeamAllocated={handleTeamAllocated} />
+        )}
+        {activeTab === "tab2" && <PendingCamps camps={allCamps} />}
+        {activeTab === "tab3" && <ApprovedCamps camps={allCamps} />}
+        {activeTab === "tab4" && <RejectedCamps camps={allCamps} />}
       </div>
     </div>
   );
