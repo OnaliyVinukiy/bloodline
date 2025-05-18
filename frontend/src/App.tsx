@@ -37,6 +37,7 @@ import StockIssueHistory from "./pages/admin/stock/StockIssueHistory";
 import Donors from "./pages/admin/donor/Donors";
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { UserProvider } from "./contexts/UserContext";
 
 function App() {
   const { state } = useAuthContext();
@@ -74,64 +75,66 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Router>
-        <Navigationbar />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/eligibility" element={<EligibilityCriteria />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/about" element={<AboutUs />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/contact" element={<ContactUs />} />
-            <Route path="/donorDeclaration" element={<DonorDeclaration />} />
-            <Route path="/admin/appointments" element={<Appointments />} />
-            <Route path="/appointment/:id" element={<AppointmentDetails />} />
-            <Route path="/camp/:id" element={<CampDetails />} />
-            <Route
-              path="/camp-registration"
-              element={<BloodCampRegistration />}
-            />
-            <Route
-              path="/admin/pending-appointments"
-              element={<PendingAppointments />}
-            />
-            <Route path="/admin/calendar" element={<CalendarPage />} />
-            <Route
-              path="/organization-registration"
-              element={<OrganizationRegistration />}
-            />
-            <Route path="/appointments" element={<DonorAppointments />} />
-            <Route path="/donations" element={<DonorDonations />} />
-            <Route path="/map" element={<Map />} />
-            <Route path="/organized-camps" element={<OrganizedCamps />} />
-            <Route path="/admin/camps" element={<Camps />} />
-            <Route path="/admin/dashboard" element={<Dashboard />} />
-            <Route path="/admin/stock" element={<Stock />} />
-            <Route
-              path="/admin/stock/addition-history"
-              element={<StockAdditionHistory />}
-            />
-            <Route
-              path="/admin/stock/issuance-history"
-              element={<StockIssueHistory />}
-            />
-            <Route
-              path="/admin/donation/:appointmentId"
-              element={<BloodDonation />}
-            />
-            <Route
-              path="/admin/testing/:appointmentId"
-              element={<BloodTesting />}
-            />
-            <Route path="/admin/organizations" element={<Organizations />} />
-            <Route path="/admin/donors" element={<Donors />} />
-          </Routes>
-        </main>
-        <FooterComponent />
-      </Router>
-    </div>
+    <UserProvider>
+      <div className="flex flex-col min-h-screen">
+        <Router>
+          <Navigationbar />
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/eligibility" element={<EligibilityCriteria />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/contact" element={<ContactUs />} />
+              <Route path="/donorDeclaration" element={<DonorDeclaration />} />
+              <Route path="/admin/appointments" element={<Appointments />} />
+              <Route path="/appointment/:id" element={<AppointmentDetails />} />
+              <Route path="/camp/:id" element={<CampDetails />} />
+              <Route
+                path="/camp-registration"
+                element={<BloodCampRegistration />}
+              />
+              <Route
+                path="/admin/pending-appointments"
+                element={<PendingAppointments />}
+              />
+              <Route path="/admin/calendar" element={<CalendarPage />} />
+              <Route
+                path="/organization-registration"
+                element={<OrganizationRegistration />}
+              />
+              <Route path="/appointments" element={<DonorAppointments />} />
+              <Route path="/donations" element={<DonorDonations />} />
+              <Route path="/map" element={<Map />} />
+              <Route path="/organized-camps" element={<OrganizedCamps />} />
+              <Route path="/admin/camps" element={<Camps />} />
+              <Route path="/admin/dashboard" element={<Dashboard />} />
+              <Route path="/admin/stock" element={<Stock />} />
+              <Route
+                path="/admin/stock/addition-history"
+                element={<StockAdditionHistory />}
+              />
+              <Route
+                path="/admin/stock/issuance-history"
+                element={<StockIssueHistory />}
+              />
+              <Route
+                path="/admin/donation/:appointmentId"
+                element={<BloodDonation />}
+              />
+              <Route
+                path="/admin/testing/:appointmentId"
+                element={<BloodTesting />}
+              />
+              <Route path="/admin/organizations" element={<Organizations />} />
+              <Route path="/admin/donors" element={<Donors />} />
+            </Routes>
+          </main>
+          <FooterComponent />
+        </Router>
+      </div>
+    </UserProvider>
   );
 }
 
