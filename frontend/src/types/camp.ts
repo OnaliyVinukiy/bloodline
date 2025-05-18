@@ -5,10 +5,9 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { ObjectId } from "mongodb";
 
 export interface Camp {
-  _id?: ObjectId;
+  _id?: string;
   organizationName: string;
   fullName: string;
   nic: string;
