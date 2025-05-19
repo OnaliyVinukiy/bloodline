@@ -6,7 +6,7 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
 import { Label, Modal, Toast } from "flowbite-react";
 import axios from "axios";
@@ -15,7 +15,7 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import { HiExclamation } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import { validatePhoneNumber } from "../../../../utils/ValidationsUtils";
-import { Organization, User } from "../../../../types/users";
+import { Organization } from "../../../../types/users";
 import { useUser } from "../../../../contexts/UserContext";
 
 declare global {
