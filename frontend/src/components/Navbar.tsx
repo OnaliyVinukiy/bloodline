@@ -10,13 +10,14 @@ import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 import { UserIcon } from "@heroicons/react/24/solid";
-import { Donor, Organization, User } from "../types/users";
+import { Donor, Organization } from "../types/users";
 import axios from "axios";
+import { useUser } from "../contexts/UserContext";
 
 export function Navigationbar() {
-  const { state, signIn, signOut, getAccessToken } = useAuthContext();
-  const [user, setUser] = useState<User | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { state, signIn, signOut } = useAuthContext();
+  const { isAdmin, isLoading, user } = useUser();
+  const [isDataLoading, setIsDataLoading] = useState(false);
   const navigate = useNavigate();
   const [donor, setDonor] = useState<Donor>({
     nic: "",
@@ -51,43 +52,12 @@ export function Navigationbar() {
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  // Fetch and assign user info
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (state?.isAuthenticated) {
-        try {
-          const accessToken = await getAccessToken();
-          const response = await axios.post(
-            `${backendURL}/api/user-info`,
-            { accessToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
-
-          setUser(response.data);
-          if (
-            response.data.role &&
-            response.data.role.includes("Internal/Admin")
-          ) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-        }
-      } else {
-        setUser(null);
-      }
-    };
-
-    fetchUserInfo();
-  }, [state?.isAuthenticated, getAccessToken]);
-
   // Fetch donor info after user info is fetched
   useEffect(() => {
     const fetchDonorInfo = async () => {
       if (user) {
         try {
+          setIsDataLoading(true);
           // Fetch donor info using the user's email
           const { data: donorInfo } = await axios.get(
             `${backendURL}/api/donor/${user.email}`
@@ -103,13 +73,39 @@ export function Navigationbar() {
             setOrg(orgInfo);
           }
         } catch (error) {
-          console.error("Error fetching donor info:", error);
+          console.error("Error fetching donor:", error);
+        } finally {
+          setIsDataLoading(false);
         }
       }
     };
 
     fetchDonorInfo();
   }, [user]);
+
+  // Loading animation
+  if (isLoading || isDataLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
 
   return (
     <Navbar fluid rounded className="shadow-lg md:py-4 py-2">
