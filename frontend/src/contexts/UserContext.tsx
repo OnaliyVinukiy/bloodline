@@ -8,24 +8,28 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { User } from "../types/users";
 
 type UserContextType = {
+  user: User | null;
   isAdmin: boolean;
   isLoading: boolean;
-  role: string | null;
+  error: Error | null;
 };
 
 const UserContext = createContext<UserContextType>({
+  user: null,
   isAdmin: false,
   isLoading: true,
-  role: null,
+  error: null,
 });
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<UserContextType>({
+  const [contextValue, setContextValue] = useState<UserContextType>({
+    user: null,
     isAdmin: false,
     isLoading: true,
-    role: null,
+    error: null,
   });
   const { state, getAccessToken } = useAuthContext();
 
@@ -45,23 +49,30 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             { headers: { "Content-Type": "application/json" } }
           );
 
-          const isAdmin =
-            response.data.role?.includes("Internal/Admin") ?? false;
+          const userData = response.data;
+          const isAdmin = userData.role?.includes("Internal/Admin") ?? false;
 
-          setUser({
+          setContextValue({
+            user: userData,
             isAdmin,
             isLoading: false,
-            role: response.data.role || null,
+            error: null,
           });
         } catch (error) {
           console.error("Error fetching user info:", error);
-          setUser((prev) => ({ ...prev, isLoading: false }));
+          setContextValue({
+            user: null,
+            isAdmin: false,
+            isLoading: false,
+            error: error as Error,
+          });
         }
       } else {
-        setUser({
+        setContextValue({
+          user: null,
           isAdmin: false,
           isLoading: false,
-          role: null,
+          error: null,
         });
       }
     };
@@ -69,7 +80,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     fetchUserInfo();
   }, [state?.isAuthenticated, getAccessToken]);
 
-  return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
+  );
 };
 
 export const useUser = () => useContext(UserContext);
