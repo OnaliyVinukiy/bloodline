@@ -13,7 +13,6 @@ import EligibilityCriteria from "./pages/eligibility/Eligibility";
 import Profile from "./pages/profile/Profile";
 import DonorDeclaration from "./pages/appointment/DonorDeclarations";
 import Appointments from "./pages/admin/appointment/Appointments";
-import PendingAppointments from "./pages/admin/appointment/PendingAppointments";
 import Camps from "./pages/admin/camp/Camps";
 import CalendarPage from "./pages/admin/appointment/CalendarPage";
 import AppointmentDetails from "./pages/admin/appointment/AppointmentDetails";
@@ -95,10 +94,7 @@ function App() {
                 path="/camp-registration"
                 element={<BloodCampRegistration />}
               />
-              <Route
-                path="/admin/pending-appointments"
-                element={<PendingAppointments />}
-              />
+
               <Route path="/admin/calendar" element={<CalendarPage />} />
               <Route
                 path="/organization-registration"
