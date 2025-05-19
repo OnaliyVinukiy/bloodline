@@ -25,11 +25,20 @@ export interface Appointment {
     bloodGroup: string;
     avatar: string;
     gender: string;
+    city: string;
   };
   firstForm: {};
-  secondForm: {};
-  thirdForm: {};
-  fourthForm: {};
+  secondForm: {
+    isPregnant: string;
+    isTakingTreatment?: string;
+    isSurgeryDone?: string;
+    isEngageHeavyWork?: string;
+  };
+  thirdForm: { hadHepatitis?: string; hadTyphoid?: string };
+  fourthForm: {
+    isMedicallyAdvised: string;
+    hadVaccination?: string;
+  };
   fifthForm: {};
   sixthForm: {};
   seventhForm: {};
@@ -57,4 +66,20 @@ export interface Appointment {
     volume: string;
     collectedAt: string;
   };
+}
+
+export interface Appointments {
+  _id: string;
+  donorInfo: {
+    fullName: string;
+    nic: string;
+    contactNumber: string;
+    avatar: string;
+    city: string;
+  };
+  selectedDate: string;
+  selectedSlot: string;
+  status: string;
+  fourthform?: { isMedicallyAdvised: string };
+  secondForm?: { isPregnant: string };
 }

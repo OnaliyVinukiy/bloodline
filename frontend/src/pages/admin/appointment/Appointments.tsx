@@ -14,53 +14,85 @@ import AssessedAppointments from "./AssessedAppointments";
 import ConfirmedAppointments from "./ConfirmedAppointments";
 import IssuedAppointments from "./IssuedAppointments";
 import BloodCollectedAppointments from "./BloodCollectedAppointments";
+import { useUser } from "../../../contexts/UserContext";
 import { useAuthContext } from "@asgardeo/auth-react";
 import axios from "axios";
 
 const Appointments = () => {
   const [activeTab, setActiveTab] = useState("tab1");
-  const { state, getAccessToken } = useAuthContext();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const { isAdmin, isLoading } = useUser();
+  const { getAccessToken } = useAuthContext();
+  const [appointments, setAppointments] = useState([]);
+
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  // Fetch user info and check admin role
+  // Fetch all appointments once
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (state?.isAuthenticated) {
-        try {
-          const accessToken = await getAccessToken();
-          const response = await axios.post(
-            `${backendURL}/api/user-info`,
-            { accessToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
+    const fetchAppointments = async () => {
+      try {
+        setIsDataLoading(true);
+        const token = await getAccessToken();
 
-          if (
-            response.data.role &&
-            response.data.role.includes("Internal/Admin")
-          ) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
+        const response = await axios.get(
+          `${backendURL}/api/appointments/fetch-appointment`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-        } finally {
-          setIsAuthLoading(false);
-        }
-      } else {
-        setIsAuthLoading(false);
+        );
+
+        setAppointments(response.data);
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      } finally {
+        setIsDataLoading(false);
       }
     };
 
-    fetchUserInfo();
-  }, [state?.isAuthenticated, getAccessToken]);
+    if (isAdmin) {
+      fetchAppointments();
+    }
+  }, [isAdmin, getAccessToken]);
 
-  if (!isAdmin && !isAuthLoading) {
+  // Filter appointments by status
+  const getFilteredAppointments = (status?: string) => {
+    if (!status) return appointments;
+    return appointments.filter(
+      (appointment: any) => appointment.status === status
+    );
+  };
+
+  // Loading animation
+  if (isLoading || isDataLoading) {
+    return (
+      <div className="loading flex justify-center items-center h-screen">
+        <svg width="64px" height="48px">
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="back"
+            stroke="#e53e3e"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+          <polyline
+            points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+            id="front"
+            stroke="#f56565"
+            strokeWidth="2"
+            fill="none"
+          ></polyline>
+        </svg>
+      </div>
+    );
+  }
+
+  // Access Denied
+  if (!isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
@@ -89,6 +121,7 @@ const Appointments = () => {
       </div>
     );
   }
+
   return (
     <div className="mt-12">
       <div className="flex justify-center border-b border-gray-200 dark:border-gray-700">
@@ -165,7 +198,6 @@ const Appointments = () => {
               Issued
             </button>
           </li>
-
           <li className="me-2">
             <button
               onClick={() => setActiveTab("tab8")}
@@ -194,14 +226,44 @@ const Appointments = () => {
       </div>
 
       <div>
-        {activeTab === "tab1" && <AllAppointments />}
-        {activeTab === "tab2" && <PendingAppointments />}
-        {activeTab === "tab3" && <ApprovedAppointments />}
-        {activeTab === "tab4" && <ConfirmedAppointments />}
-        {activeTab === "tab5" && <AssessedAppointments />}
-        {activeTab === "tab6" && <IssuedAppointments />}
-        {activeTab === "tab7" && <RejectedAppointments />}
-        {activeTab === "tab8" && <BloodCollectedAppointments />}
+        {activeTab === "tab1" && (
+          <AllAppointments appointments={appointments} />
+        )}
+        {activeTab === "tab2" && (
+          <PendingAppointments
+            appointments={getFilteredAppointments("Pending")}
+          />
+        )}
+        {activeTab === "tab3" && (
+          <ApprovedAppointments
+            appointments={getFilteredAppointments("Approved")}
+          />
+        )}
+        {activeTab === "tab4" && (
+          <ConfirmedAppointments
+            appointments={getFilteredAppointments("Confirmed")}
+          />
+        )}
+        {activeTab === "tab5" && (
+          <AssessedAppointments
+            appointments={getFilteredAppointments("Assessed")}
+          />
+        )}
+        {activeTab === "tab6" && (
+          <IssuedAppointments
+            appointments={getFilteredAppointments("Issued")}
+          />
+        )}
+        {activeTab === "tab7" && (
+          <RejectedAppointments
+            appointments={getFilteredAppointments("Rejected")}
+          />
+        )}
+        {activeTab === "tab8" && (
+          <BloodCollectedAppointments
+            appointments={getFilteredAppointments("Collected")}
+          />
+        )}
       </div>
     </div>
   );
