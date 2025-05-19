@@ -79,8 +79,13 @@ const AppointmentDetails = () => {
       setAppointment((prev: any) => ({ ...prev, status: "Approved" }));
       setIsApprovedToastOpen(true);
 
+      const redirectUrl =
+        import.meta.env.VITE_IS_PRODUCTION === "true"
+          ? "https://bloodlinesrilanka.com/admin/appointments"
+          : "http://localhost:5173/admin/appointments";
+
       setTimeout(() => {
-        window.location.href = "http://localhost:5173/admin/appointments";
+        window.location.href = redirectUrl;
       }, 1500);
     } catch (error) {
       console.error("Error approving appointment:", error);
