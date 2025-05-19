@@ -116,9 +116,6 @@ const DonorAppointments = () => {
       );
 
       setIsCancelModalOpen(true);
-      setTimeout(() => {
-        window.location.href = "http://localhost:5173/appointments";
-      }, 1500);
     } catch (error) {
       console.error("Error canceling appointment:", error);
     } finally {
