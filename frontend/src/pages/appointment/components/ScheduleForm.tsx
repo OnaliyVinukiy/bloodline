@@ -83,20 +83,37 @@ const ScheduleForm: React.FC<StepperProps> = ({
     fetchDonorAppointments();
   }, [memoizedGetAccessToken, getBasicUserInfo, backendURL]);
 
-  // Check if the selected date is within 4 months of the last appointment
+  // Check if the selected date is within 4 months of the last valid appointment
   const checkAppointmentDate = (date: Date) => {
     if (donorAppointments.length > 0) {
-      const lastAppointmentDate = new Date(donorAppointments[0].selectedDate);
-      const fourMonthsLater = new Date(
-        lastAppointmentDate.setMonth(lastAppointmentDate.getMonth() + 4)
+      const validAppointments = donorAppointments.filter(
+        (appt) => appt.status !== "Cancelled" && appt.status !== "Rejected"
       );
 
-      if (date < fourMonthsLater) {
-        showValidationMessage(
-          "Appointment Restriction",
-          "You have already placed an appointment. You cannot place another appointment less than 4 months from your last appointment. Please cancel your existing appointment or select a date after 4 months."
+      if (validAppointments.length > 0) {
+        // Sort by date descending to get the most recent appointment
+        validAppointments.sort(
+          (a, b) =>
+            new Date(b.selectedDate).getTime() -
+            new Date(a.selectedDate).getTime()
         );
-        return false;
+
+        const lastValidAppointmentDate = new Date(
+          validAppointments[0].selectedDate
+        );
+        const fourMonthsLater = new Date(lastValidAppointmentDate);
+        fourMonthsLater.setMonth(fourMonthsLater.getMonth() + 4);
+
+        if (date < fourMonthsLater) {
+          showValidationMessage(
+            "Appointment Restriction",
+            "You have already placed an appointment. You cannot place another appointment less than 4 months from your last valid appointment. " +
+              "Please cancel your existing appointment or select a date after " +
+              fourMonthsLater.toLocaleDateString() +
+              "."
+          );
+          return false;
+        }
       }
     }
     return true;
