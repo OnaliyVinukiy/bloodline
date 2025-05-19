@@ -5,7 +5,7 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { Button, Datepicker, Label, Modal } from "flowbite-react";
+import { Button, Label, Modal } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/stepper";
 import axios from "axios";
@@ -21,7 +21,7 @@ const StepEight: React.FC<StepperProps> = ({
   const [formSevenData, setFormSevenData] = useState({
     donatingMonth: null,
     donorName: "",
-    dateSigned: "",
+    dateSigned: new Date().toISOString().split("T")[0],
   });
 
   // Populate the form state from the parent formData
@@ -75,7 +75,6 @@ const StepEight: React.FC<StepperProps> = ({
       if (!formSevenData.donatingMonth)
         newErrors.month = "Please select an option.";
       if (!formSevenData.donorName) newErrors.name = "Please enter your name.";
-      if (!formSevenData.dateSigned) newErrors.date = "Please enter the date.";
 
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
@@ -247,25 +246,9 @@ const StepEight: React.FC<StepperProps> = ({
                 >
                   Date
                 </Label>
-                <Datepicker
-                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-                  value={
-                    formSevenData?.dateSigned
-                      ? new Date(formSevenData.dateSigned)
-                      : undefined
-                  }
-                  onChange={(date) => {
-                    if (date) {
-                      handleInputChange(
-                        "dateSigned",
-                        date.toISOString().split("T")[0]
-                      );
-                    }
-                  }}
-                />
-                {errors.date && (
-                  <div className="text-red-500 text-sm">{errors.date}</div>
-                )}
+                <div className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg block w-full p-2.5">
+                  {new Date().toLocaleDateString()}
+                </div>
               </div>
             </div>
 
