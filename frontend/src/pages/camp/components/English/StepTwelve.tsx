@@ -6,7 +6,7 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
 import { Label, Modal, Toast } from "flowbite-react";
 import axios from "axios";
@@ -14,10 +14,9 @@ import { Camp } from "../../../../types/camp";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { HiExclamation } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
-import {
-  validatePhoneNumber,
-} from "../../../../utils/ValidationsUtils";
-import { Organization, User } from "../../../../types/users";
+import { validatePhoneNumber } from "../../../../utils/ValidationsUtils";
+import { Organization } from "../../../../types/users";
+import { useUser } from "../../../../contexts/UserContext";
 
 declare global {
   interface Window {
@@ -36,6 +35,7 @@ const StepTwelve: React.FC<
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
   };
+  const { user } = useUser();
   const mapRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
@@ -60,19 +60,13 @@ const StepTwelve: React.FC<
 
   const [errors, setErrors] = useState<{ [key in keyof Camp]?: string }>({});
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
   const [organizationOptions, setOrganizationOptions] = useState<string[]>([]);
-  const [allOrganizations, setAllOrganizations] = useState<string[]>([]); 
+  const [allOrganizations, setAllOrganizations] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { getAccessToken } = useAuthContext();
-
-  const memoizedGetAccessToken = useCallback(
-    () => getAccessToken(),
-    [getAccessToken]
-  );
 
   // Fetch all organizations on page load
   useEffect(() => {
@@ -84,18 +78,10 @@ const StepTwelve: React.FC<
         const orgNames = response.data.map((org) => org.organizationName);
         setAllOrganizations(orgNames);
 
-        const accessToken = await memoizedGetAccessToken();
-        const { data: userInfo } = await axios.post(
-          `${backendURL}/api/user-info`,
-          { accessToken },
-          { headers: { "Content-Type": "application/json" } }
-        );
-        setUser(userInfo);
-
         // Set email when user info is fetched
         setFormData((prev) => ({
           ...prev,
-          email: userInfo.email || "",
+          email: user?.email || "",
         }));
       } catch (error) {
         console.error("Error fetching organizations:", error);
@@ -236,6 +222,32 @@ const StepTwelve: React.FC<
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+  const fetchOrganizationData = async (orgName: string) => {
+    try {
+      const response = await axios.get(
+        `${backendURL}/api/organizations/name/${encodeURIComponent(orgName)}`
+      );
+      const orgData = response.data;
+      // Update formData with representative's details
+      setFormData((prev) => ({
+        ...prev,
+        organizationName: orgData.organizationName || prev.organizationName,
+        fullName: orgData.repFullName || prev.fullName,
+        nic: orgData.repNIC || prev.nic,
+        email: orgData.repEmail || prev.email,
+        contactNumber: orgData.repContactNumber || prev.contactNumber,
+      }));
+      // Validate phone number if it exists
+      if (orgData.repContactNumber) {
+        setIsPhoneNumberValid(validatePhoneNumber(orgData.repContactNumber));
+      }
+    } catch (error) {
+      console.error("Error fetching organization data:", error);
+      setToastMessage(
+        "Failed to fetch organization details. Please try again."
+      );
+    }
   };
 
   //Load google map
@@ -388,6 +400,16 @@ const StepTwelve: React.FC<
     }
   };
 
+  const handleOrganizationSelect = (orgName: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      organizationName: orgName,
+    }));
+    setOrganizationOptions([]);
+    // Fetch organization data when an organization is selected
+    fetchOrganizationData(orgName);
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
     navigate("/");
@@ -457,19 +479,13 @@ const StepTwelve: React.FC<
                     }
                   />
                   {organizationOptions.length > 0 && (
-                    <ul className="absolute z-10 w-3/4 bg-white border border-indigo-300 rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto">
+                    <ul className="absolute z-10 w-full bg-white border border-indigo-300 rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto">
                       {organizationOptions.map((orgName, index) => (
                         <li
                           key={index}
                           className="p-2 hover:bg-indigo-50 cursor-pointer text-sm text-indigo-900"
                           onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              organizationName: orgName,
-                            }));
-                            setOrganizationOptions([]);
-                          }}
+                          onClick={() => handleOrganizationSelect(orgName)}
                         >
                           {orgName}
                         </li>

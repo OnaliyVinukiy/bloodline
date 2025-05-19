@@ -9,7 +9,7 @@ import express from "express";
 import { Request, Response } from "express";
 import { BlobServiceClient } from "@azure/storage-blob";
 import dotenv from "dotenv";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import {
   DATABASE_ID,
   ORGANIZATION_COLLECTION_ID,
@@ -240,5 +240,70 @@ export const getOrganizationsCount = async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ message: "Error fetching organization count", error });
+  }
+};
+
+// Fetch organizations by Id
+export const getOrganizationById = async (req: Request, res: Response) => {
+  try {
+    const { collection, client } = await connectToCosmos();
+    const { id } = req.params;
+
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+
+    let organization;
+    if (isObjectId) {
+      organization = await collection.findOne({ _id: new ObjectId(id) });
+    } else {
+      organization = await collection.findOne({ organizationName: id });
+    }
+
+    if (!organization) {
+      return res.status(404).json({ message: "Organization not found" });
+    }
+
+    const responseData = {
+      organizationName: organization.organizationName,
+      fullName: organization.repFullName || "",
+      nic: organization.repNIC || "",
+      email: organization.repEmail || "",
+      contactNumber: organization.repContactNumber || "",
+    };
+
+    res.status(200).json(responseData);
+    client.close();
+  } catch (error) {
+    console.error("Error fetching organization:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Fetch organizations by name
+export const getOrganizationByName = async (req: Request, res: Response) => {
+  try {
+    const { collection, client } = await connectToCosmos();
+    const { name } = req.params;
+
+    const organization = await collection.findOne({
+      organizationName: { $regex: new RegExp(`^${name}$`, "i") },
+    });
+
+    if (!organization) {
+      return res.status(404).json({ message: "Organization not found" });
+    }
+
+    const responseData = {
+      organizationName: organization.organizationName,
+      repFullName: organization.repFullName || "",
+      repNIC: organization.repNIC || "",
+      repEmail: organization.repEmail || "",
+      repContactNumber: organization.repContactNumber || "",
+    };
+
+    res.status(200).json(responseData);
+    client.close();
+  } catch (error) {
+    console.error("Error fetching organization:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

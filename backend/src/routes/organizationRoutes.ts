@@ -14,6 +14,8 @@ import {
   getAllOrganizations,
   getOrganizationsCount,
   getOrganizationsDaily,
+  getOrganizationById,
+  getOrganizationByName,
 } from "../controllers/organizationController";
 import multer from "multer";
 
@@ -26,6 +28,10 @@ router.get("/organization/:repEmail", getOrganizationByEmail);
 
 //Router to fetch all organizations
 router.get("/all-organizations", getAllOrganizations);
+
+router.get("/name/:name", getOrganizationByName);
+
+router.get("/id/:id", getOrganizationById);
 
 //Router to update organization data
 router.post("/update-organization", upsertOrganization);
