@@ -12,15 +12,14 @@ import { Toast } from "flowbite-react";
 import { HiCheck } from "react-icons/hi";
 import { Button, Modal } from "flowbite-react";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { useUser } from "../../../contexts/UserContext";
 
 const AppointmentDetails = () => {
   const { id } = useParams();
-  const { state, getAccessToken } = useAuthContext();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [appointment, setAppointment] = useState<any>(null);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const { getAccessToken } = useAuthContext();
   const [isDataLoading, setIsDataLoading] = useState(true);
-  const isLoading = isAuthLoading || isDataLoading;
+  const { isAdmin, isLoading } = useUser();
+  const [appointment, setAppointment] = useState<any>(null);
   const [isApproving, setIsApproving] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,39 +33,6 @@ const AppointmentDetails = () => {
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
-
-  // Fetch user info and check admin role
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (state?.isAuthenticated) {
-        try {
-          const accessToken = await getAccessToken();
-          const response = await axios.post(
-            `${backendURL}/api/user-info`,
-            { accessToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
-
-          if (
-            response.data.role &&
-            response.data.role.includes("Internal/Admin")
-          ) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-        } finally {
-          setIsAuthLoading(false);
-        }
-      } else {
-        setIsAuthLoading(false);
-      }
-    };
-
-    fetchUserInfo();
-  }, [state?.isAuthenticated, getAccessToken]);
 
   //Fetch appointment data
   useEffect(() => {
@@ -158,7 +124,7 @@ const AppointmentDetails = () => {
   };
 
   // Loading animation
-  if (isLoading) {
+  if (isLoading || isDataLoading) {
     return (
       <div className="loading flex justify-center items-center h-screen">
         <svg width="64px" height="48px">
@@ -182,7 +148,7 @@ const AppointmentDetails = () => {
   }
 
   // Loading Animation
-  if (!isAdmin && !isLoading) {
+  if (!isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
