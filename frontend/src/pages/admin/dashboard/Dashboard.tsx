@@ -26,6 +26,9 @@ import {
   Stats,
 } from "../../../types/dashboard";
 import { useUser } from "../../../contexts/UserContext";
+import { Badge, Alert } from "flowbite-react";
+import { HiExclamation } from "react-icons/hi";
+import { BloodStock } from "../../../types/stock";
 
 ChartJS.register(
   CategoryScale,
@@ -46,6 +49,7 @@ const Dashboard = () => {
     organizations: 0,
   });
 
+  const [bloodStocks, setBloodStocks] = useState<BloodStock[]>([]);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const { isAdmin, isLoading } = useUser();
   const [appointmentsByMonth, setAppointmentsByMonth] = useState<MonthlyData[]>(
@@ -54,6 +58,7 @@ const Dashboard = () => {
   const [campsByMonth, setCampsByMonth] = useState<MonthlyData[]>([]);
   const [donorsByDay, setDonorsByDay] = useState<DailyData[]>([]);
   const [organizationsByDay, setOrganizationsByDay] = useState<DailyData[]>([]);
+  const [lowStockAlert, setLowStockAlert] = useState(false);
 
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
@@ -67,7 +72,7 @@ const Dashboard = () => {
       try {
         const token = await getAccessToken();
 
-        // Fetch all stats and monthly data in parallel
+        // Fetch all stats and monthly data
         const [
           donorsRes,
           campsRes,
@@ -77,6 +82,7 @@ const Dashboard = () => {
           campsMonthlyRes,
           donorsDailyRes,
           organizationsDailyRes,
+          bloodStocksRes,
         ] = await Promise.all([
           fetch(`${backendURL}/api/donors/count`).then((res) => res.json()),
           fetch(`${backendURL}/api/camps/count`).then((res) => res.json()),
@@ -94,6 +100,9 @@ const Dashboard = () => {
           fetch(`${backendURL}/api/organizations/daily`).then((res) =>
             res.json()
           ),
+          fetch(`${backendURL}/api/stocks/fetch-stocks`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }).then((res) => res.json()),
         ]);
 
         setStats({
@@ -107,6 +116,13 @@ const Dashboard = () => {
         setCampsByMonth(campsMonthlyRes);
         setDonorsByDay(donorsDailyRes);
         setOrganizationsByDay(organizationsDailyRes);
+        setBloodStocks(bloodStocksRes);
+
+        // Check for low stock
+        const hasLowStock = bloodStocksRes.some(
+          (stock: BloodStock) => stock.quantity < 500
+        );
+        setLowStockAlert(hasLowStock);
 
         setIsDataLoading(false);
       } catch (error) {
@@ -118,7 +134,7 @@ const Dashboard = () => {
     fetchStats();
   }, []);
 
-  // Prepare chart data
+  // Appointment chart data
   const appointmentsChartData = {
     labels: appointmentsByMonth.map((item) => item.month),
     datasets: [
@@ -133,6 +149,7 @@ const Dashboard = () => {
     ],
   };
 
+  // Camp chart data
   const campsChartData = {
     labels: campsByMonth.map((item) => item.month),
     datasets: [
@@ -147,6 +164,7 @@ const Dashboard = () => {
     ],
   };
 
+  // Donor chart data
   const donorsChartData = {
     labels: donorsByDay.map((item) => item.date),
     datasets: [
@@ -165,6 +183,7 @@ const Dashboard = () => {
     ],
   };
 
+  // Organization chart data
   const organizationsChartData = {
     labels: organizationsByDay.map((item) => item.date),
     datasets: [
@@ -179,6 +198,29 @@ const Dashboard = () => {
         pointBackgroundColor: "rgba(245, 158, 11, 1)",
         pointRadius: 4,
         pointHoverRadius: 6,
+      },
+    ],
+  };
+
+  // Blood stock chart data
+  const bloodStockChartData = {
+    labels: bloodStocks.map((stock) => stock.bloodType),
+    datasets: [
+      {
+        label: "Blood Stock (ml)",
+        data: bloodStocks.map((stock) => stock.quantity),
+        backgroundColor: bloodStocks.map((stock) =>
+          stock.quantity < 500
+            ? "rgba(239, 68, 68, 0.7)"
+            : "rgba(16, 185, 129, 0.7)"
+        ),
+        borderColor: bloodStocks.map((stock) =>
+          stock.quantity < 500
+            ? "rgba(239, 68, 68, 1)"
+            : "rgba(16, 185, 129, 1)"
+        ),
+        borderWidth: 1,
+        borderRadius: 4,
       },
     ],
   };
@@ -233,7 +275,6 @@ const Dashboard = () => {
     );
   }
 
-  // Loading Animation
   if (!isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -265,7 +306,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-8 px-16">
       {/* Stats Cards */}
       <div className="mt-10 md:mx-40 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
@@ -294,14 +335,65 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* Charts Section */}
-      <div className="sm:mx-40 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Low Stock Alert */}
+      {lowStockAlert && (
+        <div className="md:mx-40 mb-6">
+          <Alert color="failure" icon={HiExclamation}>
+            <span className="font-medium">Warning!</span> Some blood types are
+            running low on stock. Please check the blood inventory and arrange
+            for donations.
+          </Alert>
+        </div>
+      )}
+
+      {/* Blood Stock Chart*/}
+      <div className="sm:mx-40 mb-8">
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Current Blood Inventory
+            </h2>
+            <Badge color={lowStockAlert ? "failure" : "success"}>
+              {lowStockAlert ? "Low Stock Alert" : "Stock Levels OK"}
+            </Badge>
+          </div>
+          <div className="h-96">
+            <Bar
+              data={bloodStockChartData}
+              options={{
+                ...chartOptions,
+                maintainAspectRatio: false,
+                plugins: {
+                  ...chartOptions.plugins,
+                  tooltip: {
+                    callbacks: {
+                      label: (context) => {
+                        const label = context.dataset.label || "";
+                        const value = context.raw as number;
+                        const status = value < 500 ? "LOW STOCK" : "Sufficient";
+                        return `${label}: ${value}ml (${status})`;
+                      },
+                    },
+                  },
+                },
+              }}
+            />
+          </div>
+          <div className="mt-4 text-sm text-gray-600">
+            <p className="flex items-center">
+              <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+              <span>Red bars indicate low stock (&lt; 500ml)</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      {/* Monthly Charts */}
+      <div className="sm:mx-40 grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Appointments Chart */}
         <div className="bg-white p-6 rounded-xl shadow-lg">
           <h2 className="text-xl font-semibold text-gray-800 mb-10">
             Monthly Appointments
           </h2>
-
           <Bar
             data={appointmentsChartData}
             options={{
@@ -318,7 +410,6 @@ const Dashboard = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-8">
             Monthly Blood Camps
           </h2>
-
           <Bar
             data={campsChartData}
             options={{
@@ -331,13 +422,13 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="mb-20 sm:mx-40 mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Trend Charts */}
+      <div className="mb-20 sm:mx-40 grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Donors Trend Chart */}
         <div className="bg-white p-6 rounded-xl shadow-lg">
           <h2 className="text-xl font-semibold text-gray-800 mb-8">
             Donor Registration Trend
           </h2>
-
           <Line
             data={donorsChartData}
             options={{
@@ -352,7 +443,6 @@ const Dashboard = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-8">
             Organization Registration Trend
           </h2>
-
           <Line
             data={organizationsChartData}
             options={{
@@ -371,12 +461,13 @@ const Dashboard = () => {
 const StatCard = ({ title, value, icon, color }: StatCardProps) => {
   return (
     <div className="group relative z-0 overflow-hidden rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl">
-      <div className="absolute inset-0 bg-gradient-to-br opacity-10 group-hover:opacity-20 transition-opacity duration-300 ${color}"></div>
+      <div
+        className={`absolute inset-0 bg-gradient-to-br opacity-10 group-hover:opacity-20 transition-opacity duration-300 ${color}`}
+      ></div>
 
       <div className="relative z-10 flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-500 mb-1">{title}</p>
-
           <p className="text-3xl font-bold text-gray-800">
             {value >= 0 ? value.toLocaleString() : "Error"}
           </p>
