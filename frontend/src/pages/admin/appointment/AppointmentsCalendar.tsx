@@ -25,6 +25,7 @@ const AppointmentCalendar = () => {
     [getAccessToken]
   );
 
+  // Backend URL
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
@@ -118,7 +119,7 @@ const AppointmentCalendar = () => {
     );
   }
 
-  // Loading Animation
+  // Access denied for non-admins
   if (!isAdmin && !isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">

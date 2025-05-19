@@ -19,6 +19,7 @@ const BloodDonation = () => {
   const [isDataLoading, setIsDataLoading] = useState(true);
   const isLoading = isAuthLoading || isDataLoading;
 
+  // Backend URL
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL

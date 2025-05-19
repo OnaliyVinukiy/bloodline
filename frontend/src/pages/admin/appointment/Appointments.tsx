@@ -25,6 +25,7 @@ const Appointments = () => {
   const { getAccessToken } = useAuthContext();
   const [appointments, setAppointments] = useState([]);
 
+  // Backend URL
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
@@ -91,7 +92,7 @@ const Appointments = () => {
     );
   }
 
-  // Access Denied
+  // Access denied for non-admins
   if (!isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen">
