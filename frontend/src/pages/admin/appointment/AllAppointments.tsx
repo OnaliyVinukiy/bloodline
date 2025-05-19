@@ -5,70 +5,36 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { useAuthContext } from "@asgardeo/auth-react";
+import { useUser } from "../../../contexts/UserContext";
+import { Appointment } from "../../../types/appointment";
 
-const AllAppointments = () => {
-  const { state, getAccessToken } = useAuthContext();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [appointments, setAppointments] = useState([]);
-  const [filteredAppointments, setFilteredAppointments] = useState([]);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
-  const [isDataLoading, setIsDataLoading] = useState(true);
-  const isLoading = isAuthLoading || isDataLoading;
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+const AllAppointments = ({ appointments }: { appointments: Appointment[] }) => {
+  const { isAdmin, isLoading } = useUser();
+  const [filteredAppointments, setFilteredAppointments] = useState<
+    Appointment[]
+  >([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [filterType, setFilterType] = useState("all");
+  const [cityFilter, setCityFilter] = useState("");
+  const [citySuggestions, setCitySuggestions] = useState<string[]>([]);
+  const [showCitySuggestions, setShowCitySuggestions] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const cityInputRef = useRef<HTMLInputElement>(null);
 
-  const memoizedGetAccessToken = useCallback(
-    () => getAccessToken(),
-    [getAccessToken]
-  );
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  // Fetch user info and check admin role
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (state?.isAuthenticated) {
-        try {
-          const accessToken = await getAccessToken();
-          const response = await axios.post(
-            `${backendURL}/api/user-info`,
-            { accessToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
-
-          if (
-            response.data.role &&
-            response.data.role.includes("Internal/Admin")
-          ) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-        } finally {
-          setIsAuthLoading(false);
-        }
-      } else {
-        setIsAuthLoading(false);
-      }
-    };
-
-    fetchUserInfo();
-  }, [state?.isAuthenticated, getAccessToken]);
-
-  const isMedicalConditionPresent = (appointment: any) => {
+  // Check for medical conditions
+  const isMedicalConditionPresent = (appointment: Appointment) => {
     return (
-      appointment.fourthform?.isMedicallyAdvised === "Yes" ||
+      appointment.fourthForm?.isMedicallyAdvised === "Yes" ||
       appointment.secondForm?.isPregnant === "Yes" ||
       appointment.secondForm?.isTakingTreatment === "Yes" ||
       appointment.secondForm?.isSurgeryDone === "Yes" ||
@@ -79,34 +45,48 @@ const AllAppointments = () => {
     );
   };
 
-  //Fetch appointments
+  // Initialize filtered appointments
   useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        setIsDataLoading(true);
-        const token = await memoizedGetAccessToken();
+    setFilteredAppointments(appointments);
+  }, [appointments]);
 
-        const response = await axios.get(
-          `${backendURL}/api/appointments/fetch-appointment`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+  // Fetch city suggestions
+  const fetchCitySuggestions = async (query: string) => {
+    try {
+      const response = await axios.get(
+        `${backendURL}/api/city/search?q=${query}`
+      );
+      setCitySuggestions(response.data.map((city: any) => city.city_name_en));
+    } catch (error) {
+      console.error("Error fetching city suggestions:", error);
+      setCitySuggestions([]);
+    }
+  };
 
-        setAppointments(response.data);
-        setFilteredAppointments(response.data);
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
-      } finally {
-        setIsDataLoading(false);
-      }
-    };
+  // Handle city input change
+  const handleCityInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCityFilter(value);
 
-    fetchAppointments();
-  }, [memoizedGetAccessToken]);
+    if (value.length > 2) {
+      fetchCitySuggestions(value);
+      setShowCitySuggestions(true);
+    } else {
+      setCitySuggestions([]);
+      setShowCitySuggestions(false);
+    }
+  };
 
+  // Select a city from suggestions
+  const selectCity = (city: string) => {
+    setCityFilter(city);
+    setShowCitySuggestions(false);
+    if (cityInputRef.current) {
+      cityInputRef.current.focus();
+    }
+  };
+
+  // Apply filters
   useEffect(() => {
     let results = [...appointments];
 
@@ -114,16 +94,28 @@ const AllAppointments = () => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       results = results.filter(
-        (appointment: any) =>
+        (appointment) =>
           appointment.donorInfo.fullName.toLowerCase().includes(term) ||
           appointment.donorInfo.nic.toLowerCase().includes(term)
       );
     }
 
+    // Apply city filter
+    if (cityFilter) {
+      results = results.filter((appointment) =>
+        appointment.donorInfo.city
+          ?.toLowerCase()
+          .includes(cityFilter.toLowerCase())
+      );
+    }
+
     // Apply date filter
     if (dateFilter && filterType !== "all") {
-      results = results.filter((appointment: any) => {
+      results = results.filter((appointment) => {
+        if (!appointment.selectedDate) return false;
+
         const appointmentDate = new Date(appointment.selectedDate);
+        if (isNaN(appointmentDate.getTime())) return false;
 
         switch (filterType) {
           case "day":
@@ -144,9 +136,9 @@ const AllAppointments = () => {
 
     setFilteredAppointments(results);
     setCurrentPage(1);
-  }, [appointments, searchTerm, dateFilter, filterType]);
+  }, [appointments, searchTerm, dateFilter, cityFilter, filterType]);
 
-  // Get current appointments
+  // Get current appointments for pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentAppointments = filteredAppointments.slice(
@@ -181,8 +173,8 @@ const AllAppointments = () => {
     );
   }
 
-  // Loading Animation
-  if (!isAdmin && !isLoading) {
+  // Access denied for non-admins
+  if (!isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
@@ -215,7 +207,7 @@ const AllAppointments = () => {
   return (
     <div className="flex justify-center mt-8">
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-w-7xl w-full mb-20">
-        <div className="mt-4 ml-4 flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
+        <div className="mt-4 ml-4 flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
           <div className="flex flex-col md:flex-row gap-4 w-full">
             <div className="relative flex-1">
               <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -237,12 +229,56 @@ const AllAppointments = () => {
               </div>
               <input
                 type="text"
-                id="table-search-users"
+                id="table-search-appointments"
                 className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Search by name or NIC"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
+            </div>
+
+            {/* City Filter */}
+            <div className="relative" ref={cityInputRef}>
+              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                <svg
+                  className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 512 512"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M3.9 54.9C10.5 40.9 24.5 32 40 32H472c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9V448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6V320.9L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z"
+                  />
+                </svg>
+              </div>
+              <input
+                type="text"
+                className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-60 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Filter by city"
+                value={cityFilter}
+                onChange={handleCityInputChange}
+                onFocus={() =>
+                  cityFilter.length > 2 && setShowCitySuggestions(true)
+                }
+              />
+              {showCitySuggestions && citySuggestions.length > 0 && (
+                <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg max-h-60 overflow-auto">
+                  {citySuggestions.map((city, index) => (
+                    <div
+                      key={index}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => selectCity(city)}
+                    >
+                      {city}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Date filter dropdown */}
@@ -286,7 +322,7 @@ const AllAppointments = () => {
         </div>
 
         <table className="mt-4 mb-4 w-full text-md text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead className="text- text-gray-700 uppercase bg-yellow-50 dark:bg-gray-700 dark:text-gray-400">
+          <thead className="text- text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" className="px-6 py-3"></th>
               <th scope="col" className="px-6 py-3">
@@ -314,7 +350,7 @@ const AllAppointments = () => {
             </tr>
           </thead>
           <tbody>
-            {currentAppointments.map((appointment: any) => (
+            {currentAppointments.map((appointment) => (
               <tr
                 key={appointment._id}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -323,7 +359,7 @@ const AllAppointments = () => {
                   <img
                     className="w-10 h-10 rounded-full"
                     src={appointment.donorInfo.avatar}
-                    alt="Jese image"
+                    alt="Donor avatar"
                   />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -332,65 +368,37 @@ const AllAppointments = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {appointment.selectedDate}
                 </td>
-                <td className="px-6 py-4">{appointment.selectedSlot}</td>
-
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {appointment.selectedSlot}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
                   {appointment.donorInfo.nic}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {appointment.donorInfo.contactNumber}
                 </td>
-                {appointment.status === "Rejected" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
+                <td className="px-6 py-6 text-center">
+                  <div className="badges flex justify-center">
+                    {appointment.status === "Rejected" ? (
                       <button className="red">Rejected</button>
-                    </div>
-                  </td>
-                ) : appointment.status === "Approved" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
+                    ) : appointment.status === "Approved" ? (
                       <button className="green">Approved</button>
-                    </div>
-                  </td>
-                ) : appointment.status === "Pending" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
+                    ) : appointment.status === "Pending" ? (
                       <button className="yellow">Pending</button>
-                    </div>
-                  </td>
-                ) : appointment.status === "Confirmed" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
+                    ) : appointment.status === "Confirmed" ? (
                       <button className="blue">Confirmed</button>
-                    </div>
-                  </td>
-                ) : appointment.status === "Assessed" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
+                    ) : appointment.status === "Assessed" ? (
                       <button className="pink">Assessed</button>
-                    </div>
-                  </td>
-                ) : appointment.status === "Issued" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
+                    ) : appointment.status === "Issued" ? (
                       <button className="indigo">Issued</button>
-                    </div>
-                  </td>
-                ) : appointment.status === "Collected" ? (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
+                    ) : appointment.status === "Collected" ? (
                       <button className="purple">Collected</button>
-                    </div>
-                  </td>
-                ) : (
-                  <td className="px-6 py-6 text-center">
-                    <div className="badges flex justify-center">
+                    ) : (
                       <button className="yellow">None</button>
-                    </div>
-                  </td>
-                )}
-
-                <td className="px-4 py-4 text-center">
+                    )}
+                  </div>
+                </td>
+                <td className="px-8 py-4 text-center">
                   <div className="flex justify-center space-x-4">
                     <Link to={`/appointment/${appointment._id}`}>
                       <button
@@ -414,7 +422,6 @@ const AllAppointments = () => {
                         </svg>
                       </button>
                     </Link>
-
                     {appointment.status !== "Collected" ? (
                       <Link to={`/admin/donation/${appointment._id}`}>
                         <button
@@ -452,11 +459,11 @@ const AllAppointments = () => {
                     ) : (
                       <Link to={`/admin/testing/${appointment._id}`}>
                         <button
-                          className="font-medium text-black-400 dark:text-yellow-500 hover:underline"
-                          aria-label="View"
+                          className="font-medium text-gray-600 dark:text-gray-400 hover:underline"
+                          aria-label="Testing"
                         >
                           <svg
-                            className="mt-0.5 w-5 h-5 text-black-400 dark:text-white"
+                            className="mt-0.5 w-5 h-5 text-gray-600 dark:text-white"
                             aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -475,7 +482,6 @@ const AllAppointments = () => {
                     )}
                   </div>
                 </td>
-
                 <td className="px-1 py-1">
                   {isMedicalConditionPresent(appointment) && (
                     <button
