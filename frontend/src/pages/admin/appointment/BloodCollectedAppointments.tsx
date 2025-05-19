@@ -10,6 +10,9 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useUser } from "../../../contexts/UserContext";
 import { Appointment } from "../../../types/appointment";
+import { Modal, Toast } from "flowbite-react";
+import JsBarcode from "jsbarcode";
+import { HiExclamation } from "react-icons/hi";
 
 const BloodCollectedAppointments = ({
   appointments,
@@ -29,6 +32,12 @@ const BloodCollectedAppointments = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const cityInputRef = useRef<HTMLInputElement>(null);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
+  const [showBarcodeModal, setShowBarcodeModal] = useState(false);
+  const [barcodeGenerated, setBarcodeGenerated] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const barcodeRef = useRef<HTMLCanvasElement>(null);
 
   // Backend URL
   const backendURL =
@@ -139,6 +148,153 @@ const BloodCollectedAppointments = ({
 
   // Change page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // Generate barcode
+  const handleGenerateBarcode = (appointment: Appointment) => {
+    if (!appointment || !appointment.donorInfo) {
+      setToastMessage("No donor information available to generate barcode.");
+      return;
+    }
+
+    try {
+      const barcodeData = [
+        appointment._id.slice(-8),
+        appointment.donorInfo.bloodGroup,
+        appointment.bloodCollection?.volume || "0",
+        appointment.donorInfo.nic,
+        appointment.bloodCollection?.endTime || "",
+      ].join("|");
+
+      if (barcodeRef.current) {
+        // Clear previous barcode if any
+        const ctx = barcodeRef.current.getContext("2d");
+        if (ctx)
+          ctx.clearRect(
+            0,
+            0,
+            barcodeRef.current.width,
+            barcodeRef.current.height
+          );
+
+        // Generate new barcode
+        JsBarcode(barcodeRef.current, barcodeData, {
+          format: "CODE128",
+          width: 2,
+          height: 60,
+          displayValue: true,
+          margin: 10,
+          background: "#ffffff",
+          lineColor: "#000000",
+          fontSize: 12,
+        });
+        setBarcodeGenerated(true);
+      }
+    } catch (error) {
+      console.error("Error generating barcode:", error);
+      setToastMessage("Failed to generate scannable barcode.");
+    }
+  };
+
+  // Print barcode
+  const handlePrintBarcode = () => {
+    if (!barcodeRef.current || !selectedAppointment) {
+      setToastMessage("Barcode not generated yet");
+      return;
+    }
+
+    try {
+      const canvas = barcodeRef.current;
+      const barcodeDataUrl = canvas.toDataURL("image/png");
+
+      // Create a temporary iframe for printing
+      const printFrame = document.createElement("iframe");
+      printFrame.style.position = "absolute";
+      printFrame.style.width = "1px";
+      printFrame.style.height = "1px";
+      printFrame.style.left = "-9999px";
+      printFrame.style.top = "-9999px";
+
+      printFrame.onload = () => {
+        const printDoc =
+          printFrame.contentDocument || printFrame.contentWindow?.document;
+        if (!printDoc) return;
+
+        printDoc.open();
+        printDoc.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Print Barcode</title>
+              <style>
+                @page { size: auto; margin: 5mm; }
+                body { 
+                  display: flex; 
+                  justify-content: center; 
+                  align-items: center; 
+                  height: 100vh; 
+                  margin: 0; 
+                  font-family: Arial, sans-serif;
+                }
+                .barcode-container {
+                  text-align: center;
+                  padding: 10px;
+                  width: 300px;
+                }
+                .barcode-image {
+                  width: 300px;
+                  height: 100px;
+                }
+                .barcode-info {
+                  margin-top: 10px;
+                  font-size: 14px;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="barcode-container">
+                <img 
+                  src="${barcodeDataUrl}" 
+                  alt="Barcode" 
+                  class="barcode-image"
+                  onload="window.focus(); window.print();"
+                />
+                <div class="barcode-info">
+                  <p>${selectedAppointment?.donorInfo?.fullName || "Donor"}</p>
+                  <p>${
+                    selectedAppointment?.donorInfo?.bloodGroup || "Blood Group"
+                  } • ${
+          selectedAppointment?.bloodCollection?.volume || "0"
+        }ml</p>
+                  <p>${new Date().toLocaleDateString()}</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `);
+        printDoc.close();
+      };
+
+      document.body.appendChild(printFrame);
+
+      // Clean up after printing
+      const cleanup = () => {
+        document.body.removeChild(printFrame);
+        window.removeEventListener("afterprint", cleanup);
+      };
+      window.addEventListener("afterprint", cleanup);
+    } catch (error) {
+      console.error("Print error:", error);
+      setToastMessage("Failed to prepare print document");
+    }
+  };
+
+  // Handle barcode icon click
+  const handleBarcodeClick = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setBarcodeGenerated(false);
+    setShowBarcodeModal(true);
+    setTimeout(() => handleGenerateBarcode(appointment), 0);
+  };
 
   // Loading animation
   if (isLoading) {
@@ -439,6 +595,27 @@ const BloodCollectedAppointments = ({
                         </svg>
                       </button>
                     </Link>
+                    <button
+                      onClick={() => handleBarcodeClick(appointment)}
+                      className="font-medium text-blue-400 dark:text-blue-500 hover:underline"
+                      aria-label="Generate Barcode"
+                    >
+                      <svg
+                        className="mb-1 w-5 h-5 text-blue-500 dark:text-white"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        fill="currentColor"
+                        viewBox="0 0 512 512"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zM432 248a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
                   </div>
                 </td>
                 <td className="px-1 py-1">
@@ -549,6 +726,68 @@ const BloodCollectedAppointments = ({
           </div>
         )}
       </div>
+
+      {/* Barcode Modal */}
+      <Modal show={showBarcodeModal} onClose={() => setShowBarcodeModal(false)}>
+        <Modal.Header>Barcode Generation</Modal.Header>
+        <Modal.Body>
+          <div className="flex flex-col items-center bg-white p-4 rounded border border-gray-300">
+            <div className="mb-2 text-center">
+              <p className="text-sm font-medium text-gray-700">
+                {selectedAppointment?.donorInfo?.fullName || "Donor"} •{" "}
+                {selectedAppointment?.donorInfo?.bloodGroup || "Blood Group"}
+              </p>
+              <p className="text-xs text-gray-500">
+                {new Date().toLocaleDateString()}
+              </p>
+            </div>
+            <canvas
+              ref={barcodeRef}
+              id="barcode"
+              width="300"
+              height="100"
+              className="w-full max-w-xs h-16"
+            />
+            <div className="mt-2 flex items-center gap-1">
+              <span className="text-xs font-medium text-gray-700">
+                BLOODLINE BLOOD BANK MANAGEMENT SYSTEM
+              </span>
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() =>
+                selectedAppointment &&
+                handleGenerateBarcode(selectedAppointment)
+              }
+              className="text-white bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2"
+            >
+              {barcodeGenerated ? "Regenerate" : "Generate"}
+            </button>
+            {barcodeGenerated && (
+              <button
+                onClick={handlePrintBarcode}
+                className="text-white bg-green-800 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2"
+              >
+                Print
+              </button>
+            )}
+          </div>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Toast */}
+      {toastMessage && (
+        <Toast className="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500">
+            <HiExclamation className="h-5 w-5" />
+          </div>
+          <div className="ml-3 text-sm font-normal">{toastMessage}</div>
+          <Toast.Toggle onClick={() => setToastMessage(null)} />
+        </Toast>
+      )}
     </div>
   );
 };

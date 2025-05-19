@@ -709,10 +709,10 @@ const StepTwelve: React.FC<
                     id="searchLocation"
                     placeholder="Search for location"
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-                    value={formData.venue} // Bind to formData.venue
+                    value={formData.venue}
                     onChange={(e) =>
                       setFormData({ ...formData, venue: e.target.value })
-                    } // Update venue in state when typing manually
+                    }
                   />
 
                   <div
