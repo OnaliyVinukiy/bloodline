@@ -29,7 +29,7 @@ const AppointmentDetails = () => {
   const [isRejectedToastOpen, setIsRejectedToastOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
 
-  //Backend URL
+  // Backend URL
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
