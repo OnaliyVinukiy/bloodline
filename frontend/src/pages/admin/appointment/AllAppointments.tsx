@@ -26,6 +26,7 @@ const AllAppointments = ({ appointments }: { appointments: Appointment[] }) => {
   const [itemsPerPage] = useState(10);
   const cityInputRef = useRef<HTMLInputElement>(null);
 
+  // Backend URL
   const backendURL =
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
