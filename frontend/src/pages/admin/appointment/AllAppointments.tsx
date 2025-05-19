@@ -394,6 +394,12 @@ const AllAppointments = ({ appointments }: { appointments: Appointment[] }) => {
                       <button className="indigo">Issued</button>
                     ) : appointment.status === "Collected" ? (
                       <button className="purple">Collected</button>
+                    ) : appointment.status === "Labelled" ? (
+                      <button className="labelled">Labelled</button>
+                    ) : appointment.status === "Processed" ? (
+                      <button className="processed">Processed</button>
+                    ) : appointment.status === "Tested" ? (
+                      <button className="tested">Tested</button>
                     ) : (
                       <button className="yellow">None</button>
                     )}
