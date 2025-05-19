@@ -78,8 +78,13 @@ const CampDetails = () => {
       setCamp((prev: any) => ({ ...prev, status: "Approved" }));
       setIsApprovedToastOpen(true);
 
+      const redirectUrl =
+        import.meta.env.VITE_IS_PRODUCTION === "true"
+          ? "https://bloodlinesrilanka.com/admin/camps"
+          : "http://localhost:5173/admin/camps";
+
       setTimeout(() => {
-        window.location.href = "http://localhost:5173/admin/camps";
+        window.location.href = redirectUrl;
       }, 1500);
     } catch (error) {
       console.error("Error approving camp:", error);
@@ -114,9 +119,13 @@ const CampDetails = () => {
 
       setCamp((prev: any) => ({ ...prev, status: "Rejected" }));
       setIsRejectedToastOpen(true);
+      const redirectUrl =
+        import.meta.env.VITE_IS_PRODUCTION === "true"
+          ? "https://bloodlinesrilanka.com/admin/camps"
+          : "http://localhost:5173/admin/camps";
 
       setTimeout(() => {
-        window.location.href = "http://localhost:5173/admin/camps";
+        window.location.href = redirectUrl;
       }, 1500);
     } catch (error) {
       console.error("Error rejecting camp:", error);
