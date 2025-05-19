@@ -11,17 +11,21 @@ import dotenv from "dotenv";
 import { Request, Response } from "express";
 import nodemailer from "nodemailer";
 import { AppointmentConfirmation } from "../emailTemplates/AppointmentConfirmation";
-
-dotenv.config();
+import { AppointmentReminderOneWeek } from "../emailTemplates/AppointmentReminderOneWeek";
+import { AppointmentReminderOneDay } from "../emailTemplates/AppointmentReminderOneDay";
+import { scheduleJob } from "node-schedule";
 import { ObjectId } from "mongodb";
 import { AppointmentRejection } from "../emailTemplates/AppointmentRejection";
 import { AppointmentApproval } from "../emailTemplates/AppointmentApproval";
 import { AppointmentCancellation } from "../emailTemplates/AppointmentCancellation";
 
+dotenv.config();
+
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
 if (!COSMOS_DB_CONNECTION_STRING) {
   throw new Error("Missing environment variable: COSMOS_DB_CONNECTION_STRING");
 }
+
 // Save appointment data
 export const saveAppointment = async (req: Request, res: Response) => {
   const appointmentData = req.body;
@@ -94,6 +98,7 @@ export const getAppointments = async (req: Request, res: Response) => {
   }
 };
 
+// Fetch appointment count
 export const getAppointmentsCount = async (req: Request, res: Response) => {
   try {
     // Connect to the database
@@ -102,7 +107,7 @@ export const getAppointmentsCount = async (req: Request, res: Response) => {
     const database = client.db(DATABASE_ID);
     const collection = database.collection(APPOINTMENT_COLLECTION_ID);
 
-    //Fetch the count of all appointments
+    // Fetch the count of all appointments
     const count = await collection.countDocuments();
 
     res.status(200).json({ count });
@@ -179,7 +184,7 @@ export const getAppointmentsByEmail = async (req: Request, res: Response) => {
 export const getAppointmentsByDate = async (req: Request, res: Response) => {
   const { date } = req.params;
   try {
-    //Connect to the database
+    // Connect to the database
     const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
 
     await client.connect();
@@ -187,7 +192,7 @@ export const getAppointmentsByDate = async (req: Request, res: Response) => {
     const database = client.db(DATABASE_ID);
     const collection = database.collection(APPOINTMENT_COLLECTION_ID);
 
-    //Format date to get appointments for the whole day
+    // Format date to get appointments for the whole day
     const startDate = new Date(date);
     startDate.setHours(0, 0, 0, 0);
     const endDate = new Date(date);
@@ -211,9 +216,10 @@ export const getAppointmentsByDate = async (req: Request, res: Response) => {
   }
 };
 
+// Fetch appointments by month
 export const getAppointmentsByMonth = async (req: Request, res: Response) => {
   try {
-    //Connect to database
+    // Connect to database
     const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
     await client.connect();
 
@@ -307,7 +313,7 @@ export const updateAppointment = async (req: Request, res: Response) => {
   }
 };
 
-//Approve pending appointments
+// Approve pending appointments
 export const approveAppointment = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -321,11 +327,29 @@ export const approveAppointment = async (req: Request, res: Response) => {
     const collection = database.collection(APPOINTMENT_COLLECTION_ID);
     const objectId = new ObjectId(id);
 
+    const appointment = await collection.findOne({ _id: objectId });
+    if (!appointment) {
+      await client.close();
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Update the appointment status
     const updatedAppointment = await collection.findOneAndUpdate(
       { _id: objectId },
-      { $set: { status: "Approved" } },
+      {
+        $set: {
+          status: "Approved",
+          remindersSent: {
+            oneWeek: false,
+            oneDay: false,
+          },
+        },
+      },
       { returnDocument: "after" }
     );
+
+    // Schedule reminder emails
+    scheduleReminderEmails(updatedAppointment);
 
     // Send approval email
     await sendApprovalEmail(updatedAppointment);
@@ -340,6 +364,112 @@ export const approveAppointment = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error updating appointment status:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Schedule reminder emails
+const scheduleReminderEmails = (appointment: any) => {
+  const appointmentDate = new Date(
+    `${appointment.selectedDate}T${appointment.selectedSlot}:00+0530`
+  );
+
+  // Schedule one week before reminder
+  const oneWeekBefore = new Date(appointmentDate);
+  oneWeekBefore.setDate(oneWeekBefore.getDate() - 7);
+
+  // Schedule one day before reminder
+  const oneDayBefore = new Date(appointmentDate);
+  oneDayBefore.setDate(oneDayBefore.getDate() - 1);
+
+  const now = new Date();
+
+  // Schedule one-week reminder if in the future
+  if (oneWeekBefore > now) {
+    console.log(
+      `Scheduling one-week reminder for ${appointment._id} at ${oneWeekBefore}`
+    );
+    scheduleJob(oneWeekBefore, async () => {
+      await sendReminderEmail(appointment, "oneWeek");
+    });
+  } else {
+    console.log(
+      `One-week reminder for ${appointment._id} not scheduled (past due: ${oneWeekBefore})`
+    );
+  }
+
+  // Always schedule one-day reminder
+  console.log(
+    `Scheduling one-day reminder for ${appointment._id} at ${oneDayBefore}`
+  );
+  scheduleJob(oneDayBefore, async () => {
+    await sendReminderEmail(appointment, "oneDay");
+  });
+
+  // If one-day reminder is in the past or now, send immediately
+  if (oneDayBefore <= now) {
+    console.log(
+      `One-day reminder for ${appointment._id} is past due (${oneDayBefore}), sending immediately`
+    );
+    sendReminderEmail(appointment, "oneDay").catch((error) => {
+      console.error(
+        `Failed to send immediate one-day reminder for ${appointment._id}:`,
+        error
+      );
+    });
+  }
+};
+
+// Send reminder emails
+const sendReminderEmail = async (
+  appointment: any,
+  reminderType: "oneWeek" | "oneDay"
+) => {
+  const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+  try {
+    await client.connect();
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+
+    const currentAppointment = await collection.findOne({
+      _id: appointment._id,
+    });
+    if (currentAppointment?.remindersSent?.[reminderType]) {
+      return;
+    }
+
+    // Send the appropriate email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: appointment.donorInfo.email,
+      subject:
+        reminderType === "oneWeek"
+          ? "Blood Donation Appointment Reminder (1 Week)"
+          : "Blood Donation Appointment Reminder (Tomorrow)",
+      html:
+        reminderType === "oneWeek"
+          ? AppointmentReminderOneWeek(appointment)
+          : AppointmentReminderOneDay(appointment),
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    // Update the database to mark the reminder as sent
+    await collection.updateOne(
+      { _id: appointment._id },
+      { $set: { [`remindersSent.${reminderType}`]: true } }
+    );
+  } catch (error) {
+    console.error(`Error sending ${reminderType} reminder email:`, error);
+  } finally {
+    await client.close();
   }
 };
 
@@ -363,7 +493,7 @@ const sendApprovalEmail = async (appointment: any) => {
   await transporter.sendMail(mailOptions);
 };
 
-//Reject pending appointments
+// Reject pending appointments
 export const rejectAppointment = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -429,7 +559,7 @@ const sendRejectionEmail = async (appointment: any) => {
   await transporter.sendMail(mailOptions);
 };
 
-//Cancel appointments
+// Cancel appointments
 export const cancelAppointment = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -449,7 +579,7 @@ export const cancelAppointment = async (req: Request, res: Response) => {
       { returnDocument: "after" }
     );
 
-    // Send approval email
+    // Send cancellation email
     await sendCancellationEmail(updatedAppointment);
 
     await client.close();
@@ -484,3 +614,70 @@ const sendCancellationEmail = async (appointment: any) => {
 
   await transporter.sendMail(mailOptions);
 };
+
+// Utility function to manually trigger a reminder email
+export const triggerReminderEmail = async (
+  appointmentId: string,
+  reminderType: "oneWeek" | "oneDay"
+) => {
+  const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+  try {
+    await client.connect();
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+
+    const appointment = await collection.findOne({
+      _id: new ObjectId(appointmentId),
+    });
+    if (!appointment) {
+      throw new Error(`Appointment ${appointmentId} not found`);
+    }
+
+    await sendReminderEmail(appointment, reminderType);
+    console.log(
+      `Manually triggered ${reminderType} reminder for appointment ${appointmentId}`
+    );
+  } catch (error) {
+    console.error(
+      `Error triggering ${reminderType} reminder for ${appointmentId}:`,
+      error
+    );
+    throw error;
+  } finally {
+    await client.close();
+  }
+};
+
+// Daily cron job to catch missed one-day reminders
+scheduleJob("0 0 * * *", async () => {
+  const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+  try {
+    await client.connect();
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    const appointments = await collection
+      .find({
+        status: "Approved",
+        selectedDate: tomorrow.toISOString().split("T")[0],
+        "remindersSent.oneDay": false,
+      })
+      .toArray();
+
+    for (const appointment of appointments) {
+      await sendReminderEmail(appointment, "oneDay");
+      console.log(
+        `Sent missed one-day reminder for appointment ${appointment._id}`
+      );
+    }
+  } catch (error) {
+    console.error("Error in daily reminder check:", error);
+  } finally {
+    await client.close();
+  }
+});
