@@ -347,11 +347,30 @@ const IssuedAppointments = ({
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 <td className="px-6 py-4">
-                  <img
-                    className="w-10 h-10 rounded-full"
-                    src={appointment.donorInfo.avatar}
-                    alt="Donor avatar"
-                  />
+                  {appointment.donorInfo.avatar ? (
+                    <img
+                      className="w-10 h-10 rounded-full"
+                      src={appointment.donorInfo.avatar}
+                      alt="Donor avatar"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 flex items-center justify-center bg-gray-300 rounded-full">
+                      <svg
+                        className="w-6 h-6 text-gray-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                    </div>
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {appointment.donorInfo.fullName}
