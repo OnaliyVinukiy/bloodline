@@ -41,6 +41,7 @@ bloodline/
 - **Database**: Azure Cosmos DB with MongoDB API
 - **Cloud**: Azure Web Apps, Azure Blob Storage
 - **Authentication**: JWT, JWKS-RSA
+- **Chatbot**: Azure OpenAI, Azure AI Foundry
 - **Utilities**: Multer, Nodemailer, UUID, CORS
 - **Testing**: Jest, Supertest
 
