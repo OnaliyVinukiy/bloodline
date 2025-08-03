@@ -475,7 +475,7 @@ const sendSMS = async (contactNumber: string, message: string) => {
         },
       }
     );
-
+    console.log("App ID", MSPACE_APPLICATION_ID);
     console.log("SMS sent successfully:", response.data);
     return response.data;
   } catch (error: any) {
