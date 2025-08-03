@@ -18,6 +18,7 @@ import { ObjectId } from "mongodb";
 import { AppointmentRejection } from "../emailTemplates/AppointmentRejection";
 import { AppointmentApproval } from "../emailTemplates/AppointmentApproval";
 import { AppointmentCancellation } from "../emailTemplates/AppointmentCancellation";
+import axios from "axios";
 
 dotenv.config();
 
@@ -313,60 +314,6 @@ export const updateAppointment = async (req: Request, res: Response) => {
   }
 };
 
-// Approve pending appointments
-export const approveAppointment = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    // Connect to the database
-    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
-
-    await client.connect();
-
-    const database = client.db(DATABASE_ID);
-    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
-    const objectId = new ObjectId(id);
-
-    const appointment = await collection.findOne({ _id: objectId });
-    if (!appointment) {
-      await client.close();
-      return res.status(404).json({ message: "Appointment not found" });
-    }
-
-    // Update the appointment status
-    const updatedAppointment = await collection.findOneAndUpdate(
-      { _id: objectId },
-      {
-        $set: {
-          status: "Approved",
-          remindersSent: {
-            oneWeek: false,
-            oneDay: false,
-          },
-        },
-      },
-      { returnDocument: "after" }
-    );
-
-    // Schedule reminder emails
-    scheduleReminderEmails(updatedAppointment);
-
-    // Send approval email
-    await sendApprovalEmail(updatedAppointment);
-
-    await client.close();
-
-    if (!updatedAppointment) {
-      return res.status(404).json({ message: "Appointment not found" });
-    }
-
-    res.status(200).json(updatedAppointment);
-  } catch (error) {
-    console.error("Error updating appointment status:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
 // Schedule reminder emails
 const scheduleReminderEmails = (appointment: any) => {
   const appointmentDate = new Date(
@@ -491,6 +438,119 @@ const sendApprovalEmail = async (appointment: any) => {
   };
 
   await transporter.sendMail(mailOptions);
+};
+
+const MSPACE_API_BASE_URL = "https://api.mspace.lk";
+const MSPACE_SMS_SEND_PATH = "/sms/send";
+const MSPACE_API_VERSION = "1.0";
+const MSPACE_APPLICATION_ID = process.env.MSPACE_APPLICATION_ID;
+const MSPACE_PASSWORD = process.env.MSPACE_PASSWORD;
+
+const sendSMS = async (contactNumber: string, message: string) => {
+  try {
+    console.log("Sending SMS to:", contactNumber);
+    let formattedContactNumber = contactNumber;
+    if (contactNumber.startsWith("0")) {
+      formattedContactNumber = `94${contactNumber.substring(1)}`;
+    } else if (!contactNumber.startsWith("94")) {
+      formattedContactNumber = `94${contactNumber}`;
+    }
+
+    const finalContactNumber = `tel:${formattedContactNumber}`;
+
+    const requestBody = {
+      version: MSPACE_API_VERSION,
+      applicationId: MSPACE_APPLICATION_ID,
+      password: MSPACE_PASSWORD,
+      message: message,
+      destinationAddresses: [finalContactNumber],
+    };
+
+    const response = await axios.post(
+      `${MSPACE_API_BASE_URL}${MSPACE_SMS_SEND_PATH}`,
+      requestBody,
+      {
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+        },
+      }
+    );
+
+    console.log("SMS sent successfully:", response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error sending SMS:", error.response?.data || error.message);
+    throw new Error("Failed to send SMS notification");
+  }
+};
+
+const sendApprovalSMS = async (appointment: any) => {
+  const donorContactNumber = appointment.donorInfo.contactNumber;
+  if (!donorContactNumber) {
+    console.warn("Donor phone number not found. Skipping SMS notification.");
+    return;
+  }
+
+  const approvalMessage = `Hello ${appointment.donorInfo.name}, your blood donation appointment on ${appointment.appointmentDate} at ${appointment.appointmentTime} has been approved.`;
+
+  await sendSMS(donorContactNumber, approvalMessage);
+};
+
+export const approveAppointment = async (req: Request, res: Response) => {
+  let client: MongoClient | null = null;
+  try {
+    const { id } = req.params;
+
+    // Connect to the database
+    client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+    const objectId = new ObjectId(id);
+
+    const appointment = await collection.findOne({ _id: objectId });
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Update the appointment status
+    const updatedAppointment = await collection.findOneAndUpdate(
+      { _id: objectId },
+      {
+        $set: {
+          status: "Approved",
+          remindersSent: {
+            oneWeek: false,
+            oneDay: false,
+          },
+        },
+      },
+      { returnDocument: "after" }
+    );
+
+    if (!updatedAppointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Schedule reminder emails
+    scheduleReminderEmails(updatedAppointment);
+
+    // Send approval email
+    await sendApprovalEmail(updatedAppointment);
+
+    // Send approval SMS
+    await sendApprovalSMS(updatedAppointment);
+
+    res.status(200).json(updatedAppointment);
+  } catch (error) {
+    console.error("Error updating appointment status:", error);
+    res.status(500).json({ message: "Server error" });
+  } finally {
+    if (client) {
+      await client.close();
+    }
+  }
 };
 
 // Reject pending appointments
