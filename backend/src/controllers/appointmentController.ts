@@ -464,6 +464,10 @@ const sendSMS = async (contactNumber: string, message: string) => {
       password: MSPACE_PASSWORD,
       message: message,
       destinationAddresses: [finalContactNumber],
+      sourceAddress: "77011",
+      deliveryStatusRequest: "0",
+      encoding: "0",
+      
     };
 
     const response = await axios.post(
