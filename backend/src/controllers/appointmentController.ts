@@ -463,7 +463,7 @@ const sendSMS = async (contactNumber: string, message: string) => {
       applicationId: MSPACE_APPLICATION_ID,
       password: MSPACE_PASSWORD,
       message: message,
-      destinationAddresses: [finalContactNumber],
+      destinationAddresses:["tel:94703334321"],
       sourceAddress: "77011",
       deliveryStatusRequest: "0",
       encoding: "0",
