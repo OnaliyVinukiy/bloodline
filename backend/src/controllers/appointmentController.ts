@@ -459,7 +459,7 @@ const sendSMS = async (contactNumber: string, message: string) => {
     const finalContactNumber = `tel:${formattedContactNumber}`;
 
     const requestBody = {
-      version: MSPACE_API_VERSION,
+      version: "1.0",
       applicationId: MSPACE_APPLICATION_ID,
       password: MSPACE_PASSWORD,
       message: message,
