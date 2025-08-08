@@ -460,7 +460,6 @@ const sendSMS = async (contactNumber: string, message: string) => {
     const requestBody = {
       applicationId: MSPACE_APPLICATION_ID,
       password: MSPACE_PASSWORD,
-      message: message,
       subscriberId: "tel:94703334321",
       action: "1",
     };
