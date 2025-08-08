@@ -462,7 +462,7 @@ const sendSMS = async (contactNumber: string, message: string) => {
       password: MSPACE_PASSWORD,
       message: message,
       subscriberId: "tel:94703334321",
-      action: "0",
+      action: "1",
     };
     console.log("Request Body for SMS:", requestBody);
     const response = await axios.post(
