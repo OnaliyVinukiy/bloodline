@@ -440,8 +440,7 @@ const sendApprovalEmail = async (appointment: any) => {
   await transporter.sendMail(mailOptions);
 };
 
-const MSPACE_API_BASE_URL = "https://api.mspace.lk";
-const MSPACE_SMS_SEND_PATH = "/subscription/send";
+const MSPACE_API_BASE_URL = "https://api.mspace.lk/subscription/send";
 const MSPACE_API_VERSION = "1.0";
 const MSPACE_APPLICATION_ID = process.env.MSPACE_APPLICATION_ID;
 const MSPACE_PASSWORD = process.env.MSPACE_PASSWORD;
@@ -467,7 +466,7 @@ const sendSMS = async (contactNumber: string, message: string) => {
     };
     console.log("Request Body for SMS:", requestBody);
     const response = await axios.post(
-      `${MSPACE_API_BASE_URL}${MSPACE_SMS_SEND_PATH}`,
+      `${MSPACE_API_BASE_URL}`,
       requestBody,
       {
         headers: {
@@ -477,6 +476,7 @@ const sendSMS = async (contactNumber: string, message: string) => {
     );
     console.log("App ID", MSPACE_APPLICATION_ID);
     console.log("SMS sent successfully:", response.data);
+    console.log("API", MSPACE_API_BASE_URL);
     return response.data;
   } catch (error: any) {
     console.error("Error sending SMS:", error.response?.data || error.message);
