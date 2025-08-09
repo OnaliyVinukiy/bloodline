@@ -7,6 +7,7 @@
  */
 import { useState, useRef, useEffect } from "react";
 import { FaCommentAlt, FaTimes, FaPaperPlane } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 type Message = {
   id: string;
@@ -16,11 +17,12 @@ type Message = {
 };
 
 const Chatbot = () => {
+  const { t } = useTranslation("chatbot");
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Hello! I'm Bloodline Assistant. How can I help you with blood bank information today?",
+      text: t("hello_message"),
       sender: "bot",
       timestamp: new Date(),
     },
@@ -53,7 +55,7 @@ const Chatbot = () => {
     // Add loading indicator
     const loadingMessage: Message = {
       id: "loading-" + Date.now().toString(),
-      text: "...",
+      text: t("loading_message"),
       sender: "bot",
       timestamp: new Date(),
     };
@@ -94,7 +96,7 @@ const Chatbot = () => {
       //Add error message
       const errorMessage: Message = {
         id: Date.now().toString(),
-        text: "Sorry, I encountered an error. Please try again later.",
+        text: t("error_message"),
         sender: "bot",
         timestamp: new Date(),
       };
@@ -135,7 +137,7 @@ const Chatbot = () => {
         <div className="w-80 h-[500px] bg-white rounded-lg shadow-xl flex flex-col border border-gray-200 overflow-hidden">
           {/* Header */}
           <div className="bg-red-600 text-white p-4 flex justify-between items-center">
-            <h3 className="font-bold text-lg">Bloodline Assistant</h3>
+            <h3 className="font-bold text-lg">{t("title")}</h3>
             <button
               onClick={toggleChatbot}
               className="text-white hover:text-gray-200"
@@ -181,7 +183,7 @@ const Chatbot = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
+                placeholder={t("placeholder")}
                 className="flex-1 border border-gray-300 rounded-l-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
                 rows={1}
               />
