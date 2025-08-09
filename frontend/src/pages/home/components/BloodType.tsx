@@ -6,47 +6,51 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import React from "react";
+import { useTranslation } from "react-i18next";
+
 const BloodType: React.FC = () => {
+  const { t } = useTranslation(["bloodType", "common"]);
+
   const bloodTypes = [
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/apositive.png",
       alt: "Blood Type A+",
-      text: "One of the most common blood types and is in high demand for transfusions.",
+      text: t("a_positive_text", { ns: "bloodType" }),
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/anegative.png",
       alt: "Blood Type A-",
-      text: "A rare blood type but can be given to A-, A+, AB-, and AB+ patients.",
+      text: t("a_negative_text", { ns: "bloodType" }),
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/bpositive.png",
       alt: "Blood Type B+",
-      text: "A relatively common blood type, making up around 8% of the global population.",
+      text: t("b_positive_text", { ns: "bloodType" }),
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/bnegative.png",
       alt: "Blood Type B-",
-      text: "One of the rarest blood types, found in only about 2% of people.",
+      text: t("b_negative_text", { ns: "bloodType" }),
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/opositive.png",
       alt: "Blood Type O+",
-      text: "The most common blood type and is widely used in emergency transfusions.",
+      text: t("o_positive_text", { ns: "bloodType" }),
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/onegative.png",
       alt: "Blood Type O-",
-      text: "The universal donor blood type, meaning it can be given to any patient.",
+      text: t("o_negative_text", { ns: "bloodType" }),
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/abpositive.png",
       alt: "Blood Type AB+",
-      text: "The universal recipient for red blood cells and is rare but valuable for plasma donations.",
+      text: t("ab_positive_text", { ns: "bloodType" }),
     },
     {
       src: "https://bloodlineresources.blob.core.windows.net/assets/abnegative.png",
       alt: "Blood Type AB-",
-      text: "The rarest blood type and is the universal donor for plasma transfusions.",
+      text: t("ab_negative_text", { ns: "bloodType" }),
     },
   ];
 
@@ -59,14 +63,13 @@ const BloodType: React.FC = () => {
     >
       <div className="px-4 mx-auto max-w-screen-xl text-center py-12 lg:py-24">
         <h1 className="mb-4 text-3xl font-extrabold font-roboto tracking-tight leading-none text-white sm:text-4xl lg:text-5xl">
-          Blood Type Information
+          {t("title", { ns: "bloodType" })}
         </h1>
 
         <p className="mb-8 text-base font-normal text-gray-300 sm:text-lg lg:text-xl sm:px-6 lg:px-48">
-          Learn about different blood types and their importance in
-          transfusions.
+          {t("subtitle", { ns: "bloodType" })}
           <br />
-          Hover over each blood type to see its significance.
+          {t("hover_info", { ns: "bloodType" })}
         </p>
 
         {/* Blood Type Cards in a Single Horizontal Row */}
@@ -94,7 +97,7 @@ const BloodType: React.FC = () => {
             href="/map"
             className="inline-flex items-center justify-center px-6 py-3 text-sm sm:text-lg font-medium text-white bg-red-800 rounded-lg shadow-md hover:bg-red-700 focus:ring-4 focus:ring-red-300 relative"
           >
-            Find a Donation Camp
+            {t("find_donation_camp", { ns: "common" })}
           </a>
         </div>
       </div>
