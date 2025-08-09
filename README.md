@@ -1,4 +1,4 @@
-# 🩸 BloodLine – Blood Bank Management System
+# 🩸 Bloodline – Blood Bank Management System
 
 **Bloodline** is a centralized blood bank management solution designed to simplify and modernize blood donation workflows. From donor registration and appointment booking to blood stock tracking and donation camp scheduling, Bloodline offers a seamless and secure experience for hospitals, donors, blood camp organizers and administrators.
 
@@ -41,6 +41,7 @@ bloodline/
 - **Database**: Azure Cosmos DB with MongoDB API
 - **Cloud**: Azure Web Apps, Azure Blob Storage
 - **Authentication**: JWT, JWKS-RSA
+- **Chatbot**: Azure OpenAI, Azure AI Foundry
 - **Utilities**: Multer, Nodemailer, UUID, CORS
 - **Testing**: Jest, Supertest
 
