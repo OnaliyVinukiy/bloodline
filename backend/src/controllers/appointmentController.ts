@@ -464,15 +464,11 @@ const sendSMS = async (contactNumber: string, message: string) => {
       action: "1",
     };
     console.log("Request Body for SMS:", requestBody);
-    const response = await axios.post(
-      `${MSPACE_API_BASE_URL}`,
-      requestBody,
-      {
-        headers: {
-          "Content-Type": "application/json;charset=utf-8",
-        },
-      }
-    );
+    const response = await axios.post(`${MSPACE_API_BASE_URL}`, requestBody, {
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+      },
+    });
     console.log("App ID", MSPACE_APPLICATION_ID);
     console.log("SMS sent successfully:", response.data);
     console.log("API", MSPACE_API_BASE_URL);
