@@ -1,0 +1,13 @@
+{
+  "login_required": "ලොගින් වීම අත්‍යවශ්‍යයි",
+  "login_loading": "ලොගින් වෙමින් පවතී...",
+  "login_button": "ලොගින් වෙන්න",
+  "cancel_button": "අවලංගු කරන්න",
+  "update_button": "යාවත්කාලීන කරන්න",
+  "complete_button": "සම්පූර්ණ කරන්න",
+  "updating_button": "යාවත්කාලීන වෙමින්...",
+  "ok_button": "හරි",
+  "find_donation_camp": "ලඟම රුධිර දන්දීමේ කඳවුර සොයන්න",
+  "error_title": "දෝෂයක් සිදු විය!",
+  "error_message": "යාවත්කාලීන කිරීමේදී දෝෂයක් ඇති විය. කරුණාකර නැවත උත්සාහ කරන්න."
+}

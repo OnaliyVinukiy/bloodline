@@ -10,8 +10,10 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button, Modal } from "flowbite-react";
+import { useTranslation } from "react-i18next";
 
 export function CarouselSlider() {
+  const { t } = useTranslation(["carousel", "common"]);
   const { state, signIn } = useAuthContext();
   const navigate = useNavigate();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -68,8 +70,8 @@ export function CarouselSlider() {
   // Determine modal message based on loginAction
   const modalMessage =
     loginAction === "appointment"
-      ? "Please log in first to place an appointment."
-      : "Please log in first to register as a donor.";
+      ? t("modal_appointment", { ns: "carousel" })
+      : t("modal_donor_registration", { ns: "carousel" });
 
   return (
     <section
@@ -90,10 +92,10 @@ export function CarouselSlider() {
           role="alert"
         >
           <span className="text-[10px] md:text-xs bg-red-600 rounded-full text-white px-4 py-1.5 mr-3">
-            Who we are
+            {t("tag_who_we_are", { ns: "carousel" })}
           </span>
           <span className="text-xs md:text-sm font-medium">
-            Learn more about Bloodline!
+            {t("tag_learn_more", { ns: "carousel" })}
           </span>
           <svg
             className="ml-2 w-5 h-5"
@@ -110,21 +112,20 @@ export function CarouselSlider() {
         </a>
 
         <h1 className="mt-2 mb-6 text-3xl font-semibold tracking-tight leading-tight text-white sm:mb-8 sm:text-4xl md:text-5xl lg:text-6xl">
-          Every Drop Counts, Every Life Matters!
+          {t("headline", { ns: "carousel" })}
         </h1>
         <p className="mt-2 text-base font-normal text-white sm:text-lg md:text-xl">
-          Join us in creating a world where no life is lost due to the lack of
-          blood.
+          {t("slogan_1", { ns: "carousel" })}
         </p>
         <p className="mb-8 text-base font-normal text-white sm:text-lg md:text-xl">
-          Together, we save lives.
+          {t("slogan_2", { ns: "carousel" })}
         </p>
         <div className="mt-12 flex flex-col mb-4 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
           <button
             onClick={handleAppointmentSchedule}
             className="inline-flex justify-center items-center py-2 px-4 text-sm font-medium text-center text-white rounded-lg bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 sm:py-3 sm:px-5 sm:text-base"
           >
-            Place an appointment
+            {t("appointment_button", { ns: "carousel" })}
             <svg
               className="ml-2 -mr-1 w-4 h-4 sm:w-5 sm:h-5"
               fill="currentColor"
@@ -157,7 +158,7 @@ export function CarouselSlider() {
                 clip-rule="evenodd"
               />
             </svg>
-            Register as a Donor
+            {t("donor_registration_button", { ns: "carousel" })}
           </button>
         </div>
 
@@ -184,7 +185,7 @@ export function CarouselSlider() {
                   d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                 />
               </svg>
-              Login Required
+              {t("login_required", { ns: "common" })}
             </p>
           </Modal.Header>
           <Modal.Body>
@@ -215,10 +216,10 @@ export function CarouselSlider() {
                       fill="currentColor"
                     />
                   </svg>
-                  Loading...
+                  {t("login_loading", { ns: "common" })}
                 </>
               ) : (
-                "Login"
+                t("login_button", { ns: "common" })
               )}
             </Button>
             <Button
@@ -227,7 +228,7 @@ export function CarouselSlider() {
               onClick={() => setIsLoginModalOpen(false)}
               className="border-red-700 text-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300"
             >
-              Cancel
+              {t("cancel_button", { ns: "common" })}
             </Button>
           </Modal.Footer>
         </Modal>

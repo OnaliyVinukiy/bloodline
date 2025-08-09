@@ -10,7 +10,10 @@ import React, { useEffect, useState } from "react";
 import { Button, Card, Modal } from "flowbite-react";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 const Cards: React.FC = () => {
+  const { t } = useTranslation(["cards", "common"]);
   const { state, signIn } = useAuthContext();
   const navigate = useNavigate();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -66,8 +69,8 @@ const Cards: React.FC = () => {
   // Determine modal message based on loginAction
   const modalMessage =
     loginAction === "orgRegistration"
-      ? "Please log in first to register your organization."
-      : "Please log in first to register your blood donation camp.";
+      ? t("modal_org_registration", { ns: "cards" })
+      : t("modal_camp_registration", { ns: "cards" });
 
   return (
     <div className="flex flex-wrap justify-center gap-8 lg:space-x-40 lg:mt-20 mt-10">
@@ -78,17 +81,17 @@ const Cards: React.FC = () => {
           className="w-40 h-45 object-cover mx-auto"
         />
         <h5 className="text-2xl text-center font-bold tracking-tight text-gray-900 dark:text-white">
-          Am I Eligible?
+          {t("eligible_card_title", { ns: "cards" })}
         </h5>
         <p className="font-normal text-center text-gray-700 dark:text-gray-400">
-          Put yourself into a test and check whether you can donate blood.
+          {t("eligible_card_text", { ns: "cards" })}
         </p>
         <Button
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
           href="/eligibility"
         >
-          Check Eligibility
+          {t("eligible_card_button", { ns: "cards" })}
           <svg
             className="-mr-1 ml-2 mt-1 h-4 w-4"
             fill="currentColor"
@@ -111,17 +114,17 @@ const Cards: React.FC = () => {
           className="w-40 h-45 object-cover mx-auto"
         />
         <h5 className="text-2xl text-center font-bold tracking-tight text-gray-900 dark:text-white">
-          Host a Blood Donation Camp
+          {t("host_camp_card_title", { ns: "cards" })}
         </h5>
         <p className="font-normal text-center text-gray-700 dark:text-gray-400">
-          Place a request to host a blood donation camp and help save lives.
+          {t("host_camp_card_text", { ns: "cards" })}
         </p>
         <Button
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
           onClick={handleCampSchedule}
         >
-          Request Now
+          {t("host_camp_card_button", { ns: "cards" })}
           <svg
             className="-mr-1 ml-2 mt-1 h-4 w-4"
             fill="currentColor"
@@ -144,17 +147,17 @@ const Cards: React.FC = () => {
           className="w-40 h-45 object-cover mx-auto"
         />
         <h5 className="text-2xl text-center font-bold tracking-tight text-gray-900 dark:text-white">
-          Register your Organization
+          {t("org_register_card_title", { ns: "cards" })}
         </h5>
         <p className="font-normal text-center text-gray-700 dark:text-gray-400">
-          Register your organization and host a blood donation camp.
+          {t("org_register_card_text", { ns: "cards" })}
         </p>
         <Button
           className="bg-red-800 hover:bg-red-700 text-white"
           color="red-800"
           onClick={handleOrgRegistration}
         >
-          Register Now
+          {t("org_register_card_button", { ns: "cards" })}
           <svg
             className="-mr-1 ml-2 mt-1 h-4 w-4"
             fill="currentColor"
@@ -189,7 +192,7 @@ const Cards: React.FC = () => {
                 d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
               />
             </svg>
-            Login Required
+            {t("login_required", { ns: "common" })}
           </p>
         </Modal.Header>
         <Modal.Body>
@@ -216,10 +219,10 @@ const Cards: React.FC = () => {
                     fill="currentColor"
                   />
                 </svg>
-                Loading...
+                {t("login_loading", { ns: "common" })}
               </>
             ) : (
-              "Login"
+              t("login_button", { ns: "common" })
             )}
           </Button>
           <Button
@@ -228,7 +231,7 @@ const Cards: React.FC = () => {
             onClick={() => setIsLoginModalOpen(false)}
             className="border-red-700 text-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300"
           >
-            Cancel
+            {t("cancel_button", { ns: "common" })}
           </Button>
         </Modal.Footer>
       </Modal>

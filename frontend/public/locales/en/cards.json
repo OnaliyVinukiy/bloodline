@@ -1,0 +1,13 @@
+{
+  "eligible_card_title": "Am I Eligible?",
+  "eligible_card_text": "Put yourself into a test and check whether you can donate blood.",
+  "eligible_card_button": "Check Eligibility",
+  "host_camp_card_title": "Host a Blood Donation Camp",
+  "host_camp_card_text": "Place a request to host a blood donation camp and help save lives.",
+  "host_camp_card_button": "Request Now",
+  "org_register_card_title": "Register your Organization",
+  "org_register_card_text": "Register your organization and host a blood donation camp.",
+  "org_register_card_button": "Register Now",
+  "modal_org_registration": "Please log in first to register your organization.",
+  "modal_camp_registration": "Please log in first to register your blood donation camp."
+}

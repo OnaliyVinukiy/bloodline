@@ -440,48 +440,38 @@ const sendApprovalEmail = async (appointment: any) => {
   await transporter.sendMail(mailOptions);
 };
 
-const MSPACE_API_BASE_URL = "https://api.mspace.lk";
-const MSPACE_SMS_SEND_PATH = "/sms/send";
+const MSPACE_API_BASE_URL = "https://api.mspace.lk/subscription/send";
 const MSPACE_API_VERSION = "1.0";
 const MSPACE_APPLICATION_ID = process.env.MSPACE_APPLICATION_ID;
 const MSPACE_PASSWORD = process.env.MSPACE_PASSWORD;
 
 const sendSMS = async (contactNumber: string, message: string) => {
   try {
-    console.log("Sending SMS to:", contactNumber);
-    let formattedContactNumber = contactNumber;
-    if (contactNumber.startsWith("0")) {
-      formattedContactNumber = `94${contactNumber.substring(1)}`;
-    } else if (!contactNumber.startsWith("94")) {
-      formattedContactNumber = `94${contactNumber}`;
-    }
+    //console.log("Sending SMS to:", contactNumber);
+    // let formattedContactNumber = contactNumber;
+    // if (contactNumber.startsWith("0")) {
+    //   formattedContactNumber = `94${contactNumber.substring(1)}`;
+    // } else if (!contactNumber.startsWith("94")) {
+    //   formattedContactNumber = `94${contactNumber}`;
+    // }
 
-    const finalContactNumber = `tel:${formattedContactNumber}`;
+    //const finalContactNumber = `tel:${formattedContactNumber}`;
 
     const requestBody = {
-      version: "1.0",
       applicationId: MSPACE_APPLICATION_ID,
       password: MSPACE_PASSWORD,
-      message: message,
-      destinationAddresses:["tel:94703334321"],
-      sourceAddress: "77011",
-      deliveryStatusRequest: "0",
-      encoding: "0",
-      
+      subscriberId: "tel:94703334321",
+      action: "1",
     };
-
-    const response = await axios.post(
-      `${MSPACE_API_BASE_URL}${MSPACE_SMS_SEND_PATH}`,
-      requestBody,
-      {
-        headers: {
-          "Content-Type": "application/json;charset=utf-8",
-        },
-      }
-    );
+    console.log("Request Body for SMS:", requestBody);
+    const response = await axios.post(`${MSPACE_API_BASE_URL}`, requestBody, {
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+      },
+    });
     console.log("App ID", MSPACE_APPLICATION_ID);
-    console.log("App PWD", MSPACE_PASSWORD);
-    console.log("SMS sent successfully to:", response.data);
+    console.log("SMS sent successfully:", response.data);
+    console.log("API", MSPACE_API_BASE_URL);
     return response.data;
   } catch (error: any) {
     console.error("Error sending SMS:", error.response?.data || error.message);
