@@ -1,0 +1,7 @@
+{
+  "hello_message": "Hello! I'm Bloodline Assistant. How can I help you with blood bank information today?",
+  "loading_message": "...",
+  "error_message": "Sorry, I encountered an error. Please try again later.",
+  "placeholder": "Type your message...",
+  "title": "Bloodline Assistant"
+}

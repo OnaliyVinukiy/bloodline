@@ -1,0 +1,13 @@
+{
+  "title": "Blood Type Information",
+  "subtitle": "Learn about different blood types and their importance in transfusions.",
+  "hover_info": "Hover over each blood type to see its significance.",
+  "a_positive_text": "One of the most common blood types and is in high demand for transfusions.",
+  "a_negative_text": "A rare blood type but can be given to A-, A+, AB-, and AB+ patients.",
+  "b_positive_text": "A relatively common blood type, making up around 8% of the global population.",
+  "b_negative_text": "One of the rarest blood types, found in only about 2% of people.",
+  "o_positive_text": "The most common blood type and is widely used in emergency transfusions.",
+  "o_negative_text": "The universal donor blood type, meaning it can be given to any patient.",
+  "ab_positive_text": "The universal recipient for red blood cells and is rare but valuable for plasma donations.",
+  "ab_negative_text": "The rarest blood type and is the universal donor for plasma transfusions."
+}

@@ -1,0 +1,13 @@
+{
+  "login_required": "Login Required",
+  "login_loading": "Loading...",
+  "login_button": "Login",
+  "cancel_button": "Cancel",
+  "update_button": "Update Profile",
+  "complete_button": "Complete Profile",
+  "updating_button": "Updating...",
+  "ok_button": "OK",
+  "find_donation_camp": "Find a Donation Camp",
+  "error_title": "Oops an Error!",
+  "error_message": "Error updating the profile. Please try again shortly."
+}
