@@ -37,6 +37,7 @@ import Donors from "./pages/admin/donor/Donors";
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { UserProvider } from "./contexts/UserContext";
+import LanguageSwitcher from "./components/LanguageSwitcher";
 
 function App() {
   const { state } = useAuthContext();
@@ -78,6 +79,7 @@ function App() {
       <div className="flex flex-col min-h-screen">
         <Router>
           <Navigationbar />
+          <LanguageSwitcher />
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home />} />
