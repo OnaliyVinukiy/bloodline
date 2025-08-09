@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { AuthProvider } from "@asgardeo/auth-react";
 import App from "./App.tsx";
 import "./index.css";
+import "./i18n.ts";
 
 // Check if we're in a production environment or local development
 const isProduction = window.location.hostname !== "localhost";
