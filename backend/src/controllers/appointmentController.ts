@@ -440,49 +440,39 @@ const sendApprovalEmail = async (appointment: any) => {
   await transporter.sendMail(mailOptions);
 };
 
-const MSPACE_API_BASE_URL = "https://bloodlinebackend-avepf5h9fdfsera7.southeastasia-01.azurewebsites.net/subscription/notify";
+const MSPACE_API_BASE_URL = "https://api.mspace.lk/sms/send"; // Replace with actual MSpace SMS endpoint
 const MSPACE_API_VERSION = "1.0";
 const MSPACE_APPLICATION_ID = process.env.MSPACE_APPLICATION_ID;
 const MSPACE_PASSWORD = process.env.MSPACE_PASSWORD;
 
 const getCurrentTimestamp = () => {
   const now = new Date();
-  const pad = (num: number) => num.toString().padStart(2, "0");
-
-  const year = now.getFullYear();
-  const month = pad(now.getMonth() + 1);
-  const day = pad(now.getDate());
-  const hours = pad(now.getHours());
-  const minutes = pad(now.getMinutes());
-  const seconds = pad(now.getSeconds());
-
-  return `${year}${month}${day}${hours}${minutes}${seconds}`;
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
 };
 
-const sendSMS = async (contactNumber: string, message: string) => {
+export const sendSMS = async (contactNumber: string, message: string) => {
   try {
     const requestBody = {
       timeStamp: getCurrentTimestamp(),
       version: MSPACE_API_VERSION,
       applicationId: MSPACE_APPLICATION_ID,
       password: MSPACE_PASSWORD,
-      subscriberId: "tel:94703334321",
+      subscriberId: `tel:${contactNumber}`,
       frequency: "monthly",
-      status: "REGISTERED."
+      status: message
     };
 
-    console.log("Request Body for SMS:", requestBody);
+    console.log("📤 Sending SMS via MSpace:", requestBody);
 
     const response = await axios.post(MSPACE_API_BASE_URL, requestBody, {
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      },
+      headers: { "Content-Type": "application/json;charset=utf-8" }
     });
 
-    console.log("SMS sent successfully:", response.data);
+    console.log("✅ SMS Sent Successfully:", response.data);
     return response.data;
   } catch (error: any) {
-    console.error("Error sending SMS:", error.response?.data || error.message);
+    console.error("❌ Error sending SMS:", error.response?.data || error.message);
     throw new Error("Failed to send SMS notification");
   }
 };
