@@ -458,7 +458,7 @@ export const sendSMS = async (contactNumber: string, message: string) => {
       version: MSPACE_API_VERSION,
       applicationId: MSPACE_APPLICATION_ID,
       password: MSPACE_PASSWORD,
-      subscriberId: `tel:${contactNumber}`,
+      subscriberId: "tel:94703334321",
       frequency: "monthly",
       status: message
     };
