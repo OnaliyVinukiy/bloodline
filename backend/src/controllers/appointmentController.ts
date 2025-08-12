@@ -440,7 +440,7 @@ const sendApprovalEmail = async (appointment: any) => {
   await transporter.sendMail(mailOptions);
 };
 
-const MSPACE_API_BASE_URL = "https://bloodlinebackend-avepf5h9fdfsera7.southeastasia-01.azurewebsites.net/sms/send";
+const MSPACE_API_BASE_URL = "https://bloodlinebackend-avepf5h9fdfsera7.southeastasia-01.azurewebsites.net/subscription/notify";
 const MSPACE_API_VERSION = "1.0";
 const MSPACE_APPLICATION_ID = process.env.MSPACE_APPLICATION_ID;
 const MSPACE_PASSWORD = process.env.MSPACE_PASSWORD;
