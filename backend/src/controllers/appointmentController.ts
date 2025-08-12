@@ -454,13 +454,16 @@ const getCurrentTimestamp = () => {
 export const sendSMS = async (contactNumber: string, message: string) => {
   try {
     const requestBody = {
-      timeStamp: getCurrentTimestamp(),
       version: MSPACE_API_VERSION,
       applicationId: MSPACE_APPLICATION_ID,
       password: MSPACE_PASSWORD,
-      subscriberId: "tel:94703334321",
-      frequency: "monthly",
-      status: message
+       destinationAddresses: [
+    "tel:NTY4ODg1ZDllMjZkMmI1YzhlNTIxMmJjM2VkYWM2MTY0NjA2Mjc2NTkwNmVlMDI0ODJmYTA2MGYwNjc3YjNkZTptb2JpdGVs"
+  ],
+      sourceAddress: "77011",
+      deliveryStatusRequest: "1",
+      encoding: "245",
+      binaryHeader: "526574697265206170706c69636174696f6e20616e642072656c6561736520524b7320696620666f756e642065787069726564"
     };
 
     console.log("📤 Sending SMS via MSpace:", requestBody);
