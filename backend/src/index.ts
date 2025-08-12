@@ -61,7 +61,7 @@ app.use("/api/stocks", stockRoutes);
 // Chatbot Routes
 app.use("/api/chatbot", chatRoutes);
 
-app.use("/subscription", subscriptionRoutes);
+app.use("/sms", subscriptionRoutes);
 
 // Home route
 app.get("/", (req: Request, res: Response): void => {
