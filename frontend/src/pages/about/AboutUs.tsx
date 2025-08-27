@@ -15,19 +15,21 @@ import {
   FaUsersCog,
   FaExpand,
 } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const AboutUs: React.FC = () => {
+  const { t } = useTranslation("about");
+
   return (
     <section className="bg-gray-50 py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-6 bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent leading-tight">
-            About Bloodline
+            {t("title")}
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Revolutionizing blood donation management for the National Blood
-            Transfusion Service of Sri Lanka
+            {t("subtitle")}
           </p>
         </div>
 
@@ -35,26 +37,18 @@ const AboutUs: React.FC = () => {
         <div className="bg-white rounded-xl shadow-md p-8 mb-16">
           <div className="flex items-center mb-6">
             <FaHeartbeat className="h-8 w-8 text-red-600 mr-3" />
-            <h2 className="text-2xl font-bold text-gray-800">Our Mission</h2>
+            <h2 className="text-2xl font-bold text-gray-800">
+              {t("mission_title")}
+            </h2>
           </div>
-          <p className="text-gray-600 mb-6">
-            The Bloodline Blood Bank Management System was developed to address
-            the challenges faced by the NBTS, blood donors, and blood donation
-            camp organizers. Our platform bridges the gap between donors and
-            recipients while streamlining operations for the National Blood
-            Transfusion Service.
-          </p>
-          <p className="text-gray-600">
-            Through innovative technology and user-centered design, we're
-            transforming Sri Lanka's blood donation ecosystem to ensure no
-            patient suffers from blood shortage.
-          </p>
+          <p className="text-gray-600 mb-6">{t("mission_paragraph_1")}</p>
+          <p className="text-gray-600">{t("mission_paragraph_2")}</p>
         </div>
 
         {/* Objectives Section */}
         <div className="mb-16">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-            Our Key Objectives
+            {t("objectives_title")}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -64,14 +58,10 @@ const AboutUs: React.FC = () => {
                   <FaHeartbeat className="h-6 w-6 text-red-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800">
-                  Intuitive Platform
+                  {t("objective_1_title")}
                 </h3>
               </div>
-              <p className="text-gray-600">
-                Designed with special attention to user experience for both
-                tech-savvy and non-technical users, ensuring seamless navigation
-                and minimal effort to access features.
-              </p>
+              <p className="text-gray-600">{t("objective_1_description")}</p>
             </div>
 
             <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
@@ -80,14 +70,10 @@ const AboutUs: React.FC = () => {
                   <FaShieldAlt className="h-6 w-6 text-red-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800">
-                  Secure Database
+                  {t("objective_2_title")}
                 </h3>
               </div>
-              <p className="text-gray-600">
-                Built on Azure and Asgardeo with enterprise-grade security
-                including data encryption, access controls, and secure
-                authentication to protect sensitive donor information.
-              </p>
+              <p className="text-gray-600">{t("objective_2_description")}</p>
             </div>
 
             <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
@@ -96,14 +82,10 @@ const AboutUs: React.FC = () => {
                   <FaCalendarAlt className="h-6 w-6 text-red-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800">
-                  Appointment System
+                  {t("objective_3_title")}
                 </h3>
               </div>
-              <p className="text-gray-600">
-                Robust online booking reduces waiting times by allowing donors
-                to select convenient slots, while enabling NBTS to manage
-                appointment requests efficiently.
-              </p>
+              <p className="text-gray-600">{t("objective_3_description")}</p>
             </div>
 
             <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
@@ -112,14 +94,10 @@ const AboutUs: React.FC = () => {
                   <FaUsersCog className="h-6 w-6 text-red-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800">
-                  Camp Management
+                  {t("objective_4_title")}
                 </h3>
               </div>
-              <p className="text-gray-600">
-                Streamlines camp organization with online registration, NBTS
-                approval workflows, and medical team allocation - eliminating
-                paperwork and delays.
-              </p>
+              <p className="text-gray-600">{t("objective_4_description")}</p>
             </div>
 
             <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
@@ -128,14 +106,10 @@ const AboutUs: React.FC = () => {
                   <FaFlask className="h-6 w-6 text-red-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800">
-                  Stock Management
+                  {t("objective_5_title")}
                 </h3>
               </div>
-              <p className="text-gray-600">
-                Comprehensive tracking of blood stock levels with complete
-                history of additions and issuances, ensuring optimal inventory
-                management at NBTS.
-              </p>
+              <p className="text-gray-600">{t("objective_5_description")}</p>
             </div>
 
             <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
@@ -144,14 +118,10 @@ const AboutUs: React.FC = () => {
                   <FaEnvelope className="h-6 w-6 text-red-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800">
-                  Notification System
+                  {t("objective_6_title")}
                 </h3>
               </div>
-              <p className="text-gray-600">
-                Automated emails keep donors engaged with updates on local
-                campaigns and appointment confirmations, while camp organizers
-                receive camp approval notifications.
-              </p>
+              <p className="text-gray-600">{t("objective_6_description")}</p>
             </div>
           </div>
         </div>
@@ -159,32 +129,24 @@ const AboutUs: React.FC = () => {
         {/* Additional Features */}
         <div className="bg-white rounded-xl shadow-md p-8 mb-16">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">
-            System Features
+            {t("features_title")}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                 <FaShieldAlt className="h-5 w-5 text-red-600 mr-2" />
-                Role-Based Access Control
+                {t("feature_1_title")}
               </h3>
-              <p className="text-gray-600">
-                Strict access control enforced through WSO2 Asgardeo ensures
-                only authorized personnel have appropriate system privileges,
-                maintaining healthcare data security.
-              </p>
+              <p className="text-gray-600">{t("feature_1_description")}</p>
             </div>
 
             <div>
               <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                 <FaExpand className="h-5 w-5 text-red-600 mr-2" />
-                Future-Ready Architecture
+                {t("feature_2_title")}
               </h3>
-              <p className="text-gray-600">
-                Designed with scalability in mind, the system can easily
-                accommodate new features, increased user loads, and integration
-                with other healthcare systems as needed.
-              </p>
+              <p className="text-gray-600">{t("feature_2_description")}</p>
             </div>
           </div>
         </div>
@@ -192,23 +154,16 @@ const AboutUs: React.FC = () => {
         {/* Future Impact Statement */}
         <div className="bg-gradient-to-r from-red-700 to-red-900 rounded-xl shadow-md p-8 text-white">
           <h2 className="text-2xl font-bold mb-4">
-            The Future of Blood Donation in Sri Lanka
+            {t("future_impact_title")}
           </h2>
-          <p className="mb-6">
-            Bloodline is designed to revolutionize how NBTS manages blood
-            donations, with anticipated improvements in:
-          </p>
+          <p className="mb-6">{t("future_impact_intro")}</p>
           <ul className="list-disc pl-5 mb-6 space-y-2">
-            <li>Streamlining donor registration and appointment processes</li>
-            <li>Reducing administrative burdens for NBTS staff</li>
-            <li>Improving blood stock visibility across all centers</li>
-            <li>Enhancing donor engagement and retention</li>
+            <li>{t("future_impact_list_item_1")}</li>
+            <li>{t("future_impact_list_item_2")}</li>
+            <li>{t("future_impact_list_item_3")}</li>
+            <li>{t("future_impact_list_item_4")}</li>
           </ul>
-          <p>
-            By implementing this system, NBTS will be better equipped to meet
-            Sri Lanka's blood supply needs through modern, technology-driven
-            solutions.
-          </p>
+          <p>{t("future_impact_conclusion")}</p>
         </div>
       </div>
     </section>

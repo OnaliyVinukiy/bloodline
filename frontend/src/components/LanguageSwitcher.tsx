@@ -9,23 +9,23 @@ const LanguageSwitcher: React.FC = () => {
   };
 
   return (
-    <div className="flex space-x-2">
+    <div className="flex items-center border border-gray-300 rounded-full p-1 bg-white shadow-sm">
       <button
         onClick={() => handleLanguageChange("en")}
-        className={`px-3 py-1 rounded-md text-sm ${
+        className={`px-3 py-1 rounded-full text-sm font-medium ${
           i18n.language === "en"
-            ? "bg-red-800 text-white"
-            : "bg-gray-200 text-gray-800"
+            ? "bg-red-700 text-white"
+            : "text-gray-700 hover:bg-gray-100"
         }`}
       >
-        EN
+        English
       </button>
       <button
         onClick={() => handleLanguageChange("si")}
-        className={`px-3 py-1 rounded-md text-sm ${
+        className={`px-3 py-1 rounded-full text-sm font-medium ${
           i18n.language === "si"
-            ? "bg-red-800 text-white"
-            : "bg-gray-200 text-gray-800"
+            ? "bg-red-700 text-white"
+            : "text-gray-700 hover:bg-gray-100"
         }`}
       >
         සිංහල

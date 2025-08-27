@@ -1,0 +1,21 @@
+{
+  "loading": "පැටවෙමින් පවතී...",
+  "donor_profile": "පැතිකඩ",
+  "organization_profile": "සංවිධානය",
+  "organized_camps": "කඳවුරු",
+  "donations": "පරිත්‍යාග",
+  "appointments": "වරයන්",
+  "sign_out": "පිටවීම",
+  "admin_dashboard": "පරිපාලක උපකරණ පුවරුව",
+  "admin_appointments": "වරයන්",
+  "admin_donors": "දායකයින්",
+  "admin_organizations": "සංවිධාන",
+  "admin_camps": "කඳවුරු",
+  "admin_calendar": "දින දර්ශනය",
+  "admin_stocks": "තොග",
+  "login_button": "ලොගින් වෙන්න",
+  "home": "මුල් පිටුව",
+  "about": "අපි ගැන",
+  "services": "සේවා",
+  "contact_us": "අප අමතන්න"
+}
