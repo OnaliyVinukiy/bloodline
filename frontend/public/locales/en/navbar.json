@@ -1,0 +1,21 @@
+{
+  "loading": "Loading...",
+  "donor_profile": "Profile",
+  "organization_profile": "Organization",
+  "organized_camps": "Camps",
+  "donations": "Donations",
+  "appointments": "Appointments",
+  "sign_out": "Sign out",
+  "admin_dashboard": "Admin Dashboard",
+  "admin_appointments": "Appointments",
+  "admin_donors": "Donors",
+  "admin_organizations": "Organizations",
+  "admin_camps": "Camps",
+  "admin_calendar": "Calendar",
+  "admin_stocks": "Stocks",
+  "login_button": "Login",
+  "home": "Home",
+  "about": "About",
+  "services": "Services",
+  "contact_us": "Contact Us"
+}
