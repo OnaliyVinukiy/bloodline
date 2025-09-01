@@ -14,26 +14,41 @@ import {
   getStockIssuanceHistory,
   getAvailableStockEntries,
 } from "../controllers/stockController";
-import { authenticateUser } from "../middleware/authMiddleware";
+import { authenticateUser, authorizeAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
 //Fetch all blood stocks
-router.get("/fetch-stocks", authenticateUser, fetchStocks);
+router.get("/fetch-stocks", authenticateUser, authorizeAdmin, fetchStocks);
 
 //Update blood stock
-router.post("/update-stock", authenticateUser, updateStock);
+router.post("/update-stock", authenticateUser, authorizeAdmin, updateStock);
 
 //Issue blood stock
-router.post("/issue-stock", authenticateUser, issueBloodStock);
+router.post("/issue-stock", authenticateUser, authorizeAdmin, issueBloodStock);
 
 //Fetch blood stock addition history
-router.get("/addition-history", getStockAdditionHistory);
+router.get(
+  "/addition-history",
+  authenticateUser,
+  authorizeAdmin,
+  getStockAdditionHistory
+);
 
 //Fetch blood stock issuance history
-router.get("/issuance-history", getStockIssuanceHistory);
+router.get(
+  "/issuance-history",
+  authenticateUser,
+  authorizeAdmin,
+  getStockIssuanceHistory
+);
 
 //Fetch blood stock history
-router.get("/history", getAvailableStockEntries);
+router.get(
+  "/history",
+  authenticateUser,
+  authorizeAdmin,
+  getAvailableStockEntries
+);
 
 export default router;
