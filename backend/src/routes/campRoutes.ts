@@ -17,9 +17,9 @@ import {
   checkTeamAvailability,
   getCampsCount,
   getCampsByMonth,
-  getCampByEmail
+  getCampByEmail,
 } from "../controllers/campController";
-import { authenticateUser } from "../middleware/authMiddleware";
+import { authenticateUser, authorizeAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -39,13 +39,13 @@ router.get("/fetch-camp/:id", authenticateUser, getCampById);
 router.get("/fetch-camp-email/:repEmail", authenticateUser, getCampByEmail);
 
 // Route to approve camp
-router.put("/approve-camp/:id", authenticateUser, approveCamp);
+router.put("/approve-camp/:id", authenticateUser, authorizeAdmin, approveCamp);
 
 // Route to reject camp
-router.put("/reject-camp/:id", authenticateUser, rejectCamp);
+router.put("/reject-camp/:id", authenticateUser, authorizeAdmin, rejectCamp);
 
 // Route to allocate a team
-router.put("/allocate-team", authenticateUser, allocateTeam);
+router.put("/allocate-team", authenticateUser, authorizeAdmin, allocateTeam);
 
 //Route to check team availability
 router.get("/availability", checkTeamAvailability);
