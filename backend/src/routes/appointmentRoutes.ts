@@ -19,7 +19,7 @@ import {
   updateAppointment,
   cancelAppointment,
 } from "../controllers/appointmentController";
-import { authenticateUser } from "../middleware/authMiddleware";
+import { authenticateUser, authorizeAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -47,10 +47,20 @@ router.get(
 );
 
 // Route to approve appointment
-router.put("/approve-appointment/:id", authenticateUser, approveAppointment);
+router.put(
+  "/approve-appointment/:id",
+  authenticateUser,
+  authorizeAdmin,
+  approveAppointment
+);
 
 // Route to reject appointment
-router.put("/reject-appointment/:id", authenticateUser, rejectAppointment);
+router.put(
+  "/reject-appointment/:id",
+  authenticateUser,
+  authorizeAdmin,
+  rejectAppointment
+);
 
 // Route to cancel appointment
 router.put("/cancel-appointment/:id", authenticateUser, cancelAppointment);
