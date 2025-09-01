@@ -41,17 +41,40 @@ export const authenticateUser = (
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
   }
 
   const token = authHeader.split(" ")[1];
 
   jwt.verify(token, getKey, { algorithms: ["RS256"] }, (err, decoded) => {
     if (err) {
-      return res.status(401).json({ message: "Invalid token" });
+      return res
+        .status(401)
+        .json({ message: "Invalid token", error: err.message });
     }
-
     req.user = decoded;
     next();
   });
+};
+
+export const authorizeAdmin = (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = req.user;
+  console.log("Inspecting req.user in authorizeAdmin:", user);
+
+  if (
+    user &&
+    user.roles &&
+    Array.isArray(user.roles) &&
+    user.roles.includes("Admin")
+  ) {
+    return next();
+  }
+
+  return res
+    .status(403)
+    .json({ message: "Access Forbidden: Admin role required" });
 };
