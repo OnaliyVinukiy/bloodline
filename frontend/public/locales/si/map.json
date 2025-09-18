@@ -1,0 +1,12 @@
+{
+  "title": "රුධිර දන්දීමේ කඳවුරු සොයන්න",
+  "select_province": "පළාතක් තෝරන්න",
+  "select_district": "දිස්ත්‍රික්කයක් තෝරන්න",
+  "select_city": "නගරයක් තෝරන්න",
+  "loading_camps": "කඳවුරු පටවමින්...",
+  "no_camps_found": "කණගාටුයි ! තෝරාගත් නගරයේ රුධිර දන්දීමේ කඳවුරු නොමැත.",
+  "info_window_date": "දිනය:",
+  "info_window_time": "වේලාව:",
+  "info_window_location": "ස්ථානය:",
+  "info_window_contact": "සම්බන්ධතා:"
+}
