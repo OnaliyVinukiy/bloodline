@@ -15,19 +15,21 @@ import {
   FaChartLine,
 } from "react-icons/fa";
 import { GiHealthIncrease } from "react-icons/gi";
+import { useTranslation } from "react-i18next";
 
 const Services: React.FC = () => {
+  const { t } = useTranslation("services");
+
   return (
     <section className="bg-gray-50 py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-6 bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent leading-tight">
-            Our Services
+            {t("title")}
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Comprehensive solutions designed to transform blood donation
-            management for the National Blood Transfusion Service of Sri Lanka
+            {t("subtitle")}
           </p>
         </div>
 
@@ -37,7 +39,9 @@ const Services: React.FC = () => {
             <div className="bg-red-700 p-4 text-white">
               <div className="flex items-center">
                 <FaUsers className="h-8 w-8 mr-3" />
-                <h2 className="text-xl font-bold">Donor Services</h2>
+                <h2 className="text-xl font-bold">
+                  {t("donor_services_title")}
+                </h2>
               </div>
             </div>
             <div className="p-6">
@@ -46,11 +50,10 @@ const Services: React.FC = () => {
                   <FaCalendarAlt className="h-5 w-5 text-red-600 mt-1 mr-3 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      Online Appointment Booking
+                      {t("online_booking_title")}
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Schedule donations at your convenience with our
-                      easy-to-use booking system
+                      {t("online_booking_description")}
                     </p>
                   </div>
                 </li>
@@ -58,11 +61,10 @@ const Services: React.FC = () => {
                   <GiHealthIncrease className="h-5 w-5 text-red-600 mt-1 mr-3 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      Donor Health Tracking
+                      {t("health_tracking_title")}
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Maintain your donation history and track eligibility
-                      periods
+                      {t("health_tracking_description")}
                     </p>
                   </div>
                 </li>
@@ -70,11 +72,10 @@ const Services: React.FC = () => {
                   <FaBell className="h-5 w-5 text-red-600 mt-1 mr-3 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      Email Notifications
+                      {t("donor_notifications_title")}
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Receive emails about appointment status and appointment
-                      reminders
+                      {t("donor_notifications_description")}
                     </p>
                   </div>
                 </li>
@@ -87,7 +88,9 @@ const Services: React.FC = () => {
             <div className="bg-red-700 p-4 text-white">
               <div className="flex items-center">
                 <FaFlask className="h-8 w-8 mr-3" />
-                <h2 className="text-xl font-bold">NBTS Services</h2>
+                <h2 className="text-xl font-bold">
+                  {t("nbts_services_title")}
+                </h2>
               </div>
             </div>
             <div className="p-6">
@@ -96,11 +99,10 @@ const Services: React.FC = () => {
                   <FaChartLine className="h-5 w-5 text-red-600 mt-1 mr-3 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      Real-time Inventory Management
+                      {t("inventory_management_title")}
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Add, issue and track current blood stock levels available
-                      for each blood type
+                      {t("inventory_management_description")}
                     </p>
                   </div>
                 </li>
@@ -108,11 +110,10 @@ const Services: React.FC = () => {
                   <FaUsers className="h-5 w-5 text-red-600 mt-1 mr-3 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      Donor Database Management
+                      {t("donor_db_management_title")}
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Maintain comprehensive donor records with advanced
-                      filtering capabilities
+                      {t("donor_db_management_description")}
                     </p>
                   </div>
                 </li>
@@ -120,11 +121,10 @@ const Services: React.FC = () => {
                   <FaShieldAlt className="h-5 w-5 text-red-600 mt-1 mr-3 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      Secure Data Handling
+                      {t("secure_data_title")}
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Enterprise-grade security for all sensitive donor and
-                      inventory data
+                      {t("secure_data_description")}
                     </p>
                   </div>
                 </li>
@@ -137,7 +137,9 @@ const Services: React.FC = () => {
             <div className="bg-red-700 p-4 text-white">
               <div className="flex items-center">
                 <FaCalendarAlt className="h-8 w-8 mr-3" />
-                <h2 className="text-xl font-bold">Camp Services</h2>
+                <h2 className="text-xl font-bold">
+                  {t("camp_services_title")}
+                </h2>
               </div>
             </div>
             <div className="p-6">
@@ -146,11 +148,10 @@ const Services: React.FC = () => {
                   <FaUsers className="h-5 w-5 text-red-600 mt-1 mr-3 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      Online Camp Registration
+                      {t("online_camp_registration_title")}
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Easily organize and register blood donation camps through
-                      our platform
+                      {t("online_camp_registration_description")}
                     </p>
                   </div>
                 </li>
@@ -158,11 +159,10 @@ const Services: React.FC = () => {
                   <FaBell className="h-5 w-5 text-red-600 mt-1 mr-3 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      Donor Email Notifications
+                      {t("camp_notifications_donors_title")}
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Donors receive email notifications about camp schedules
-                      and updates
+                      {t("camp_notifications_donors_description")}
                     </p>
                   </div>
                 </li>
@@ -170,11 +170,10 @@ const Services: React.FC = () => {
                   <FaBell className="h-5 w-5 text-red-600 mt-1 mr-3 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      Email Notifications
+                      {t("camp_notifications_orgs_title")}
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Receive email notifications about camp acceptance or
-                      rejection
+                      {t("camp_notifications_orgs_description")}
                     </p>
                   </div>
                 </li>
@@ -186,7 +185,7 @@ const Services: React.FC = () => {
         {/* Integrated Features */}
         <div className="bg-white rounded-xl shadow-md p-8 mb-16">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">
-            Integrated System Features
+            {t("integrated_features_title")}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="flex items-start">
@@ -195,11 +194,10 @@ const Services: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  Role-Based Access Control
+                  {t("role_based_access_title")}
                 </h3>
                 <p className="text-gray-600">
-                  Secure, granular permissions ensuring only authorized
-                  personnel can access specific system functions
+                  {t("role_based_access_description")}
                 </p>
               </div>
             </div>
@@ -209,11 +207,10 @@ const Services: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  Automated Notifications
+                  {t("automated_notifications_title")}
                 </h3>
                 <p className="text-gray-600">
-                  Timely alerts for appointment confirmations, rejections,
-                  reminders, and camp updates
+                  {t("automated_notifications_description")}
                 </p>
               </div>
             </div>
@@ -223,11 +220,10 @@ const Services: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  Important Statistics
+                  {t("important_stats_title")}
                 </h3>
                 <p className="text-gray-600">
-                  Provide important statistics about donors, organizations,
-                  appointments, camps and stock to NBTS for decision making
+                  {t("important_stats_description")}
                 </p>
               </div>
             </div>
@@ -236,16 +232,11 @@ const Services: React.FC = () => {
 
         {/* Call to Action */}
         <div className="bg-gradient-to-r from-red-700 to-red-900 rounded-xl shadow-md p-8 text-white text-center">
-          <h2 className="text-2xl font-bold mb-4">
-            Ready to Transform Blood Donation Management?
-          </h2>
-          <p className="mb-6 max-w-2xl mx-auto">
-            Discover how Bloodline can streamline your blood donation processes,
-            whether you're a donor, NBTS administrator, or camp organizer.
-          </p>
+          <h2 className="text-2xl font-bold mb-4">{t("cta_title")}</h2>
+          <p className="mb-6 max-w-2xl mx-auto">{t("cta_subtitle")}</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button className="border-2 border-white text-white font-semibold px-6 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors">
-              Contact Our Team
+              {t("cta_button")}
             </button>
           </div>
         </div>
