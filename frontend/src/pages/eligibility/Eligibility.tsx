@@ -6,48 +6,48 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 const EligibilityCriteria: React.FC = () => {
+  const { t } = useTranslation("eligibility");
+
   const eligibilityCriteria = [
-    "Age above 18 years and below 60 years.",
-    "If previously donated, at least 4 months should be elapsed since the date of previous donation.",
-    "Hemoglobin level should be more than 12g/dL. (this blood test is done prior to each blood donation)",
-    "Free from any serious disease condition or pregnancy.",
-    "Should have a valid identity card or any other document to prove the identity.",
-    "Free from 'Risk Behaviors'.",
+    t("criteria_1"),
+    t("criteria_2"),
+    t("criteria_3"),
+    t("criteria_4"),
+    t("criteria_5"),
+    t("criteria_6"),
   ];
 
   const riskBehaviors = [
-    "Homosexuals.",
-    "Sex workers.",
-    "Clients of sex workers",
-    "Drug addicts.",
-    "Engaging in sex with any of the above.",
-    "Having more than one sexual partner.",
+    t("risk_behavior_1"),
+    t("risk_behavior_2"),
+    t("risk_behavior_3"),
+    t("risk_behavior_4"),
+    t("risk_behavior_5"),
+    t("risk_behavior_6"),
   ];
 
   const donorTypes = [
     {
-      type: "Voluntary non-remunerated donors",
-      description:
-        "Donate for the sake of others and do not expect any benefit. Their blood is considered safe and healthy.",
+      type: t("donor_type_1_type"),
+      description: t("donor_type_1_description"),
       icon: "❤️",
     },
     {
-      type: "Replacement donors",
-      description:
-        "Donate to replace the units used for their friends or family members. Not accepted by NBTS.",
+      type: t("donor_type_2_type"),
+      description: t("donor_type_2_description"),
       icon: "🔄",
     },
     {
-      type: "Paid donors",
-      description: "Receive payment for donation. Not accepted by NBTS.",
+      type: t("donor_type_3_type"),
+      description: t("donor_type_3_description"),
       icon: "💰",
     },
     {
-      type: "Directed donors",
-      description:
-        "Donate only for a specific patient’s requirement. Used in certain conditions such as in rare blood groups.",
+      type: t("donor_type_4_type"),
+      description: t("donor_type_4_description"),
       icon: "🎯",
     },
   ];
@@ -56,17 +56,16 @@ const EligibilityCriteria: React.FC = () => {
     <section className="bg-gray-10 py-16">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <h1 className="text-5xl font-bold text-center mb-6 bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent leading-tight pb-2">
-          Blood Donation Eligibility Criteria
+          {t("title")}
         </h1>
 
         <p className="mt-2 text-lg text-gray-700 text-center mb-12 max-w-2xl mx-auto">
-          The criteria below ensure the safety of both the donor and the quality
-          of the donated blood.
+          {t("subtitle")}
         </p>
 
         <div className="mb-16">
           <h2 className="text-3xl font-semibold text-red-700 mb-6 text-center">
-            Donor Selection Criteria
+            {t("donor_selection_title")}
           </h2>
           <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {eligibilityCriteria.map((criteria, index) => (
@@ -84,7 +83,7 @@ const EligibilityCriteria: React.FC = () => {
 
         <div className="mb-16">
           <h2 className="text-3xl font-semibold text-red-700 mb-6 text-center">
-            Risk Behaviors
+            {t("risk_behaviors_title")}
           </h2>
           <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {riskBehaviors.map((behavior, index) => (
@@ -103,7 +102,7 @@ const EligibilityCriteria: React.FC = () => {
 
         <div className="mb-16">
           <h2 className="text-3xl font-semibold text-red-700 mb-6 text-center">
-            Types of Donors
+            {t("donor_types_title")}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {donorTypes.map((donor, index) => (
@@ -121,11 +120,7 @@ const EligibilityCriteria: React.FC = () => {
           </div>
         </div>
         <div className="mb-6 p-4 bg-yellow-100 rounded-lg">
-          <p className="text-yellow-700 text-center">
-            {" "}
-            NBTS achieved the mighty figure of 100% voluntary non-remunerated
-            blood donor base.
-          </p>
+          <p className="text-yellow-700 text-center"> {t("note_message")}</p>
         </div>
       </div>
     </section>
