@@ -1,0 +1,12 @@
+{
+  "title": "Find Blood Donation Camps",
+  "select_province": "Select Province",
+  "select_district": "Select District",
+  "select_city": "Select City",
+  "loading_camps": "Loading camps...",
+  "no_camps_found": "Sorry ! There are No Blood Donation Camps Available in the Selected City.",
+  "info_window_date": "Date:",
+  "info_window_time": "Time:",
+  "info_window_location": "Location:",
+  "info_window_contact": "Contact:"
+}

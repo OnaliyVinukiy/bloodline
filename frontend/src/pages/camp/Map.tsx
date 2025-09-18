@@ -14,8 +14,10 @@ import {
   useLoadScript,
   InfoWindowF,
 } from "@react-google-maps/api";
+import { useTranslation } from "react-i18next";
 
 const Map: React.FC = () => {
+  const { t } = useTranslation("map");
   const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   const { isLoaded } = useLoadScript({
@@ -155,7 +157,7 @@ const Map: React.FC = () => {
     <div className="p-8 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <h1 className="mt-4 text-4xl font-bold text-center mb-6 bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent leading-tight pb-2">
-          Find Blood Donation Camps
+          {t("title")}
         </h1>
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -165,7 +167,7 @@ const Map: React.FC = () => {
               onChange={(e) => setSelectedProvince(e.target.value)}
               className="w-full"
             >
-              <option value="">Select Province</option>
+              <option value="">{t("select_province")}</option>
               {provinces.map((p) => (
                 <option key={p.province_id} value={p.province_name_en}>
                   {p.province_name_en}
@@ -179,7 +181,7 @@ const Map: React.FC = () => {
               onChange={(e) => setSelectedDistrict(e.target.value)}
               className="w-full"
             >
-              <option value="">Select District</option>
+              <option value="">{t("select_district")}</option>
               {districts.map((d) => (
                 <option key={d.district_id} value={d.district_name_en}>
                   {d.district_name_en}
@@ -193,7 +195,7 @@ const Map: React.FC = () => {
               onChange={(e) => setSelectedCity(e.target.value)}
               className="w-full"
             >
-              <option value="">Select City</option>
+              <option value="">{t("select_city")}</option>
               {cities.map((c) => (
                 <option key={c.city_id} value={c.city_name_en}>
                   {c.city_name_en}
@@ -225,8 +227,7 @@ const Map: React.FC = () => {
         ) : noCampsFound ? (
           <div className="mb-6 p-4 bg-red-200 rounded-lg">
             <p className="text-red-700 text-center font-semibold font-opensans">
-              Sorry ! There are No Blood Donation Camps Available in the
-              Selected City.
+              {t("no_camps_found")}
             </p>
           </div>
         ) : isLoaded ? (
@@ -257,13 +258,14 @@ const Map: React.FC = () => {
                           {marker.organizationName}
                         </h2>
                         <p className="text-sm">
-                          <strong>Date:</strong> {marker.date}
+                          <strong>{t("info_window_date")}</strong> {marker.date}
                         </p>
                         <p className="text-sm">
-                          <strong>Time:</strong> {marker.startTime}
+                          <strong>{t("info_window_time")}</strong>{" "}
+                          {marker.startTime}
                         </p>
                         <p className="text-sm">
-                          <strong> Location: </strong>{" "}
+                          <strong> {t("info_window_location")} </strong>{" "}
                           <a
                             href={marker.googleMapLink}
                             target="_blank"
@@ -275,7 +277,7 @@ const Map: React.FC = () => {
                           </a>
                         </p>
                         <p className="text-sm">
-                          Contact:{" "}
+                          {t("info_window_contact")}{" "}
                           <a
                             href={`tel:${marker.contactNumber}`}
                             className="text-blue-500"
