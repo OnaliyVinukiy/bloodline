@@ -440,41 +440,42 @@ const sendApprovalEmail = async (appointment: any) => {
   await transporter.sendMail(mailOptions);
 };
 
-const MSPACE_API_BASE_URL = "https://api.mspace.lk/subscription/send";
+const MSPACE_API_BASE_URL = "https://bloodlinebackend-avepf5h9fdfsera7.southeastasia-01.azurewebsites.net/sms/send"; // Replace with actual MSpace SMS endpoint
 const MSPACE_API_VERSION = "1.0";
 const MSPACE_APPLICATION_ID = process.env.MSPACE_APPLICATION_ID;
 const MSPACE_PASSWORD = process.env.MSPACE_PASSWORD;
 
-const sendSMS = async (contactNumber: string, message: string) => {
+const getCurrentTimestamp = () => {
+  const now = new Date();
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+};
+
+export const sendSMS = async (contactNumber: string, message: string) => {
   try {
-    //console.log("Sending SMS to:", contactNumber);
-    // let formattedContactNumber = contactNumber;
-    // if (contactNumber.startsWith("0")) {
-    //   formattedContactNumber = `94${contactNumber.substring(1)}`;
-    // } else if (!contactNumber.startsWith("94")) {
-    //   formattedContactNumber = `94${contactNumber}`;
-    // }
-
-    //const finalContactNumber = `tel:${formattedContactNumber}`;
-
     const requestBody = {
+      version: MSPACE_API_VERSION,
       applicationId: MSPACE_APPLICATION_ID,
       password: MSPACE_PASSWORD,
-      subscriberId: "tel:94703334321",
-      action: "1",
+       destinationAddresses: [
+    "tel:NTY4ODg1ZDllMjZkMmI1YzhlNTIxMmJjM2VkYWM2MTY0NjA2Mjc2NTkwNmVlMDI0ODJmYTA2MGYwNjc3YjNkZTptb2JpdGVs"
+  ],
+      sourceAddress: "77011",
+      deliveryStatusRequest: "1",
+      encoding: "245",
+      binaryHeader: "526574697265206170706c69636174696f6e20616e642072656c6561736520524b7320696620666f756e642065787069726564"
     };
-    console.log("Request Body for SMS:", requestBody);
-    const response = await axios.post(`${MSPACE_API_BASE_URL}`, requestBody, {
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      },
+
+    console.log("📤 Sending SMS via MSpace:", requestBody);
+
+    const response = await axios.post(MSPACE_API_BASE_URL, requestBody, {
+      headers: { "Content-Type": "application/json;charset=utf-8" }
     });
-    console.log("App ID", MSPACE_APPLICATION_ID);
-    console.log("SMS sent successfully:", response.data);
-    console.log("API", MSPACE_API_BASE_URL);
+
+    console.log("✅ SMS Sent Successfully:", response.data);
     return response.data;
   } catch (error: any) {
-    console.error("Error sending SMS:", error.response?.data || error.message);
+    console.error("❌ Error sending SMS:", error.response?.data || error.message);
     throw new Error("Failed to send SMS notification");
   }
 };

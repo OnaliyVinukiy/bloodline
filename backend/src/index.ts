@@ -17,7 +17,8 @@ import campRoutes from "./routes/campRoutes";
 import organizationRoutes from "./routes/organizationRoutes";
 import stockRoutes from "./routes/stockRoutes";
 import chatRoutes from "./routes/chatRoutes";
-
+import subscriptionRoutes from "./routes/subscriptionRoutes";
+import smsRoutes from "./routes/smsRoutes";
 const app = express();
 
 // CORS Configuration
@@ -59,6 +60,10 @@ app.use("/api/stocks", stockRoutes);
 
 // Chatbot Routes
 app.use("/api/chatbot", chatRoutes);
+
+app.use("/sms", subscriptionRoutes);
+
+app.use("/subscription", smsRoutes);
 
 // Home route
 app.get("/", (req: Request, res: Response): void => {
