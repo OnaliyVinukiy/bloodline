@@ -190,7 +190,9 @@ router.post("/request-otp", async (req, res) => {
       }
     }
 
-    res.status(500).json({ success: false, error: errorMessage, details: errorDetails });
+    res
+      .status(500)
+      .json({ success: false, error: errorMessage, details: errorDetails });
   }
 });
 
@@ -258,7 +260,9 @@ router.post("/verify-otp", async (req, res) => {
         "Axios request error";
     }
 
-    res.status(500).json({ success: false, error: errorMessage, details: errorDetails });
+    res
+      .status(500)
+      .json({ success: false, error: errorMessage, details: errorDetails });
   }
 });
 
