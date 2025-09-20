@@ -25,6 +25,13 @@ export default function Profile() {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
 
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState("");
+  const [otp, setOtp] = useState("");
+  const [subscriptionId, setSubscriptionId] = useState("");
+  const [isRequestingOtp, setIsRequestingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+
   const [province, setProvince] = useState<
     { province_id: string; province_name_en: string }[]
   >([]);
@@ -52,6 +59,8 @@ export default function Profile() {
     avatar: "",
     gender: "",
     status: "active",
+    isSubscribed: false,
+    maskedNumber: "",
   });
 
   const [isProfileComplete, setIsProfileComplete] = useState(false);
@@ -182,6 +191,93 @@ export default function Profile() {
   const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCity = event.target.value;
     setDonor((prev) => ({ ...prev, city: selectedCity }));
+  };
+
+  const handleRequestOtp = async () => {
+    if (!donor.contactNumber) {
+      showValidationMessage(
+        "Missing Phone Number",
+        "Please add a valid phone number before subscribing to notifications."
+      );
+      return;
+    }
+
+    setIsRequestingOtp(true);
+    try {
+      const response = await axios.post(
+        `${backendURL}/subscription/request-otp`,
+        {
+          phone: donor.contactNumber,
+        }
+      );
+
+      if (response.data.success) {
+        setSubscriptionId(response.data.subscriptionId);
+        setSubscriptionStatus("otp_sent");
+      } else {
+        setSubscriptionStatus("error");
+        console.error("Failed to send OTP:", response.data.error);
+      }
+    } catch (error) {
+      setSubscriptionStatus("error");
+      console.error("Error requesting OTP:", error);
+    } finally {
+      setIsRequestingOtp(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setIsVerifyingOtp(true);
+    try {
+      const response = await axios.post(
+        `${backendURL}/subscription/verify-otp`,
+        {
+          phone: donor.contactNumber,
+          otp: otp,
+          subscriptionId: subscriptionId,
+        }
+      );
+
+      if (response.data.success) {
+        setSubscriptionStatus("success");
+
+        // Update donor record with subscription status
+        const updatedDonor = {
+          ...donor,
+          isSubscribed: true,
+        };
+
+        // We'll get the masked number from the webhook, so we don't set it here
+        setDonor(updatedDonor);
+
+        // Update the donor record in the database
+        await axios.post(`${backendURL}/api/update-donor`, updatedDonor);
+      } else {
+        setSubscriptionStatus("error");
+      }
+    } catch (error) {
+      setSubscriptionStatus("error");
+      console.error("Error verifying OTP:", error);
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
+  const handleUnsubscribe = async () => {
+    // Implement unsubscribe logic if needed
+    const updatedDonor = {
+      ...donor,
+      isSubscribed: false,
+      maskedNumber: "",
+    };
+
+    setDonor(updatedDonor);
+
+    try {
+      await axios.post(`${backendURL}/api/update-donor`, updatedDonor);
+    } catch (error) {
+      console.error("Error updating subscription status:", error);
+    }
   };
 
   //Fetch districts list
@@ -739,6 +835,41 @@ export default function Profile() {
                 />
               </div>
             )}
+            {/* Subscription Section */}
+            <div className="mt-6 p-4 border rounded-lg">
+              <h3 className="text-lg font-medium text-indigo-900 mb-4">
+                SMS Notifications
+              </h3>
+
+              <div className="flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  id="sms-subscription"
+                  checked={donor.isSubscribed}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setShowSubscriptionModal(true);
+                    } else {
+                      // Handle unsubscribe logic here
+                      handleUnsubscribe();
+                    }
+                  }}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                />
+                <Label
+                  htmlFor="sms-subscription"
+                  className="text-sm text-indigo-900"
+                >
+                  Subscribe to SMS notifications for blood donation requests
+                </Label>
+              </div>
+
+              {donor.isSubscribed && donor.maskedNumber && (
+                <p className="text-sm text-green-600">
+                  ✅ Subscribed with number: {donor.maskedNumber}
+                </p>
+              )}
+            </div>
 
             <div className="flex justify-end mt-6">
               <button
@@ -936,6 +1067,87 @@ export default function Profile() {
         title={validationModalContent.title}
         content={validationModalContent.content}
       />
+
+      {/* Subscription Modal */}
+      <Modal
+        show={showSubscriptionModal}
+        onClose={() => setShowSubscriptionModal(false)}
+      >
+        <Modal.Header>Subscribe to SMS Notifications</Modal.Header>
+        <Modal.Body>
+          <div className="space-y-4">
+            {subscriptionStatus === "" && (
+              <>
+                <p className="text-gray-700">
+                  You'll receive an OTP to your phone number:{" "}
+                  {donor.contactNumber}
+                </p>
+                <Button
+                  onClick={handleRequestOtp}
+                  disabled={isRequestingOtp}
+                  className="w-full"
+                >
+                  {isRequestingOtp ? "Sending OTP..." : "Send OTP"}
+                </Button>
+              </>
+            )}
+
+            {subscriptionStatus === "otp_sent" && (
+              <>
+                <p className="text-gray-700">
+                  Enter the OTP sent to your phone number
+                </p>
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="Enter OTP"
+                  className="w-full p-2 border rounded"
+                />
+                <Button
+                  onClick={handleVerifyOtp}
+                  disabled={isVerifyingOtp || otp.length < 4}
+                  className="w-full"
+                >
+                  {isVerifyingOtp ? "Verifying..." : "Verify OTP"}
+                </Button>
+              </>
+            )}
+
+            {subscriptionStatus === "success" && (
+              <div className="text-green-600 text-center">
+                <svg
+                  className="w-12 h-12 mx-auto mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                <p>Successfully subscribed to SMS notifications!</p>
+              </div>
+            )}
+
+            {subscriptionStatus === "error" && (
+              <div className="text-red-600 text-center">
+                <p>Failed to subscribe. Please try again.</p>
+              </div>
+            )}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          {subscriptionStatus === "success" && (
+            <Button onClick={() => setShowSubscriptionModal(false)}>
+              Close
+            </Button>
+          )}
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
