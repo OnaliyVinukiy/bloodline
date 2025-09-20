@@ -34,41 +34,98 @@ const otpStore: Record<string, OtpData> = {};
 const subscriptionStore: Record<string, SubscriptionData> = {};
 
 router.post("/notify", async (req, res) => {
-  console.log("📩 Subscription notification received:", req.body);
+  console.log(
+    "📩 Subscription notification received:",
+    JSON.stringify(req.body, null, 2)
+  );
 
   const maskedNumber = req.body.subscriberId;
   if (maskedNumber) {
-    console.log("Masked number:", maskedNumber);
+    console.log("Masked number from MSpace:", maskedNumber);
 
     // Extract the phone number from the subscriberId (format: tel:94712345678)
     const phoneMatch = maskedNumber.match(/tel:(\d+)/);
     if (phoneMatch) {
-      const phone = phoneMatch[1];
+      const phoneFromMSpace = phoneMatch[1];
+      console.log("Extracted phone number:", phoneFromMSpace);
 
       try {
         // Find the donor with this phone number and update their subscription status
         const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
-
         await client.connect();
         const database = client.db(DATABASE_ID);
         const collection = database.collection(DONOR_COLLECTION_ID);
 
-        await collection.updateOne(
-          { contactNumber: phone },
-          {
-            $set: {
-              isSubscribed: true,
-              maskedNumber: maskedNumber,
-            },
+        // Debug: Check what numbers exist in the database
+        console.log("Searching for phone number in database:", phoneFromMSpace);
+
+        // Look for the donor by phone number
+        const donor = await collection.findOne({
+          contactNumber: phoneFromMSpace,
+        });
+
+        if (donor) {
+          console.log("Found donor:", {
+            email: donor.email,
+            contactNumber: donor.contactNumber,
+            existingMaskedNumber: donor.maskedNumber,
+          });
+
+          // Update the donor record
+          const updateResult = await collection.updateOne(
+            { contactNumber: phoneFromMSpace },
+            {
+              $set: {
+                isSubscribed: true,
+                maskedNumber: maskedNumber,
+                subscriptionUpdatedAt: new Date().toISOString(),
+              },
+            }
+          );
+
+          console.log("Update result:", {
+            matchedCount: updateResult.matchedCount,
+            modifiedCount: updateResult.modifiedCount,
+          });
+
+          if (updateResult.modifiedCount === 0) {
+            console.log(
+              "No documents were modified. The values might be the same."
+            );
+          } else {
+            console.log(
+              `Successfully updated subscription for phone: ${phoneFromMSpace}`
+            );
           }
-        );
+        } else {
+          console.log("No donor found with phone number:", phoneFromMSpace);
+
+          // Debug: Check what phone numbers exist in the database
+          const allDonors = await collection
+            .find({}, { projection: { contactNumber: 1, email: 1 } })
+            .limit(10)
+            .toArray();
+          console.log(
+            "First 10 donors in database:",
+            allDonors.map((d) => ({
+              email: d.email,
+              contactNumber: d.contactNumber,
+            }))
+          );
+        }
 
         client.close();
-        console.log(`Updated subscription for phone: ${phone}`);
       } catch (error) {
         console.error("Error updating donor subscription:", error);
       }
+    } else {
+      console.log(
+        "Could not extract phone number from maskedNumber:",
+        maskedNumber
+      );
     }
+  } else {
+    console.log("No maskedNumber found in request body");
   }
 
   res.status(200).send("Notification received");
