@@ -33,8 +33,8 @@ export interface Donor {
   avatar: string | null;
   gender: string;
   status: string;
-  isSubscribed: boolean;
-  maskedNumber: string;
+  isSubscribed?: boolean;
+  maskedNumber?: string;
 }
 
 export interface BloodDonor {
