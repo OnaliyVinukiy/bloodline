@@ -141,6 +141,13 @@ export const upsertDonor = async (req: Request, res: Response) => {
 
   try {
     const { collection, client } = await connectToCosmos();
+   
+    const existingDonor = await collection.findOne({ email: donor.email });
+    
+    if (existingDonor && existingDonor.maskedNumber && !donor.maskedNumber) {
+      donor.maskedNumber = existingDonor.maskedNumber;
+    }
+    
     const upsertResult = await collection.updateOne(
       { email: donor.email },
       { $set: donor },
