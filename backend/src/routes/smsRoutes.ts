@@ -90,7 +90,7 @@ router.post("/request-otp", async (req, res) => {
     const otpResponse = await axios.post(
       process.env.MSPACE_API_URL + "/otp/request",
       {
-        applicationId: process.env.MSPACE_APP_ID,
+        applicationId: process.env.MSPACE_APPLICATION_ID,
         password: process.env.MSPACE_PASSWORD,
         subscriberId: `tel:${cleanPhone}`,
         applicationHash: "abcdefgh",
@@ -180,7 +180,7 @@ router.post("/verify-otp", async (req, res) => {
     const verifyResponse = await axios.post(
       process.env.MSPACE_API_URL + "/otp/verify",
       {
-        applicationId: process.env.MSPACE_APP_ID,
+        applicationId: process.env.MSPACE_APPLICATION_ID,
         password: process.env.MSPACE_PASSWORD,
         referenceNo: otpData.referenceNo,
         otp: otp.toString(),
