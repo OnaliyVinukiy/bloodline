@@ -67,6 +67,14 @@ class ChatbotController {
     return null;
   }
 
+  private static getTodayFormattedDate(): string {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, "0");
+    const day = today.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
   // Fetch appointments from database
   private static async fetchAppointments(query: string): Promise<string> {
     const MAX_APPOINTMENTS_PER_DAY = 10;
@@ -79,17 +87,24 @@ class ChatbotController {
     const collection = database.collection(APPOINTMENT_COLLECTION_ID);
 
     try {
-      const dateMatch = query.match(/on (\d{4}-\d{2}-\d{2})/);
-      const dateMatchFormatted = query.match(
-        /on (\d{1,2})(?:st|nd|rd|th)?\s([A-Za-z]+)\s(\d{4})/
-      );
-
+      const lowerQuery = query.toLowerCase();
       let normalizedDate: string | null = null;
-      if (dateMatch) {
-        normalizedDate = dateMatch[1];
-      } else if (dateMatchFormatted) {
-        const dateString = `${dateMatchFormatted[1]} ${dateMatchFormatted[2]} ${dateMatchFormatted[3]}`;
-        normalizedDate = ChatbotController.normalizeDateString(dateString);
+
+      // New logic to handle "today"
+      if (lowerQuery.includes("today")) {
+        normalizedDate = this.getTodayFormattedDate();
+      } else {
+        const dateMatch = query.match(/on (\d{4}-\d{2}-\d{2})/);
+        const dateMatchFormatted = query.match(
+          /on (\d{1,2})(?:st|nd|rd|th)?\s([A-Za-z]+)\s(\d{4})/
+        );
+
+        if (dateMatch) {
+          normalizedDate = dateMatch[1];
+        } else if (dateMatchFormatted) {
+          const dateString = `${dateMatchFormatted[1]} ${dateMatchFormatted[2]} ${dateMatchFormatted[3]}`;
+          normalizedDate = ChatbotController.normalizeDateString(dateString);
+        }
       }
 
       if (normalizedDate) {
