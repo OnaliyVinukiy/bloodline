@@ -10,6 +10,7 @@ router.post("/send", (req, res) => {
   // Example: Save subscription status to donor record
 
   res.status(200).send("OK");
+  console.log(res);
 });
 
 export default router;
