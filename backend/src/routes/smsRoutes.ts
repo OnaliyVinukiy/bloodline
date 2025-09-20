@@ -86,19 +86,42 @@ router.post("/request-otp", async (req, res) => {
     // Clean and validate phone number
     const cleanPhone = phone.replace(/\D/g, "");
 
+    // Check if required environment variables are set
+    if (!process.env.MSPACE_API_URL) {
+      throw new Error("MSPACE_API_URL environment variable is not set");
+    }
+
+    if (!process.env.MSPACE_APPLICATION_ID) {
+      throw new Error("MSPACE_APPLICATION_ID environment variable is not set");
+    }
+
+    if (!process.env.MSPACE_PASSWORD) {
+      throw new Error("MSPACE_PASSWORD environment variable is not set");
+    }
+
+    // Construct the full URL and log it (mask password for security)
+    const apiUrl = `${process.env.MSPACE_API_URL}/otp/request`;
+    console.log("Calling MSpace API:", apiUrl);
+
     // Request OTP from mSpace
     const otpResponse = await axios.post(
-      process.env.MSPACE_API_URL + "/otp/request",
+      apiUrl,
       {
         applicationId: process.env.MSPACE_APPLICATION_ID,
         password: process.env.MSPACE_PASSWORD,
         subscriberId: `tel:${cleanPhone}`,
         applicationHash: "abcdefgh",
         applicationMetaData: {
-          client: "BLOODLINE_APP",
+          client: "WEBAPP",
           device: "Web Browser",
           os: "Any",
-          appCode: "bloodline-app",
+          appCode: "https://bloodlinesrilanka.com/",
+        },
+      },
+      {
+        timeout: 10000, // 10 second timeout
+        headers: {
+          "Content-Type": "application/json",
         },
       }
     );
@@ -140,7 +163,26 @@ router.post("/request-otp", async (req, res) => {
     let errorDetails = "Unknown error";
 
     if (axios.isAxiosError(error)) {
+      console.error("Axios error details:", {
+        message: error.message,
+        code: error.code,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          data: error.config?.data,
+        },
+      });
+
       errorDetails = error.response?.data?.statusDetail || error.message;
+
+      // Check if it's a URL issue
+      if (error.code === "ENOTFOUND" || error.code === "ECONNREFUSED") {
+        errorMessage = "Cannot connect to SMS service";
+        errorDetails = `Failed to connect to: ${error.config?.url}`;
+      } else if (error.message.includes("Invalid URL")) {
+        errorMessage = "Invalid SMS service configuration";
+        errorDetails = "The SMS service URL is malformed or incorrect";
+      }
     } else if (error instanceof Error) {
       errorDetails = error.message;
     }
