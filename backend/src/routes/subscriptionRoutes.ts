@@ -1,4 +1,3 @@
-// routes/subscriptionRoutes.ts
 import express from "express";
 import axios from "axios";
 
@@ -8,7 +7,7 @@ router.post("/send", async (req, res) => {
   try {
     // Forward the request body directly to the MSpace SMS API
     const response = await axios.post(
-      "https://api.mspace.lk/sms/send",
+      "https://api.mspace.lk/subscription/send",
       req.body,
       {
         headers: { "Content-Type": "application/json;charset=utf-8" },

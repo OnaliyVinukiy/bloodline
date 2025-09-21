@@ -35,7 +35,10 @@ const subscriptionStore: Record<string, SubscriptionData> = {};
 
 // ✅ Notification endpoint
 router.post("/notify", async (req, res) => {
-  console.log("📩 Subscription notification received:", JSON.stringify(req.body, null, 2));
+  console.log(
+    "📩 Subscription notification received:",
+    JSON.stringify(req.body, null, 2)
+  );
 
   const subscriberId = req.body.subscriberId;
   const status = req.body.status;
@@ -104,7 +107,8 @@ router.post("/notify", async (req, res) => {
 router.post("/request-otp", async (req, res) => {
   try {
     const { phone } = req.body;
-    if (!phone) return res.status(400).json({ error: "Phone number is required" });
+    if (!phone)
+      return res.status(400).json({ error: "Phone number is required" });
 
     const cleanPhone = phone.replace(/\D/g, "");
     const apiUrl = `${process.env.MSPACE_API_URL}/otp/request`;
@@ -150,10 +154,19 @@ router.post("/request-otp", async (req, res) => {
     };
 
     console.log("✅ OTP requested successfully for:", cleanPhone);
-    res.json({ success: true, message: "OTP sent successfully", referenceNo: otpResponse.data.referenceNo, subscriptionId });
+    res.json({
+      success: true,
+      message: "OTP sent successfully",
+      referenceNo: otpResponse.data.referenceNo,
+      subscriptionId,
+    });
   } catch (error: any) {
     console.error("❌ Error in OTP request:", error);
-    res.status(500).json({ success: false, error: "Failed to send OTP", details: error.message });
+    res.status(500).json({
+      success: false,
+      error: "Failed to send OTP",
+      details: error.message,
+    });
   }
 });
 
@@ -162,24 +175,34 @@ router.post("/verify-otp", async (req, res) => {
   try {
     const { phone, otp, subscriptionId } = req.body;
     if (!phone || !otp || !subscriptionId) {
-      return res.status(400).json({ success: false, error: "Phone, OTP, and subscription ID are required" });
+      return res.status(400).json({
+        success: false,
+        error: "Phone, OTP, and subscription ID are required",
+      });
     }
 
     const cleanPhone = phone.replace(/\D/g, "");
     const otpData = otpStore[cleanPhone];
     if (!otpData || otpData.status !== "pending") {
-      return res.status(400).json({ success: false, error: "Invalid or expired OTP request" });
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid or expired OTP request" });
     }
 
-    const verifyResponse = await axios.post(`${process.env.MSPACE_API_URL}/otp/verify`, {
-      applicationId: process.env.MSPACE_APPLICATION_ID,
-      password: process.env.MSPACE_PASSWORD,
-      referenceNo: otpData.referenceNo,
-      otp: otp.toString(),
-    });
+    const verifyResponse = await axios.post(
+      `${process.env.MSPACE_API_URL}/otp/verify`,
+      {
+        applicationId: process.env.MSPACE_APPLICATION_ID,
+        password: process.env.MSPACE_PASSWORD,
+        referenceNo: otpData.referenceNo,
+        otp: otp.toString(),
+      }
+    );
 
     if (verifyResponse.data.statusCode !== "S1000") {
-      throw new Error(verifyResponse.data.statusDetail || "OTP verification failed");
+      throw new Error(
+        verifyResponse.data.statusDetail || "OTP verification failed"
+      );
     }
 
     otpData.status = "verified";
@@ -199,7 +222,6 @@ router.post("/verify-otp", async (req, res) => {
       { contactNumber: cleanPhone },
       {
         $set: {
-          contactNumber: cleanPhone,
           isSubscribed: false,
           subscriptionId,
           updatedAt: new Date().toISOString(),
@@ -210,14 +232,21 @@ router.post("/verify-otp", async (req, res) => {
       },
       { upsert: true }
     );
-
     await client.close();
 
     console.log("OTP verified successfully for:", cleanPhone);
-    res.json({ success: true, message: "OTP verified. Processing subscription...", subscriptionId });
+    res.json({
+      success: true,
+      message: "OTP verified. Processing subscription...",
+      subscriptionId,
+    });
   } catch (error: any) {
     console.error("Error in OTP verification:", error);
-    res.status(500).json({ success: false, error: "Failed to verify OTP", details: error.message });
+    res.status(500).json({
+      success: false,
+      error: "Failed to verify OTP",
+      details: error.message,
+    });
   }
 });
 
