@@ -462,7 +462,7 @@ export const sendSMS = async (contactNumber: string, message: string) => {
       destinationAddresses: [
         "tel:ZjQ1YTI0YzYwODRjNjUzNjE4NDMxODE3ZTEzMzllMWI0ZDljYjhhOGY1YTc1YzljM2I5MTIzZDkzNzY3YmNjZTptb2JpdGVs",
       ],
-      sourceAddress: "77011",
+      sourceAddress: "BLAPP",
       deliveryStatusRequest: "1",
       encoding: "245",
       message: "Your blood donation appointment has been approved. Thank you!",
