@@ -91,6 +91,14 @@ export default function Profile() {
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
+  const transformPhoneNumber = (phone: string): string => {
+    // Remove leading 0 and add 94 prefix
+    if (phone.startsWith("0")) {
+      return "94" + phone.substring(1);
+    }
+    return phone;
+  };
+
   // Fetch user info from Asgardeo
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -202,12 +210,22 @@ export default function Profile() {
       return;
     }
 
+    if (!validatePhoneNumber(donor.contactNumber)) {
+      showValidationMessage(
+        "Invalid Phone Number",
+        "Please enter a valid 10-digit phone number starting with 0."
+      );
+      return;
+    }
+
     setIsRequestingOtp(true);
     try {
+      const transformedPhone = transformPhoneNumber(donor.contactNumber);
+
       const response = await axios.post(
         `${backendURL}/subscription/request-otp`,
         {
-          phone: donor.contactNumber,
+          phone: transformedPhone,
         }
       );
 
@@ -225,14 +243,14 @@ export default function Profile() {
       setIsRequestingOtp(false);
     }
   };
-
   const handleVerifyOtp = async () => {
     setIsVerifyingOtp(true);
     try {
+      const transformedPhone = transformPhoneNumber(donor.contactNumber);
       const response = await axios.post(
         `${backendURL}/subscription/verify-otp`,
         {
-          phone: donor.contactNumber,
+          phone: transformedPhone,
           otp: otp,
           subscriptionId: subscriptionId,
         }
@@ -247,7 +265,6 @@ export default function Profile() {
           isSubscribed: true,
         };
 
-        // We'll get the masked number from the webhook, so we don't set it here
         setDonor(updatedDonor);
 
         // Update the donor record in the database
@@ -406,7 +423,12 @@ export default function Profile() {
     try {
       const { _id, ...donorData } = donor;
 
-      await axios.post(`${backendURL}/api/update-donor`, donorData);
+      const payload = {
+        ...donorData,
+        contactNumber: transformPhoneNumber(donorData.contactNumber),
+      };
+
+      await axios.post(`${backendURL}/api/update-donor`, payload);
       setIsProfileComplete(true);
       setLoading(false);
       if (!isProfileComplete) {
