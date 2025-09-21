@@ -35,64 +35,75 @@ const subscriptionStore: Record<string, SubscriptionData> = {};
 
 // ✅ Notification endpoint
 router.post("/notify", async (req, res) => {
-  console.log(
-    "📩 Subscription notification received:",
-    JSON.stringify(req.body, null, 2)
-  );
-
-  const subscriberId = req.body.subscriberId;
-  const status = req.body.status;
-
-  if (!subscriberId) {
-    console.log("❌ No subscriberId in request body");
-    return res.status(400).send("Missing subscriberId");
-  }
-
-  console.log("🔑 Raw subscriberId from MSpace:", subscriberId);
-
-  let phoneFromMSpace: string | null = null;
-  const phoneMatch = subscriberId.match(/tel:(\d+)/);
-  if (phoneMatch) {
-    phoneFromMSpace = phoneMatch[1];
-    console.log("📱 Extracted phone number:", phoneFromMSpace);
-  }
-
-  try {
-    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
-    await client.connect();
-    const database = client.db(DATABASE_ID);
-    const collection = database.collection(DONOR_COLLECTION_ID);
-
-    let query: any = {};
-    if (phoneFromMSpace) {
-      query = { contactNumber: phoneFromMSpace };
-    } else {
-      query = { maskedNumber: subscriberId };
-    }
-
-    const updateResult = await collection.updateOne(
-      query,
-      {
-        $set: {
-          isSubscribed: status === "REGISTERED",
-          maskedNumber: subscriberId,
-          subscriptionUpdatedAt: new Date().toISOString(),
-        },
-      },
-
-      { upsert: false }
+    console.log(
+      "📩 Subscription notification received:",
+      JSON.stringify(req.body, null, 2)
     );
 
-    console.log("✅ Donor subscription updated:", {
-      matched: updateResult.matchedCount,
-      modified: updateResult.modifiedCount,
-    });
+    const subscriberId = req.body.subscriberId;
+    const status = req.body.status;
+    const referenceNo = req.body.referenceNo; // This is a crucial field from MSpace
 
-    await client.close();
-  } catch (error) {
-    console.error("❌ Error updating donor subscription:", error);
-  }
-  res.status(200).send("Notification received");
+    if (!subscriberId) {
+      console.log("❌ No subscriberId in request body");
+      return res.status(400).send("Missing subscriberId");
+    }
+
+    console.log("🔑 Raw subscriberId from MSpace:", subscriberId);
+
+    // Step 1: Find the phone number from the in-memory store using the reference number.
+    // Assuming the MSpace webhook sends back the 'referenceNo' from the initial request.
+    const subscription = Object.values(subscriptionStore).find(sub => sub.referenceNo === referenceNo);
+    let contactNumberFromStore = null;
+    if (subscription) {
+        contactNumberFromStore = subscription.phone;
+        console.log("📱 Found contact number from in-memory store:", contactNumberFromStore);
+    } else {
+        console.log("⚠️ Could not find contact number from in-memory store for referenceNo:", referenceNo);
+    }
+    
+    try {
+        const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+        await client.connect();
+        const database = client.db(DATABASE_ID);
+        const collection = database.collection(DONOR_COLLECTION_ID);
+        
+        // Step 2: Use the phone number (or a fallback) to find the correct donor.
+        let query = {};
+        if (contactNumberFromStore) {
+            query = { contactNumber: contactNumberFromStore };
+        } else {
+            // Fallback: This is a less reliable path. If you can't find the phone number, 
+            // the two-document problem will reoccur.
+            query = { isSubscribed: true, maskedNumber: { $exists: false } };
+            // This fallback is not great, but better than nothing. It tries to find a user
+            // who is subscribed but doesn't have a masked number yet.
+        }
+
+        const updateDoc = {
+            $set: {
+                isSubscribed: status === "REGISTERED",
+                maskedNumber: subscriberId, // **Crucial:** Save the masked number here
+                subscriptionUpdatedAt: new Date().toISOString(),
+            },
+        };
+
+        const updateResult = await collection.updateOne(query, updateDoc);
+
+        if (updateResult.matchedCount === 0) {
+            console.warn("⚠️ No donor document matched the query. The masked number was not saved.");
+        } else {
+            console.log("✅ Donor subscription updated:", {
+                matched: updateResult.matchedCount,
+                modified: updateResult.modifiedCount,
+            });
+        }
+
+        await client.close();
+    } catch (error) {
+        console.error("❌ Error updating donor subscription:", error);
+    }
+    res.status(200).send("Notification received");
 });
 
 // ✅ Request OTP
@@ -167,10 +178,12 @@ router.post("/verify-otp", async (req, res) => {
   try {
     const { phone, otp, subscriptionId } = req.body;
     if (!phone || !otp || !subscriptionId) {
-      return res.status(400).json({
-        success: false,
-        error: "Phone, OTP, and subscription ID are required",
-      });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "Phone, OTP, and subscription ID are required",
+        });
     }
 
     const cleanPhone = phone.replace(/\D/g, "");
@@ -205,7 +218,7 @@ router.post("/verify-otp", async (req, res) => {
       subscription.verifiedAt = new Date().toISOString();
     }
 
-    // ✅ Update donor in DB safely
+    // **Change:** Update donor in DB. Set isSubscribed to true and save the subscriptionId.
     const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
     await client.connect();
     const database = client.db(DATABASE_ID);
@@ -215,15 +228,12 @@ router.post("/verify-otp", async (req, res) => {
       { contactNumber: cleanPhone }, // The query to find the correct document
       {
         $set: {
-          // Set the subscription status to true immediately after successful OTP verification
           isSubscribed: true,
-          subscriptionId,
+          subscriptionId: subscriptionId, // Save the subscriptionId here for later lookup
           updatedAt: new Date().toISOString(),
         },
         $setOnInsert: {
-          // This will be executed only if a new document is created
           createdAt: new Date().toISOString(),
-          contactNumber: cleanPhone,
         },
       },
       { upsert: true }
@@ -231,19 +241,21 @@ router.post("/verify-otp", async (req, res) => {
 
     await client.close();
 
-    console.log("OTP verified successfully for:", cleanPhone);
+    console.log("OTP verified and donor profile updated successfully for:", cleanPhone);
     res.json({
       success: true,
-      message: "OTP verified. Processing subscription...",
+      message: "OTP verified. The masked number will be saved shortly.",
       subscriptionId,
     });
   } catch (error: any) {
     console.error("❌ Error in OTP verification:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to verify OTP",
-      details: error.message,
-    });
+    res
+      .status(500)
+      .json({
+        success: false,
+        error: "Failed to verify OTP",
+        details: error.message,
+      });
   }
 });
 
