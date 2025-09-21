@@ -141,16 +141,22 @@ export const upsertDonor = async (req: Request, res: Response) => {
 
   try {
     const { collection, client } = await connectToCosmos();
-   
+
+    const { _id, ...donorDataWithoutId } = donor;
+
     const existingDonor = await collection.findOne({ email: donor.email });
-    
-    if (existingDonor && existingDonor.maskedNumber && !donor.maskedNumber) {
-      donor.maskedNumber = existingDonor.maskedNumber;
+    if (
+      existingDonor &&
+      existingDonor.maskedNumber &&
+      !donorDataWithoutId.maskedNumber
+    ) {
+      donorDataWithoutId.maskedNumber = existingDonor.maskedNumber;
     }
-    
+
+    // Pass the cleaned object to the $set operator
     const upsertResult = await collection.updateOne(
       { email: donor.email },
-      { $set: donor },
+      { $set: donorDataWithoutId },
       { upsert: true }
     );
 
@@ -159,9 +165,9 @@ export const upsertDonor = async (req: Request, res: Response) => {
       donor: upsertResult,
     });
 
-    client.close();
+    await client.close();
   } catch (error) {
-    console.error("Error upserting donor profile:", error);
+    console.error("❌ Error upserting donor profile:", error);
     res.status(500).json({ message: "Error upserting donor profile" });
   }
 };
