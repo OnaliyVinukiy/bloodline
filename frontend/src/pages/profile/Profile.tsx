@@ -32,6 +32,10 @@ export default function Profile() {
   const [isRequestingOtp, setIsRequestingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
 
+  // New state for unsubscription
+  const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false);
+  const [isUnsubscribing, setIsUnsubscribing] = useState(false);
+
   const [province, setProvince] = useState<
     { province_id: string; province_name_en: string }[]
   >([]);
@@ -281,19 +285,42 @@ export default function Profile() {
   };
 
   const handleUnsubscribe = async () => {
-    // Implement unsubscribe logic if needed
-    const updatedDonor = {
-      ...donor,
-      isSubscribed: false,
-      maskedNumber: "",
-    };
-
-    setDonor(updatedDonor);
-
+    setIsUnsubscribing(true);
     try {
-      await axios.post(`${backendURL}/api/update-donor`, updatedDonor);
+      // Call the new backend unsubscribe endpoint
+      const response = await axios.post(
+        `${backendURL}/subscription/unsubscribe`,
+        {
+          email: donor.email,
+        }
+      );
+
+      if (response.data.success) {
+        // Update the local state to reflect the unsubscription
+        const updatedDonor = {
+          ...donor,
+          isSubscribed: false,
+          maskedNumber: "",
+        };
+        setDonor(updatedDonor);
+
+        // Close the modal and show a success message
+        setShowUnsubscribeModal(false);
+        showValidationMessage(
+          "Unsubscribed Successfully",
+          "You have been unsubscribed from SMS notifications."
+        );
+      } else {
+        showValidationMessage("Unsubscription Failed", response.data.error);
+      }
     } catch (error) {
-      console.error("Error updating subscription status:", error);
+      console.error("Error during unsubscription:", error);
+      showValidationMessage(
+        "Unsubscription Failed",
+        "An error occurred while trying to unsubscribe. Please try again."
+      );
+    } finally {
+      setIsUnsubscribing(false);
     }
   };
 
@@ -872,8 +899,7 @@ export default function Profile() {
                     if (e.target.checked) {
                       setShowSubscriptionModal(true);
                     } else {
-                      // Handle unsubscribe logic here
-                      handleUnsubscribe();
+                      setShowUnsubscribeModal(true);
                     }
                   }}
                   className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
@@ -882,14 +908,13 @@ export default function Profile() {
                   htmlFor="sms-subscription"
                   className="text-sm text-indigo-900"
                 >
-                  Subscribe to SMS notifications for blood donation requests
+                  Subscribe to receive SMS notifications about your blood
+                  donation appointments.(Subscription fee: Rs.30 per month)
                 </Label>
               </div>
 
               {donor.isSubscribed && donor.maskedNumber && (
-                <p className="text-sm text-green-600">
-                  ✅ Subscribed with number: {donor.maskedNumber}
-                </p>
+                <p className="text-sm text-green-600">Already Subscribed!</p>
               )}
             </div>
 
@@ -1168,6 +1193,34 @@ export default function Profile() {
               Close
             </Button>
           )}
+        </Modal.Footer>
+      </Modal>
+      {/* Unsubscribe Confirmation Modal */}
+      <Modal
+        show={showUnsubscribeModal}
+        onClose={() => setShowUnsubscribeModal(false)}
+      >
+        <Modal.Header>Unsubscribe from SMS Notifications</Modal.Header>
+        <Modal.Body>
+          <p className="text-lg text-gray-700">
+            Are you sure you want to unsubscribe from SMS notifications?
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            You will no longer receive important updates about blood donation
+            appointments.
+          </p>
+        </Modal.Body>
+        <Modal.Footer className="flex justify-end space-x-4">
+          <Button color="gray" onClick={() => setShowUnsubscribeModal(false)}>
+            Cancel
+          </Button>
+          <Button
+            color="failure"
+            onClick={handleUnsubscribe}
+            disabled={isUnsubscribing}
+          >
+            {isUnsubscribing ? "Unsubscribing..." : "Unsubscribe"}
+          </Button>
         </Modal.Footer>
       </Modal>
     </div>
