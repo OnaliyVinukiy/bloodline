@@ -1,0 +1,11 @@
+{
+    "info_message": "Pick a date and time slot for the blood donation",
+    "date_label": "Select a Date",
+    "time_slots_label": "Select an Available Time Slot",
+    "next_button": "Next",
+    "validation_title": "Appointment Restriction",
+    "validation_content": "You have already placed an appointment. You cannot place another appointment less than 4 months from your last valid appointment. Please cancel your existing appointment or select a date after ",
+    "validation_modal_title": "Appointment Restriction",
+    "validation_modal_content_1": "You have already placed an appointment. You cannot place another appointment less than 4 months from your last valid appointment.",
+    "validation_modal_content_2": "Please cancel your existing appointment or select a date after "
+  }
