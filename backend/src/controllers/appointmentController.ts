@@ -332,31 +332,17 @@ const scheduleReminderEmails = (appointment: any) => {
 
   // Schedule one-week reminder if in the future
   if (oneWeekBefore > now) {
-    console.log(
-      `Scheduling one-week reminder for ${appointment._id} at ${oneWeekBefore}`
-    );
     scheduleJob(oneWeekBefore, async () => {
       await sendReminderEmail(appointment, "oneWeek");
     });
-  } else {
-    console.log(
-      `One-week reminder for ${appointment._id} not scheduled (past due: ${oneWeekBefore})`
-    );
   }
 
-  // Always schedule one-day reminder
-  console.log(
-    `Scheduling one-day reminder for ${appointment._id} at ${oneDayBefore}`
-  );
   scheduleJob(oneDayBefore, async () => {
     await sendReminderEmail(appointment, "oneDay");
   });
 
   // If one-day reminder is in the past or now, send immediately
   if (oneDayBefore <= now) {
-    console.log(
-      `One-day reminder for ${appointment._id} is past due (${oneDayBefore}), sending immediately`
-    );
     sendReminderEmail(appointment, "oneDay").catch((error) => {
       console.error(
         `Failed to send immediate one-day reminder for ${appointment._id}:`,
@@ -468,19 +454,13 @@ export const sendSMS = async (contactNumber: string, message: string) => {
       message: "Your blood donation appointment has been approved. Thank you!",
     };
 
-    console.log("📤 Sending SMS via MSpace:", requestBody);
-
     const response = await axios.post(MSPACE_API_BASE_URL, requestBody, {
       headers: { "Content-Type": "application/json;charset=utf-8" },
     });
 
-    console.log("✅ SMS Sent Successfully:", response.data);
     return response.data;
   } catch (error: any) {
-    console.error(
-      "❌ Error sending SMS:",
-      error.response?.data || error.message
-    );
+    console.error("Error sending SMS:", error.response?.data || error.message);
     throw new Error("Failed to send SMS notification");
   }
 };
@@ -695,9 +675,6 @@ export const triggerReminderEmail = async (
     }
 
     await sendReminderEmail(appointment, reminderType);
-    console.log(
-      `Manually triggered ${reminderType} reminder for appointment ${appointmentId}`
-    );
   } catch (error) {
     console.error(
       `Error triggering ${reminderType} reminder for ${appointmentId}:`,
@@ -732,9 +709,6 @@ scheduleJob("0 0 * * *", async () => {
 
     for (const appointment of appointments) {
       await sendReminderEmail(appointment, "oneDay");
-      console.log(
-        `Sent missed one-day reminder for appointment ${appointment._id}`
-      );
     }
   } catch (error) {
     console.error("Error in daily reminder check:", error);

@@ -248,4 +248,75 @@ router.post("/verify-otp", async (req, res) => {
   }
 });
 
+router.post("/unsubscribe", async (req, res) => {
+  let client = null;
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Donor email is required" });
+    }
+
+    // Connect to the database
+    client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await client.connect();
+    const database = client.db(DATABASE_ID);
+    const donorCollection = database.collection(DONOR_COLLECTION_ID);
+
+    // Fetch the donor's document to get the masked number
+    const donor = await donorCollection.findOne({ email });
+
+    if (!donor || !donor.maskedNumber) {
+      return res.status(404).json({
+        success: false,
+        error: "Donor not found or is not subscribed",
+      });
+    }
+
+    // Call the MSpace API to unsubscribe
+    const unsubscribeResponse = await axios.post(
+      `${process.env.MSPACE_API_URL}/subscription/userSubscription`,
+      {
+        applicationId: process.env.MSPACE_APPLICATION_ID,
+        password: process.env.MSPACE_PASSWORD,
+        subscriberId: donor.maskedNumber,
+        action: "0", // Action 0 for unsubscription
+      }
+    );
+
+    // Check for success from MSpace
+    if (unsubscribeResponse.data.statusCode !== "S1000") {
+      throw new Error(
+        unsubscribeResponse.data.statusDetail || "Failed to unsubscribe"
+      );
+    }
+
+    // Update the donor's document in your database
+    await donorCollection.updateOne(
+      { _id: donor._id },
+      {
+        $set: {
+          isSubscribed: false,
+          maskedNumber: null,
+          subscriptionId: null,
+          updatedAt: new Date().toISOString(),
+        },
+      }
+    );
+
+    res.json({
+      success: true,
+      message:
+        "Unsubscribed successfully. You will no longer receive SMS notifications.",
+    });
+  } catch (error) {
+    console.error("Error during unsubscription:", error);
+  } finally {
+    if (client) {
+      await client.close();
+    }
+  }
+});
+
 export default router;
