@@ -276,7 +276,7 @@ router.post("/unsubscribe", async (req, res) => {
 
     // Call the MSpace API to unsubscribe
     const unsubscribeResponse = await axios.post(
-      `${process.env.MSPACE_API_URL}/subscription/userSubscription`,
+      `${process.env.MSPACE_API_URL}/subscription/send`,
       {
         applicationId: process.env.MSPACE_APPLICATION_ID,
         password: process.env.MSPACE_PASSWORD,
