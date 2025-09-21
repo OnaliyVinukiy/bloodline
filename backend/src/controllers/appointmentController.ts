@@ -460,11 +460,11 @@ export const sendSMS = async (contactNumber: string, message: string) => {
       applicationId: MSPACE_APPLICATION_ID,
       password: MSPACE_PASSWORD,
       destinationAddresses: [
-        "tel:NTI5MGEzNDZmOTZkY2Y4N2MyNDRlZjgzY2M4MmY3MGMzMjVlMjJlNWQwYWQ2YmE3N2Y3MTk5ZjFkZTQzMWE2MDptb2JpdGVs",
+        "tel:ZjQ1YTI0YzYwODRjNjUzNjE4NDMxODE3ZTEzMzllMWI0ZDljYjhhOGY1YTc1YzljM2I5MTIzZDkzNzY3YmNjZTptb2JpdGVs",
       ],
-      sourceAddress: "77011",
-      deliveryStatusRequest: "1",
-      encoding: "245",
+      sourceAddress: "BLAPP",
+      deliveryStatusRequest: "0",
+      encoding: "0",
       message: "Your blood donation appointment has been approved. Thank you!",
     };
 
