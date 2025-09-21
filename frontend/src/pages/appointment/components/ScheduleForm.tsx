@@ -6,6 +6,7 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, Label } from "flowbite-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -18,6 +19,7 @@ const ScheduleForm: React.FC<StepperProps> = ({
   onNextStep,
   onFormDataChange,
 }) => {
+  const { t } = useTranslation("scheduleForm");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
@@ -106,9 +108,9 @@ const ScheduleForm: React.FC<StepperProps> = ({
 
         if (date < fourMonthsLater) {
           showValidationMessage(
-            "Appointment Restriction",
-            "You have already placed an appointment. You cannot place another appointment less than 4 months from your last valid appointment. " +
-              "Please cancel your existing appointment or select a date after " +
+            t("validation_modal_title"),
+            t("validation_modal_content_1") +
+              t("validation_modal_content_2") +
               fourMonthsLater.toLocaleDateString() +
               "."
           );
@@ -188,7 +190,7 @@ const ScheduleForm: React.FC<StepperProps> = ({
           <div className="mt-4 space-y-6">
             <div className="mb-6 p-4 bg-yellow-100 rounded-lg">
               <p className="text-yellow-800 font-opensans font-semibold">
-                Pick a date and time slot for the blood donation
+                {t("info_message")}
               </p>
             </div>
             <div className="flex flex-col items-center p-6">
@@ -197,7 +199,7 @@ const ScheduleForm: React.FC<StepperProps> = ({
                   htmlFor="date"
                   className="block mb-2 text-md font-semibold font-opensans"
                 >
-                  Select a Date
+                  {t("date_label")}
                 </Label>
                 <DatePicker
                   selected={selectedDate}
@@ -239,7 +241,7 @@ const ScheduleForm: React.FC<StepperProps> = ({
                     htmlFor="time-slots"
                     className="block mb-2 text-md font-semibold font-opensans"
                   >
-                    Select an Available Time Slot
+                    {t("time_slots_label")}
                   </Label>
                   <div className="mt-4 flex flex-wrap gap-5">
                     <div className="mt-4 flex flex-wrap gap-5">
@@ -285,7 +287,7 @@ const ScheduleForm: React.FC<StepperProps> = ({
                 }`}
                 disabled={!selectedDate || !selectedSlot}
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>
