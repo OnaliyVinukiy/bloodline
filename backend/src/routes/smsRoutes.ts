@@ -50,7 +50,6 @@ router.post("/notify", async (req, res) => {
 
   console.log("🔑 Raw subscriberId from MSpace:", subscriberId);
 
-  // Try to extract phone if it's plain tel: format
   let phoneFromMSpace: string | null = null;
   const phoneMatch = subscriberId.match(/tel:(\d+)/);
   if (phoneMatch) {
@@ -65,11 +64,9 @@ router.post("/notify", async (req, res) => {
     const collection = database.collection(DONOR_COLLECTION_ID);
 
     let query: any = {};
-
     if (phoneFromMSpace) {
       query = { contactNumber: phoneFromMSpace };
     } else {
-      // fallback if only masked ID is available
       query = { maskedNumber: subscriberId };
     }
 
@@ -81,25 +78,20 @@ router.post("/notify", async (req, res) => {
           maskedNumber: subscriberId,
           subscriptionUpdatedAt: new Date().toISOString(),
         },
-        $setOnInsert: {
-          createdAt: new Date().toISOString(),
-          contactNumber: phoneFromMSpace || null,
-        },
       },
-      { upsert: true }
+
+      { upsert: false }
     );
 
     console.log("✅ Donor subscription updated:", {
       matched: updateResult.matchedCount,
       modified: updateResult.modifiedCount,
-      upsertedId: updateResult.upsertedId,
     });
 
     await client.close();
   } catch (error) {
     console.error("❌ Error updating donor subscription:", error);
   }
-
   res.status(200).send("Notification received");
 });
 
@@ -205,6 +197,7 @@ router.post("/verify-otp", async (req, res) => {
       );
     }
 
+    // Update in-memory stores
     otpData.status = "verified";
     const subscription = subscriptionStore[subscriptionId];
     if (subscription) {
@@ -219,19 +212,23 @@ router.post("/verify-otp", async (req, res) => {
     const collection = database.collection(DONOR_COLLECTION_ID);
 
     await collection.updateOne(
-      { contactNumber: cleanPhone },
+      { contactNumber: cleanPhone }, // The query to find the correct document
       {
         $set: {
-          isSubscribed: false,
+          // Set the subscription status to true immediately after successful OTP verification
+          isSubscribed: true,
           subscriptionId,
           updatedAt: new Date().toISOString(),
         },
         $setOnInsert: {
+          // This will be executed only if a new document is created
           createdAt: new Date().toISOString(),
+          contactNumber: cleanPhone,
         },
       },
       { upsert: true }
     );
+
     await client.close();
 
     console.log("OTP verified successfully for:", cleanPhone);
@@ -241,7 +238,7 @@ router.post("/verify-otp", async (req, res) => {
       subscriptionId,
     });
   } catch (error: any) {
-    console.error("Error in OTP verification:", error);
+    console.error("❌ Error in OTP verification:", error);
     res.status(500).json({
       success: false,
       error: "Failed to verify OTP",
