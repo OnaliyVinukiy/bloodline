@@ -6,7 +6,11 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { MongoClient } from "mongodb";
-import { DATABASE_ID, APPOINTMENT_COLLECTION_ID } from "../config/azureConfig";
+import {
+  DATABASE_ID,
+  APPOINTMENT_COLLECTION_ID,
+  DONOR_COLLECTION_ID,
+} from "../config/azureConfig";
 import dotenv from "dotenv";
 import { Request, Response } from "express";
 import nodemailer from "nodemailer";
@@ -439,19 +443,17 @@ const getCurrentTimestamp = () => {
   )}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
 };
 
-export const sendSMS = async (contactNumber: string, message: string) => {
+export const sendSMS = async (destinationAddress: string, message: string) => {
   try {
     const requestBody = {
       version: MSPACE_API_VERSION,
       applicationId: MSPACE_APPLICATION_ID,
       password: MSPACE_PASSWORD,
-      destinationAddresses: [
-        "tel:ZjQ1YTI0YzYwODRjNjUzNjE4NDMxODE3ZTEzMzllMWI0ZDljYjhhOGY1YTc1YzljM2I5MTIzZDkzNzY3YmNjZTptb2JpdGVs",
-      ],
+      destinationAddresses: [destinationAddress],
       sourceAddress: "BLAPP",
       deliveryStatusRequest: "0",
       encoding: "0",
-      message: "Your blood donation appointment has been approved. Thank you!",
+      message: message,
     };
 
     const response = await axios.post(MSPACE_API_BASE_URL, requestBody, {
@@ -487,16 +489,32 @@ export const approveAppointment = async (req: Request, res: Response) => {
     await client.connect();
 
     const database = client.db(DATABASE_ID);
-    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+    const appointmentCollection = database.collection(
+      APPOINTMENT_COLLECTION_ID
+    );
+    const donorCollection = database.collection(DONOR_COLLECTION_ID);
     const objectId = new ObjectId(id);
 
-    const appointment = await collection.findOne({ _id: objectId });
+    const appointment = await appointmentCollection.findOne({ _id: objectId });
     if (!appointment) {
       return res.status(404).json({ message: "Appointment not found" });
     }
 
+    const donor = await donorCollection.findOne({
+      email: appointment.donorInfo.email,
+    });
+    if (!donor || !donor.maskedNumber) {
+      console.warn(
+        "Donor not found or not subscribed to SMS. Skipping SMS notification."
+      );
+    } else {
+      const approvalMessage = `Hello ${appointment.donorInfo.fullName}, your blood donation appointment on ${appointment.selectedDate} at ${appointment.selectedSlot} has been approved.`;
+      await sendSMS(donor.maskedNumber, approvalMessage);
+      console.log("✅ Approval SMS sent to", donor.maskedNumber);
+    }
+
     // Update the appointment status
-    const updatedAppointment = await collection.findOneAndUpdate(
+    const updatedAppointment = await appointmentCollection.findOneAndUpdate(
       { _id: objectId },
       {
         $set: {
@@ -519,9 +537,6 @@ export const approveAppointment = async (req: Request, res: Response) => {
 
     // Send approval email
     await sendApprovalEmail(updatedAppointment);
-
-    // Send approval SMS
-    await sendApprovalSMS(updatedAppointment);
 
     res.status(200).json(updatedAppointment);
   } catch (error) {
