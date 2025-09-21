@@ -144,15 +144,6 @@ router.post("/request-otp", async (req, res) => {
       createdAt: Date.now(),
     };
 
-    subscriptionStore[subscriptionId] = {
-      phone: cleanPhone,
-      status: "pending",
-      referenceNo: otpResponse.data.referenceNo,
-      subscriptionId,
-      createdAt: new Date().toISOString(),
-      attempts: 0,
-    };
-
     console.log("✅ OTP requested successfully for:", cleanPhone);
     res.json({
       success: true,
@@ -189,6 +180,7 @@ router.post("/verify-otp", async (req, res) => {
         .json({ success: false, error: "Invalid or expired OTP request" });
     }
 
+    // Call MSpace API to verify the OTP
     const verifyResponse = await axios.post(
       `${process.env.MSPACE_API_URL}/otp/verify`,
       {
@@ -199,20 +191,19 @@ router.post("/verify-otp", async (req, res) => {
       }
     );
 
+    // Check MSpace verification status
     if (verifyResponse.data.statusCode !== "S1000") {
       throw new Error(
         verifyResponse.data.statusDetail || "OTP verification failed"
       );
     }
 
-    otpData.status = "verified";
-    const subscription = subscriptionStore[subscriptionId];
-    if (subscription) {
-      subscription.status = "verifying";
-      subscription.verifiedAt = new Date().toISOString();
-    }
+    // MSpace has verified the OTP and provided the masked number.
+    const maskedNumber = verifyResponse.data.subscriberId;
+    const subscriptionStatus =
+      verifyResponse.data.subscriptionStatus === "REGISTERED";
 
-    // ✅ Update donor in DB safely
+    // ✅ Now, update the donor document in the database
     const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
     await client.connect();
     const database = client.db(DATABASE_ID);
@@ -222,8 +213,9 @@ router.post("/verify-otp", async (req, res) => {
       { contactNumber: cleanPhone },
       {
         $set: {
-          isSubscribed: false,
-          subscriptionId,
+          isSubscribed: subscriptionStatus,
+          subscriptionId: subscriptionId,
+          maskedNumber: maskedNumber, // This is the masked number from MSpace
           updatedAt: new Date().toISOString(),
         },
         $setOnInsert: {
@@ -232,16 +224,22 @@ router.post("/verify-otp", async (req, res) => {
       },
       { upsert: true }
     );
-    await client.close();
 
-    console.log("OTP verified successfully for:", cleanPhone);
+    await client.close();
+    delete otpStore[cleanPhone]; // Clean up the in-memory store
+
+    console.log(
+      "OTP verified successfully and masked number saved for:",
+      cleanPhone
+    );
     res.json({
       success: true,
-      message: "OTP verified. Processing subscription...",
+      message: "OTP verified. The masked number has been saved.",
       subscriptionId,
+      maskedNumber,
     });
   } catch (error: any) {
-    console.error("Error in OTP verification:", error);
+    console.error("❌ Error in OTP verification:", error);
     res.status(500).json({
       success: false,
       error: "Failed to verify OTP",
