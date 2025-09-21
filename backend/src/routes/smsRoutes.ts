@@ -213,10 +213,10 @@ router.post("/verify-otp", async (req, res) => {
 
     await client.close();
 
-    console.log("✅ OTP verified successfully for:", cleanPhone);
+    console.log("OTP verified successfully for:", cleanPhone);
     res.json({ success: true, message: "OTP verified. Processing subscription...", subscriptionId });
   } catch (error: any) {
-    console.error("❌ Error in OTP verification:", error);
+    console.error("Error in OTP verification:", error);
     res.status(500).json({ success: false, error: "Failed to verify OTP", details: error.message });
   }
 });
