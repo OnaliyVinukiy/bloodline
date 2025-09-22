@@ -154,3 +154,84 @@ export const getHospitals = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error fetching hospitals", error });
   }
 };
+
+// Approve hospital request
+export const approveHospital = async (req: Request, res: Response) => {
+  try {
+    const { collection, client } = await connectToCosmos();
+    const { id } = req.params;
+
+    // Validate ObjectId
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid hospital ID" });
+    }
+
+    const result = await collection.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          status: "approved",
+          approvedAt: new Date(),
+          rejectionReason: null,
+        },
+      }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "Hospital not found" });
+    }
+
+    res.status(200).json({
+      message: "Hospital approved successfully",
+      hospitalId: id,
+    });
+
+    client.close();
+  } catch (error) {
+    console.error("Error approving hospital:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Reject hospital request
+export const rejectHospital = async (req: Request, res: Response) => {
+  try {
+    const { collection, client } = await connectToCosmos();
+    const { id } = req.params;
+    const { rejectionReason } = req.body;
+
+    if (!rejectionReason || rejectionReason.trim() === "") {
+      return res.status(400).json({ message: "Rejection reason is required" });
+    }
+
+    // Validate ObjectId
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid hospital ID" });
+    }
+
+    const result = await collection.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          status: "rejected",
+          rejectionReason: rejectionReason.trim(),
+          rejectedAt: new Date(),
+        },
+      }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "Hospital not found" });
+    }
+
+    res.status(200).json({
+      message: "Hospital rejected successfully",
+      hospitalId: id,
+    });
+
+    client.close();
+  } catch (error) {
+    console.error("Error rejecting hospital:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
