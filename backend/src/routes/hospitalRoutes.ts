@@ -7,8 +7,10 @@
  */
 import express from "express";
 import {
+  approveHospital,
   getHospitalByEmail,
   getHospitals,
+  rejectHospital,
   uploadHospitalLogo,
   upsertHospital,
 } from "../controllers/hospitalController";
@@ -30,5 +32,11 @@ router.post("/submit-request", upsertHospital);
 
 //Route to fetch hospital data
 router.get("/fetch-hospitals", authenticateUser, getHospitals);
+
+//Route to approve hospital
+router.patch("/:id/approve", approveHospital);
+
+//Route to reject hospital
+router.patch("/:id/reject", rejectHospital);
 
 export default router;
