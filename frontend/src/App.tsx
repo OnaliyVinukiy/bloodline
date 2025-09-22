@@ -37,7 +37,8 @@ import Donors from "./pages/admin/donor/Donors";
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { UserProvider } from "./contexts/UserContext";
-
+import HospitalRegistration from "./pages/hospital/HospitalRegistration";
+import Hospitals from "./pages/admin/hospital/Hospitals";
 function App() {
   const { state } = useAuthContext();
   const [isLoading, setIsLoading] = useState(true);
@@ -125,6 +126,11 @@ function App() {
               />
               <Route path="/admin/organizations" element={<Organizations />} />
               <Route path="/admin/donors" element={<Donors />} />
+              <Route
+                path="/hospital-registration"
+                element={<HospitalRegistration />}
+              />
+              <Route path="/admin/hospitals" element={<Hospitals />} />
             </Routes>
           </main>
           <FooterComponent />
