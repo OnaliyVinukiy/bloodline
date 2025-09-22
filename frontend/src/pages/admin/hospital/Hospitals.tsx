@@ -6,7 +6,9 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { useEffect, useState } from "react";
-import AllHospitals from "./AllHospitals";
+import ApprovedHospitals from "./ApprovedHospitals";
+import PendingHospitals from "./PendingHospitals";
+import RejectedHospitals from "./RejectedHospitals";
 import { useUser } from "../../../contexts/UserContext";
 import { useAuthContext } from "@asgardeo/auth-react";
 import axios from "axios";
@@ -121,7 +123,7 @@ const Hospitals = () => {
                   : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
               }`}
             >
-              All
+              Pending
             </button>
           </li>
           <li className="me-2">
@@ -133,7 +135,7 @@ const Hospitals = () => {
                   : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
               }`}
             >
-              Pending
+              Approved
             </button>
           </li>
           <li className="me-2">
@@ -145,18 +147,6 @@ const Hospitals = () => {
                   : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
               }`}
             >
-              Approved
-            </button>
-          </li>
-          <li className="me-2">
-            <button
-              onClick={() => setActiveTab("tab4")}
-              className={`px-6 py-3 rounded-t-lg transition-colors duration-300 ${
-                activeTab === "tab4"
-                  ? "text-white bg-red-800 border-b-0"
-                  : "text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
-              }`}
-            >
               Rejected
             </button>
           </li>
@@ -164,10 +154,9 @@ const Hospitals = () => {
       </div>
 
       <div>
-        {activeTab === "tab1" && <AllHospitals hospitals={hospitals} />}
-        {activeTab === "tab2" && <AllHospitals hospitals={hospitals} />}
-        {activeTab === "tab3" && <AllHospitals hospitals={hospitals} />}
-        {activeTab === "tab4" && <AllHospitals hospitals={hospitals} />}
+        {activeTab === "tab1" && <PendingHospitals hospitals={hospitals} />}
+        {activeTab === "tab2" && <ApprovedHospitals hospitals={hospitals} />}
+        {activeTab === "tab3" && <RejectedHospitals hospitals={hospitals} />}
       </div>
     </div>
   );

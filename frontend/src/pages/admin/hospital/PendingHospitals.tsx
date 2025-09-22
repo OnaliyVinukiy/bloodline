@@ -11,7 +11,7 @@ import { useUser } from "../../../contexts/UserContext";
 import { Hospital } from "../../../types/users";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 
-const AllHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
+const PendingHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
   const { isAdmin, isLoading } = useUser();
   const [filteredHospitals, setFilteredHospitals] = useState<Hospital[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,14 +25,13 @@ const AllHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
-  // Initialize filtered appointments
+  // Filter pending hospitals
   useEffect(() => {
-    setFilteredHospitals(hospitals);
-  }, [hospitals]);
+    const pendingHospitals = hospitals.filter(
+      (hospital) => hospital.status === "pending"
+    );
 
-  // Apply filters
-  useEffect(() => {
-    let results = [...hospitals];
+    let results = [...pendingHospitals];
 
     // Apply search filter
     if (searchTerm) {
@@ -85,7 +84,7 @@ const AllHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
     }
   };
 
-  // Get current appointments for pagination
+  // Get current hospitals for pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentHospitals = filteredHospitals.slice(
@@ -154,9 +153,15 @@ const AllHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
   return (
     <div className="flex justify-center mt-8">
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-w-7xl w-full mb-20">
-        <div className="mt-4 ml-4 flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
-          <div className="flex flex-col md:flex-row gap-4 w-full">
-            <div className="relative flex-1">
+        <div className="p-6 bg-white dark:bg-gray-900">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+            <div className="mt-4 md:mt-0 text-sm text-gray-500 dark:text-gray-400">
+              {filteredHospitals.length} pending request(s)
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0 pb-4">
+            <div className="relative w-full md:w-1/3">
               <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                 <svg
                   className="w-4 h-4 text-gray-500 dark:text-gray-400"
@@ -176,7 +181,7 @@ const AllHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
               </div>
               <input
                 type="text"
-                id="table-search-hospitals"
+                id="table-search-pending-hospitals"
                 className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Search by hospital name"
                 value={searchTerm}
@@ -186,8 +191,8 @@ const AllHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
           </div>
         </div>
 
-        <table className="mt-4 mb-4 w-full text-md text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead className="text- text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <table className="w-full text-md text-left rtl:text-right text-gray-500 dark:text-gray-400">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" className="px-6 py-3"></th>
               <th scope="col" className="px-6 py-3">
@@ -208,9 +213,7 @@ const AllHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
               <th scope="col" className="px-6 py-3">
                 Rep Contact No
               </th>
-              <th scope="col" className="px-6 py-3 text-center">
-                Status
-              </th>
+
               <th scope="col" className="px-6 py-3 text-center">
                 Action
               </th>
@@ -255,7 +258,7 @@ const AllHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
                     </div>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
                   {hospital.hospitalName}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -273,32 +276,13 @@ const AllHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {hospital.repContactNumber}
                 </td>
-                <td className="px-6 py-6 text-center">
-                  <div className="badges flex justify-center">
-                    {hospital.status === "rejected" ? (
-                      <button className="red">Rejected</button>
-                    ) : hospital.status === "approved" ? (
-                      <button className="green">Approved</button>
-                    ) : hospital.status === "pending" ? (
-                      <button className="yellow">Pending</button>
-                    ) : (
-                      <button className="yellow">None</button>
-                    )}
-                  </div>
-                </td>
+
                 <td className="px-6 py-4 text-center">
                   <div className="flex justify-center space-x-2">
                     <button
                       onClick={() => handleApprove(hospital.id)}
-                      disabled={
-                        hospital.status !== "pending" ||
-                        loadingAction === `approve-${hospital.id}`
-                      }
-                      className={`p-2 rounded-full ${
-                        hospital.status !== "pending"
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "bg-green-100 text-green-600 hover:bg-green-200"
-                      }`}
+                      disabled={loadingAction === `approve-${hospital.id}`}
+                      className="p-2 bg-green-100 text-green-600 hover:bg-green-200 rounded-full transition-colors duration-200"
                       title="Approve Hospital"
                     >
                       {loadingAction === `approve-${hospital.id}` ? (
@@ -327,15 +311,8 @@ const AllHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
                     </button>
                     <button
                       onClick={() => handleReject(hospital.id)}
-                      disabled={
-                        hospital.status !== "pending" ||
-                        loadingAction === `reject-${hospital.id}`
-                      }
-                      className={`p-2 rounded-full ${
-                        hospital.status !== "pending"
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "bg-red-100 text-red-600 hover:bg-red-200"
-                      }`}
+                      disabled={loadingAction === `reject-${hospital.id}`}
+                      className="p-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-full transition-colors duration-200"
                       title="Reject Hospital"
                     >
                       {loadingAction === `reject-${hospital.id}` ? (
@@ -370,9 +347,29 @@ const AllHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
               <tr>
                 <td
                   colSpan={9}
-                  className="text-center px-6 py-4 text-gray-500 dark:text-gray-400"
+                  className="text-center px-6 py-8 text-gray-500 dark:text-gray-400"
                 >
-                  No hospitals found matching your criteria.
+                  <div className="flex flex-col items-center justify-center">
+                    <svg
+                      className="w-16 h-16 text-gray-300 mb-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    <p className="text-lg font-medium">
+                      No pending hospital requests
+                    </p>
+                    <p className="text-sm mt-1">
+                      All hospital requests have been processed.
+                    </p>
+                  </div>
                 </td>
               </tr>
             )}
@@ -448,4 +445,4 @@ const AllHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
   );
 };
 
-export default AllHospitals;
+export default PendingHospitals;
