@@ -1,0 +1,156 @@
+/*!
+ * Bloodline Blood Bank Management System
+ * Copyright (c) 2025 Onaliy Jayawardana
+ * All rights reserved.
+ *
+ * Unauthorized copying, modification, or distribution of this code is prohibited.
+ */
+import express from "express";
+import { Request, Response } from "express";
+import { BlobServiceClient } from "@azure/storage-blob";
+import dotenv from "dotenv";
+import { MongoClient, ObjectId } from "mongodb";
+import {
+  DATABASE_ID,
+  HOSPITAL_COLLECTION_ID,
+  LOGO_CONTAINER_NAME,
+} from "../config/azureConfig";
+
+const app = express();
+app.use(express.json());
+dotenv.config();
+
+const AZURE_STORAGE_CONNECTION_STRING =
+  process.env.AZURE_STORAGE_CONNECTION_STRING;
+if (!AZURE_STORAGE_CONNECTION_STRING) {
+  throw new Error(
+    "Missing environment variable: AZURE_STORAGE_CONNECTION_STRING"
+  );
+}
+const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
+if (!COSMOS_DB_CONNECTION_STRING) {
+  throw new Error("Missing environment variable: COSMOS_DB_CONNECTION_STRING");
+}
+
+const blobServiceClient = BlobServiceClient.fromConnectionString(
+  AZURE_STORAGE_CONNECTION_STRING
+);
+const containerClient =
+  blobServiceClient.getContainerClient(LOGO_CONTAINER_NAME);
+
+// Connect to DB using MongoClient.
+const connectToCosmos = async () => {
+  try {
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+
+    const db = client.db(DATABASE_ID);
+    const collection = db.collection(HOSPITAL_COLLECTION_ID);
+    return { db, collection, client };
+  } catch (error) {
+    console.error("Error connecting to Cosmos DB:", error);
+    throw error;
+  }
+};
+
+//Fetch hospital by email
+export const getHospitalByEmail = async (req: Request, res: Response) => {
+  try {
+    const { collection, client } = await connectToCosmos();
+    const { repEmail } = req.params;
+    const hospital = await collection.findOne({ repEmail });
+
+    if (!hospital) {
+      return res.status(404).json({ message: "Hospital not found" });
+    }
+
+    res.status(200).json(hospital);
+    client.close();
+  } catch (error) {
+    console.error("Error fetching hospital:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Handle avatar upload to Azure Blob Storage
+export const uploadHospitalLogo = async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const { email } = req.body;
+    const blobName = `${email}-${Date.now()}-${req.file.originalname}`;
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+    await blockBlobClient.uploadData(req.file.buffer, {
+      blobHTTPHeaders: { blobContentType: req.file.mimetype },
+    });
+
+    const avatarUrl = blockBlobClient.url;
+
+    // Update donor record in Cosmos DB
+    const mongoClient = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    await mongoClient.connect();
+    const database = mongoClient.db(DATABASE_ID);
+    const hospitalCollection = database.collection(HOSPITAL_COLLECTION_ID);
+
+    await hospitalCollection.updateOne(
+      { email },
+      { $set: { avatar: avatarUrl } }
+    );
+
+    await mongoClient.close();
+
+    res.status(200).json({ avatarUrl });
+  } catch (error) {
+    console.error("Error uploading avatar:", error);
+    res.status(500).json({ error: "Failed to upload avatar" });
+  }
+};
+
+// Create or update hospital record in DB
+export const upsertHospital = async (req: Request, res: Response) => {
+  const hospital = req.body;
+
+  try {
+    const { collection, client } = await connectToCosmos();
+    const upsertResult = await collection.updateOne(
+      { repEmail: hospital.repEmail },
+      { $set: hospital },
+      { upsert: true }
+    );
+
+    res.status(200).json({
+      message: "Hospital updated successfully!",
+      organization: upsertResult,
+    });
+
+    client.close();
+  } catch (error) {
+    console.error("Error updating hospital:", error);
+    res.status(500).json({ message: "Error updating hospital" });
+  }
+};
+
+// Fetch hospital data
+export const getHospitals = async (req: Request, res: Response) => {
+  try {
+    // Connect to the database
+    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+
+    await client.connect();
+
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(HOSPITAL_COLLECTION_ID);
+
+    // Fetch all hospitals
+    const hospitals = await collection.find({}).toArray();
+
+    res.status(200).json(hospitals);
+
+    await client.close();
+  } catch (error) {
+    console.error("Error fetching hospitals:", error);
+    res.status(500).json({ message: "Error fetching hospitals", error });
+  }
+};
