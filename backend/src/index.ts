@@ -19,6 +19,7 @@ import stockRoutes from "./routes/stockRoutes";
 import chatRoutes from "./routes/chatRoutes";
 import subscriptionRoutes from "./routes/subscriptionRoutes";
 import smsRoutes from "./routes/smsRoutes";
+import hospitalRoutes from "./routes/hospitalRoutes";
 const app = express();
 
 // CORS Configuration
@@ -54,6 +55,9 @@ app.use("/api/camps", campRoutes);
 
 // Organization Routes
 app.use("/api/organizations", organizationRoutes);
+
+// Hospital Routes
+app.use("/api/hospitals", hospitalRoutes);
 
 // Stocks Routes
 app.use("/api/stocks", stockRoutes);
