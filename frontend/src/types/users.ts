@@ -70,3 +70,18 @@ export interface Organization {
   repContactNumber: string;
   avatar: string;
 }
+
+export interface Hospital {
+  id: string;
+  hospitalName: string;
+  hospitalEmail: string;
+  repFullName: string;
+  repEmail: string;
+  repNIC: string;
+  repGender: string;
+  hosContactNumber: string;
+  repContactNumber: string;
+  avatar: string;
+  status?: string;
+  rejectionReason?: string;
+}
