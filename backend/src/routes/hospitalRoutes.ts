@@ -8,9 +8,11 @@
 import express from "express";
 import {
   approveHospital,
+  getBloodRequests,
   getHospitalByEmail,
   getHospitals,
   rejectHospital,
+  submitBloodRequest,
   uploadHospitalLogo,
   upsertHospital,
 } from "../controllers/hospitalController";
@@ -38,5 +40,10 @@ router.patch("/:id/approve", approveHospital);
 
 //Route to reject hospital
 router.patch("/:id/reject", rejectHospital);
+
+// Blood request routes
+router.post("/blood-requests", submitBloodRequest);
+
+router.get("/blood-requests/:hospitalId", getBloodRequests);
 
 export default router;
