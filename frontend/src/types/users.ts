@@ -72,7 +72,7 @@ export interface Organization {
 }
 
 export interface Hospital {
-  id: string;
+  _id: string;
   hospitalName: string;
   hospitalEmail: string;
   repFullName: string;
