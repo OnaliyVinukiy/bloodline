@@ -29,7 +29,7 @@ const HospitalRegistrationRequest = () => {
   const [isHosPhoneNumberValid, setIsHosPhoneNumberValid] = useState(true);
 
   const [hospital, setHospital] = useState<Hospital>({
-    id: "",
+    _id: "",
     hospitalName: "",
     hospitalEmail: "",
     repFullName: "",
@@ -200,7 +200,7 @@ const HospitalRegistrationRequest = () => {
 
     try {
       setLoading(true);
-      const { id, ...hospitalData } = hospital;
+      const { _id, ...hospitalData } = hospital;
 
       await axios.post(`${backendURL}/api/hospitals/submit-request`, {
         ...hospitalData,
