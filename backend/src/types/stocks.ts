@@ -59,3 +59,20 @@ export interface StockAdditionHistory {
   labelId?: string;
   expiryDate?: string;
 }
+
+export interface BloodRequest {
+  id: string;
+  hospitalId: string;
+  hospitalName: string;
+  hospitalEmail: string;
+  contactNumber: string;
+  bloodType: string;
+  quantity: number;
+  urgency: "low" | "medium" | "high" | "critical";
+  purpose: string;
+  status: "pending" | "approved" | "rejected" | "fulfilled";
+  requestedAt: Date;
+  neededBy: Date;
+  rejectionReason?: string;
+  fulfilledAt?: Date;
+}
