@@ -235,3 +235,62 @@ export const rejectHospital = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// Submit blood request
+export const submitBloodRequest = async (req: Request, res: Response) => {
+  try {
+    const { collection, client } = await connectToCosmos();
+    const bloodRequest = req.body;
+
+    // Validate hospital exists and is approved
+    const hospital = await collection.findOne({
+      _id: new ObjectId(bloodRequest.hospitalId),
+      status: "approved",
+    });
+
+    if (!hospital) {
+      return res
+        .status(404)
+        .json({ message: "Hospital not found or not approved" });
+    }
+
+    // Insert blood request
+    const result = await collection.insertOne({
+      ...bloodRequest,
+      createdAt: new Date(),
+      requestId: `BR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    });
+
+    res.status(201).json({
+      message: "Blood request submitted successfully",
+      requestId: result.insertedId,
+    });
+
+    client.close();
+  } catch (error) {
+    console.error("Error submitting blood request:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get blood requests for hospital
+export const getBloodRequests = async (req: Request, res: Response) => {
+  try {
+    const { collection, client } = await connectToCosmos();
+    const { hospitalId } = req.params;
+
+    const requests = await collection
+      .find({
+        hospitalId,
+        type: "blood-request",
+      })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    res.status(200).json(requests);
+    client.close();
+  } catch (error) {
+    console.error("Error fetching blood requests:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
