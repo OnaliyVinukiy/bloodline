@@ -39,6 +39,8 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import { UserProvider } from "./contexts/UserContext";
 import HospitalRegistration from "./pages/hospital/HospitalRegistration";
 import Hospitals from "./pages/admin/hospital/Hospitals";
+import HospitalBloodRequest from "./pages/hospital/RequestBlood";
+
 function App() {
   const { state } = useAuthContext();
   const [isLoading, setIsLoading] = useState(true);
@@ -131,6 +133,9 @@ function App() {
                 element={<HospitalRegistration />}
               />
               <Route path="/admin/hospitals" element={<Hospitals />} />
+              <Route
+                path="/hospital/request-blood"
+                element={<HospitalBloodRequest />} />
             </Routes>
           </main>
           <FooterComponent />
