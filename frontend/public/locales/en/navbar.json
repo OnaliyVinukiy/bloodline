@@ -17,5 +17,7 @@
   "home": "Home",
   "about": "About",
   "services": "Services",
-  "contact_us": "Contact Us"
+  "contact_us": "Contact Us",
+  "admin_hospitals": "Hospitals",
+  "blood_requests": "Blood Requests"
 }
