@@ -50,8 +50,6 @@ const PendingHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
     try {
       setLoadingAction(`approve-${hospitalId}`);
       await axios.patch(`${backendURL}/api/hospitals/${hospitalId}/approve`);
-      // Refresh the hospitals list by triggering a parent component update
-      window.location.reload();
     } catch (error) {
       console.error("Error approving hospital:", error);
       alert("Error approving hospital. Please try again.");
@@ -222,7 +220,7 @@ const PendingHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
           <tbody>
             {currentHospitals.map((hospital) => (
               <tr
-                key={hospital.id}
+                key={hospital._id}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 <td className="px-6 py-4">
@@ -280,12 +278,12 @@ const PendingHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
                 <td className="px-6 py-4 text-center">
                   <div className="flex justify-center space-x-2">
                     <button
-                      onClick={() => handleApprove(hospital.id)}
-                      disabled={loadingAction === `approve-${hospital.id}`}
+                      onClick={() => handleApprove(hospital._id)}
+                      disabled={loadingAction === `approve-${hospital._id}`}
                       className="p-2 bg-green-100 text-green-600 hover:bg-green-200 rounded-full transition-colors duration-200"
                       title="Approve Hospital"
                     >
-                      {loadingAction === `approve-${hospital.id}` ? (
+                      {loadingAction === `approve-${hospital._id}` ? (
                         <svg
                           className="w-5 h-5 animate-spin"
                           fill="none"
@@ -310,12 +308,12 @@ const PendingHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
                       )}
                     </button>
                     <button
-                      onClick={() => handleReject(hospital.id)}
-                      disabled={loadingAction === `reject-${hospital.id}`}
+                      onClick={() => handleReject(hospital._id)}
+                      disabled={loadingAction === `reject-${hospital._id}`}
                       className="p-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-full transition-colors duration-200"
                       title="Reject Hospital"
                     >
-                      {loadingAction === `reject-${hospital.id}` ? (
+                      {loadingAction === `reject-${hospital._id}` ? (
                         <svg
                           className="w-5 h-5 animate-spin"
                           fill="none"
