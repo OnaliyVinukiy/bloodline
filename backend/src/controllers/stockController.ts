@@ -14,12 +14,26 @@ import {
 import dotenv from "dotenv";
 import e, { Request, Response } from "express";
 import { BloodStock, StockAdditionHistory } from "../types/stocks";
+import nodemailer from "nodemailer";
+import axios from "axios";
+import { lowStockAlert } from "../emailTemplates/LowStockAlert";
 
 dotenv.config();
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
 if (!COSMOS_DB_CONNECTION_STRING) {
   throw new Error("Missing environment variable: COSMOS_DB_CONNECTION_STRING");
+}
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
+const DESTINATION_PHONE_NUMBER = process.env.DESTINATION_ADDRESS;
+const MSPACE_API_BASE_URL = "https://api.mspace.lk/sms/send";
+const MSPACE_API_VERSION = "1.0";
+const MSPACE_APPLICATION_ID = process.env.MSPACE_APPLICATION_ID;
+const MSPACE_PASSWORD = process.env.MSPACE_PASSWORD;
+
+if (!DESTINATION_PHONE_NUMBER) {
+  throw new Error("Missing environment variable: DESTINATION_ADDRESS");
 }
 
 // Fetch blood stock
@@ -321,7 +335,74 @@ export const updateStock = async (req: Request, res: Response) => {
   }
 };
 
-// Issue blood stock
+// Function to send an email alert
+const sendEmailAlert = async (subject: string, message: string) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: EMAIL_USER,
+        pass: EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: EMAIL_USER,
+      to: "bloodline.notifications@gmail.com",
+      subject: subject,
+      html: message,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Email alert sent successfully.");
+  } catch (error) {
+    console.error("Error sending email alert:", error);
+    throw new Error("Failed to send email notification.");
+  }
+};
+
+// Function to send an SMS alert
+const sendSmsAlert = async (destinationAddress: string, message: string) => {
+  try {
+    const requestBody = {
+      version: MSPACE_API_VERSION,
+      applicationId: MSPACE_APPLICATION_ID,
+      password: MSPACE_PASSWORD,
+      destinationAddresses: [destinationAddress],
+      sourceAddress: "BLAPP",
+      deliveryStatusRequest: "0",
+      encoding: "0",
+      message: message,
+    };
+
+    const response = await axios.post(MSPACE_API_BASE_URL, requestBody, {
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+      },
+    });
+
+    console.log("SMS alert sent successfully:", response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error sending SMS:", error.response?.data || error.message);
+    throw new Error("Failed to send SMS notification.");
+  }
+};
+
+// Function to handle all alerts
+const handleStockAlert = async (
+  bloodType: string,
+  remainingQuantity: number
+) => {
+  const subject = `Low Blood Stock Alert for ${bloodType}`;
+  const emailMessage = lowStockAlert(bloodType, remainingQuantity);
+  const smsMessage = `ALERT: Blood stock for ${bloodType} is low at ${remainingQuantity} units.`;
+
+  await sendEmailAlert(subject, emailMessage);
+  await sendSmsAlert(DESTINATION_PHONE_NUMBER, smsMessage);
+};
+
+// 💉 Issue blood stock
 export const issueBloodStock = async (req: Request, res: Response) => {
   let client: MongoClient | null = null;
   try {
@@ -356,20 +437,33 @@ export const issueBloodStock = async (req: Request, res: Response) => {
 
     const parsedQuantity = Number(quantity);
     if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
-      return res
-        .status(400)
-        .json({ message: "Quantity must be a positive number." });
+      return res.status(400).json({
+        message: "Quantity must be a positive number.",
+      });
     }
 
     // Fetch selected entries
     const entries = await historyCollection
       .find({
-        _id: { $in: selectedEntries.map((id: string) => new ObjectId(id)) },
+        _id: {
+          $in: selectedEntries.map((id: string) => new ObjectId(id)),
+        },
         bloodType,
         operationType: "addition",
         $or: [
-          { remainingQuantity: { $gt: 0 } },
-          { remainingQuantity: { $exists: false }, quantityAdded: { $gt: 0 } },
+          {
+            remainingQuantity: {
+              $gt: 0,
+            },
+          },
+          {
+            remainingQuantity: {
+              $exists: false,
+            },
+            quantityAdded: {
+              $gt: 0,
+            },
+          },
         ],
       })
       .toArray();
@@ -395,11 +489,13 @@ export const issueBloodStock = async (req: Request, res: Response) => {
     }
 
     // Check if total stock is sufficient
-    const stockItem = await stockCollection.findOne({ bloodType });
+    const stockItem = await stockCollection.findOne({
+      bloodType,
+    });
     if (!stockItem || stockItem.quantity < parsedQuantity) {
-      return res
-        .status(400)
-        .json({ message: "Not enough stock available in inventory." });
+      return res.status(400).json({
+        message: "Not enough stock available in inventory.",
+      });
     }
 
     let remainingToIssue = parsedQuantity;
@@ -415,8 +511,14 @@ export const issueBloodStock = async (req: Request, res: Response) => {
         const toDeduct = Math.min(available, remainingToIssue);
 
         await historyCollection.updateOne(
-          { _id: entry._id },
-          { $set: { remainingQuantity: available - toDeduct } }
+          {
+            _id: entry._id,
+          },
+          {
+            $set: {
+              remainingQuantity: available - toDeduct,
+            },
+          }
         );
 
         remainingToIssue -= toDeduct;
@@ -433,7 +535,9 @@ export const issueBloodStock = async (req: Request, res: Response) => {
     // Update total stock
     const updatedQuantity = stockItem.quantity - parsedQuantity;
     await stockCollection.updateOne(
-      { _id: stockItem._id },
+      {
+        _id: stockItem._id,
+      },
       {
         $set: {
           quantity: updatedQuantity,
@@ -452,6 +556,13 @@ export const issueBloodStock = async (req: Request, res: Response) => {
       stockItem.quantity,
       issuedTo
     );
+
+    if (updatedQuantity < 500) {
+      console.log(
+        `Low stock alert triggered for ${bloodType}. Remaining: ${updatedQuantity}`
+      );
+      await handleStockAlert(bloodType, updatedQuantity);
+    }
 
     res.status(200).json({
       message: "Blood stock issued successfully.",
