@@ -40,6 +40,7 @@ import { UserProvider } from "./contexts/UserContext";
 import HospitalRegistration from "./pages/hospital/HospitalRegistration";
 import Hospitals from "./pages/admin/hospital/Hospitals";
 import HospitalBloodRequest from "./pages/hospital/RequestBlood";
+import BloodRequests from "./pages/admin/hospital/BloodRequests";
 
 function App() {
   const { state } = useAuthContext();
@@ -135,7 +136,9 @@ function App() {
               <Route path="/admin/hospitals" element={<Hospitals />} />
               <Route
                 path="/hospital/request-blood"
-                element={<HospitalBloodRequest />} />
+                element={<HospitalBloodRequest />}
+              />
+              <Route path="/admin/blood-requests" element={<BloodRequests />} />
             </Routes>
           </main>
           <FooterComponent />
