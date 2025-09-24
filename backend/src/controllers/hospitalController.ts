@@ -305,13 +305,16 @@ export const submitBloodRequest = async (req: Request, res: Response) => {
 export const getAllBloodRequests = async (req: Request, res: Response) => {
   try {
     const { collection, client } = await connectToBloodRequestsCollection();
+    const requests = await collection.find({}).toArray();
 
-    const requests = await collection
-      .find({})
-      .sort({ requestedAt: -1 })
-      .toArray();
+    // Sort by requestedAt in memory
+    const sortedRequests = requests.sort((a, b) => {
+      const dateA = new Date(a.requestedAt || a.createdAt || 0);
+      const dateB = new Date(b.requestedAt || b.createdAt || 0);
+      return dateB.getTime() - dateA.getTime();
+    });
 
-    res.status(200).json(requests);
+    res.status(200).json(sortedRequests);
     client.close();
   } catch (error) {
     console.error("Error fetching blood requests:", error);
@@ -333,10 +336,16 @@ export const getHospitalBloodRequests = async (req: Request, res: Response) => {
       .find({
         hospitalId: new ObjectId(hospitalId),
       })
-      .sort({ requestedAt: -1 })
       .toArray();
 
-    res.status(200).json(requests);
+    // Sort by requestedAt in memory
+    const sortedRequests = requests.sort((a, b) => {
+      const dateA = new Date(a.requestedAt || a.createdAt || 0);
+      const dateB = new Date(b.requestedAt || b.createdAt || 0);
+      return dateB.getTime() - dateA.getTime();
+    });
+
+    res.status(200).json(sortedRequests);
     client.close();
   } catch (error) {
     console.error("Error fetching hospital blood requests:", error);
