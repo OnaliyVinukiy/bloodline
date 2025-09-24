@@ -157,7 +157,12 @@ const HospitalBloodRequest = () => {
       setLoading(true);
 
       await axios.post(`${backendURL}/api/hospitals/blood-requests`, {
-        ...bloodRequest,
+        hospitalId: hospital?._id,
+        bloodType: bloodRequest.bloodType,
+        quantity: bloodRequest.quantity,
+        urgency: bloodRequest.urgency,
+        purpose: bloodRequest.purpose,
+        neededBy: bloodRequest.neededBy,
         requestedAt: new Date(),
       });
 
