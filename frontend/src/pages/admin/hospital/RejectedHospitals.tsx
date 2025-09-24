@@ -173,7 +173,7 @@ const RejectedHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
           <tbody>
             {currentHospitals.map((hospital) => (
               <tr
-                key={hospital.id}
+                key={hospital._id}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 <td className="px-6 py-4">

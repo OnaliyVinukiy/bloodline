@@ -8,13 +8,17 @@
 import express from "express";
 import {
   approveHospital,
-  getBloodRequests,
   getHospitalByEmail,
   getHospitals,
   rejectHospital,
-  submitBloodRequest,
   uploadHospitalLogo,
   upsertHospital,
+  submitBloodRequest,
+  getAllBloodRequests,
+  getHospitalBloodRequests,
+  approveBloodRequest,
+  rejectBloodRequest,
+  fulfillBloodRequest,
 } from "../controllers/hospitalController";
 import multer from "multer";
 import { authenticateUser } from "../middleware/authMiddleware";
@@ -23,27 +27,20 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-//Router to fetch organization by email
+// Hospital routes
 router.get("/hospital/:repEmail", getHospitalByEmail);
-
-//Router to upload hospital logo
 router.post("/uploadHospitalLogo", upload.single("file"), uploadHospitalLogo);
-
-//Router to update hospital data
 router.post("/submit-request", upsertHospital);
-
-//Route to fetch hospital data
 router.get("/fetch-hospitals", authenticateUser, getHospitals);
-
-//Route to approve hospital
 router.patch("/:id/approve", approveHospital);
-
-//Route to reject hospital
 router.patch("/:id/reject", rejectHospital);
 
 // Blood request routes
 router.post("/blood-requests", submitBloodRequest);
-
-router.get("/blood-requests/:hospitalId", getBloodRequests);
+router.get("/blood-requests", getAllBloodRequests);
+router.get("/blood-requests/hospital/:hospitalId", getHospitalBloodRequests);
+router.patch("/blood-requests/:id/approve", approveBloodRequest);
+router.patch("/blood-requests/:id/reject", rejectBloodRequest);
+router.patch("/blood-requests/:id/fulfill", fulfillBloodRequest);
 
 export default router;

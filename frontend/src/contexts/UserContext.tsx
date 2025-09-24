@@ -13,6 +13,7 @@ import { User } from "../types/users";
 type UserContextType = {
   user: User | null;
   isAdmin: boolean;
+  isHospital: boolean;
   isLoading: boolean;
   error: Error | null;
 };
@@ -20,6 +21,7 @@ type UserContextType = {
 const UserContext = createContext<UserContextType>({
   user: null,
   isAdmin: false,
+  isHospital: false,
   isLoading: true,
   error: null,
 });
@@ -28,6 +30,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [contextValue, setContextValue] = useState<UserContextType>({
     user: null,
     isAdmin: false,
+    isHospital: false,
     isLoading: true,
     error: null,
   });
@@ -50,11 +53,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           );
 
           const userData = response.data;
+          console.log(userData);
           const isAdmin = userData.role?.includes("Internal/Admin") ?? false;
-
+          const isHospital = (userData.role?.includes("Internal/Hospital") || userData.role?.includes("Hospital")) ?? false;
+          console.log(isHospital);
           setContextValue({
             user: userData,
             isAdmin,
+            isHospital,
             isLoading: false,
             error: null,
           });
@@ -63,6 +69,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           setContextValue({
             user: null,
             isAdmin: false,
+            isHospital: false,
             isLoading: false,
             error: error as Error,
           });
@@ -71,11 +78,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         setContextValue({
           user: null,
           isAdmin: false,
+          isHospital: false,
           isLoading: false,
           error: null,
         });
       }
     };
+    
 
     fetchUserInfo();
   }, [state?.isAuthenticated, getAccessToken]);

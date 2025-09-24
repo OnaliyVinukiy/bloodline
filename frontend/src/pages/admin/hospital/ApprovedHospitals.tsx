@@ -6,10 +6,8 @@
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useUser } from "../../../contexts/UserContext";
 import { Hospital } from "../../../types/users";
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 
 const ApprovedHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
   const { isAdmin, isLoading } = useUser();
@@ -17,13 +15,6 @@ const ApprovedHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [loadingAction, setLoadingAction] = useState<string | null>(null);
-
-  // Backend URL
-  const backendURL =
-    import.meta.env.VITE_IS_PRODUCTION === "true"
-      ? import.meta.env.VITE_BACKEND_URL
-      : "http://localhost:5000";
 
   // Filter pending hospitals
   useEffect(() => {
@@ -44,45 +35,6 @@ const ApprovedHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
     setFilteredHospitals(results);
     setCurrentPage(1);
   }, [hospitals, searchTerm]);
-
-  // Handle approve/reject actions
-  const handleApprove = async (hospitalId: string) => {
-    try {
-      setLoadingAction(`approve-${hospitalId}`);
-      await axios.patch(`${backendURL}/api/hospitals/${hospitalId}/approve`);
-      // Refresh the hospitals list by triggering a parent component update
-      window.location.reload();
-    } catch (error) {
-      console.error("Error approving hospital:", error);
-      alert("Error approving hospital. Please try again.");
-    } finally {
-      setLoadingAction(null);
-    }
-  };
-
-  const handleReject = async (hospitalId: string) => {
-    const reason = prompt("Please enter the reason for rejection:");
-    if (reason === null) return;
-
-    if (!reason.trim()) {
-      alert("Please provide a reason for rejection.");
-      return;
-    }
-
-    try {
-      setLoadingAction(`reject-${hospitalId}`);
-      await axios.patch(`${backendURL}/api/hospitals/${hospitalId}/reject`, {
-        rejectionReason: reason,
-      });
-      // Refresh the hospitals list
-      window.location.reload();
-    } catch (error) {
-      console.error("Error rejecting hospital:", error);
-      alert("Error rejecting hospital. Please try again.");
-    } finally {
-      setLoadingAction(null);
-    }
-  };
 
   // Get current hospitals for pagination
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -213,16 +165,12 @@ const ApprovedHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
               <th scope="col" className="px-6 py-3">
                 Rep Contact No
               </th>
-
-              <th scope="col" className="px-6 py-3 text-center">
-                Action
-              </th>
             </tr>
           </thead>
           <tbody>
             {currentHospitals.map((hospital) => (
               <tr
-                key={hospital.id}
+                key={hospital._id}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 <td className="px-6 py-4">
@@ -275,71 +223,6 @@ const ApprovedHospitals = ({ hospitals }: { hospitals: Hospital[] }) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {hospital.repContactNumber}
-                </td>
-
-                <td className="px-6 py-4 text-center">
-                  <div className="flex justify-center space-x-2">
-                    <button
-                      onClick={() => handleApprove(hospital.id)}
-                      disabled={loadingAction === `approve-${hospital.id}`}
-                      className="p-2 bg-green-100 text-green-600 hover:bg-green-200 rounded-full transition-colors duration-200"
-                      title="Approve Hospital"
-                    >
-                      {loadingAction === `approve-${hospital.id}` ? (
-                        <svg
-                          className="w-5 h-5 animate-spin"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                          ></path>
-                        </svg>
-                      ) : (
-                        <CheckCircleIcon className="w-5 h-5" />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => handleReject(hospital.id)}
-                      disabled={loadingAction === `reject-${hospital.id}`}
-                      className="p-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-full transition-colors duration-200"
-                      title="Reject Hospital"
-                    >
-                      {loadingAction === `reject-${hospital.id}` ? (
-                        <svg
-                          className="w-5 h-5 animate-spin"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                          ></path>
-                        </svg>
-                      ) : (
-                        <XCircleIcon className="w-5 h-5" />
-                      )}
-                    </button>
-                  </div>
                 </td>
               </tr>
             ))}
