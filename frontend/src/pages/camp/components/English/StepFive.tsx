@@ -8,11 +8,14 @@
 
 import React from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
+import { useTranslation } from "react-i18next";
 
 const StepFive: React.FC<StepperPropsCamps> = ({
   onNextStep,
   onPreviousStep,
 }) => {
+  const { t } = useTranslation("campBuilding");
+
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
@@ -50,69 +53,57 @@ const StepFive: React.FC<StepperPropsCamps> = ({
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Selecting a Building for the Blood Donation Camp
+                  {t("title")}
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
-                Every drop counts. Let’s make a difference together!
+                {t("subtitle")}
               </div>
             </div>
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                To ensure the safety and well-being of both donors and collected
-                blood, the National Blood Transfusion Service (NBTS) Sri Lanka
-                does not approve the use of temporary buildings like tents. The
-                selected venue must meet the following essential requirements:
+                {t("description_intro")}
                 <ul className="list-disc pl-6 mt-6 space-y-4">
                   <li>
                     <strong className="text-red-700">
-                      Permanent Building:
+                      {t("list_item_1_title")}
                     </strong>{" "}
-                    The building should be a solid, secure structure to provide
-                    a stable and safe environment.
-                  </li>
-                  <li>
-                    <strong className="text-red-700">No Water Leakages:</strong>{" "}
-                    The building must be free from leaks to maintain a hygienic
-                    space for the blood donation process.
+                    {t("list_item_1_text")}
                   </li>
                   <li>
                     <strong className="text-red-700">
-                      Clean, Dust-Free Floor:
+                      {t("list_item_2_title")}
                     </strong>{" "}
-                    A flat and dust-free ground ensures a sanitary and
-                    comfortable experience for donors and medical staff.
+                    {t("list_item_2_text")}
                   </li>
                   <li>
                     <strong className="text-red-700">
-                      Proper Lighting & Ventilation:
+                      {t("list_item_3_title")}
                     </strong>{" "}
-                    Sufficient lighting and air circulation are necessary for a
-                    comfortable and safe atmosphere.
+                    {t("list_item_3_text")}
                   </li>
                   <li>
                     <strong className="text-red-700">
-                      Electricity & Water Facilities:
+                      {t("list_item_4_title")}
                     </strong>{" "}
-                    The venue must have a reliable electricity supply and access
-                    to clean water.
+                    {t("list_item_4_text")}
                   </li>
                   <li>
                     <strong className="text-red-700">
-                      Easy Accessibility for Donors:
+                      {t("list_item_5_title")}
                     </strong>{" "}
-                    If the venue is on an upper floor, an elevator must be
-                    available for donors. If no elevator is present, the venue
-                    should be on the ground floor to avoid the need for stair
-                    access.
+                    {t("list_item_5_text")}
+                  </li>
+                  <li>
+                    <strong className="text-red-700">
+                      {t("list_item_6_title")}
+                    </strong>{" "}
+                    {t("list_item_6_text")}
                   </li>
                 </ul>
                 <br />
-                Before finalizing the venue, organizers must discuss with the
-                NBTS or the nearest blood bank to confirm that the space meets
-                all necessary requirements. A well-prepared venue ensures a
-                smooth and successful blood donation drive!
+                {t("description_conclusion_1")} {t("description_conclusion_2")}
               </div>
             </div>
 
@@ -121,13 +112,13 @@ const StepFive: React.FC<StepperPropsCamps> = ({
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               <button
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>
