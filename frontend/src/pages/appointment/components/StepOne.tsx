@@ -22,7 +22,7 @@ const StepOne: React.FC<StepperProps> = ({
   onFormDataChange,
   formData,
 }) => {
-  const { t } = useTranslation("donorRegistration");
+  const { t, i18n } = useTranslation("donorRegistration");
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
   const [errors, setErrors] = useState<{ [key in keyof BloodDonor]?: string }>(
@@ -34,15 +34,15 @@ const StepOne: React.FC<StepperProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [province, setProvince] = useState<
-    { province_id: string; province_name_en: string }[]
+    { province_id: string; province_name_si: string; province_name_en: string }[]
   >([]);
 
   const [district, setDistrict] = useState<
-    { district_id: string; district_name_en: string; province_id: string }[]
+    { district_id: string; district_name_si: string; district_name_en: string }[]
   >([]);
 
   const [city, setCity] = useState<
-    { city_id: string; city_name_en: string; district_id: string }[]
+    { city_id: string; city_name_en: string; city_name_si: string }[]
   >([]);
 
   const backendURL =
@@ -58,9 +58,9 @@ const StepOne: React.FC<StepperProps> = ({
     contactNumber: "",
     contactNumberHome: "",
     contactNumberOffice: "",
-    province: "",
-    district: "",
-    city: "",
+    province: "", // This will now store the English name
+    district: "", // This will now store the English name
+    city: "", // This will now store the English name
     address: "",
     addressOffice: "",
     birthdate: "",
@@ -92,10 +92,11 @@ const StepOne: React.FC<StepperProps> = ({
   }, [backendURL]);
 
   //Fetch districts list
-  const fetchDistricts = async (provinceName: string) => {
+  // Note: API calls will always use the English name
+  const fetchDistricts = async (provinceNameEn: string) => {
     try {
       const response = await fetch(
-        `${backendURL}/api/districts/province-name/${provinceName}`
+        `${backendURL}/api/districts/province-name/${provinceNameEn}`
       );
       const districts = await response.json();
       if (response.ok) {
@@ -111,29 +112,38 @@ const StepOne: React.FC<StepperProps> = ({
   const handleProvinceChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const selectedProvince = event.target.value;
-    setDonor((prev) => ({ ...prev, province: selectedProvince }));
-    fetchDistricts(selectedProvince);
+    const selectedProvinceEn = event.target.value;
+    setDonor((prev) => ({
+      ...prev,
+      province: selectedProvinceEn,
+      district: "",
+      city: ""
+    }));
+    setDistrict([]);
+    setCity([]);
+    fetchDistricts(selectedProvinceEn);
   };
 
   const handleDistrictChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const selectedDistrict = event.target.value;
-    setDonor((prev) => ({ ...prev, district: selectedDistrict }));
-    fetchCities(selectedDistrict);
+    const selectedDistrictEn = event.target.value;
+    setDonor((prev) => ({ ...prev, district: selectedDistrictEn, city: "" }));
+    setCity([]);
+    fetchCities(selectedDistrictEn);
   };
 
   const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedCity = event.target.value;
-    setDonor((prev) => ({ ...prev, city: selectedCity }));
+    const selectedCityEn = event.target.value;
+    setDonor((prev) => ({ ...prev, city: selectedCityEn }));
   };
 
   //Fetch cities list
-  const fetchCities = async (districtName: string) => {
+  // Note: API calls will always use the English name
+  const fetchCities = async (districtNameEn: string) => {
     try {
       const response = await fetch(
-        `${backendURL}/api/city/district/${districtName}`
+        `${backendURL}/api/city/district/${districtNameEn}`
       );
       const cities = await response.json();
       if (response.ok) {
@@ -183,6 +193,14 @@ const StepOne: React.FC<StepperProps> = ({
 
           if (donorInfo) {
             setDonor(donorInfo);
+
+            // Re-fetch districts and cities if donor info is loaded
+            if (donorInfo.province) {
+              fetchDistricts(donorInfo.province);
+            }
+            if (donorInfo.district) {
+              fetchCities(donorInfo.district);
+            }
           }
         } catch (error) {
           console.error("Error fetching user info:", error);
@@ -573,7 +591,7 @@ const StepOne: React.FC<StepperProps> = ({
                   </Label>
                   <select
                     id="province"
-                    value={donor.province}
+                    value={donor.province} // The value is now the English name
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     onChange={handleProvinceChange}
                   >
@@ -581,9 +599,11 @@ const StepOne: React.FC<StepperProps> = ({
                     {province.map((prov) => (
                       <option
                         key={prov.province_id}
-                        value={prov.province_name_en}
+                        value={prov.province_name_en} // The value is always the English name
                       >
-                        {prov.province_name_en}
+                        {i18n.language === "si"
+                          ? prov.province_name_si
+                          : prov.province_name_en}
                       </option>
                     ))}
                   </select>
@@ -598,7 +618,7 @@ const StepOne: React.FC<StepperProps> = ({
                   </Label>
                   <select
                     id="district"
-                    value={donor.district}
+                    value={donor.district} // The value is now the English name
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     onChange={handleDistrictChange}
                   >
@@ -607,9 +627,11 @@ const StepOne: React.FC<StepperProps> = ({
                       district.map((districtItem) => (
                         <option
                           key={districtItem.district_id}
-                          value={districtItem.district_name_en}
+                          value={districtItem.district_name_en} // The value is always the English name
                         >
-                          {districtItem.district_name_en}
+                          {i18n.language === "si"
+                            ? districtItem.district_name_si
+                            : districtItem.district_name_en}
                         </option>
                       ))
                     ) : (
@@ -638,7 +660,9 @@ const StepOne: React.FC<StepperProps> = ({
                           key={cityItem.city_id}
                           value={cityItem.city_name_en}
                         >
-                          {cityItem.city_name_en}
+                          {i18n.language === "si"
+                            ? cityItem.city_name_si
+                            : cityItem.city_name_en}
                         </option>
                       ))
                     ) : (
