@@ -8,11 +8,14 @@
 
 import React from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
+import { useTranslation } from "react-i18next";
 
 const StepFour: React.FC<StepperPropsCamps> = ({
   onNextStep,
   onPreviousStep,
 }) => {
+  const { t } = useTranslation("campVenue");
+
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
@@ -50,49 +53,45 @@ const StepFour: React.FC<StepperPropsCamps> = ({
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Selecting a Venue for the Blood Donation Camp
+                  {t("title")}
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
-                Every drop counts. Let’s make a difference together!
+                {t("subtitle")}
               </div>
             </div>
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                Selecting the right venue is essential for a smooth and
-                successful blood donation camp. Here are some key factors to consider:
+                {t("description_intro")}
                 <ul className="list-disc pl-6 mt-6 space-y-4">
                   <li>
                     <strong className="text-red-700">
-                      Easily Accessible Location:
+                      {t("list_item_1_title")}
                     </strong>{" "}
-                    A well-known public place ensures better participation and
-                    ease of travel for both donors and staff.
+                    {t("list_item_1_text")}
                   </li>
                   <li>
                     <strong className="text-red-700">
-                      Good Transport Access:
+                      {t("list_item_2_title")}
                     </strong>{" "}
-                    The venue should be easily reachable by vehicles, ensuring a
-                    hassle-free experience for donors and medical teams.
+                    {t("list_item_2_text")}
                   </li>
                   <li>
                     <strong className="text-red-700">
-                      Clean & Safe Environment:
+                      {t("list_item_3_title")}
                     </strong>{" "}
-                    A permanent building with a clean and hygienic surrounding
-                    is ideal for maintaining health and safety standards.
+                    {t("list_item_3_text")}
                   </li>
                   <li>
-                    <strong className="text-red-700">Toilet Facilities:</strong>{" "}
-                    Proper restroom facilities must be available for donors and
-                    staff throughout the event.
+                    <strong className="text-red-700">
+                      {t("list_item_4_title")}
+                    </strong>{" "}
+                    {t("list_item_4_text")}
                   </li>
                 </ul>
-                <br />A well-planned venue creates a comfortable experience for
-                everyone involved and contributes to a successful blood donation
-                drive!
+                <br />
+                {t("description_conclusion")}
               </div>
             </div>
 
@@ -101,13 +100,13 @@ const StepFour: React.FC<StepperPropsCamps> = ({
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               <button
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>
