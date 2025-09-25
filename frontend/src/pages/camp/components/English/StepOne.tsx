@@ -9,8 +9,10 @@
 import React, { useEffect } from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { useTranslation } from "react-i18next";
 
 const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
+  const { t } = useTranslation("campRegistration");
   const { state, signIn } = useAuthContext();
 
   useEffect(() => {
@@ -33,10 +35,10 @@ const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
           <div className="relative bg-white rounded-xl p-8 z-10">
             <div className="text-center mb-8">
               <h2 className="mt-4 text-2xl md:text-4xl font-bold text-gray-800">
-                Organize a Blood Donation Camp
+                {t("title")}
               </h2>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
-                Together, we can save lives. Start your camp today!
+                {t("subtitle")}
               </div>
             </div>
 
@@ -50,23 +52,16 @@ const StepOne: React.FC<StepperPropsCamps> = ({ onNextStep }) => {
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-lg text-center text-gray-700 leading-relaxed">
-                Our main goal is to encourage and support blood donation to help
-                save lives. You can organize a blood donation camp for any
-                reason, whether it's for a national or religious event or even a
-                personal occasion like your birthday. You can choose to hold the
-                camp in your own community or at one of our blood centers. If
-                you decide to host it at one of our blood centers, our team will
-                be there to support you every step of the way. Together, we can
-                make a difference!
+                {t("description")}
               </div>
             </div>
 
             <div className="flex justify-end mt-8">
               <button
                 onClick={handleNext}
-                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700  focus:ring-4 focus:ring-red-300 transition-all duration-300"
+                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>
