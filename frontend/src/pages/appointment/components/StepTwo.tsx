@@ -5,7 +5,9 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
+
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, Datepicker, Label, Modal } from "flowbite-react";
 import { StepperProps } from "../../../types/stepper";
 
@@ -15,7 +17,7 @@ const StepTwo: React.FC<StepperProps> = ({
   onFormDataChange,
   formData,
 }) => {
-  //Structure for form data
+  const { t } = useTranslation("donorDeclaration");
   const [formOneData, setFormOneData] = useState({
     isDonatedBefore: null,
     timesOfDonation: "",
@@ -35,14 +37,12 @@ const StepTwo: React.FC<StepperProps> = ({
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  // Populate the form data from the parent form data
   useEffect(() => {
     if (formData?.firstForm) {
       setFormOneData(formData.firstForm);
     }
   }, [formData]);
 
-  //Function to set form data (radio buttons)
   const handleRadioChange =
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setFormOneData((prevState) => ({
@@ -51,7 +51,6 @@ const StepTwo: React.FC<StepperProps> = ({
       }));
     };
 
-  //Function to set form data (text fields)
   const handleInputChange = (field: string, value: string) => {
     setFormOneData((prevState) => ({
       ...prevState,
@@ -59,25 +58,23 @@ const StepTwo: React.FC<StepperProps> = ({
     }));
   };
 
-  //Save form data and move to next step
   const handleNext = () => {
     const newErrors: { [key: string]: string } = {};
 
-    // Check if necessary fields are filled
     if (!formOneData.isDonatedBefore)
-      newErrors.isDonatedBefore = "Please select an option.";
+      newErrors.isDonatedBefore = t("q1_error");
     if (formOneData.isDonatedBefore === "Yes" && !formOneData.timesOfDonation)
-      newErrors.timesOfDonation = "Times of donation is required.";
+      newErrors.timesOfDonation = t("q1_1_error");
     if (formOneData.isDonatedBefore === "Yes" && !formOneData.lastDonationDate)
-      newErrors.lastDonationDate = "Last donation date is required.";
+      newErrors.lastDonationDate = t("q1_2_error");
     if (formOneData.isDonatedBefore === "Yes" && !formOneData.isAnyDifficulty)
-      newErrors.isAnyDifficulty = "Please select an option.";
+      newErrors.isAnyDifficulty = t("q1_3_error");
     if (formOneData.isAnyDifficulty === "Yes" && !formOneData.difficulty)
-      newErrors.difficulty = "Please specify the difficulty.";
+      newErrors.difficulty = t("q1_4_error");
     if (!formOneData.isMedicallyAdvised)
-      newErrors.isMedicallyAdvised = "Please select an option.";
+      newErrors.isMedicallyAdvised = t("q2_error");
     if (!formOneData.isLeafletRead)
-      newErrors.isLeafletRead = "Please select an option.";
+      newErrors.isLeafletRead = t("q3_error");
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -85,7 +82,6 @@ const StepTwo: React.FC<StepperProps> = ({
       return;
     }
 
-    // Check if last donation was within the last 6 months
     if (formOneData.isDonatedBefore === "Yes" && formOneData.lastDonationDate) {
       const lastDonation = new Date(formOneData.lastDonationDate);
       const today = new Date();
@@ -120,7 +116,7 @@ const StepTwo: React.FC<StepperProps> = ({
                   htmlFor="donatedBefore"
                   className="block mb-2 text-md font-medium text-indigo-900"
                 >
-                  1.) Have you donated blood previously?
+                  {t("q1_label")}
                 </Label>
                 <div className="flex items-center space-x-4">
                   <label className="flex items-center">
@@ -132,7 +128,7 @@ const StepTwo: React.FC<StepperProps> = ({
                       onChange={handleRadioChange("isDonatedBefore")}
                       className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
-                    Yes
+                    {t("q1_yes")}
                   </label>
                   <label className="flex items-center">
                     <input
@@ -143,7 +139,7 @@ const StepTwo: React.FC<StepperProps> = ({
                       onChange={handleRadioChange("isDonatedBefore")}
                       className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
-                    No
+                    {t("q1_no")}
                   </label>
                   {errors.isDonatedBefore && (
                     <div className="text-red-500 text-sm">
@@ -160,7 +156,7 @@ const StepTwo: React.FC<StepperProps> = ({
                       htmlFor="timesOfDonation"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
-                      1.1.) How many times?
+                      {t("q1_1_label")}
                     </Label>
                     <input
                       type="text"
@@ -181,7 +177,7 @@ const StepTwo: React.FC<StepperProps> = ({
                       htmlFor="lastDonationDate"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
-                      1.2.) Date of last donation
+                      {t("q1_2_label")}
                     </Label>
                     <Datepicker
                       className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
@@ -210,8 +206,7 @@ const StepTwo: React.FC<StepperProps> = ({
                       htmlFor="difficulty"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
-                      1.3.) Did you experience any ailment, difficulty, or
-                      discomfort during previous donations?
+                      {t("q1_3_label")}
                     </Label>
                     <div className="flex items-center space-x-4">
                       <label className="flex items-center">
@@ -223,7 +218,7 @@ const StepTwo: React.FC<StepperProps> = ({
                           onChange={handleRadioChange("isAnyDifficulty")}
                           className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                         />
-                        Yes
+                        {t("q1_yes")}
                       </label>
                       <label className="flex items-center">
                         <input
@@ -234,7 +229,7 @@ const StepTwo: React.FC<StepperProps> = ({
                           onChange={handleRadioChange("isAnyDifficulty")}
                           className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                         />
-                        No
+                        {t("q1_no")}
                       </label>
                       {errors.isAnyDifficulty && (
                         <div className="text-red-500 text-sm mt-1">
@@ -248,7 +243,7 @@ const StepTwo: React.FC<StepperProps> = ({
                           htmlFor="difficulty"
                           className="block mb-2 text-sm font-medium text-indigo-900"
                         >
-                          1.4.) What was the difficulty?
+                          {t("q1_4_label")}
                         </Label>
                         <input
                           type="text"
@@ -275,8 +270,7 @@ const StepTwo: React.FC<StepperProps> = ({
                     htmlFor="medicallyAdvised"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    2.) Have you ever been medically advised not to donate
-                    blood?
+                    {t("q2_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -288,7 +282,7 @@ const StepTwo: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isMedicallyAdvised")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("q2_yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -299,7 +293,7 @@ const StepTwo: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isMedicallyAdvised")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("q2_no")}
                     </label>
                     {errors.isMedicallyAdvised && (
                       <div className="text-red-500 text-sm">
@@ -316,8 +310,7 @@ const StepTwo: React.FC<StepperProps> = ({
                     htmlFor="leafletRead"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    3.) Have you read and understood the "Blood donors
-                    information leaflet"?
+                    {t("q3_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -329,7 +322,7 @@ const StepTwo: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isLeafletRead")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("q3_yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -340,7 +333,7 @@ const StepTwo: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isLeafletRead")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("q3_no")}
                     </label>
                     {errors.isLeafletRead && (
                       <div className="text-red-500 text-sm">
@@ -357,11 +350,11 @@ const StepTwo: React.FC<StepperProps> = ({
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               {showErrorMessage && (
                 <p className="text-red-500 text-sm mt-2">
-                  Please fill all required fields.
+                  {t("error_message")}
                 </p>
               )}
 
@@ -369,22 +362,21 @@ const StepTwo: React.FC<StepperProps> = ({
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>
         </main>
         <Modal show={showModal} onClose={() => setShowModal(false)}>
-          <Modal.Header>Donation Eligibility</Modal.Header>
+          <Modal.Header>{t("modal_title")}</Modal.Header>
           <Modal.Body>
             <p className="text-lg text-gray-700">
-              You cannot donate blood as your last donation was less than 6
-              months ago. Please wait until you are eligible.
+              {t("modal_message")}
             </p>
           </Modal.Body>
           <Modal.Footer className="flex justify-end">
             <Button color="failure" onClick={() => setShowModal(false)}>
-              OK
+              {t("modal_button_ok")}
             </Button>
           </Modal.Footer>
         </Modal>

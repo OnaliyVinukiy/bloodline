@@ -14,6 +14,7 @@ import { BloodDonor, User } from "../../../types/users";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { validatePhoneNumber } from "../../../utils/ValidationsUtils";
 import { ValidationModal } from "../../../components/ValidationModal";
+import { useTranslation } from "react-i18next";
 
 const StepOne: React.FC<StepperProps> = ({
   onNextStep,
@@ -21,6 +22,7 @@ const StepOne: React.FC<StepperProps> = ({
   onFormDataChange,
   formData,
 }) => {
+  const { t } = useTranslation("donorRegistration");
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
   const [errors, setErrors] = useState<{ [key in keyof BloodDonor]?: string }>(
@@ -127,7 +129,7 @@ const StepOne: React.FC<StepperProps> = ({
     setDonor((prev) => ({ ...prev, city: selectedCity }));
   };
 
-  //Fetch districts list
+  //Fetch cities list
   const fetchCities = async (districtName: string) => {
     try {
       const response = await fetch(
@@ -238,7 +240,7 @@ const StepOne: React.FC<StepperProps> = ({
 
     setErrors((prev) => ({
       ...prev,
-      [field]: isValid ? "" : "Invalid phone number format.",
+      [field]: isValid ? "" : t(`error_invalid_${field}`),
     }));
 
     handleInputChange(field, value);
@@ -279,31 +281,31 @@ const StepOne: React.FC<StepperProps> = ({
     // Check if necessary fields are filled
     const newErrors: { [key in keyof BloodDonor]?: string } = {};
 
-    if (!donor.nic) newErrors.nic = "NIC is required.";
-    if (!donor.fullName) newErrors.fullName = "Full Name is required.";
-    if (!donor.email) newErrors.email = "Email is required.";
+    if (!donor.nic) newErrors.nic = t("error_nic_required");
+    if (!donor.fullName) newErrors.fullName = t("error_full_name_required");
+    if (!donor.email) newErrors.email = t("error_email_required");
     if (!donor.contactNumber)
-      newErrors.contactNumber = "Contact number is required.";
+      newErrors.contactNumber = t("error_contact_number_required");
     if (
       donor.contactNumberHome &&
       !validatePhoneNumber(donor.contactNumberHome)
     ) {
-      newErrors.contactNumberHome = "Invalid home number.";
+      newErrors.contactNumberHome = t("error_invalid_home_number");
     }
 
     if (
       donor.contactNumberOffice &&
       !validatePhoneNumber(donor.contactNumberOffice)
     ) {
-      newErrors.contactNumberOffice = "Invalid office number.";
+      newErrors.contactNumberOffice = t("error_invalid_office_number");
     }
     if (!validatePhoneNumber(donor.contactNumber)) {
-      newErrors.contactNumber = "Invalid mobile number.";
+      newErrors.contactNumber = t("error_invalid_mobile_number");
     }
-    if (!donor.address) newErrors.address = "Address is required.";
-    if (!donor.birthdate) newErrors.birthdate = "Birthdate is required.";
-    if (!donor.bloodGroup) newErrors.bloodGroup = "Blood Group is required.";
-    if (!donor.gender) newErrors.gender = "Gender is required.";
+    if (!donor.address) newErrors.address = t("error_address_required");
+    if (!donor.birthdate) newErrors.birthdate = t("error_birthdate_required");
+    if (!donor.bloodGroup) newErrors.bloodGroup = t("error_blood_group_required");
+    if (!donor.gender) newErrors.gender = t("error_gender_required");
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -324,8 +326,8 @@ const StepOne: React.FC<StepperProps> = ({
 
         if (existingDonor && existingDonor.status === "Deferred") {
           showValidationMessage(
-            "Donation Restricted",
-            "You cannot donate as your donor status is currently deferred. Please contact the blood bank for more information."
+            t("validation_title_deferral"),
+            t("validation_content_deferral")
           );
           return;
         }
@@ -344,8 +346,8 @@ const StepOne: React.FC<StepperProps> = ({
       const donorWithAge = { ...donor, age };
       if (age < 18) {
         showValidationMessage(
-          "Age Restriction",
-          "You cannot place an appointment as a donor unless you are aged 18 or above."
+          t("validation_title_age"),
+          t("validation_content_age")
         );
         return;
       }
@@ -374,7 +376,7 @@ const StepOne: React.FC<StepperProps> = ({
       onNextStep();
     } catch (error) {
       console.error("Error handling donor data:", error);
-      alert("Error saving donor information. Please try again.");
+      alert(t("error_saving_data"));
     } finally {
       setIsNextLoading(false);
     }
@@ -406,7 +408,7 @@ const StepOne: React.FC<StepperProps> = ({
   if (!user) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p className="text-lg text-gray-700">Please login to fill the form</p>
+        <p className="text-lg text-gray-700">{t("login_message")}</p>
       </div>
     );
   }
@@ -443,7 +445,7 @@ const StepOne: React.FC<StepperProps> = ({
                     onClick={() => document.getElementById("avatar")?.click()}
                     className="px-4 py-2 text-sm text-indigo-600 hover:text-indigo-800"
                   >
-                    Change Avatar
+                    {t("change_avatar")}
                   </button>
                   {selectedFile && (
                     <button
@@ -451,7 +453,7 @@ const StepOne: React.FC<StepperProps> = ({
                       className="ml-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
                       disabled={isUploading}
                     >
-                      {isUploading ? "Uploading..." : "Upload"}
+                      {isUploading ? t("uploading_avatar") : t("upload_avatar")}
                     </button>
                   )}
                 </div>
@@ -462,7 +464,7 @@ const StepOne: React.FC<StepperProps> = ({
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
                   {" "}
-                  Full Name (As in NIC)*
+                  {t("full_name_label")}
                 </Label>
                 <input
                   type="text"
@@ -483,7 +485,7 @@ const StepOne: React.FC<StepperProps> = ({
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
                   {" "}
-                  Email*
+                  {t("email_label")}
                 </Label>
                 <input
                   type="email"
@@ -502,7 +504,7 @@ const StepOne: React.FC<StepperProps> = ({
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
                   {" "}
-                  NIC*
+                  {t("nic_label")}
                 </Label>
                 <input
                   type="text"
@@ -520,7 +522,7 @@ const StepOne: React.FC<StepperProps> = ({
                   htmlFor="gender"
                   className="mt-1 block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  Gender*
+                  {t("gender_label")}
                 </Label>
                 <div className="mt-4 flex items-center">
                   <input
@@ -538,7 +540,7 @@ const StepOne: React.FC<StepperProps> = ({
                     htmlFor="male"
                     className="mr-4 text-sm text-indigo-900"
                   >
-                    Male
+                    {t("gender_male")}
                   </Label>
 
                   <input
@@ -553,7 +555,7 @@ const StepOne: React.FC<StepperProps> = ({
                     className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                   />
                   <Label htmlFor="female" className="text-sm text-indigo-900">
-                    Female
+                    {t("gender_female")}
                   </Label>
                   {errors.gender && (
                     <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
@@ -567,7 +569,7 @@ const StepOne: React.FC<StepperProps> = ({
                     htmlFor="province"
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
-                    Province
+                    {t("province_label")}
                   </Label>
                   <select
                     id="province"
@@ -575,7 +577,7 @@ const StepOne: React.FC<StepperProps> = ({
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     onChange={handleProvinceChange}
                   >
-                    <option value="">Select a province</option>
+                    <option value="">{t("select_province_placeholder")}</option>
                     {province.map((prov) => (
                       <option
                         key={prov.province_id}
@@ -592,7 +594,7 @@ const StepOne: React.FC<StepperProps> = ({
                     htmlFor="district"
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
-                    District
+                    {t("district_label")}
                   </Label>
                   <select
                     id="district"
@@ -600,7 +602,7 @@ const StepOne: React.FC<StepperProps> = ({
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     onChange={handleDistrictChange}
                   >
-                    <option value="">Select a district</option>
+                    <option value="">{t("select_district_placeholder")}</option>
                     {district.length > 0 ? (
                       district.map((districtItem) => (
                         <option
@@ -611,7 +613,7 @@ const StepOne: React.FC<StepperProps> = ({
                         </option>
                       ))
                     ) : (
-                      <option value="">Please select a province first</option>
+                      <option value="">{t("select_province_first")}</option>
                     )}
                   </select>
                 </div>
@@ -621,7 +623,7 @@ const StepOne: React.FC<StepperProps> = ({
                     htmlFor="city"
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
-                    City
+                    {t("city_label")}
                   </Label>
                   <select
                     id="city"
@@ -629,7 +631,7 @@ const StepOne: React.FC<StepperProps> = ({
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     onChange={handleCityChange}
                   >
-                    <option value="">Select a city</option>
+                    <option value="">{t("select_city_placeholder")}</option>
                     {city.length > 0 ? (
                       city.map((cityItem) => (
                         <option
@@ -640,7 +642,7 @@ const StepOne: React.FC<StepperProps> = ({
                         </option>
                       ))
                     ) : (
-                      <option value="">Please select a district first</option>
+                      <option value="">{t("select_district_first")}</option>
                     )}
                   </select>
                 </div>
@@ -651,7 +653,7 @@ const StepOne: React.FC<StepperProps> = ({
                   htmlFor="fullName"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  Address (Home)*
+                  {t("address_home_label")}
                 </Label>
                 <input
                   type="text"
@@ -668,7 +670,7 @@ const StepOne: React.FC<StepperProps> = ({
                   htmlFor="fullName"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  Address (Office)
+                  {t("address_office_label")}
                 </Label>
                 <input
                   type="text"
@@ -685,8 +687,7 @@ const StepOne: React.FC<StepperProps> = ({
                   htmlFor="first_name"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  {" "}
-                  Contact Number (Mobile)*
+                  {t("contact_mobile_label")}
                 </Label>
                 <input
                   type="text"
@@ -710,8 +711,7 @@ const StepOne: React.FC<StepperProps> = ({
                   htmlFor="first_name"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  {" "}
-                  Contact Number (Home)
+                  {t("contact_home_label")}
                 </Label>
                 <input
                   type="text"
@@ -735,8 +735,7 @@ const StepOne: React.FC<StepperProps> = ({
                   htmlFor="first_name"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  {" "}
-                  Contact Number (Office)
+                  {t("contact_office_label")}
                 </Label>
                 <input
                   type="text"
@@ -761,7 +760,7 @@ const StepOne: React.FC<StepperProps> = ({
                   htmlFor="fullName"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  Blood Group*
+                  {t("blood_group_label")}
                 </Label>
                 <select
                   value={donor?.bloodGroup || ""}
@@ -770,7 +769,7 @@ const StepOne: React.FC<StepperProps> = ({
                   }
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 >
-                  <option value="">Select Blood Group</option>
+                  <option value="">{t("select_blood_group_placeholder")}</option>
                   <option value="A+">A+</option>
                   <option value="A-">A-</option>
                   <option value="B+">B+</option>
@@ -792,7 +791,7 @@ const StepOne: React.FC<StepperProps> = ({
                   htmlFor="fullName"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  Date of Birth*
+                  {t("birthdate_label")}
                 </Label>
                 <Datepicker
                   value={
@@ -824,7 +823,7 @@ const StepOne: React.FC<StepperProps> = ({
                     htmlFor="fullName"
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
-                    Age
+                    {t("age_label")}
                   </Label>
                   <input
                     type="text"
@@ -840,11 +839,11 @@ const StepOne: React.FC<StepperProps> = ({
                   onClick={handlePrevious}
                   className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
                 >
-                  Back
+                  {t("back_button")}
                 </button>
                 {showErrorMessage && (
                   <p className="text-red-500 text-sm mt-2">
-                    Please fill all required fields before proceeding.
+                    {t("validation_error_fields")}
                   </p>
                 )}
 
@@ -872,10 +871,10 @@ const StepOne: React.FC<StepperProps> = ({
                           fill="currentColor"
                         />
                       </svg>
-                      Loading...
+                      {t("loading_button")}
                     </>
                   ) : (
-                    "Next"
+                    t("next_button")
                   )}
                 </button>
               </div>
