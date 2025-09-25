@@ -52,7 +52,7 @@ export interface StockAdditionHistory {
 }
 
 export interface BloodRequest {
-  id: string;
+  _id: string;
   hospitalId: string;
   hospitalName: string;
   hospitalEmail: string;

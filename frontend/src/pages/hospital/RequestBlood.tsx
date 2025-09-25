@@ -25,7 +25,7 @@ const HospitalBloodRequest = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const [bloodRequest, setBloodRequest] = useState<BloodRequest>({
-    id: "",
+    _id: "",
     hospitalId: "",
     hospitalName: "",
     hospitalEmail: "",
