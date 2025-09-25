@@ -1,0 +1,19 @@
+{
+  "title": "නියමිත වරයන්",
+  "table_header_date": "දිනය",
+  "table_header_time": "වේලාව",
+  "table_header_status": "තත්ත්වය",
+  "table_header_action": "ක්‍රියාව",
+  "status_rejected": "ප්‍රතික්ෂේප කරන ලදි",
+  "status_approved": "අනුමත කරන ලදි",
+  "status_cancelled": "අවලංගු කරන ලදි",
+  "status_pending": "තහවුරු කිරීමට ඇත",
+  "action_button": "වරය අවලංගු කරන්න",
+  "no_appointments_found": "කිසිදු වරයක් සොයාගත නොහැකි විය.",
+  "modal_title": "වරය අවලංගු කරන්න",
+  "modal_message": "ඔබට මෙම වරය අවලංගු කිරීමට අවශ්‍ය බව සහතිකද?",
+  "modal_button_cancelling": "අවලංගු කරමින්...",
+  "modal_button_yes": "ඔව්",
+  "modal_button_cancel": "අවලංගු කරන්න",
+  "modal_button_ok": "හරි"
+}

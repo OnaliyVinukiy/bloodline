@@ -1,0 +1,19 @@
+{
+  "important_title": "Important!",
+  "q1_label": "1.) Do you know that people of following categories should not give blood?",
+  "q1_list_1": "If you were found to be positive for HIV, Hepatitis B, C or Syphilis infections at any time",
+  "q1_list_2": "If you have had multiple sexual partners",
+  "q1_list_3": "If you have ever engaged in male to male sexual activity",
+  "q1_list_4": "If you have ever injected any drug (esp.Narcotics) not prescribed by a qualified medical practitioner",
+  "q1_list_5": "If you have ever worked as a commercial sex worker",
+  "q1_list_6": "If you have had sex with a commercial sex worker or an unknown partner during last 1 year",
+  "q1_list_7": "If you suspect that you or your partner may have got HIV or any other sexually transmitted infection",
+  "yes": "Yes",
+  "no": "No",
+  "q2_label": "2.) Do you or your sexual partner belong to one of the above categories?",
+  "q3_label": "3.) Are you having persistent fever, diarrhoea, multiple swollen lymph nodes or unintentional weight loss?",
+  "error_message": "Please select an option.",
+  "error_all_fields": "Please fill all required fields.",
+  "back_button": "Back",
+  "next_button": "Next"
+}
