@@ -8,11 +8,14 @@
 
 import React from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
+import { useTranslation } from "react-i18next";
 
 const StepTwo: React.FC<StepperPropsCamps> = ({
   onNextStep,
   onPreviousStep,
 }) => {
+  const { t } = useTranslation("campDates");
+
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
@@ -50,35 +53,29 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
                   />
                 </svg>
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
-                  Selecting a Date for the Blood Donation Camp
+                  {t("title")}
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
-                Every drop counts. Let’s make a difference together!
+                {t("subtitle")}
               </div>
             </div>
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                You have the freedom to pick a date that aligns with your camp
-                goals. However, please inform the{" "}
+                {t("description_part1")}
                 <strong className="text-red-700">
-                  National Blood Transfusion Service (NBTS) at Narahenpita
+                  {t("description_part2")}
                 </strong>{" "}
-                or your local blood bank at least{" "}
-                <strong className="text-red-700">one month in advance</strong>.
-                Weekends and holidays are in high demand for blood donation
-                camps, so we recommend securing your date at least{" "}
-                <strong className="text-red-700">three months ahead</strong> if
-                you’re planning a camp during these days.
-                <br />
-                <br />
-                If your potential donors are typically unavailable on weekdays
-                due to work, a weekend camp might be the best fit. On the other
-                hand, if an organization or company is hosting the event, a
-                weekday could be more convenient. Thoughtful planning ensures a
-                seamless and impactful camp, helping save countless lives in the
-                process!
+                {t("description_part3")}
+                <strong className="text-red-700">
+                  {t("description_part4")}
+                </strong>
+                {t("description_part5")}
+                <strong className="text-red-700">
+                  {t("description_part6")}
+                </strong>{" "}
+                {t("description_part7")}
               </div>
             </div>
 
@@ -87,13 +84,13 @@ const StepTwo: React.FC<StepperPropsCamps> = ({
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               <button
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>
