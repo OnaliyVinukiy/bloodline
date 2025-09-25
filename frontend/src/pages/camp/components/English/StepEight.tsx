@@ -8,11 +8,14 @@
 
 import React from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
+import { useTranslation } from "react-i18next";
 
 const StepEight: React.FC<StepperPropsCamps> = ({
   onNextStep,
   onPreviousStep,
 }) => {
+  const { t } = useTranslation("campDonors");
+
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
@@ -50,133 +53,196 @@ const StepEight: React.FC<StepperPropsCamps> = ({
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Finding Blood Donors
+                  {t("title")}
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
-                Every drop counts. Let’s make a difference together!
+                {t("subtitle")}
               </div>
             </div>
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                A successful blood donation camp is a collective effort. With
-                sincere dedication and hard work, you can get the help of
-                everyone. Friends, sports clubs, voluntary organizations,
-                government and non-government institutions are some of the
-                parties that can help you.
+                {t("description_part1")}
                 <br />
                 <br />
-                Blood donation camps focused only on personal fame often fail. A
-                camp that is fair and free from discrimination based on race,
-                caste, political affiliation, or religion will gain support and
-                be successful.
+                {t("description_part2")}
                 <ul className="list-disc pl-6 mt-6 space-y-4">
                   <li>
-                    Healthy individuals aged{" "}
-                    <strong className="text-red-700">18 to 55</strong>, weighing
-                    more than <strong className="text-red-700">50 kg</strong>,
-                    can donate blood once every{" "}
-                    <strong className="text-red-700">4 months.</strong>
+                    {t("list_item_1_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_1_bold_1")}
+                    </strong>
+                    {t("list_item_1_part2")}
+                    <strong className="text-red-700">
+                      {t("list_item_1_bold_2")}
+                    </strong>
+                    {t("list_item_1_part3")}
+                    <strong className="text-red-700">
+                      {t("list_item_1_bold_3")}
+                    </strong>
+                    {t("list_item_1_part4")}
                   </li>
                   <li>
-                    Those who have previously had their blood tested can donate
-                    up to the age of <strong className="text-red-700">60</strong>.
+                    {t("list_item_2_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_2_bold_1")}
+                    </strong>
+                    {t("list_item_2_part2")}
+                  </li>
+                  <li>{t("list_item_3")}</li>
+                  <li>
+                    {t("list_item_4_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_4_bold_1")}
+                    </strong>
+                    {t("list_item_4_part2")}
+                    <strong className="text-red-700">
+                      {t("list_item_4_bold_2")}
+                    </strong>
+                    {t("list_item_4_part3")}
                   </li>
                   <li>
-                    Make a list of eligible donors, inform them personally, and
-                    encourage them to donate blood.
+                    {t("list_item_5_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_5_bold_1")}
+                    </strong>
+                    {t("list_item_5_part2")}
+                    <strong className="text-red-700">
+                      {t("list_item_5_bold_2")}
+                    </strong>
+                    {t("list_item_5_part3")}
                   </li>
                   <li>
-                    For a successful blood donation camp on a{" "}
-                    <strong className="text-red-700">weekday</strong>, at least{" "}
-                    <strong className="text-red-700">50 donors</strong> are
-                    needed.
+                    {t("list_item_6_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_6_bold_1")}
+                    </strong>
+                    ,{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_6_bold_2")}
+                    </strong>
+                    ,{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_6_bold_3")}
+                    </strong>
+                    , and{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_6_bold_4")}
+                    </strong>
+                    {t("list_item_6_part2")}
                   </li>
                   <li>
-                    For a successful blood donation camp on a{" "}
-                    <strong className="text-red-700">holiday</strong>, at least{" "}
-                    <strong className="text-red-700">100 donors</strong> are
-                    needed.
+                    {t("list_item_7_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_7_bold_1")}
+                    </strong>
+                    ,{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_7_bold_2")}
+                    </strong>
+                    {t("list_item_7_part2")}
                   </li>
                   <li>
-                    Raise awareness about the camp through{" "}
-                    <strong className="text-red-700">posters</strong>,{" "}
-                    <strong className="text-red-700">pamphlets</strong>,{" "}
-                    <strong className="text-red-700">banners</strong>, and{" "}
-                    <strong className="text-red-700">newspaper advertisements</strong>.
+                    {t("list_item_8_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_8_bold_1")}
+                    </strong>
+                    {t("list_item_8_part2")}
+                    <strong className="text-red-700">
+                      {t("list_item_8_bold_2")}
+                    </strong>
+                    , and{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_8_bold_3")}
+                    </strong>
+                    {t("list_item_8_part3")}
+                    <strong className="text-red-700">
+                      {t("list_item_8_bold_4")}
+                    </strong>
+                    , and{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_8_bold_5")}
+                    </strong>
+                    {t("list_item_8_part4")}
                   </li>
                   <li>
-                    Also inform blood donors by holding meetings in public
-                    institutions in the area. For example,{" "}
-                    <strong className="text-red-700">school societies</strong> and{" "}
-                    <strong className="text-red-700">banks</strong>.
+                    {t("list_item_9_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_9_bold_1")}
+                    </strong>
+                    ,{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_9_bold_2")}
+                    </strong>
+                    , and{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_9_bold_3")}
+                    </strong>
+                    {t("list_item_9_part2")}
+                  </li>
+                  <li>{t("list_item_10_part1")}</li>
+                  <li>{t("list_item_11_part1")}</li>
+                  <li>
+                    {t("list_item_12_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_12_bold_1")}
+                    </strong>
+                    {t("list_item_12_part2")}
                   </li>
                   <li>
-                    Publicity work can be done using{" "}
-                    <strong className="text-red-700">speakerphones</strong> on the day of
-                    the camp and the day before. Remember to obtain the
-                    necessary permission for this in advance.{" "}
-                    <strong className="text-red-700">Orators</strong> and{" "}
-                    <strong className="text-red-700">poets</strong> who can speak to the hearts of people can do a
-                    great service here.{" "}
-                    <strong className="text-red-700">Radio</strong> and{" "}
-                    <strong className="text-red-700">television advertisements</strong> can
-                    also be used.
+                    {t("list_item_13_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_13_bold_1")}
+                    </strong>
+                    , and{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_13_bold_2")}
+                    </strong>
+                    {t("list_item_13_part2")}
                   </li>
                   <li>
-                    The <strong className="text-red-700">date</strong>,{" "}
-                    <strong className="text-red-700">time</strong>, and{" "}
-                    <strong className="text-red-700">venue</strong> of the blood donation camp should
-                    be clearly advertised. It is also important to highlight the
-                    importance of donating blood.
+                    {t("list_item_14_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_14_bold_1")}
+                    </strong>
+                    {t("list_item_14_part2")}
+                    <strong className="text-red-700">
+                      {t("list_item_14_bold_2")}
+                    </strong>
+                    {t("list_item_14_part3")}
                   </li>
                   <li>
-                    By sending letters to those who have participated once, we
-                    can bring them back for the next camp. We have found this to
-                    be a very successful method. Even if they were ineligible
-                    before, they may be eligible for future donations.
+                    {t("list_item_15_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_15_bold_1")}
+                    </strong>
+                    ,{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_15_bold_2")}
+                    </strong>
+                    , and{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_15_bold_3")}
+                    </strong>
+                    {t("list_item_15_part2")}
                   </li>
                   <li>
-                    If you represent an organization, assign each member to
-                    bring a specific number of blood donors.
+                    {t("list_item_16_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_16_bold_1")}
+                    </strong>
+                    , and a{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_16_bold_2")}
+                    </strong>
+                    {t("list_item_16_part2")}
                   </li>
                   <li>
-                    You can further increase the number of blood donors who may
-                    take part by informing them from{" "}
-                    <strong className="text-red-700">house to house</strong>.
-                  </li>
-                  <li>
-                    Modern advertising media such as{" "}
-                    <strong className="text-red-700">telephone</strong> and{" "}
-                    <strong className="text-red-700">internet</strong> can
-                    also be used to attract blood donors.
-                  </li>
-                  <li>
-                    Posters are provided by the{" "}
-                    <strong className="text-red-700">NBTS</strong> or by the relevant blood
-                    banks for awareness. If possible, display them twice, once
-                    in advance and again{" "}
-                    <strong className="text-red-700">2-3 days before</strong> the blood donation
-                    camp.
-                  </li>
-                  <li>
-                    Furthermore, <strong className="text-red-700">meetings</strong>,{" "}
-                    <strong className="text-red-700">short films</strong>, and{" "}
-                    <strong className="text-red-700">videos</strong> can be
-                    provided to target groups as needed. While organizing all
-                    this, it is important to maintain close contact
-                    with the relevant blood bank.
-                  </li>
-                  <li>
-                    Also, the main organizer's{" "}
-                    <strong className="text-red-700">landline number</strong> and a{" "}
-                    <strong className="text-red-700">mobile phone number</strong> should be provided to the relevant blood
-                    bank.
-                  </li>
-                  <li>
-                    Since the government incurs a high amount in organizing
-                    blood donation camps, it's crucial to make them{" "}
-                    <strong className="text-red-700">successful</strong>.
+                    {t("list_item_17_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_17_bold_1")}
+                    </strong>
+                    {t("list_item_17_part2")}
                   </li>
                 </ul>
               </div>
@@ -187,13 +253,13 @@ const StepEight: React.FC<StepperPropsCamps> = ({
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               <button
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>
