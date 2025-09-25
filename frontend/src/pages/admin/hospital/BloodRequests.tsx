@@ -378,7 +378,7 @@ const BloodRequests = () => {
           <tbody>
             {currentRequests.map((request) => (
               <tr
-                key={request.id}
+                key={request._id}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 <td className="px-6 py-4">
@@ -440,24 +440,24 @@ const BloodRequests = () => {
                     {request.status === "pending" && (
                       <>
                         <button
-                          onClick={() => handleApprove(request.id)}
-                          disabled={loadingAction === `approve-${request.id}`}
+                          onClick={() => handleApprove(request._id)}
+                          disabled={loadingAction === `approve-${request._id}`}
                           className="p-1 text-green-600 hover:text-green-800 disabled:text-gray-400"
                           title="Approve Request"
                         >
-                          {loadingAction === `approve-${request.id}` ? (
+                          {loadingAction === `approve-${request._id}` ? (
                             <ClockIcon className="w-5 h-5 animate-spin" />
                           ) : (
                             <CheckCircleIcon className="w-5 h-5" />
                           )}
                         </button>
                         <button
-                          onClick={() => handleReject(request.id)}
-                          disabled={loadingAction === `reject-${request.id}`}
+                          onClick={() => handleReject(request._id)}
+                          disabled={loadingAction === `reject-${request._id}`}
                           className="p-1 text-red-600 hover:text-red-800 disabled:text-gray-400"
                           title="Reject Request"
                         >
-                          {loadingAction === `reject-${request.id}` ? (
+                          {loadingAction === `reject-${request._id}` ? (
                             <ClockIcon className="w-5 h-5 animate-spin" />
                           ) : (
                             <XCircleIcon className="w-5 h-5" />
@@ -468,12 +468,12 @@ const BloodRequests = () => {
 
                     {request.status === "approved" && (
                       <button
-                        onClick={() => handleFulfill(request.id)}
-                        disabled={loadingAction === `fulfill-${request.id}`}
+                        onClick={() => handleFulfill(request._id)}
+                        disabled={loadingAction === `fulfill-${request._id}`}
                         className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:bg-gray-400"
                         title="Mark as Fulfilled"
                       >
-                        {loadingAction === `fulfill-${request.id}`
+                        {loadingAction === `fulfill-${request._id}`
                           ? "..."
                           : "Fulfill"}
                       </button>

@@ -93,7 +93,7 @@ const HospitalBloodRequests = () => {
       searchTerm === "" ||
       request.bloodType.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.purpose.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.id?.toLowerCase().includes(searchTerm.toLowerCase());
+      request._id?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
       statusFilter === "all" || request.status === statusFilter;
@@ -395,11 +395,11 @@ const HospitalBloodRequests = () => {
 
                 return (
                   <tr
-                    key={request.id}
+                    key={request._id}
                     className="bg-white border-b hover:bg-gray-50"
                   >
                     <td className="px-6 py-4 font-mono text-xs text-gray-500">
-                      {request.id}
+                      {request._id}
                     </td>
                     <td className="px-6 py-4">
                       <span className="font-bold text-red-600 text-lg">
