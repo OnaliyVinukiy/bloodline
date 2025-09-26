@@ -75,6 +75,15 @@ class ChatbotController {
     return `${year}-${month}-${day}`;
   }
 
+  private static getTomorrowFormattedDate(): string {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const year = tomorrow.getFullYear();
+    const month = (tomorrow.getMonth() + 1).toString().padStart(2, "0");
+    const day = tomorrow.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
   // Fetch appointments from database
   private static async fetchAppointments(query: string): Promise<string> {
     const MAX_APPOINTMENTS_PER_DAY = 10;
@@ -90,9 +99,10 @@ class ChatbotController {
       const lowerQuery = query.toLowerCase();
       let normalizedDate: string | null = null;
 
-      // New logic to handle "today"
       if (lowerQuery.includes("today")) {
         normalizedDate = this.getTodayFormattedDate();
+      } else if (lowerQuery.includes("tomorrow")) {
+        normalizedDate = this.getTomorrowFormattedDate();
       } else {
         const dateMatch = query.match(/on (\d{4}-\d{2}-\d{2})/);
         const dateMatchFormatted = query.match(
