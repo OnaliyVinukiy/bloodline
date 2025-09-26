@@ -14,7 +14,7 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import { HiExclamation } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import { validatePhoneNumber } from "../../../../utils/ValidationsUtils";
-import { Organization, User } from "../../../../types/users";
+import { Organization } from "../../../../types/users";
 import { useUser } from "../../../../contexts/UserContext";
 import { useTranslation } from "react-i18next";
 
@@ -420,38 +420,6 @@ const StepTwelve: React.FC<
     setShowModal(false);
     navigate("/");
   };
-  const getProvinceName = (province_en: string) => {
-    const currentLang = i18n.language;
-    const selectedProvince = province.find(
-      (p) => p.province_name_en === province_en
-    );
-    if (currentLang === "si" && selectedProvince) {
-      return selectedProvince.province_name_si;
-    }
-    return province_en;
-  };
-
-  const getDistrictName = (district_en: string) => {
-    const currentLang = i18n.language;
-    const selectedDistrict = district.find(
-      (d) => d.district_name_en === district_en
-    );
-    if (currentLang === "si" && selectedDistrict) {
-      return selectedDistrict.district_name_si;
-    }
-    return district_en;
-  };
-
-  const getCityName = (city_en: string) => {
-    const currentLang = i18n.language;
-    const selectedCity = city.find((c) => c.city_name_en === city_en);
-    if (currentLang === "si" && selectedCity) {
-      return selectedCity.city_name_si;
-    }
-    return city_en;
-  };
-
-  // ... rest of the component
 
   return (
     <div className="flex justify-center bg-white min-h-screen">
