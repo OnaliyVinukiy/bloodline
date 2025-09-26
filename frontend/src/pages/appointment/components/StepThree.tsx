@@ -8,6 +8,7 @@
 import { Label } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/stepper";
+import { useTranslation } from "react-i18next";
 
 const StepThree: React.FC<StepperProps> = ({
   onNextStep,
@@ -15,7 +16,7 @@ const StepThree: React.FC<StepperProps> = ({
   onFormDataChange,
   formData,
 }) => {
-  //Structure for the blood donor data
+  const { t } = useTranslation("donorHealth");
   const [formTwoData, setFormTwoData] = useState({
     isFeelingWell: null,
     isTakingTreatment: null,
@@ -33,7 +34,6 @@ const StepThree: React.FC<StepperProps> = ({
     onPreviousStep();
   };
 
-  //Function to set form data (radiobuttons)
   const handleRadioChange =
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setFormTwoData((prevState) => ({
@@ -42,19 +42,14 @@ const StepThree: React.FC<StepperProps> = ({
       }));
     };
 
-  //Save form data and move to next step
   const handleNext = () => {
     const newErrors: { [key: string]: string } = {};
 
-    // Check if necessary fields are filled
-    if (
-      !formTwoData.isFeelingWell ||
-      !formTwoData.isEngageHeavyWork ||
-      !formTwoData.isPregnant ||
-      !formTwoData.isSurgeryDone ||
-      !formTwoData.isTakingTreatment
-    )
-      newErrors.isEmpty = "Please select an option.";
+    if (!formTwoData.isFeelingWell) newErrors.isFeelingWell = t("error_message");
+    if (!formTwoData.isTakingTreatment) newErrors.isTakingTreatment = t("error_message");
+    if (!formTwoData.isSurgeryDone) newErrors.isSurgeryDone = t("error_message");
+    if (!formTwoData.isEngageHeavyWork) newErrors.isEngageHeavyWork = t("error_message");
+    if (!formTwoData.isPregnant) newErrors.isPregnant = t("error_message");
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -73,7 +68,6 @@ const StepThree: React.FC<StepperProps> = ({
     onNextStep();
   };
 
-  // Populate the form data from the parent form data
   useEffect(() => {
     if (formData?.secondForm) {
       setFormTwoData(formData.secondForm);
@@ -88,10 +82,10 @@ const StepThree: React.FC<StepperProps> = ({
             <div className="mt-4 space-y-6">
               <div className="w-full">
                 <Label
-                  htmlFor="donatedBefore"
+                  htmlFor="isFeelingWell"
                   className="block mb-2 text-md font-medium text-indigo-900"
                 >
-                  1.) Are you feeling well today?
+                  {t("q1_label")}
                 </Label>
                 <div className="flex items-center space-x-4">
                   <label className="flex items-center">
@@ -103,7 +97,7 @@ const StepThree: React.FC<StepperProps> = ({
                       onChange={handleRadioChange("isFeelingWell")}
                       className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
-                    Yes
+                    {t("q1_yes")}
                   </label>
                   <label className="flex items-center">
                     <input
@@ -114,10 +108,10 @@ const StepThree: React.FC<StepperProps> = ({
                       onChange={handleRadioChange("isFeelingWell")}
                       className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
-                    No
+                    {t("q1_no")}
                   </label>
-                  {errors.isEmpty && (
-                    <div className="text-red-500 text-sm">{errors.isEmpty}</div>
+                  {errors.isFeelingWell && (
+                    <div className="text-red-500 text-sm">{errors.isFeelingWell}</div>
                   )}
                 </div>
               </div>
@@ -128,47 +122,36 @@ const StepThree: React.FC<StepperProps> = ({
                     htmlFor="diseases"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    2.) Have you ever had or taken treatment for any of the
-                    following disease conditions?
+                    {t("q2_label")}
                   </Label>
                   <div className="mt-4 grid grid-cols-2 gap-4">
-                    {[
-                      "Heart Disease",
-                      "Diabetes",
-                      "Fits",
-                      "Strokes",
-                      "Asthma / Lung Disease",
-                      "Liver Diseases",
-                      "Kidney Diseases",
-                      "Blood Disorders",
-                      "Cancer",
-                    ].map((disease) => (
-                      <label key={disease} className="flex items-center">
+                    {Object.entries(t("q2_options", { returnObjects: true }) as Record<string, string>).map(([key, value]) => (
+                      <label key={key} className="flex items-center">
                         <input
                           type="checkbox"
                           name="diseases"
-                          value={disease}
-                          checked={formTwoData.diseases.includes(disease)}
+                          value={key}
+                          checked={formTwoData.diseases.includes(key)}
                           onChange={(event) => {
-                            const value = event.target.value;
+                            const newValue = event.target.value;
                             setFormTwoData((prevState) => {
                               const diseases = prevState.diseases || [];
                               if (event.target.checked) {
                                 return {
                                   ...prevState,
-                                  diseases: [...diseases, value],
+                                  diseases: [...diseases, newValue],
                                 };
                               } else {
                                 return {
                                   ...prevState,
-                                  diseases: diseases.filter((d) => d !== value),
+                                  diseases: diseases.filter((d) => d !== newValue),
                                 };
                               }
                             });
                           }}
                           className="mr-2 text-red-600 focus:ring-red-500"
                         />
-                        {disease}
+                        {value}
                       </label>
                     ))}
                   </div>
@@ -178,10 +161,10 @@ const StepThree: React.FC<StepperProps> = ({
               <div className="mt-6 space-y-6">
                 <div className="w-full">
                   <Label
-                    htmlFor="donatedBefore"
+                    htmlFor="isTakingTreatment"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    3.) Are you taking any medication/treatment presently?
+                    {t("q3_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -193,7 +176,7 @@ const StepThree: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isTakingTreatment")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("q3_yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -204,23 +187,24 @@ const StepThree: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isTakingTreatment")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("q3_no")}
                     </label>
-                    {errors.isEmpty && (
+                    {errors.isTakingTreatment && (
                       <div className="text-red-500 text-sm">
-                        {errors.isEmpty}
+                        {errors.isTakingTreatment}
                       </div>
                     )}
                   </div>
                 </div>
               </div>
+
               <div className="mt-6 space-y-6">
                 <div className="w-full">
                   <Label
-                    htmlFor="donatedBefore"
+                    htmlFor="isSurgeryDone"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    4.) Have you undergone any surgery?
+                    {t("q4_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -232,7 +216,7 @@ const StepThree: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isSurgeryDone")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("q4_yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -243,25 +227,24 @@ const StepThree: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isSurgeryDone")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("q4_no")}
                     </label>
-                    {errors.isEmpty && (
+                    {errors.isSurgeryDone && (
                       <div className="text-red-500 text-sm">
-                        {errors.isEmpty}
+                        {errors.isSurgeryDone}
                       </div>
                     )}
                   </div>
                 </div>
               </div>
+
               <div className="mt-6 space-y-6">
                 <div className="w-full">
                   <Label
-                    htmlFor="donatedBefore"
+                    htmlFor="isEngageHeavyWork"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    5.) After donating blood, do you have to engage in any heavy
-                    work, driving passenger, or heavy vehicles or work at
-                    heights today?
+                    {t("q5_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -273,7 +256,7 @@ const StepThree: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isEngageHeavyWork")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("q5_yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -284,25 +267,24 @@ const StepThree: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isEngageHeavyWork")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("q5_no")}
                     </label>
-                    {errors.isEmpty && (
+                    {errors.isEngageHeavyWork && (
                       <div className="text-red-500 text-sm">
-                        {errors.isEmpty}
+                        {errors.isEngageHeavyWork}
                       </div>
                     )}
                   </div>
                 </div>
               </div>
+
               <div className="mt-6 space-y-6">
                 <div className="w-full">
                   <Label
-                    htmlFor="donatedBefore"
+                    htmlFor="isPregnant"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    6.) (For Females) Are you pregnant or breast feeding at
-                    present? Or have you had a child birth or an abortion during
-                    last 12 months?
+                    {t("q6_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -314,7 +296,7 @@ const StepThree: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isPregnant")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("q6_yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -325,11 +307,11 @@ const StepThree: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isPregnant")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("q6_no")}
                     </label>
-                    {errors.isEmpty && (
+                    {errors.isPregnant && (
                       <div className="text-red-500 text-sm">
-                        {errors.isEmpty}
+                        {errors.isPregnant}
                       </div>
                     )}
                   </div>
@@ -342,11 +324,11 @@ const StepThree: React.FC<StepperProps> = ({
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               {showErrorMessage && (
                 <p className="text-red-500 text-sm mt-2">
-                  Please fill all required fields.
+                  {t("error_all_fields")}
                 </p>
               )}
 
@@ -354,7 +336,7 @@ const StepThree: React.FC<StepperProps> = ({
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>

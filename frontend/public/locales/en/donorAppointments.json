@@ -1,0 +1,19 @@
+{
+  "title": "Scheduled Appointments",
+  "table_header_date": "Date",
+  "table_header_time": "Time",
+  "table_header_status": "Status",
+  "table_header_action": "Action",
+  "status_rejected": "Rejected",
+  "status_approved": "Approved",
+  "status_cancelled": "Cancelled",
+  "status_pending": "Pending",
+  "action_button": "Cancel Appointment",
+  "no_appointments_found": "No appointments found.",
+  "modal_title": "Cancel Appointment",
+  "modal_message": "Are you sure you want to cancel this appointment?",
+  "modal_button_cancelling": "Cancelling...",
+  "modal_button_yes": "Yes",
+  "modal_button_cancel": "Cancel",
+  "modal_button_ok": "OK"
+}

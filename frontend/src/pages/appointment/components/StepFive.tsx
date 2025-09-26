@@ -5,9 +5,11 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-import { Label } from "flowbite-react";
+
 import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/stepper";
+import { useTranslation } from "react-i18next";
+import { Label } from "flowbite-react";
 
 const StepFive: React.FC<StepperProps> = ({
   onNextStep,
@@ -15,6 +17,7 @@ const StepFive: React.FC<StepperProps> = ({
   onFormDataChange,
   formData,
 }) => {
+  const { t } = useTranslation("donorHealth2");
   //Structure for form data
   const [formFourData, setFormFourData] = useState({
     hadVaccination: null,
@@ -55,7 +58,7 @@ const StepFive: React.FC<StepperProps> = ({
       !formFourData.hadTravelledAbroad ||
       !formFourData.hadVaccination
     )
-      newErrors.isEmpty = "Please select an option.";
+      newErrors.isEmpty = t("error_message");
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -93,7 +96,7 @@ const StepFive: React.FC<StepperProps> = ({
                   htmlFor="donatedBefore"
                   className="block mb-2 text-md font-medium text-indigo-900"
                 >
-                  During past 12 months
+                  {t("section_title")}
                 </Label>
               </div>
               <div className="w-full">
@@ -101,7 +104,7 @@ const StepFive: React.FC<StepperProps> = ({
                   htmlFor="donatedBefore"
                   className="block mb-2 text-md font-medium text-indigo-900"
                 >
-                  1.) Have you received any vaccination?
+                  {t("q1_label")}
                 </Label>
                 <div className="flex items-center space-x-4">
                   <label className="flex items-center">
@@ -113,7 +116,7 @@ const StepFive: React.FC<StepperProps> = ({
                       onChange={handleRadioChange("hadVaccination")}
                       className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
-                    Yes
+                    {t("yes")}
                   </label>
                   <label className="flex items-center">
                     <input
@@ -124,7 +127,7 @@ const StepFive: React.FC<StepperProps> = ({
                       onChange={handleRadioChange("hadVaccination")}
                       className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
-                    No
+                    {t("no")}
                   </label>
                   {errors.isEmpty && (
                     <div className="text-red-500 text-sm">{errors.isEmpty}</div>
@@ -138,8 +141,7 @@ const StepFive: React.FC<StepperProps> = ({
                     htmlFor="donatedBefore"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    2.) Have you had tattooing, ear/body piercing or acupuncture
-                    treatement?
+                    {t("q2_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -151,7 +153,7 @@ const StepFive: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadAcupuncture")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -162,7 +164,7 @@ const StepFive: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadAcupuncture")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("no")}
                     </label>
                     {errors.isEmpty && (
                       <div className="text-red-500 text-sm">
@@ -179,7 +181,7 @@ const StepFive: React.FC<StepperProps> = ({
                     htmlFor="donatedBefore"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    3.) Have you been imprisoned for any reason?
+                    {t("q3_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -191,7 +193,7 @@ const StepFive: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadImprisoned")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -202,7 +204,7 @@ const StepFive: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadImprisoned")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("no")}
                     </label>
                     {errors.isEmpty && (
                       <div className="text-red-500 text-sm">
@@ -212,13 +214,14 @@ const StepFive: React.FC<StepperProps> = ({
                   </div>
                 </div>
               </div>
+
               <div className="mt-6 space-y-6">
                 <div className="w-full">
                   <Label
                     htmlFor="donatedBefore"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    4.) Have you or your partner travelled abroad?
+                    {t("q4_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -230,7 +233,7 @@ const StepFive: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadTravelledAbroad")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -241,7 +244,7 @@ const StepFive: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadTravelledAbroad")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("no")}
                     </label>
                     {errors.isEmpty && (
                       <div className="text-red-500 text-sm">
@@ -251,14 +254,14 @@ const StepFive: React.FC<StepperProps> = ({
                   </div>
                 </div>
               </div>
+
               <div className="mt-6 space-y-6">
                 <div className="w-full">
                   <Label
                     htmlFor="donatedBefore"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    5.) Have you or your partner received blood or blood
-                    products?
+                    {t("q5_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -270,7 +273,7 @@ const StepFive: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadReceivedBlood")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -281,7 +284,7 @@ const StepFive: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadReceivedBlood")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("no")}
                     </label>
                     {errors.isEmpty && (
                       <div className="text-red-500 text-sm">
@@ -291,13 +294,14 @@ const StepFive: React.FC<StepperProps> = ({
                   </div>
                 </div>
               </div>
+
               <div className="mt-6 space-y-6">
                 <div className="w-full">
                   <Label
                     htmlFor="donatedBefore"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    6.) Have you had Malaria or taken treatment for Malaria?
+                    {t("q6_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -309,7 +313,7 @@ const StepFive: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadMaleria")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -320,7 +324,7 @@ const StepFive: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadMaleria")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("no")}
                     </label>
                     {errors.isEmpty && (
                       <div className="text-red-500 text-sm">
@@ -337,19 +341,18 @@ const StepFive: React.FC<StepperProps> = ({
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               {showErrorMessage && (
                 <p className="text-red-500 text-sm mt-2">
-                  Please fill all required fields.
+                  {t("error_all_fields")}
                 </p>
               )}
-
               <button
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>
