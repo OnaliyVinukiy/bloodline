@@ -75,6 +75,15 @@ class ChatbotController {
     return `${year}-${month}-${day}`;
   }
 
+  private static getTomorrowFormattedDate(): string {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const year = tomorrow.getFullYear();
+    const month = (tomorrow.getMonth() + 1).toString().padStart(2, "0");
+    const day = tomorrow.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
   // Fetch appointments from database
   private static async fetchAppointments(query: string): Promise<string> {
     const MAX_APPOINTMENTS_PER_DAY = 10;
@@ -90,9 +99,10 @@ class ChatbotController {
       const lowerQuery = query.toLowerCase();
       let normalizedDate: string | null = null;
 
-      // New logic to handle "today"
       if (lowerQuery.includes("today")) {
         normalizedDate = this.getTodayFormattedDate();
+      } else if (lowerQuery.includes("tomorrow")) {
+        normalizedDate = this.getTomorrowFormattedDate();
       } else {
         const dateMatch = query.match(/on (\d{4}-\d{2}-\d{2})/);
         const dateMatchFormatted = query.match(
@@ -144,6 +154,52 @@ class ChatbotController {
     }
   }
 
+  private static async fetchUserAppointmentStatus(
+    email: string
+  ): Promise<string> {
+    const client = new MongoClient(
+      process.env.COSMOS_DB_CONNECTION_STRING as string
+    );
+    await client.connect();
+    const database = client.db(DATABASE_ID);
+    const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+
+    try {
+      // Find the most recent appointment for the user
+      const latestAppointment = await collection.findOne(
+        { "donorInfo.email": email },
+        { sort: { selectedDate: -1 } }
+      );
+
+      if (!latestAppointment) {
+        return "You don't have any appointments scheduled yet. Would you like to book one?";
+      }
+
+      const status = latestAppointment.status;
+      const date = latestAppointment.selectedDate;
+      const time = latestAppointment.selectedSlot;
+
+      let response = `Your most recent appointment is on ${date} at ${time}. The current status is: **${status}**.`;
+
+      if (status === "Approved") {
+        response +=
+          " We look forward to seeing you! Check your email for reminders. 👍";
+      } else if (status === "Pending") {
+        response +=
+          " We are still reviewing your request. Please check back later. ⏳";
+      } else if (status === "Rejected" || status === "Cancelled") {
+        response += ` This appointment was ${status.toLowerCase()}. Please consider booking a new one!`;
+      }
+
+      return response;
+    } catch (error) {
+      console.error("Error fetching personalized status:", error);
+      return "⚠️ Sorry, I couldn't access your personal appointment data right now.";
+    } finally {
+      await client.close();
+    }
+  }
+
   // Call OpenAI API with system instruction
   public static async callAzureOpenAI(userMessage: string): Promise<string> {
     try {
@@ -187,7 +243,7 @@ class ChatbotController {
   // Handle incoming chatbot messages
   public async handleChat(req: Request, res: Response): Promise<Response> {
     try {
-      const { message } = req.body;
+      const { message, email } = req.body;
       if (!message)
         return res.status(400).json({ reply: "⚠️ Message is required." });
 
@@ -202,6 +258,14 @@ class ChatbotController {
         "who can donate",
         "blood donation rules",
         "donor requirements",
+      ];
+
+      const personalStatusKeywords = [
+        "my appointment",
+        "my status",
+        "status of my appointment",
+        "check my booking",
+        "next donation",
       ];
 
       const appointmentKeywords = [
@@ -229,6 +293,20 @@ class ChatbotController {
           message
         );
         return res.status(200).json({ reply: appointmentResponse });
+      }
+
+      if (
+        personalStatusKeywords.some((keyword) => lowerMessage.includes(keyword))
+      ) {
+        if (!email) {
+          return res.status(200).json({
+            reply:
+              "I need your user ID to check your personal status. Please ensure you are logged in to the application.",
+          });
+        }
+        const statusResponse =
+          await ChatbotController.fetchUserAppointmentStatus(email);
+        return res.status(200).json({ reply: statusResponse });
       }
 
       const aiResponse = await ChatbotController.callAzureOpenAI(message);
