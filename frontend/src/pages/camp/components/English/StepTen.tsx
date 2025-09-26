@@ -8,11 +8,14 @@
 
 import React from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
+import { useTranslation } from "react-i18next";
 
 const StepTen: React.FC<StepperPropsCamps> = ({
   onNextStep,
   onPreviousStep,
 }) => {
+  const { t } = useTranslation("campReview");
+
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
@@ -50,44 +53,43 @@ const StepTen: React.FC<StepperPropsCamps> = ({
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Review After the Blood Donation Camp
+                  {t("title")}
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
-                Every drop counts. Let’s make a difference together!
+                {t("subtitle")}
               </div>
             </div>
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
                 <ul className="list-disc pl-6 mt-6 space-y-4">
                   <li>
-                    At the end of the blood donation camp, it's important to
+                    {t("list_item_1")}{" "}
                     <strong className="text-red-700">
-                      {" "}
-                      review the program with the blood bank
+                      {t("list_item_1_bold")}
                     </strong>
-                    .
+                    {t("list_item_1_end")}
                   </li>
                   <li>
-                    A successful blood donation camp isn’t just about having a
-                    lot of donors; it’s also about having{" "}
+                    {t("list_item_2")}
                     <strong className="text-red-700">
-                      fewer donors who are unsuitable for donation
+                      {t("list_item_2_bold")}
                     </strong>
-                    .
+                    {t("list_item_2_end")}
                   </li>
                   <li>
-                    A good blood donation camp also means that the blood donated
-                    doesn't contain any{" "}
+                    {t("list_item_3")}
                     <strong className="text-red-700">
-                      harmful pathogens when tested
+                      {t("list_item_3_bold")}
                     </strong>
-                    .
+                    {t("list_item_3_end")}
                   </li>
                   <li>
-                    By identifying areas for improvement, your future blood
-                    donation camps will be{" "}
-                    <strong className="text-red-700">more successful</strong>.
+                    {t("list_item_4")}
+                    <strong className="text-red-700">
+                      {t("list_item_4_bold")}
+                    </strong>
+                    {t("list_item_4_end")}
                   </li>
                 </ul>
               </div>
@@ -98,13 +100,13 @@ const StepTen: React.FC<StepperPropsCamps> = ({
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               <button
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>
