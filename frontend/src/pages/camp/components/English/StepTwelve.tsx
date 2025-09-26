@@ -5,8 +5,7 @@
  *
  * Unauthorized copying, modification, or distribution of this code is prohibited.
  */
-
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
 import { Label, Modal, Toast } from "flowbite-react";
 import axios from "axios";
@@ -15,8 +14,9 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import { HiExclamation } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import { validatePhoneNumber } from "../../../../utils/ValidationsUtils";
-import { Organization } from "../../../../types/users";
+import { Organization, User } from "../../../../types/users";
 import { useUser } from "../../../../contexts/UserContext";
+import { useTranslation } from "react-i18next";
 
 declare global {
   interface Window {
@@ -31,6 +31,7 @@ const StepTwelve: React.FC<
     endTime: string | null;
   }
 > = ({ onPreviousStep, selectedDate, startTime, endTime }) => {
+  const { t, i18n } = useTranslation("campRegistrationFinal");
   const handlePrevious = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
@@ -42,15 +43,29 @@ const StepTwelve: React.FC<
   const markerInstance = useRef<google.maps.Marker | null>(null);
 
   const [province, setProvince] = useState<
-    { province_id: string; province_name_en: string }[]
+    {
+      province_id: string;
+      province_name_en: string;
+      province_name_si: string;
+    }[]
   >([]);
 
   const [district, setDistrict] = useState<
-    { district_id: string; district_name_en: string; province_id: string }[]
+    {
+      district_id: string;
+      district_name_en: string;
+      district_name_si: string;
+      province_id: string;
+    }[]
   >([]);
 
   const [city, setCity] = useState<
-    { city_id: string; city_name_en: string; district_id: string }[]
+    {
+      city_id: string;
+      city_name_en: string;
+      city_name_si: string;
+      district_id: string;
+    }[]
   >([]);
 
   const backendURL =
@@ -67,6 +82,10 @@ const StepTwelve: React.FC<
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { getAccessToken } = useAuthContext();
+  const memoizedGetAccessToken = useCallback(
+    () => getAccessToken(),
+    [getAccessToken]
+  );
 
   // Fetch all organizations on page load
   useEffect(() => {
@@ -77,17 +96,10 @@ const StepTwelve: React.FC<
         );
         const orgNames = response.data.map((org) => org.organizationName);
         setAllOrganizations(orgNames);
-
-        // Set email when user info is fetched
-        setFormData((prev) => ({
-          ...prev,
-          email: user?.email || "",
-        }));
       } catch (error) {
         console.error("Error fetching organizations:", error);
       }
     };
-
     fetchAllOrganizations();
   }, [backendURL]);
 
@@ -140,8 +152,11 @@ const StepTwelve: React.FC<
   //Fetch districts list
   const fetchDistricts = async (provinceName: string) => {
     try {
+      const currentLang = i18n.language;
+      const langParam = currentLang === "si" ? "?lang=si" : "";
+
       const response = await fetch(
-        `${backendURL}/api/districts/province-name/${provinceName}`
+        `${backendURL}/api/districts/province-name/${provinceName}${langParam}`
       );
       const districts = await response.json();
       if (response.ok) {
@@ -154,11 +169,15 @@ const StepTwelve: React.FC<
     }
   };
 
-  //Fetch districts list
+  //Fetch cities list
   const fetchCities = async (districtName: string) => {
+    // Ensure 'const { i18n } = useTranslation();' is at the top of your component
+    const currentLang = i18n.language;
+    const langParam = currentLang === "si" ? "?lang=si" : "";
+
     try {
       const response = await fetch(
-        `${backendURL}/api/city/district/${districtName}`
+        `${backendURL}/api/city/district/${districtName}${langParam}`
       );
       const cities = await response.json();
       if (response.ok) {
@@ -167,7 +186,7 @@ const StepTwelve: React.FC<
         setCity([]);
       }
     } catch (error) {
-      console.error("Error fetching districts:", error);
+      console.error("Error fetching cities:", error);
     }
   };
 
@@ -209,16 +228,19 @@ const StepTwelve: React.FC<
     const newErrors: { [key in keyof Camp]?: string } = {};
 
     if (!formData.fullName.trim())
-      newErrors.fullName = "Full Name is required.";
-    if (!formData.nic.trim()) newErrors.nic = "NIC Number is required.";
-
+      newErrors.fullName = t("error_full_name_required");
+    if (!formData.nic.trim()) newErrors.nic = t("error_nic_required");
     if (!formData.contactNumber.trim())
-      newErrors.contactNumber = "Contact Number is required.";
-    if (!formData.province.trim()) newErrors.province = "Province is required.";
-    if (!formData.district.trim()) newErrors.district = "District is required.";
-    if (!formData.city.trim()) newErrors.city = "City is required.";
+      newErrors.contactNumber = t("error_contact_number_required");
+    if (!isPhoneNumberValid)
+      newErrors.contactNumber = t("contact_number_invalid");
+    if (!formData.province.trim())
+      newErrors.province = t("error_province_required");
+    if (!formData.district.trim())
+      newErrors.district = t("error_district_required");
+    if (!formData.city.trim()) newErrors.city = t("error_city_required");
     if (!formData.googleMapLink.trim())
-      newErrors.googleMapLink = "Google Map Link is required.";
+      newErrors.googleMapLink = t("error_google_map_link_required");
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -229,7 +251,6 @@ const StepTwelve: React.FC<
         `${backendURL}/api/organizations/name/${encodeURIComponent(orgName)}`
       );
       const orgData = response.data;
-      // Update formData with representative's details
       setFormData((prev) => ({
         ...prev,
         organizationName: orgData.organizationName || prev.organizationName,
@@ -238,15 +259,12 @@ const StepTwelve: React.FC<
         email: orgData.repEmail || prev.email,
         contactNumber: orgData.repContactNumber || prev.contactNumber,
       }));
-      // Validate phone number if it exists
       if (orgData.repContactNumber) {
         setIsPhoneNumberValid(validatePhoneNumber(orgData.repContactNumber));
       }
     } catch (error) {
       console.error("Error fetching organization data:", error);
-      setToastMessage(
-        "Failed to fetch organization details. Please try again."
-      );
+      setToastMessage(t("error_message_toast_default"));
     }
   };
 
@@ -269,13 +287,11 @@ const StepTwelve: React.FC<
 
     const initializeMap = () => {
       if (mapRef.current && searchInputRef.current) {
-        // Initialize map
         mapInstance.current = new window.google.maps.Map(mapRef.current, {
           center: { lat: 6.9271, lng: 79.8612 },
           zoom: 8,
         });
 
-        // Initialize autocomplete
         const autocomplete = new window.google.maps.places.Autocomplete(
           searchInputRef.current,
           { types: ["establishment", "geocode"] }
@@ -285,7 +301,6 @@ const StepTwelve: React.FC<
           const place = autocomplete.getPlace();
           if (!place.geometry?.location) return;
 
-          // Update form data with venue name and Google Maps link
           setFormData((prev) => ({
             ...prev,
             venue: place.name || "",
@@ -294,11 +309,9 @@ const StepTwelve: React.FC<
               `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
           }));
 
-          // Update map view
           mapInstance.current?.setCenter(place.geometry.location);
           mapInstance.current?.setZoom(17);
 
-          // Update marker
           if (markerInstance.current) markerInstance.current.setMap(null);
           markerInstance.current = new window.google.maps.Marker({
             position: place.geometry.location,
@@ -306,7 +319,6 @@ const StepTwelve: React.FC<
           });
         });
 
-        // Add click listener for manual location selection
         mapInstance.current?.addListener(
           "click",
           async (e: google.maps.MapMouseEvent) => {
@@ -318,8 +330,6 @@ const StepTwelve: React.FC<
               position: e.latLng,
               map: mapInstance.current,
             });
-
-            // Reverse Geocoding to get place name
             const geocoder = new window.google.maps.Geocoder();
             geocoder.geocode(
               { location: e.latLng },
@@ -354,9 +364,7 @@ const StepTwelve: React.FC<
     if (validateForm()) {
       try {
         setLoading(true);
-        const token = await getAccessToken();
-
-        // Send updated formData, including the venue
+        const token = await memoizedGetAccessToken();
         const response = await axios.post(
           `${backendURL}/api/camps/register`,
           formData,
@@ -391,8 +399,7 @@ const StepTwelve: React.FC<
       } catch (error: any) {
         console.error("Error saving camp:", error);
         setToastMessage(
-          error.response?.data?.errors?.[0] ||
-            "There was an error. Please try again."
+          error.response?.data?.errors?.[0] || t("error_message_toast_default")
         );
       } finally {
         setLoading(false);
@@ -406,7 +413,6 @@ const StepTwelve: React.FC<
       organizationName: orgName,
     }));
     setOrganizationOptions([]);
-    // Fetch organization data when an organization is selected
     fetchOrganizationData(orgName);
   };
 
@@ -414,6 +420,38 @@ const StepTwelve: React.FC<
     setShowModal(false);
     navigate("/");
   };
+  const getProvinceName = (province_en: string) => {
+    const currentLang = i18n.language;
+    const selectedProvince = province.find(
+      (p) => p.province_name_en === province_en
+    );
+    if (currentLang === "si" && selectedProvince) {
+      return selectedProvince.province_name_si;
+    }
+    return province_en;
+  };
+
+  const getDistrictName = (district_en: string) => {
+    const currentLang = i18n.language;
+    const selectedDistrict = district.find(
+      (d) => d.district_name_en === district_en
+    );
+    if (currentLang === "si" && selectedDistrict) {
+      return selectedDistrict.district_name_si;
+    }
+    return district_en;
+  };
+
+  const getCityName = (city_en: string) => {
+    const currentLang = i18n.language;
+    const selectedCity = city.find((c) => c.city_name_en === city_en);
+    if (currentLang === "si" && selectedCity) {
+      return selectedCity.city_name_si;
+    }
+    return city_en;
+  };
+
+  // ... rest of the component
 
   return (
     <div className="flex justify-center bg-white min-h-screen">
@@ -442,11 +480,11 @@ const StepTwelve: React.FC<
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Registration
+                  {t("title")}
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
-                Every drop counts. Let’s make a difference together!
+                {t("subtitle")}
               </div>
             </div>
             {/* Form */}
@@ -455,7 +493,7 @@ const StepTwelve: React.FC<
                 htmlFor="province"
                 className="block mb-6 text-lg font-roboto font-medium text-gray-800"
               >
-                Details of the Organizer
+                {t("organizer_details_title")}
               </Label>
               <div className="mt-4 space-y-6">
                 <div className="w-full">
@@ -464,14 +502,14 @@ const StepTwelve: React.FC<
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
                     {" "}
-                    Organization Name (If Available)
+                    {t("organization_name_label")}
                   </Label>
                   <input
                     type="text"
                     name="organizationName"
                     value={formData.organizationName}
                     onChange={handleInputChange}
-                    placeholder="Enter organization name"
+                    placeholder={t("organization_name_placeholder")}
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                     onBlur={() =>
@@ -499,14 +537,14 @@ const StepTwelve: React.FC<
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
                     {" "}
-                    Full Name of Organizer (As in NIC)*
+                    {t("full_name_label")}
                   </Label>
                   <input
                     type="text"
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleInputChange}
-                    placeholder="Enter full name"
+                    placeholder={t("full_name_placeholder")}
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
@@ -522,14 +560,14 @@ const StepTwelve: React.FC<
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
                     {" "}
-                    NIC Number*
+                    {t("nic_label")}
                   </Label>
                   <input
                     type="text"
                     name="nic"
                     value={formData.nic}
                     onChange={handleInputChange}
-                    placeholder="Enter NIC number"
+                    placeholder={t("nic_placeholder")}
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
@@ -543,14 +581,14 @@ const StepTwelve: React.FC<
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
                     {" "}
-                    Email Address*
+                    {t("email_label")}
                   </Label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     disabled
-                    placeholder="Enter email address"
+                    placeholder={t("email_placeholder")}
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
                   />
@@ -561,14 +599,14 @@ const StepTwelve: React.FC<
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
                     {" "}
-                    Contact Number*
+                    {t("contact_number_label")}
                   </Label>
                   <input
                     type="text"
                     name="contactNumber"
                     value={formData.contactNumber}
                     onChange={handlePhoneNumberChange}
-                    placeholder="Enter contact number"
+                    placeholder={t("contact_number_placeholder")}
                     className={`bg-indigo-50 border ${
                       isPhoneNumberValid
                         ? "border-indigo-300"
@@ -583,8 +621,7 @@ const StepTwelve: React.FC<
                   )}
                   {!isPhoneNumberValid && (
                     <p className="text-sm text-red-500 mt-1">
-                      Please enter a valid 10-digit phone number starting from
-                      0.
+                      {t("contact_number_invalid")}
                     </p>
                   )}
                 </div>
@@ -593,7 +630,7 @@ const StepTwelve: React.FC<
                   htmlFor="province"
                   className="mt-2 block mb-2 text-lg font-medium font-roboto text-gray-800 mt-2"
                 >
-                  Details of the Venue
+                  {t("venue_details_title")}
                 </Label>
 
                 <div className="flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0 mb-6">
@@ -602,7 +639,7 @@ const StepTwelve: React.FC<
                       htmlFor="province"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
-                      Province*
+                      {t("province_label")}
                     </Label>
                     <select
                       id="province"
@@ -610,13 +647,19 @@ const StepTwelve: React.FC<
                       className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                       onChange={handleProvinceChange}
                     >
-                      <option value="">Select a province</option>
+                      <option value="">{t("select_province")}</option>
                       {province.map((prov) => (
                         <option
                           key={prov.province_id}
-                          value={prov.province_name_en}
+                          value={
+                            i18n.language === "si"
+                              ? prov.province_name_si
+                              : prov.province_name_en
+                          }
                         >
-                          {prov.province_name_en}
+                          {i18n.language === "si"
+                            ? prov.province_name_si
+                            : prov.province_name_en}
                         </option>
                       ))}
                     </select>
@@ -632,7 +675,7 @@ const StepTwelve: React.FC<
                       htmlFor="district"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
-                      District*
+                      {t("district_label")}
                     </Label>
                     <select
                       id="district"
@@ -640,18 +683,24 @@ const StepTwelve: React.FC<
                       className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                       onChange={handleDistrictChange}
                     >
-                      <option value="">Select a district</option>
+                      <option value="">{t("select_district")}</option>
                       {district.length > 0 ? (
                         district.map((districtItem) => (
                           <option
                             key={districtItem.district_id}
-                            value={districtItem.district_name_en}
+                            value={
+                              i18n.language === "si"
+                                ? districtItem.district_name_si
+                                : districtItem.district_name_en
+                            }
                           >
-                            {districtItem.district_name_en}
+                            {i18n.language === "si"
+                              ? districtItem.district_name_si
+                              : districtItem.district_name_en}
                           </option>
                         ))
                       ) : (
-                        <option value="">Please select a province first</option>
+                        <option value="">{t("select_province_first")}</option>
                       )}
                     </select>
                     {errors.district && (
@@ -666,7 +715,7 @@ const StepTwelve: React.FC<
                       htmlFor="city"
                       className="block mb-2 text-sm font-medium text-indigo-900"
                     >
-                      City*
+                      {t("city_label")}
                     </Label>
                     <select
                       id="city"
@@ -674,18 +723,24 @@ const StepTwelve: React.FC<
                       className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                       onChange={handleCityChange}
                     >
-                      <option value="">Select a city</option>
+                      <option value="">{t("select_city")}</option>
                       {city.length > 0 ? (
                         city.map((cityItem) => (
                           <option
                             key={cityItem.city_id}
-                            value={cityItem.city_name_en}
+                            value={
+                              i18n.language === "si"
+                                ? cityItem.city_name_si
+                                : cityItem.city_name_en
+                            }
                           >
-                            {cityItem.city_name_en}
+                            {i18n.language === "si"
+                              ? cityItem.city_name_si
+                              : cityItem.city_name_en}
                           </option>
                         ))
                       ) : (
-                        <option value="">Please select a district first</option>
+                        <option value="">{t("select_district_first")}</option>
                       )}
                     </select>
                     {errors.city && (
@@ -701,13 +756,13 @@ const StepTwelve: React.FC<
                     htmlFor="searchLocation"
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
-                    Search and Select Location on Map*
+                    {t("search_map_label")}
                   </Label>
                   <input
                     ref={searchInputRef}
                     type="text"
                     id="searchLocation"
-                    placeholder="Search for location"
+                    placeholder={t("search_map_placeholder")}
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     value={formData.venue}
                     onChange={(e) =>
@@ -731,9 +786,7 @@ const StepTwelve: React.FC<
                     </p>
                   )}
                   <div className="mt-2 text-sm text-gray-500">
-                    <span>
-                      Search for the venue location and select it on the map.{" "}
-                    </span>
+                    <span>{t("search_map_help_text")}</span>
                   </div>
                 </div>
                 <div className="w-full">
@@ -741,14 +794,14 @@ const StepTwelve: React.FC<
                     htmlFor="googleMapLink"
                     className="block mb-2 text-sm font-medium text-indigo-900"
                   >
-                    Google Map Link of the Venue*
+                    {t("google_map_link_label")}
                   </Label>
                   <input
                     type="text"
                     name="googleMapLink"
                     value={formData.googleMapLink}
                     onChange={handleInputChange}
-                    placeholder="Enter link"
+                    placeholder={t("google_map_link_placeholder")}
                     disabled
                     className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                     required
@@ -767,7 +820,7 @@ const StepTwelve: React.FC<
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               <button
                 onClick={handleSubmit}
@@ -793,10 +846,10 @@ const StepTwelve: React.FC<
                         fill="currentColor"
                       />
                     </svg>
-                    Submitting...
+                    {t("submitting_button")}
                   </>
                 ) : (
-                  "Submit"
+                  t("submit_button")
                 )}
               </button>
             </div>
@@ -832,16 +885,13 @@ const StepTwelve: React.FC<
                     d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"
                   />
                 </svg>
-                Request Submitted Successfully!
+                {t("modal_title_success")}
               </p>
             </Modal.Header>
             <Modal.Body>
               <p className="text-lg text-gray-700">
-                Your request for a blood donation camp has been successfully
-                submitted. Our team will review your request, and you will
-                receive a confirmation email once it has been approved or
-                rejected. Thank you for your willingness to save lives make a
-                difference!
+                {t("modal_message_success_part1")}{" "}
+                {t("modal_message_success_part2")}
               </p>
             </Modal.Body>
           </Modal>
