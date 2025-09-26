@@ -10,8 +10,10 @@ import axios from "axios";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { Appointment } from "../../types/appointment";
 import { Button, Modal } from "flowbite-react";
+import { useTranslation } from "react-i18next";
 
 const DonorAppointments = () => {
+  const { t } = useTranslation("donorAppointments");
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -154,23 +156,23 @@ const DonorAppointments = () => {
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-w-7xl w-full mb-20">
         <div className="text-center mb-10">
           <h1 className="mt-2 text-4xl font-bold text-center mb-6 bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent leading-tight pb-2">
-            Scheduled Appointments
+            {t("title")}
           </h1>
         </div>
         <table className="mt-4 mb-4 w-full text-md text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-gray-700 uppercase bg-yellow-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" className="px-6 py-3">
-                Date
+                {t("table_header_date")}
               </th>
               <th scope="col" className="px-6 py-3">
-                Time
+                {t("table_header_time")}
               </th>
               <th scope="col" className="px-6 py-3 text-center">
-                Status
+                {t("table_header_status")}
               </th>
               <th scope="col" className="px-6 py-3 text-center">
-                Action
+                {t("table_header_action")}
               </th>
               <th scope="col" className="px-1 py-1"></th>
             </tr>
@@ -188,25 +190,25 @@ const DonorAppointments = () => {
                 {appointment.status === "Rejected" ? (
                   <td className="px-6 py-6 text-center">
                     <div className="badges flex justify-center">
-                      <button className="red">Rejected</button>
+                      <button className="red">{t("status_rejected")}</button>
                     </div>
                   </td>
                 ) : appointment.status === "Approved" ? (
                   <td className="px-6 py-6 text-center">
                     <div className="badges flex justify-center">
-                      <button className="green">Approved</button>
+                      <button className="green">{t("status_approved")}</button>
                     </div>
                   </td>
                 ) : appointment.status === "Cancelled" ? (
                   <td className="px-6 py-6 text-center">
                     <div className="badges flex justify-center">
-                      <button className="red">Cancelled</button>
+                      <button className="red">{t("status_cancelled")}</button>
                     </div>
                   </td>
                 ) : (
                   <td className="px-6 py-6 text-center">
                     <div className="badges flex justify-center">
-                      <button className="yellow">Pending</button>
+                      <button className="yellow">{t("status_pending")}</button>
                     </div>
                   </td>
                 )}
@@ -226,7 +228,7 @@ const DonorAppointments = () => {
                       appointment.status === "Cancelled"
                     }
                   >
-                    Cancel Appointment
+                    {t("action_button")}
                   </button>
                 </td>
               </tr>
@@ -237,7 +239,7 @@ const DonorAppointments = () => {
                   colSpan={5}
                   className="text-center px-6 py-4 text-gray-500 dark:text-gray-400"
                 >
-                  No appointments found.
+                  {t("no_appointments_found")}
                 </td>
               </tr>
             )}
@@ -245,7 +247,6 @@ const DonorAppointments = () => {
         </table>
       </div>
 
-      {/* Confirmation Modal */}
       <Modal
         show={isCancelModalOpen}
         onClose={() => {
@@ -255,10 +256,10 @@ const DonorAppointments = () => {
           }
         }}
       >
-        <Modal.Header>Cancel Appointment</Modal.Header>
+        <Modal.Header>{t("modal_title")}</Modal.Header>
         <Modal.Body>
           <p className="text-lg text-gray-700">
-            Are you sure you want to cancel this appointment?
+            {t("modal_message")}
           </p>
         </Modal.Body>
         <Modal.Footer className="flex justify-end">
@@ -286,10 +287,10 @@ const DonorAppointments = () => {
                     fill="currentColor"
                   />
                 </svg>
-                Cancelling...
+                {t("modal_button_cancelling")}
               </>
             ) : (
-              "Yes"
+              t("modal_button_yes")
             )}
           </Button>
           <Button
@@ -302,7 +303,7 @@ const DonorAppointments = () => {
             disabled={isCancelling}
             className="border-red-700 text-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300"
           >
-            Cancel
+            {t("modal_button_cancel")}
           </Button>
         </Modal.Footer>
       </Modal>

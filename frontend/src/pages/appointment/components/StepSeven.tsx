@@ -8,6 +8,7 @@
 import { Label } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/stepper";
+import { useTranslation } from "react-i18next";
 
 const StepSeven: React.FC<StepperProps> = ({
   onNextStep,
@@ -15,6 +16,7 @@ const StepSeven: React.FC<StepperProps> = ({
   onFormDataChange,
   formData,
 }) => {
+  const { t } = useTranslation("donorHealth4");
   //Structure for form data
   const [formSixData, setFormSixData] = useState({
     isInformed: null,
@@ -49,7 +51,7 @@ const StepSeven: React.FC<StepperProps> = ({
       !formSixData.isHarmfulCategory ||
       !formSixData.hadPersistentFever
     )
-      newErrors.isEmpty = "Please select an option.";
+      newErrors.isEmpty = t("error_message");
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -83,7 +85,7 @@ const StepSeven: React.FC<StepperProps> = ({
           <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg">
             <div className="mb-6 p-4 bg-red-200 rounded-lg">
               <p className="text-red-700 font-semibold font-opensans">
-                Important!
+                {t("important_title")}
               </p>
             </div>
             <div className="mt-4 space-y-6">
@@ -92,33 +94,18 @@ const StepSeven: React.FC<StepperProps> = ({
                   htmlFor="donatedBefore"
                   className="block mb-2 text-md font-medium text-indigo-900"
                 >
-                  1.) Do you know that people of following categories should not
-                  give blood?
+                  {t("q1_label")}
                 </Label>
               </div>
               <div className="w-full">
                 <ul className="list-disc pl-5 text-gray-800">
-                  <li>
-                    If you were found to be positive for HIV, Hepatitis B, C or
-                    Syphilis infections at any time
-                  </li>
-                  <li>If you have had multiple sexual partners</li>
-                  <li>
-                    If you have ever engaged in male to male sexual activity
-                  </li>
-                  <li>
-                    If you have ever injected any drug (esp.Narcotics) not
-                    prescribed by a qualified medical practitioner
-                  </li>
-                  <li>If you have ever worked as a commercial sex worker</li>
-                  <li>
-                    If you have had sex with a commercial sex worker or an
-                    unknown partner during last 1 year
-                  </li>
-                  <li>
-                    If you suspect that you or your partner may have got HIV or
-                    any other sexually transmitted infection
-                  </li>
+                  <li>{t("q1_list_1")}</li>
+                  <li>{t("q1_list_2")}</li>
+                  <li>{t("q1_list_3")}</li>
+                  <li>{t("q1_list_4")}</li>
+                  <li>{t("q1_list_5")}</li>
+                  <li>{t("q1_list_6")}</li>
+                  <li>{t("q1_list_7")}</li>
                 </ul>
                 <div className="mt-4 flex items-center space-x-4">
                   <label className="flex items-center">
@@ -130,7 +117,7 @@ const StepSeven: React.FC<StepperProps> = ({
                       onChange={handleRadioChange("isInformed")}
                       className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
-                    Yes
+                    {t("yes")}
                   </label>
                   <label className="flex items-center">
                     <input
@@ -141,7 +128,7 @@ const StepSeven: React.FC<StepperProps> = ({
                       onChange={handleRadioChange("isInformed")}
                       className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
-                    No
+                    {t("no")}
                   </label>
                   {errors.isEmpty && (
                     <div className="text-red-500 text-sm">{errors.isEmpty}</div>
@@ -155,8 +142,7 @@ const StepSeven: React.FC<StepperProps> = ({
                     htmlFor="donatedBefore"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    2.) Do you or your sexual partner belong to one of the above
-                    categories?
+                    {t("q2_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -168,7 +154,7 @@ const StepSeven: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isHarmfulCategory")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -179,7 +165,7 @@ const StepSeven: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("isHarmfulCategory")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("no")}
                     </label>
                     {errors.isEmpty && (
                       <div className="text-red-500 text-sm">
@@ -196,8 +182,7 @@ const StepSeven: React.FC<StepperProps> = ({
                     htmlFor="donatedBefore"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    3.) Are you having persistent fever, diarrhoea, multiple
-                    swollen lymph nodes or unintentional weight loss?
+                    {t("q3_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -209,7 +194,7 @@ const StepSeven: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadPersistentFever")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -220,7 +205,7 @@ const StepSeven: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadPersistentFever")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("no")}
                     </label>
                     {errors.isEmpty && (
                       <div className="text-red-500 text-sm">
@@ -237,11 +222,11 @@ const StepSeven: React.FC<StepperProps> = ({
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               {showErrorMessage && (
                 <p className="text-red-500 text-sm mt-2">
-                  Please fill all required fields.
+                  {t("error_all_fields")}
                 </p>
               )}
 
@@ -249,7 +234,7 @@ const StepSeven: React.FC<StepperProps> = ({
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>

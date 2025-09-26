@@ -1,0 +1,15 @@
+{
+  "section_title": "During past 12 months",
+  "q1_label": "1.) Have you received any vaccination?",
+  "q2_label": "2.) Have you had tattooing, ear/body piercing or acupuncture treatement?",
+  "q3_label": "3.) Have you been imprisoned for any reason?",
+  "q4_label": "4.) Have you or your partner travelled abroad?",
+  "q5_label": "5.) Have you or your partner received blood or blood products?",
+  "q6_label": "6.) Have you had Malaria or taken treatment for Malaria?",
+  "yes": "Yes",
+  "no": "No",
+  "error_message": "Please select an option.",
+  "error_all_fields": "Please fill all required fields.",
+  "back_button": "Back",
+  "next_button": "Next"
+}

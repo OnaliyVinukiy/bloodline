@@ -1,0 +1,12 @@
+{
+  "q1_label": "1.) During last 6 months, have you had Dengue fever?",
+  "q2_label": "2.) During last 1 month, have you had Chicken Pox, Measles, Mumps, Rubella, Diarrhoea or any other long standing(more than one week) fever?",
+  "q3_label": "3.) During last 1 week, have you had a dental extraction?",
+  "q4_label": "4.) During last 1 week, have you taken Aspirin, Antibiotics or any other medicine?",
+  "yes": "Yes",
+  "no": "No",
+  "error_message": "Please select an option.",
+  "error_all_fields": "Please fill all required fields.",
+  "back_button": "Back",
+  "next_button": "Next"
+}

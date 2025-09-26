@@ -1,0 +1,9 @@
+{
+  "q1_label": "1.) Have you ever had Jaundice/Hepatitis in the past?",
+  "q2_label": "2.) During last 2 years, have you had Tuberculosis or Typhoid or taken treatment for them?",
+  "yes": "Yes",
+  "no": "No",
+  "back_button": "Back",
+  "next_button": "Next",
+  "error_message": "Please fill all required fields."
+}
