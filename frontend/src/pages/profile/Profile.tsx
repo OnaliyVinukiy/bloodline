@@ -14,8 +14,10 @@ import { Datepicker } from "flowbite-react";
 import { User, Donor } from "../../types/users";
 import { ValidationModal } from "../../components/ValidationModal";
 import { validatePhoneNumber } from "../../utils/ValidationsUtils";
+import { useTranslation } from "react-i18next";
 
 export default function Profile() {
+  const { t } = useTranslation(["profile", "profilePage", "common"]);
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,7 +34,6 @@ export default function Profile() {
   const [isRequestingOtp, setIsRequestingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
 
-  // New state for unsubscription
   const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false);
   const [isUnsubscribing, setIsUnsubscribing] = useState(false);
 
@@ -96,7 +97,6 @@ export default function Profile() {
       : "http://localhost:5000";
 
   const transformPhoneNumber = (phone: string): string => {
-    // Remove leading 0 and add 94 prefix
     if (phone.startsWith("0")) {
       return "94" + phone.substring(1);
     }
@@ -117,13 +117,11 @@ export default function Profile() {
 
           setUser(userInfo);
 
-          // Set email when user info is fetched
           setDonor((prev) => ({
             ...prev,
             email: userInfo.email || "",
           }));
 
-          // Fetch donor info if user exists
           const { data: donorInfo } = await axios.get(
             `${backendURL}/api/donor/${userInfo.email}`
           );
@@ -208,16 +206,16 @@ export default function Profile() {
   const handleRequestOtp = async () => {
     if (!donor.contactNumber) {
       showValidationMessage(
-        "Missing Phone Number",
-        "Please add a valid phone number before subscribing to notifications."
+        t("validation_missing_phone", { ns: "profilePage" }),
+        t("validation_missing_phone_content", { ns: "profilePage" })
       );
       return;
     }
 
     if (!validatePhoneNumber(donor.contactNumber)) {
       showValidationMessage(
-        "Invalid Phone Number",
-        "Please enter a valid 10-digit phone number starting with 0."
+        t("validation_invalid_phone", { ns: "profilePage" }),
+        t("validation_invalid_phone_content", { ns: "profilePage" })
       );
       return;
     }
@@ -263,7 +261,6 @@ export default function Profile() {
       if (response.data.success) {
         setSubscriptionStatus("success");
 
-        // Update donor record with subscription status
         const updatedDonor = {
           ...donor,
           isSubscribed: true,
@@ -271,7 +268,6 @@ export default function Profile() {
 
         setDonor(updatedDonor);
 
-        // Update the donor record in the database
         await axios.post(`${backendURL}/api/update-donor`, updatedDonor);
       } else {
         setSubscriptionStatus("error");
@@ -287,7 +283,6 @@ export default function Profile() {
   const handleUnsubscribe = async () => {
     setIsUnsubscribing(true);
     try {
-      // Call the new backend unsubscribe endpoint
       const response = await axios.post(
         `${backendURL}/subscription/unsubscribe`,
         {
@@ -296,7 +291,6 @@ export default function Profile() {
       );
 
       if (response.data.success) {
-        // Update the local state to reflect the unsubscription
         const updatedDonor = {
           ...donor,
           isSubscribed: false,
@@ -304,27 +298,29 @@ export default function Profile() {
         };
         setDonor(updatedDonor);
 
-        // Close the modal and show a success message
         setShowUnsubscribeModal(false);
         showValidationMessage(
-          "Unsubscribed Successfully",
-          "You have been unsubscribed from SMS notifications."
+          t("unsub_success_title", { ns: "profilePage" }),
+          t("unsub_success_content", { ns: "profilePage" })
         );
       } else {
-        showValidationMessage("Unsubscription Failed", response.data.error);
+        showValidationMessage(
+          t("unsub_fail_title", { ns: "profilePage" }),
+          response.data.error
+        );
       }
     } catch (error) {
       console.error("Error during unsubscription:", error);
       showValidationMessage(
-        "Unsubscription Failed",
-        "An error occurred while trying to unsubscribe. Please try again."
+        t("unsub_fail_title", { ns: "profilePage" }),
+        t("unsub_fail_content_generic", { ns: "profilePage" })
       );
     } finally {
       setIsUnsubscribing(false);
     }
   };
 
-  //Fetch districts list
+  //Fetch cities list
   const fetchCities = async (districtName: string) => {
     try {
       const response = await fetch(
@@ -347,7 +343,6 @@ export default function Profile() {
       const file = event.target.files[0];
       setSelectedFile(file);
 
-      // Create an object URL for image preview
       const imageUrl = URL.createObjectURL(file);
       setDonor((prev) => ({ ...prev, avatar: imageUrl }));
     }
@@ -368,13 +363,12 @@ export default function Profile() {
         { headers: { "Content-Type": "multipart/form-data" } }
       );
 
-      // Update the donor record with new avatar URL
       setDonor((prev) => ({ ...prev, avatar: data.avatarUrl }));
 
       setShowAvatarUpdateModel(true);
     } catch (error) {
       console.error("Error uploading avatar:", error);
-      alert("Error updating avatar.");
+      alert(t("error_updating_profile_alert", { ns: "profile" }));
     } finally {
       setIsUploading(false);
       window.location.reload();
@@ -401,39 +395,34 @@ export default function Profile() {
   const handleUpdate = async () => {
     if (!user || !donor) return;
 
-    // Calculate age from birthdate
     const age = calculateAge(donor.birthdate);
 
-    // Check if the user is under 18
     if (age < 18) {
       showValidationMessage(
-        "Age Restriction",
-        "You cannot register as a donor unless you are aged 18 or above."
+        t("age_restriction_title", { ns: "profile" }),
+        t("age_restriction_content", { ns: "profile" })
       );
       return;
     }
 
-    // Check if the phone number is valid
     if (!validatePhoneNumber(donor.contactNumber)) {
       showValidationMessage(
-        "Invalid Contact Number",
-        "Please enter a valid 10-digit phone number."
+        t("contact_number_invalid_title", { ns: "profile" }),
+        t("contact_number_invalid_content", { ns: "profile" })
       );
       return;
     }
     try {
       setLoading(true);
 
-      // Check if donor with this NIC already exists
       const { data: existingDonor } = await axios.get(
         `${backendURL}/api/donor/nic/${donor.nic}`
       );
 
-      // If donor exists and it's not the current user
       if (existingDonor && existingDonor.email !== user.email) {
         showValidationMessage(
-          "Already Registered",
-          "A donor with this NIC is already registered in the system."
+          t("already_registered_title", { ns: "profile" }),
+          t("already_registered_content", { ns: "profile" })
         );
         setLoading(false);
         return;
@@ -506,7 +495,7 @@ export default function Profile() {
     return (
       <div className="flex justify-center items-center h-screen">
         <p className="text-lg text-gray-700">
-          Please login to view profile data
+          {t("login_message", { ns: "profile" })}
         </p>
       </div>
     );
@@ -519,12 +508,14 @@ export default function Profile() {
           {!isProfileComplete ? (
             <div className="mb-6 p-4 bg-yellow-100 rounded-lg">
               <p className="text-yellow-700">
-                Please complete your profile to register as a donor.
+                {t("complete_profile_modal_content", { ns: "profile" })}
               </p>
             </div>
           ) : (
             <div className="mb-6 p-4 bg-yellow-100 rounded-lg">
-              <p className="text-yellow-700">You are registered as a donor.</p>
+              <p className="text-yellow-700">
+                {t("registered_message", { ns: "profile" })}
+              </p>
             </div>
           )}
 
@@ -557,7 +548,7 @@ export default function Profile() {
                   onClick={() => document.getElementById("avatar")?.click()}
                   className="px-4 py-2 text-sm text-indigo-600 hover:text-indigo-800"
                 >
-                  Change Avatar
+                  {t("change_avatar", { ns: "profile" })}
                 </button>
                 {selectedFile && (
                   <button
@@ -565,7 +556,9 @@ export default function Profile() {
                     className="ml-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
                     disabled={isUploading}
                   >
-                    {isUploading ? "Uploading..." : "Upload"}
+                    {isUploading
+                      ? t("uploading", { ns: "profile" })
+                      : t("upload", { ns: "profile" })}
                   </button>
                 )}
               </div>
@@ -578,7 +571,7 @@ export default function Profile() {
                   htmlFor="first_name"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  First Name
+                  {t("first_name_label", { ns: "profile" })}
                 </Label>
                 <input
                   type="text"
@@ -593,7 +586,7 @@ export default function Profile() {
                   htmlFor="first_name"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  Last Name
+                  {t("last_name_label", { ns: "profile" })}
                 </Label>
                 <input
                   type="text"
@@ -609,7 +602,7 @@ export default function Profile() {
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
                   {" "}
-                  Email
+                  {t("email_label", { ns: "profile" })}
                 </Label>
                 <input
                   type="email"
@@ -625,7 +618,7 @@ export default function Profile() {
                 className="block mb-2 text-sm font-medium text-indigo-900"
               >
                 {" "}
-                Full Name (As in NIC)
+                {t("full_name_label", { ns: "profile" })}
               </Label>
               <input
                 type="text"
@@ -641,7 +634,7 @@ export default function Profile() {
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
                   {" "}
-                  NIC
+                  {t("nic_label", { ns: "profile" })}
                 </Label>
                 <input
                   type="text"
@@ -656,7 +649,7 @@ export default function Profile() {
                   htmlFor="gender"
                   className="mt-1 block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  Gender
+                  {t("gender_label", { ns: "profile" })}
                 </Label>
                 <div className="mt-4 flex items-center">
                   <input
@@ -674,7 +667,7 @@ export default function Profile() {
                     htmlFor="male"
                     className="mr-4 text-sm text-indigo-900"
                   >
-                    Male
+                    {t("gender_male", { ns: "profile" })}
                   </Label>
 
                   <input
@@ -689,7 +682,7 @@ export default function Profile() {
                     className="mr-2"
                   />
                   <Label htmlFor="female" className="text-sm text-indigo-900">
-                    Female
+                    {t("gender_female", { ns: "profile" })}
                   </Label>
                 </div>
               </div>
@@ -702,7 +695,7 @@ export default function Profile() {
                   htmlFor="province"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  Province
+                  {t("province_label", { ns: "profile" })}
                 </Label>
                 <select
                   id="province"
@@ -710,7 +703,9 @@ export default function Profile() {
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                   onChange={handleProvinceChange}
                 >
-                  <option value="">Select a province</option>
+                  <option value="">
+                    {t("select_province", { ns: "profile" })}
+                  </option>
                   {province.map((prov) => (
                     <option
                       key={prov.province_id}
@@ -727,7 +722,7 @@ export default function Profile() {
                   htmlFor="district"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  District
+                  {t("district_label", { ns: "profile" })}
                 </Label>
                 <select
                   id="district"
@@ -735,7 +730,9 @@ export default function Profile() {
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                   onChange={handleDistrictChange}
                 >
-                  <option value="">Select a district</option>
+                  <option value="">
+                    {t("select_district", { ns: "profile" })}
+                  </option>
                   {district.length > 0 ? (
                     district.map((districtItem) => (
                       <option
@@ -746,7 +743,9 @@ export default function Profile() {
                       </option>
                     ))
                   ) : (
-                    <option value="">Please select a province first</option>
+                    <option value="">
+                      {t("select_province_first", { ns: "profile" })}
+                    </option>
                   )}
                 </select>
               </div>
@@ -756,7 +755,7 @@ export default function Profile() {
                   htmlFor="city"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  City
+                  {t("city_label", { ns: "profile" })}
                 </Label>
                 <select
                   id="city"
@@ -764,7 +763,9 @@ export default function Profile() {
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                   onChange={handleCityChange}
                 >
-                  <option value="">Select a city</option>
+                  <option value="">
+                    {t("select_city", { ns: "profile" })}
+                  </option>
                   {city.length > 0 ? (
                     city.map((cityItem) => (
                       <option
@@ -775,7 +776,9 @@ export default function Profile() {
                       </option>
                     ))
                   ) : (
-                    <option value="">Please select a district first</option>
+                    <option value="">
+                      {t("select_district_first", { ns: "profile" })}
+                    </option>
                   )}
                 </select>
               </div>
@@ -785,7 +788,7 @@ export default function Profile() {
                 htmlFor="first_name"
                 className="block mb-2 text-sm font-medium text-indigo-900"
               >
-                Address
+                {t("address_label", { ns: "profile" })}
               </Label>
               <input
                 type="text"
@@ -801,7 +804,7 @@ export default function Profile() {
                 className="block mb-2 text-sm font-medium text-indigo-900"
               >
                 {" "}
-                Contact Number
+                {t("contact_number_label", { ns: "profile" })}
               </Label>
               <input
                 type="text"
@@ -813,7 +816,7 @@ export default function Profile() {
               />
               {!isPhoneNumberValid && (
                 <p className="text-sm text-red-500 mt-1">
-                  Please enter a valid 10-digit phone number starting from 0.
+                  {t("contact_number_invalid", { ns: "profile" })}
                 </p>
               )}
             </div>
@@ -823,7 +826,7 @@ export default function Profile() {
                 htmlFor="first_name"
                 className="block mb-2 text-sm font-medium text-indigo-900"
               >
-                Blood Group
+                {t("blood_group_label", { ns: "profile" })}
               </Label>
               <select
                 value={donor?.bloodGroup || ""}
@@ -832,7 +835,9 @@ export default function Profile() {
                 }
                 className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
               >
-                <option value="">Select Blood Group</option>
+                <option value="">
+                  {t("select_blood_group", { ns: "profile" })}
+                </option>
                 <option value="A+">A+</option>
                 <option value="A-">A-</option>
                 <option value="B+">B+</option>
@@ -849,7 +854,7 @@ export default function Profile() {
                 htmlFor="first_name"
                 className="block mb-2 text-sm font-medium text-indigo-900"
               >
-                Date of Birth
+                {t("date_of_birth_label", { ns: "profile" })}
               </Label>
               <Datepicker
                 value={donor?.birthdate ? new Date(donor.birthdate) : undefined}
@@ -874,7 +879,7 @@ export default function Profile() {
                   htmlFor="first_name"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
-                  Age
+                  {t("age_label", { ns: "profile" })}
                 </Label>
                 <input
                   type="text"
@@ -887,7 +892,7 @@ export default function Profile() {
             {/* Subscription Section */}
             <div className="mt-6 p-4 border rounded-lg">
               <h3 className="text-lg font-medium text-indigo-900 mb-4">
-                SMS Notifications
+                {t("sms_notifications_title", { ns: "profilePage" })}
               </h3>
 
               <div className="flex items-center mb-4">
@@ -908,13 +913,14 @@ export default function Profile() {
                   htmlFor="sms-subscription"
                   className="text-sm text-indigo-900"
                 >
-                  Subscribe to receive SMS notifications about your blood
-                  donation appointments.(Subscription fee: Rs.30 per month)
+                  {t("subscription_checkbox_label", { ns: "profilePage" })}
                 </Label>
               </div>
 
               {donor.isSubscribed && donor.maskedNumber && (
-                <p className="text-sm text-green-600">Already Subscribed!</p>
+                <p className="text-sm text-green-600">
+                  {t("subscribed_message", { ns: "profilePage" })}
+                </p>
               )}
             </div>
 
@@ -943,12 +949,12 @@ export default function Profile() {
                         fill="currentColor"
                       />
                     </svg>
-                    Updating...
+                    {t("updating_status", { ns: "profile" })}
                   </>
                 ) : isProfileComplete ? (
-                  "Update Profile"
+                  t("update_profile", { ns: "profile" })
                 ) : (
-                  "Complete Profile"
+                  t("complete_profile", { ns: "profile" })
                 )}
               </button>
             </div>
@@ -979,12 +985,12 @@ export default function Profile() {
                 d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"
               />
             </svg>
-            Registered Successfully!
+            {t("registered_successfully_title", { ns: "profile" })}
           </p>
         </Modal.Header>
         <Modal.Body>
           <p className="text-lg text-gray-700">
-            You got successfully registered as a blood donor.
+            {t("registered_successfully_content", { ns: "profile" })}
           </p>
         </Modal.Body>
         <Modal.Footer className="flex justify-end">
@@ -992,7 +998,7 @@ export default function Profile() {
             color="failure"
             onClick={() => setShowRegistrationModal(false)}
           >
-            OK
+            {t("ok_button", { ns: "profile" })}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -1017,30 +1023,30 @@ export default function Profile() {
                 d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"
               />
             </svg>
-            Details Updated Successfully!
+            {t("details_updated_successfully_title", { ns: "profile" })}
           </p>
         </Modal.Header>
         <Modal.Body>
           <p className="text-lg text-gray-700">
-            Your donor details are updated successfully.
+            {t("details_updated_successfully_content", { ns: "profile" })}
           </p>
         </Modal.Body>
         <Modal.Footer className="flex justify-end">
           <Button color="failure" onClick={() => setShowUpdateModal(false)}>
-            OK
+            {t("ok_button", { ns: "profile" })}
           </Button>
         </Modal.Footer>
       </Modal>
       <Modal show={showErrorModal} onClose={() => setErrorModal(false)}>
-        <Modal.Header>Oops an Error!</Modal.Header>
+        <Modal.Header>{t("error_modal_title", { ns: "profile" })}</Modal.Header>
         <Modal.Body>
           <p className="text-lg text-gray-700">
-            Error updating the profile. Please try again shortly.
+            {t("error_modal_content", { ns: "profile" })}
           </p>
         </Modal.Body>
         <Modal.Footer className="flex justify-end">
           <Button color="failure" onClick={() => setErrorModal(false)}>
-            OK
+            {t("ok_button", { ns: "profile" })}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -1049,10 +1055,12 @@ export default function Profile() {
         show={showProfileIncompleteModal}
         onClose={() => setShowProfileIncompleteModal(false)}
       >
-        <Modal.Header>Complete Your Profile</Modal.Header>
+        <Modal.Header>
+          {t("complete_profile_modal_title", { ns: "profile" })}
+        </Modal.Header>
         <Modal.Body>
           <p className="text-lg text-gray-700">
-            Please complete your profile to register as a donor.
+            {t("complete_profile_modal_content", { ns: "profile" })}
           </p>
         </Modal.Body>
         <Modal.Footer className="flex justify-end">
@@ -1060,7 +1068,7 @@ export default function Profile() {
             color="failure"
             onClick={() => setShowProfileIncompleteModal(false)}
           >
-            OK
+            {t("ok_button", { ns: "profile" })}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -1089,12 +1097,12 @@ export default function Profile() {
                 d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"
               />
             </svg>
-            Uploaded Successfully!
+            {t("uploaded_successfully_title", { ns: "profile" })}
           </p>
         </Modal.Header>
         <Modal.Body>
           <p className="text-lg text-gray-700">
-            Your profile picture got uploaded successfully.
+            {t("uploaded_successfully_content", { ns: "profile" })}
           </p>
         </Modal.Body>
         <Modal.Footer className="flex justify-end">
@@ -1102,7 +1110,7 @@ export default function Profile() {
             color="failure"
             onClick={() => setShowAvatarUpdateModel(false)}
           >
-            OK
+            {t("ok_button", { ns: "profile" })}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -1120,13 +1128,15 @@ export default function Profile() {
         show={showSubscriptionModal}
         onClose={() => setShowSubscriptionModal(false)}
       >
-        <Modal.Header>Subscribe to SMS Notifications</Modal.Header>
+        <Modal.Header>
+          {t("subscribe_modal_title", { ns: "profilePage" })}
+        </Modal.Header>
         <Modal.Body>
           <div className="space-y-4">
             {subscriptionStatus === "" && (
               <>
                 <p className="text-gray-700">
-                  You'll receive an OTP to your phone number:{" "}
+                  {t("subscribe_modal_phone_prefix", { ns: "profilePage" })}{" "}
                   {donor.contactNumber}
                 </p>
                 <Button
@@ -1134,7 +1144,9 @@ export default function Profile() {
                   disabled={isRequestingOtp}
                   className="w-full"
                 >
-                  {isRequestingOtp ? "Sending OTP..." : "Send OTP"}
+                  {isRequestingOtp
+                    ? t("sending_otp", { ns: "profilePage" })
+                    : t("request_otp_button", { ns: "profilePage" })}
                 </Button>
               </>
             )}
@@ -1142,13 +1154,13 @@ export default function Profile() {
             {subscriptionStatus === "otp_sent" && (
               <>
                 <p className="text-gray-700">
-                  Enter the OTP sent to your phone number
+                  {t("otp_sent_message", { ns: "profilePage" })}
                 </p>
                 <input
                   type="text"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
-                  placeholder="Enter OTP"
+                  placeholder={t("otp_placeholder", { ns: "profilePage" })}
                   className="w-full p-2 border rounded"
                 />
                 <Button
@@ -1156,7 +1168,9 @@ export default function Profile() {
                   disabled={isVerifyingOtp || otp.length < 4}
                   className="w-full"
                 >
-                  {isVerifyingOtp ? "Verifying..." : "Verify OTP"}
+                  {isVerifyingOtp
+                    ? t("verifying_otp", { ns: "profilePage" })
+                    : t("verify_otp_button", { ns: "profilePage" })}
                 </Button>
               </>
             )}
@@ -1176,13 +1190,15 @@ export default function Profile() {
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   ></path>
                 </svg>
-                <p>Successfully subscribed to SMS notifications!</p>
+                <p>
+                  {t("subscription_success_message", { ns: "profilePage" })}
+                </p>
               </div>
             )}
 
             {subscriptionStatus === "error" && (
               <div className="text-red-600 text-center">
-                <p>Failed to subscribe. Please try again.</p>
+                <p>{t("subscription_fail_message", { ns: "profilePage" })}</p>
               </div>
             )}
           </div>
@@ -1190,7 +1206,7 @@ export default function Profile() {
         <Modal.Footer>
           {subscriptionStatus === "success" && (
             <Button onClick={() => setShowSubscriptionModal(false)}>
-              Close
+              {t("close_button", { ns: "profilePage" })}
             </Button>
           )}
         </Modal.Footer>
@@ -1200,26 +1216,29 @@ export default function Profile() {
         show={showUnsubscribeModal}
         onClose={() => setShowUnsubscribeModal(false)}
       >
-        <Modal.Header>Unsubscribe from SMS Notifications</Modal.Header>
+        <Modal.Header>
+          {t("unsubscribe_modal_title", { ns: "profilePage" })}
+        </Modal.Header>
         <Modal.Body>
           <p className="text-lg text-gray-700">
-            Are you sure you want to unsubscribe from SMS notifications?
+            {t("unsubscribe_confirm_message", { ns: "profilePage" })}
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            You will no longer receive important updates about blood donation
-            appointments.
+            {t("unsubscribe_warning_message", { ns: "profilePage" })}
           </p>
         </Modal.Body>
         <Modal.Footer className="flex justify-end space-x-4">
           <Button color="gray" onClick={() => setShowUnsubscribeModal(false)}>
-            Cancel
+            {t("cancel_button", { ns: "profilePage" })}
           </Button>
           <Button
             color="failure"
             onClick={handleUnsubscribe}
             disabled={isUnsubscribing}
           >
-            {isUnsubscribing ? "Unsubscribing..." : "Unsubscribe"}
+            {isUnsubscribing
+              ? t("unsubscribing", { ns: "profilePage" })
+              : t("unsubscribe_button", { ns: "profilePage" })}
           </Button>
         </Modal.Footer>
       </Modal>
