@@ -11,6 +11,7 @@ import { StepperPropsCamps } from "../../../../types/stepper";
 import { Label, Modal } from "flowbite-react";
 import DatePicker from "react-datepicker";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 const StepEleven: React.FC<
   StepperPropsCamps & {
@@ -31,6 +32,7 @@ const StepEleven: React.FC<
   endTime,
   setEndTime,
 }) => {
+  const { t, i18n } = useTranslation("campBooking");
   const [loading, setLoading] = useState(false);
   const [availabilityMessage, setAvailabilityMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -77,14 +79,14 @@ const StepEleven: React.FC<
         setIsFullyBooked(isFullyBooked);
 
         if (isFullyBooked) {
-          setAvailabilityMessage(
-            "All medical teams are allocated on this day. Please select another date."
-          );
+          setAvailabilityMessage(t("modal_message_error"));
           setModalType("error");
           setShowModal(true);
         } else if (hasPendingCamps) {
           setAvailabilityMessage(
-            `There are pending camps on this day. ${availableTeams.length} medical team(s) available. Allocation will be on a first-come basis.`
+            `${t("modal_message_warning_part1")} ${availableTeams.length} ${t(
+              "modal_message_warning_part2"
+            )}`
           );
           setModalType("warning");
           setShowModal(true);
@@ -95,12 +97,12 @@ const StepEleven: React.FC<
         setAvailabilityChecked(true);
       } else {
         throw new Error(
-          response.data.message || "Failed to check availability"
+          response.data.message || t("failed_to_check_availability")
         );
       }
     } catch (error) {
       console.error("Error fetching camps:", error);
-      setAvailabilityMessage("Error checking date availability");
+      setAvailabilityMessage(t("error_checking_availability"));
       setModalType("error");
       setShowModal(true);
       setIsFullyBooked(false);
@@ -118,7 +120,7 @@ const StepEleven: React.FC<
     end.setHours(14, 0, 0, 0);
 
     while (start <= end) {
-      const time = start.toLocaleTimeString([], {
+      const time = start.toLocaleTimeString(i18n.language, {
         hour: "2-digit",
         minute: "2-digit",
         hour12: true,
@@ -139,7 +141,7 @@ const StepEleven: React.FC<
     end.setHours(15, 0, 0, 0);
 
     while (start <= end) {
-      const time = start.toLocaleTimeString([], {
+      const time = start.toLocaleTimeString(i18n.language, {
         hour: "2-digit",
         minute: "2-digit",
         hour12: true,
@@ -184,7 +186,9 @@ const StepEleven: React.FC<
                   d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                 />
               </svg>
-              {modalType === "error" ? "No Available Teams" : "Pending Camps"}
+              {modalType === "error"
+                ? t("modal_title_error")
+                : t("modal_title_warning")}
             </p>
           </Modal.Header>
           <Modal.Body>
@@ -195,7 +199,7 @@ const StepEleven: React.FC<
               className="bg-red-800 ml-auto hover:bg-red-700 text-white font-medium rounded-lg px-5 py-2.5"
               onClick={() => setShowModal(false)}
             >
-              OK
+              {t("modal_button_ok")}
             </button>
           </Modal.Footer>
         </Modal>
@@ -224,18 +228,18 @@ const StepEleven: React.FC<
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Book a Slot for the Blood Donation Camp
+                  {t("title")}
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
-                Every drop counts. Let's make a difference together!
+                {t("subtitle")}
               </div>
             </div>
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 space-y-6">
                 <div className="mb-6 p-4 bg-yellow-100 rounded-lg">
                   <p className="text-yellow-800 font-opensans font-semibold">
-                    Pick a date and time slot for the blood donation camp
+                    {t("info_message")}
                   </p>
                 </div>
 
@@ -245,7 +249,7 @@ const StepEleven: React.FC<
                       htmlFor="date"
                       className="block mb-2 text-md font-semibold font-opensans"
                     >
-                      Select a Date
+                      {t("date_label")}
                     </Label>
                     <DatePicker
                       selected={selectedDate}
@@ -293,7 +297,7 @@ const StepEleven: React.FC<
                           htmlFor="start-time"
                           className="block mb-2 text-md font-semibold font-opensans"
                         >
-                          Select Start Time
+                          {t("start_time_label")}
                         </Label>
                         <select
                           id="start-time"
@@ -302,7 +306,7 @@ const StepEleven: React.FC<
                           className="bg-indigo-50 border border-indigo-300 text-indigo-900 rounded-lg p-2 w-full"
                         >
                           <option value="" disabled>
-                            Choose a start time
+                            {t("start_time_placeholder")}
                           </option>
                           {startTimeSlots.map((slot, index) => (
                             <option key={index} value={slot}>
@@ -316,7 +320,7 @@ const StepEleven: React.FC<
                           htmlFor="end-time"
                           className="block mb-2 text-md font-semibold font-opensans"
                         >
-                          Select End Time
+                          {t("end_time_label")}
                         </Label>
                         <select
                           id="end-time"
@@ -325,7 +329,7 @@ const StepEleven: React.FC<
                           className="bg-indigo-50 border border-indigo-300 text-indigo-900 rounded-lg p-2 w-full"
                         >
                           <option value="" disabled>
-                            Choose an end time
+                            {t("end_time_placeholder")}
                           </option>
                           {endTimeSlots.map((slot, index) => (
                             <option key={index} value={slot}>
@@ -345,7 +349,7 @@ const StepEleven: React.FC<
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               <button
                 onClick={handleNext}
@@ -366,7 +370,7 @@ const StepEleven: React.FC<
                   !availabilityChecked
                 }
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>
