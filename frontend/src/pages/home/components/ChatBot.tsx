@@ -8,6 +8,7 @@
 import { useState, useRef, useEffect } from "react";
 import { FaCommentAlt, FaTimes, FaPaperPlane } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { useAuthContext } from "@asgardeo/auth-react";
 
 type Message = {
   id: string;
@@ -19,6 +20,7 @@ type Message = {
 const Chatbot = () => {
   const { t } = useTranslation("chatbot");
   const [isOpen, setIsOpen] = useState(false);
+  const { getBasicUserInfo } = useAuthContext();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -42,6 +44,8 @@ const Chatbot = () => {
   const handleSendMessage = async () => {
     if (inputValue.trim() === "") return;
 
+    const userInfo = await getBasicUserInfo();
+    const userEmail = userInfo.email;
     // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -69,6 +73,7 @@ const Chatbot = () => {
         },
         body: JSON.stringify({
           message: inputValue,
+          email: userEmail,
         }),
       });
 
