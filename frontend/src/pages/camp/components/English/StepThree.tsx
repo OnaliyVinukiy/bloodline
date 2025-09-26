@@ -8,11 +8,14 @@
 
 import React from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
+import { useTranslation } from "react-i18next";
 
 const StepThree: React.FC<StepperPropsCamps> = ({
   onNextStep,
   onPreviousStep,
 }) => {
+  const { t } = useTranslation("campTime");
+
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
@@ -50,26 +53,24 @@ const StepThree: React.FC<StepperPropsCamps> = ({
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Selecting a Time for the Blood Donation Camp
+                  {t("title")}
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
-                Every drop counts. Let’s make a difference together!
+                {t("subtitle")}
               </div>
             </div>
 
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                A blood donation camp is normally held from{" "}
-                <strong className="text-red-700">9:00 AM to 3:00 PM.</strong>{" "}
-                This time frame ensures that the collected blood can be properly
-                processed. Once donated, blood must be separated into blood
-                constituents within six hours. Therefore, blood donation camps
-                cannot exceed this time limit.
+                {t("description_part1")}
+                <strong className="text-red-700">
+                  {t("description_part2")}
+                </strong>
+                {t("description_part3")}
                 <br />
                 <br />
-                Planning your camp within this time frame helps ensure that
-                every donation makes the maximum impact in saving lives!
+                {t("description_part4")}
               </div>
             </div>
 
@@ -78,13 +79,13 @@ const StepThree: React.FC<StepperPropsCamps> = ({
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               <button
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>

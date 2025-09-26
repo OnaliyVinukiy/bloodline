@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import StepperEnglish from "./components/English/Stepper";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { startTransition } from "react";
 
 const BloodCampRegistration = () => {
   const [step, setStep] = useState(1);
@@ -21,12 +22,16 @@ const BloodCampRegistration = () => {
 
   //Handle next button
   const handleNextStep = () => {
-    setStep((prevStep) => prevStep + 1);
+    startTransition(() => {
+      setStep((prevStep) => prevStep + 1);
+    });
   };
 
   //Handle back button
   const handlePreviousStep = () => {
-    setStep((prevStep) => Math.max(prevStep - 1, 1));
+    startTransition(() => {
+      setStep((prevStep) => Math.max(prevStep - 1, 1));
+    });
   };
 
   return (

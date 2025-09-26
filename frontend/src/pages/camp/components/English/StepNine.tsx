@@ -8,11 +8,14 @@
 
 import React from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
+import { useTranslation } from "react-i18next";
 
 const StepNine: React.FC<StepperPropsCamps> = ({
   onNextStep,
   onPreviousStep,
 }) => {
+  const { t } = useTranslation("campActivities");
+
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
@@ -50,38 +53,60 @@ const StepNine: React.FC<StepperPropsCamps> = ({
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Organizing Activities of the Blood Donation Camp
+                  {t("title")}
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
-                Every drop counts. Let’s make a difference together!
+                {t("subtitle")}
               </div>
             </div>
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
                 <ul className="list-disc pl-6 mt-6 space-y-4">
                   <li>
-                    Organizers should ensure a{" "}
-                    <strong className="text-red-700">calm and safe environment</strong> at the blood donation camp.
+                    {t("list_item_1")}
+                    <strong className="text-red-700">
+                      {t("list_item_1_bold")}
+                    </strong>
+                    {t("list_item_1_end")}
                   </li>
                   <li>
-                    The environment should be{" "}
-                    <strong className="text-red-700">free from excessive noise</strong>.
+                    {t("list_item_2")}
+                    <strong className="text-red-700">
+                      {t("list_item_2_bold")}
+                    </strong>
+                    .
                   </li>
                   <li>
-                    Steps should be taken to ensure the{" "}
-                    <strong className="text-red-700">safety of the officers</strong> taking part in the blood donation camp.
+                    {t("list_item_3")}
+                    <strong className="text-red-700">
+                      {t("list_item_3_bold")}
+                    </strong>
+                    {t("list_item_3_end")}
                   </li>
                   <li>
-                    While the organizer of the blood donation camp maintains the connection with the relevant blood bank, the sub-communities under them—such as the{" "}
-                    <strong className="text-red-700">Blood Donor Searching Community</strong>,{" "}
-                    <strong className="text-red-700">Promotion Community</strong>,{" "}
-                    <strong className="text-red-700">Venue Preparation Community</strong>, and{" "}
-                    <strong className="text-red-700">Catering Community</strong>—can take part in organizing the blood donation camp.
+                    {t("list_item_4_part1")}
+                    <strong className="text-red-700">
+                      {t("list_item_4_bold_1")}
+                    </strong>
+                    ,{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_4_bold_2")}
+                    </strong>
+                    ,{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_4_bold_3")}
+                    </strong>
+                    , and{" "}
+                    <strong className="text-red-700">
+                      {t("list_item_4_bold_4")}
+                    </strong>
+                    {t("list_item_4_part2")}
                   </li>
                   <li>
-                    In cases where the number of blood donors exceeds the number we are prepared for at a camp, it may not be possible for the National Blood Transfusion Service to collect blood from everyone. In such a case, the details of those blood donors will be gathered, and blood will be collected from them at a{" "}
-                    <strong className="text-red-700">later time</strong> by the National Blood Transfusion Service. It is important to inform the blood donors and your team about this.
+                    {t("list_item_5")}
+                    <strong className="text-red-700">{t("list_item_5_bold")}</strong>
+                    {t("list_item_5_end")}
                   </li>
                 </ul>
               </div>
@@ -92,13 +117,13 @@ const StepNine: React.FC<StepperPropsCamps> = ({
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               <button
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>

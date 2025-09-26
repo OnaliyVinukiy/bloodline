@@ -1,0 +1,19 @@
+{
+  "title": "Book a Slot for the Blood Donation Camp",
+  "subtitle": "Every drop counts. Let's make a difference together!",
+  "info_message": "Pick a date and time slot for the blood donation camp",
+  "modal_title_error": "No Available Teams",
+  "modal_title_warning": "Pending Camps",
+  "modal_message_error": "All medical teams are allocated on this day. Please select another date.",
+  "modal_message_warning_part1": "There are pending camps on this day.",
+  "modal_message_warning_part2": "medical team(s) available. Allocation will be on a first-come basis.",
+  "modal_button_ok": "OK",
+  "loading_message": "Loading...",
+  "date_label": "Select a Date",
+  "start_time_label": "Select Start Time",
+  "start_time_placeholder": "Choose a start time",
+  "end_time_label": "Select End Time",
+  "end_time_placeholder": "Choose an end time",
+  "back_button": "Back",
+  "next_button": "Next"
+}

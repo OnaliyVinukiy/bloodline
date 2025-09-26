@@ -8,11 +8,14 @@
 
 import React from "react";
 import { StepperPropsCamps } from "../../../../types/stepper";
+import { useTranslation } from "react-i18next";
 
 const StepSeven: React.FC<StepperPropsCamps> = ({
   onNextStep,
   onPreviousStep,
 }) => {
+  const { t } = useTranslation("campSnacks");
+
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onNextStep();
@@ -50,39 +53,37 @@ const StepSeven: React.FC<StepperPropsCamps> = ({
                   />
                 </svg>
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-800">
-                  Snacks and Drinks for Donors
+                  {t("title")}
                 </h2>
               </div>
               <div className="mt-2 text-lg md:text-xl text-gray-600">
-                Every drop counts. Let’s make a difference together!
+                {t("subtitle")}
               </div>
             </div>
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <div className="mt-4 mb-8 font-roboto font-medium text-md md:text-xl text-left text-gray-700 leading-relaxed">
-                It is not advisable to give blood donors a heavy meal. A cool
-                drink such as{" "}
-                <strong className="text-red-700">king coconut</strong> is best.
-                Giving a{" "}
-                <strong className="text-red-700">glass of clean water</strong>{" "}
-                before donating blood can help minimize discomfort
-                such as fainting. <br />
+                {t("description_part1")}
+                <strong className="text-red-700">
+                  {t("description_part2")}
+                </strong>
+                {t("description_part3")}
+                <strong className="text-red-700">
+                  {t("description_part4")}
+                </strong>
+                {t("description_part5")}
                 <br />
-                Also, when providing food and drinks to blood donors, necessary
-                steps should be taken to provide them in a hygienic
-                and safe manner. <br />
-                <br />A blood donation camp becomes successful only if it
-                attended by voluntary blood donors who do not accept any form of
-                benefit in return for their donation. Therefore, the National
-                Blood Transfusion Service{" "}
-                <strong className="text-red-700">does not approve</strong> any
-                form of payment or valuable giftings to blood donors, as the
-                concept of 'Voluntary Blood Donation' cannot be protected
-                through that. <br />
                 <br />
-                However, it is possible to give non-monetary items such as
-                souvenirs and certificates. However, it is not necessary. The
-                most important thing is to donate
-                blood voluntarily and without any expectations.
+                {t("description_part6")}
+                <br />
+                <br />
+                {t("description_part7")}
+                <strong className="text-red-700">
+                  {t("description_part8")}
+                </strong>
+                {t("description_part9")}
+                <br />
+                <br />
+                {t("description_part10")}
               </div>
             </div>
 
@@ -91,13 +92,13 @@ const StepSeven: React.FC<StepperPropsCamps> = ({
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               <button
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>
