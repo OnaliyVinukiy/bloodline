@@ -8,6 +8,7 @@
 import { Label } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { StepperProps } from "../../../types/stepper";
+import { useTranslation } from "react-i18next";
 
 const StepFour: React.FC<StepperProps> = ({
   onNextStep,
@@ -15,7 +16,8 @@ const StepFour: React.FC<StepperProps> = ({
   onFormDataChange,
   formData,
 }) => {
-  //Structure for form data
+  const { t } = useTranslation("donorMedicalHistory");
+
   const [formThreeData, setFormThreeData] = useState({
     hadHepatitis: null,
     hadTyphoid: null,
@@ -26,7 +28,6 @@ const StepFour: React.FC<StepperProps> = ({
     onPreviousStep();
   };
 
-  //Function to set form data (radio buttons)
   const handleRadioChange =
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setFormThreeData((prevState) => ({
@@ -38,13 +39,11 @@ const StepFour: React.FC<StepperProps> = ({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
-  //Function to move to next step
   const handleNext = () => {
     const newErrors: { [key: string]: string } = {};
 
-    // Check if necessary fields are filled
     if (!formThreeData.hadHepatitis || !formThreeData.hadTyphoid)
-      newErrors.isEmpty = "Please select an option.";
+      newErrors.isEmpty = t("error_message");
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -63,7 +62,6 @@ const StepFour: React.FC<StepperProps> = ({
     onNextStep();
   };
 
-  // Populate the form state from the parent formData
   useEffect(() => {
     if (formData?.thirdForm) {
       setFormThreeData(formData.thirdForm);
@@ -81,7 +79,7 @@ const StepFour: React.FC<StepperProps> = ({
                   htmlFor="donatedBefore"
                   className="block mb-2 text-md font-medium text-indigo-900"
                 >
-                  1.) Have you ever had Jaundice/Hepatitis in the past?
+                  {t("q1_label")}
                 </Label>
                 <div className="flex items-center space-x-4">
                   <label className="flex items-center">
@@ -93,7 +91,7 @@ const StepFour: React.FC<StepperProps> = ({
                       onChange={handleRadioChange("hadHepatitis")}
                       className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
-                    Yes
+                    {t("yes")}
                   </label>
                   <label className="flex items-center">
                     <input
@@ -104,7 +102,7 @@ const StepFour: React.FC<StepperProps> = ({
                       onChange={handleRadioChange("hadHepatitis")}
                       className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                     />
-                    No
+                    {t("no")}
                   </label>
                   {errors.isEmpty && (
                     <div className="text-red-500 text-sm">{errors.isEmpty}</div>
@@ -118,8 +116,7 @@ const StepFour: React.FC<StepperProps> = ({
                     htmlFor="donatedBefore"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
-                    2.) During last 2 years, have you had Tuberculosis or
-                    Typhoid or taken treatment for them?
+                    {t("q2_label")}
                   </Label>
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
@@ -131,7 +128,7 @@ const StepFour: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadTyphoid")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      Yes
+                      {t("yes")}
                     </label>
                     <label className="flex items-center">
                       <input
@@ -142,7 +139,7 @@ const StepFour: React.FC<StepperProps> = ({
                         onChange={handleRadioChange("hadTyphoid")}
                         className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
                       />
-                      No
+                      {t("no")}
                     </label>
                     {errors.isEmpty && (
                       <div className="text-red-500 text-sm">
@@ -159,11 +156,11 @@ const StepFour: React.FC<StepperProps> = ({
                 onClick={handlePrevious}
                 className="text-red-800 hover:text-white border border-red-800 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all duration-300"
               >
-                Back
+                {t("back_button")}
               </button>
               {showErrorMessage && (
                 <p className="text-red-500 text-sm mt-2">
-                  Please fill all required fields.
+                  {t("error_message")}
                 </p>
               )}
 
@@ -171,7 +168,7 @@ const StepFour: React.FC<StepperProps> = ({
                 onClick={handleNext}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-all duration-300"
               >
-                Next
+                {t("next_button")}
               </button>
             </div>
           </div>
