@@ -1,33 +1,40 @@
 {
-  "q1_label": "1.) Are you feeling well today?",
+  "q1_label": "Are you feeling well today?",
   "q1_yes": "Yes",
   "q1_no": "No",
-  "q2_label": "2.) Have you ever had or taken treatment for any of the following disease conditions?",
+  "q1_error": "Please confirm if you are feeling well.",
+  
+  "q2_label": "Do you have or have you ever had any of the following diseases? (Select all that apply)",
   "q2_options": {
-    "Heart Disease": "Heart Disease",
-    "Diabetes": "Diabetes",
-    "Fits": "Fits",
-    "Strokes": "Strokes",
-    "Asthma / Lung Disease": "Asthma / Lung Disease",
-    "Liver Diseases": "Liver Diseases",
-    "Kidney Diseases": "Kidney Diseases",
-    "Blood Disorders": "Blood Disorders",
-    "Cancer": "Cancer"
+    "aids_hiv": "AIDS/HIV",
+    "hepatitis_b_c": "Hepatitis B or C",
+    "tuberculosis": "Tuberculosis (TB)",
+    "malaria": "Malaria",
+    "cancer": "Cancer",
+    "severe_cardiac_condition": "Severe Cardiac Condition"
   },
-  "q3_label": "3.) Are you taking any medication/treatment presently?",
+  
+  "q3_label": "Are you currently taking any medical treatment (tablets, injections, etc.)?",
   "q3_yes": "Yes",
   "q3_no": "No",
-  "q4_label": "4.) Have you undergone any surgery?",
+  "q3_error": "Please confirm your current treatment status.",
+  
+  "q4_label": "Have you had a major surgery in the last 12 months?",
   "q4_yes": "Yes",
   "q4_no": "No",
-  "q5_label": "5.) After donating blood, do you have to engage in any heavy work, driving passenger, or heavy vehicles or work at heights today?",
+  "q4_error": "Please confirm your surgery status.",
+  
+  "q5_label": "Will you engage in heavy physical labor or driving for a long period today?",
   "q5_yes": "Yes",
   "q5_no": "No",
-  "q6_label": "6.) (For Females) Are you pregnant or breast feeding at present? Or have you had a child birth or an abortion during last 12 months?",
+  "q5_error": "Please confirm your physical activity plans.",
+  
+  "q6_label": "Are you currently pregnant or breastfeeding?",
   "q6_yes": "Yes",
   "q6_no": "No",
-  "error_message": "Please select an option.",
-  "error_all_fields": "Please fill all required fields.",
+  "q6_error": "Please confirm your pregnancy/breastfeeding status.",
+  
+  "error_all_fields": "Please answer all mandatory health declaration questions.",
   "back_button": "Back",
   "next_button": "Next"
 }
