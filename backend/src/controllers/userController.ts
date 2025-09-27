@@ -17,11 +17,18 @@ import {
   CONTAINER_NAME,
 } from "../config/azureConfig";
 import { UserInfo } from "../types/users.js";
+import axios from "axios";
+import nodemailer from "nodemailer";
+import { DonorWelcome } from "../emailTemplates/DonorWelcome";
 
 const app = express();
 app.use(express.json());
 dotenv.config();
 
+const MSPACE_API_BASE_URL = "https://api.mspace.lk/sms/send";
+const MSPACE_API_VERSION = "1.0";
+const MSPACE_APPLICATION_ID = process.env.MSPACE_APPLICATION_ID;
+const MSPACE_PASSWORD = process.env.MSPACE_PASSWORD;
 const AZURE_STORAGE_CONNECTION_STRING =
   process.env.AZURE_STORAGE_CONNECTION_STRING;
 if (!AZURE_STORAGE_CONNECTION_STRING) {
@@ -138,13 +145,17 @@ export const uploadAvatar = async (req: Request, res: Response) => {
 // Create or update donor record in DB
 export const upsertDonor = async (req: Request, res: Response) => {
   const donor = req.body;
+  let client: MongoClient | null = null;
 
   try {
-    const { collection, client } = await connectToCosmos();
+    const { collection, client: dbClient } = await connectToCosmos();
+    client = dbClient;
 
     const { _id, ...donorDataWithoutId } = donor;
 
+    // Check if the donor already exists
     const existingDonor = await collection.findOne({ email: donor.email });
+    const isNewDonor = !existingDonor;
     if (
       existingDonor &&
       existingDonor.maskedNumber &&
@@ -153,25 +164,89 @@ export const upsertDonor = async (req: Request, res: Response) => {
       donorDataWithoutId.maskedNumber = existingDonor.maskedNumber;
     }
 
-    // Pass the cleaned object to the $set operator
+    // Perform the upsert operation
     const upsertResult = await collection.updateOne(
       { email: donor.email },
       { $set: donorDataWithoutId },
       { upsert: true }
     );
 
+    // Check for new registration and send notifications
+    if (isNewDonor) {
+      // Send Welcome Email
+      await sendWelcomeEmail(donor);
+
+      // Send Welcome SMS
+      if (donor.contactNumber) {
+        const welcomeMessage = `Welcome to Bloodline, ${donor.fullName}! Your registration is complete. We're grateful for your commitment to saving lives.`;
+
+        await sendSMS(donor.maskedNumber, welcomeMessage).catch((err) =>
+          console.error(
+            `Failed to send SMS to ${donor.contactNumber}:`,
+            err.message
+          )
+        );
+      }
+    }
+
     res.status(200).json({
-      message: "Donor profile upserted successfully!",
+      message: isNewDonor
+        ? "New donor registered and profile completed!"
+        : "Donor profile upserted successfully!",
       donor: upsertResult,
     });
-
-    await client.close();
   } catch (error) {
-    console.error("❌ Error upserting donor profile:", error);
+    console.error("Error upserting donor profile:", error);
     res.status(500).json({ message: "Error upserting donor profile" });
+  } finally {
+    if (client) {
+      await client.close();
+    }
   }
 };
 
+const sendWelcomeEmail = async (donor: any) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: donor.email,
+    subject: "Welcome to Bloodline - Donor Registration Complete!",
+    html: DonorWelcome(donor),
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+export const sendSMS = async (destinationAddress: string, message: string) => {
+  try {
+    const requestBody = {
+      version: MSPACE_API_VERSION,
+      applicationId: MSPACE_APPLICATION_ID,
+      password: MSPACE_PASSWORD,
+      destinationAddresses: [destinationAddress],
+      sourceAddress: "BLAPP",
+      deliveryStatusRequest: "0",
+      encoding: "0",
+      message: message,
+    };
+
+    const response = await axios.post(MSPACE_API_BASE_URL, requestBody, {
+      headers: { "Content-Type": "application/json;charset=utf-8" },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error("Error sending SMS:", error.response?.data || error.message);
+    throw new Error("Failed to send SMS notification");
+  }
+};
 //Fetch all donors
 export const getDonors = async (req: Request, res: Response) => {
   try {
