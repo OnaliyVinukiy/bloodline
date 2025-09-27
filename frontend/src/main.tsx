@@ -4,6 +4,7 @@ import { AuthProvider } from "@asgardeo/auth-react";
 import App from "./App.tsx";
 import "./index.css";
 import "./i18n.ts";
+import { Suspense } from "react";
 
 // Check if we're in a production environment or local development
 const isProduction = window.location.hostname !== "localhost";
@@ -11,6 +12,29 @@ const isProduction = window.location.hostname !== "localhost";
 const signInSignOutRedirectURL = isProduction
   ? "https://bloodlinesrilanka.com/"
   : "http://localhost:5173/";
+
+function Loader() {
+  return (
+    <div className="loading flex justify-center items-center h-screen">
+      <svg width="64px" height="48px">
+        <polyline
+          points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+          id="back"
+          stroke="#e53e3e"
+          strokeWidth="2"
+          fill="none"
+        ></polyline>
+        <polyline
+          points="0.157 23.954, 14 23.954, 21.843 48, 43 0, 50 24, 64 24"
+          id="front"
+          stroke="#f56565"
+          strokeWidth="2"
+          fill="none"
+        ></polyline>
+      </svg>
+    </div>
+  );
+}
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -46,7 +70,9 @@ createRoot(document.getElementById("root")!).render(
         ],
       }}
     >
-      <App />
+      <Suspense fallback={<Loader />}>
+        <App />
+      </Suspense>
     </AuthProvider>
   </StrictMode>
 );
