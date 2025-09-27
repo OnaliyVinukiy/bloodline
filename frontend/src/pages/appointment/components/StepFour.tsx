@@ -16,38 +16,68 @@ const StepFour: React.FC<StepperProps> = ({
   onFormDataChange,
   formData,
 }) => {
-  const { t } = useTranslation("donorMedicalHistory");
+  const { t, i18n } = useTranslation("donorMedicalHistory");
 
   const [formThreeData, setFormThreeData] = useState({
-    hadHepatitis: null,
-    hadTyphoid: null,
+    hadHepatitis: null as 'Yes' | 'No' | null,
+    hadTyphoid: null as 'Yes' | 'No' | null,
   });
+
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   const handlePrevious = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
   };
 
+  useEffect(() => {
+    if (formData?.thirdForm) {
+      setFormThreeData(formData.thirdForm);
+    }
+  }, [formData]);
+
   const handleRadioChange =
-    (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    (field: keyof typeof formThreeData) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setFormThreeData((prevState) => ({
         ...prevState,
-        [field]: event.target.value,
+        [field]: event.target.value as 'Yes' | 'No',
       }));
     };
 
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
-
-  const handleNext = () => {
+  // --- Centralized Validation Logic ---
+  const performValidation = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!formThreeData.hadHepatitis || !formThreeData.hadTyphoid)
-      newErrors.isEmpty = t("error_message");
+    if (!formThreeData.hadHepatitis) newErrors.hadHepatitis = t("q1_error");
+    if (!formThreeData.hadTyphoid) newErrors.hadTyphoid = t("q2_error");
+
+    return newErrors;
+  }
+  
+  // Effect to re-translate errors when the language changes
+  useEffect(() => {
+    if (showErrorMessage || Object.keys(errors).length > 0) {
+        // Re-run validation to get errors in the current language
+        const recheckedErrors = performValidation();
+        setErrors(recheckedErrors);
+        // Also re-translate the general error message if it's showing
+        if (showErrorMessage && Object.keys(recheckedErrors).length > 0) {
+            setShowErrorMessage(true); 
+        } else if (showErrorMessage && Object.keys(recheckedErrors).length === 0) {
+            setShowErrorMessage(false);
+        }
+    }
+  }, [i18n.language, formThreeData.hadHepatitis, formThreeData.hadTyphoid]);
+
+
+  const handleNext = () => {
+    const newErrors = performValidation();
+    setErrors(newErrors);
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
       setShowErrorMessage(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
@@ -62,12 +92,6 @@ const StepFour: React.FC<StepperProps> = ({
     onNextStep();
   };
 
-  useEffect(() => {
-    if (formData?.thirdForm) {
-      setFormThreeData(formData.thirdForm);
-    }
-  }, [formData]);
-
   return (
     <div>
       <div className="flex justify-center items-center bg-gray-100">
@@ -76,7 +100,7 @@ const StepFour: React.FC<StepperProps> = ({
             <div className="mt-4 space-y-6">
               <div className="w-full">
                 <Label
-                  htmlFor="donatedBefore"
+                  htmlFor="hadHepatitis"
                   className="block mb-2 text-md font-medium text-indigo-900"
                 >
                   {t("q1_label")}
@@ -104,8 +128,8 @@ const StepFour: React.FC<StepperProps> = ({
                     />
                     {t("no")}
                   </label>
-                  {errors.isEmpty && (
-                    <div className="text-red-500 text-sm">{errors.isEmpty}</div>
+                  {errors.hadHepatitis && (
+                    <div className="text-red-500 text-sm">{errors.hadHepatitis}</div>
                   )}
                 </div>
               </div>
@@ -113,7 +137,7 @@ const StepFour: React.FC<StepperProps> = ({
               <div className="mt-6 space-y-6">
                 <div className="w-full">
                   <Label
-                    htmlFor="donatedBefore"
+                    htmlFor="hadTyphoid"
                     className="block mb-2 text-md font-medium text-indigo-900"
                   >
                     {t("q2_label")}
@@ -141,9 +165,9 @@ const StepFour: React.FC<StepperProps> = ({
                       />
                       {t("no")}
                     </label>
-                    {errors.isEmpty && (
+                    {errors.hadTyphoid && (
                       <div className="text-red-500 text-sm">
-                        {errors.isEmpty}
+                        {errors.hadTyphoid}
                       </div>
                     )}
                   </div>
@@ -160,7 +184,7 @@ const StepFour: React.FC<StepperProps> = ({
               </button>
               {showErrorMessage && (
                 <p className="text-red-500 text-sm mt-2">
-                  {t("error_message")}
+                  {t("error_all_fields")}
                 </p>
               )}
 
