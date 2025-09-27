@@ -17,25 +17,27 @@ const StepTwo: React.FC<StepperProps> = ({
   onFormDataChange,
   formData,
 }) => {
-  const { t } = useTranslation("donorDeclaration");
+  const { t, i18n } = useTranslation("donorDeclaration");
+  
+  // State structure for form data
   const [formOneData, setFormOneData] = useState({
-    isDonatedBefore: null,
+    isDonatedBefore: null as 'Yes' | 'No' | null,
     timesOfDonation: "",
     lastDonationDate: "",
-    isAnyDifficulty: null,
+    isAnyDifficulty: null as 'Yes' | 'No' | null,
     difficulty: "",
-    isMedicallyAdvised: null,
-    isLeafletRead: null,
+    isMedicallyAdvised: null as 'Yes' | 'No' | null,
+    isLeafletRead: null as 'Yes' | 'No' | null,
   });
+
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const handlePrevious = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     onPreviousStep();
   };
-
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     if (formData?.firstForm) {
@@ -49,6 +51,35 @@ const StepTwo: React.FC<StepperProps> = ({
         ...prevState,
         [field]: event.target.value,
       }));
+      // Clear associated input fields and errors on major changes
+      if (field === "isDonatedBefore" && event.target.value === "No") {
+        setFormOneData((prevState) => ({
+          ...prevState,
+          timesOfDonation: "",
+          lastDonationDate: "",
+          isAnyDifficulty: null,
+          difficulty: "",
+        }));
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.timesOfDonation;
+          delete newErrors.lastDonationDate;
+          delete newErrors.isAnyDifficulty;
+          delete newErrors.difficulty;
+          return newErrors;
+        });
+      }
+      if (field === "isAnyDifficulty" && event.target.value === "No") {
+         setFormOneData((prevState) => ({
+          ...prevState,
+          difficulty: "",
+        }));
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.difficulty;
+          return newErrors;
+        });
+      }
     };
 
   const handleInputChange = (field: string, value: string) => {
@@ -58,36 +89,65 @@ const StepTwo: React.FC<StepperProps> = ({
     }));
   };
 
-  const handleNext = () => {
+  const performValidation = () => {
     const newErrors: { [key: string]: string } = {};
 
     if (!formOneData.isDonatedBefore)
       newErrors.isDonatedBefore = t("q1_error");
-    if (formOneData.isDonatedBefore === "Yes" && !formOneData.timesOfDonation)
-      newErrors.timesOfDonation = t("q1_1_error");
-    if (formOneData.isDonatedBefore === "Yes" && !formOneData.lastDonationDate)
-      newErrors.lastDonationDate = t("q1_2_error");
-    if (formOneData.isDonatedBefore === "Yes" && !formOneData.isAnyDifficulty)
-      newErrors.isAnyDifficulty = t("q1_3_error");
-    if (formOneData.isAnyDifficulty === "Yes" && !formOneData.difficulty)
-      newErrors.difficulty = t("q1_4_error");
+
+    if (formOneData.isDonatedBefore === "Yes") {
+      if (!formOneData.timesOfDonation || isNaN(Number(formOneData.timesOfDonation)) || Number(formOneData.timesOfDonation) <= 0)
+        newErrors.timesOfDonation = t("q1_1_error");
+      
+      if (!formOneData.lastDonationDate)
+        newErrors.lastDonationDate = t("q1_2_error");
+
+      if (!formOneData.isAnyDifficulty)
+        newErrors.isAnyDifficulty = t("q1_3_error");
+
+      if (formOneData.isAnyDifficulty === "Yes" && !formOneData.difficulty)
+        newErrors.difficulty = t("q1_4_error");
+    }
+
     if (!formOneData.isMedicallyAdvised)
       newErrors.isMedicallyAdvised = t("q2_error");
+      
     if (!formOneData.isLeafletRead)
       newErrors.isLeafletRead = t("q3_error");
 
+    return newErrors;
+  }
+
+  // Effect to re-translate errors when the language changes
+  useEffect(() => {
+    if (showErrorMessage || Object.keys(errors).length > 0) {
+        const recheckedErrors = performValidation();
+        // Since we are validating using t(), the resulting errors object contains the translated text
+        // and setting it re-renders the component with the new language.
+        setErrors(recheckedErrors);
+    }
+  }, [i18n.language, formOneData, showErrorMessage]);
+
+
+  const handleNext = () => {
+    const newErrors = performValidation();
+    setErrors(newErrors);
+
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
       setShowErrorMessage(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
     if (formOneData.isDonatedBefore === "Yes" && formOneData.lastDonationDate) {
       const lastDonation = new Date(formOneData.lastDonationDate);
       const today = new Date();
+      
+      // Calculate 6 months ago (180 days approximate check)
       const sixMonthsAgo = new Date();
-      sixMonthsAgo.setMonth(today.getMonth() - 6);
+      sixMonthsAgo.setDate(today.getDate() - 180); 
 
+      // If last donation date is more recent than 6 months ago, show modal
       if (lastDonation > sixMonthsAgo) {
         setShowModal(true);
         return;
@@ -118,7 +178,7 @@ const StepTwo: React.FC<StepperProps> = ({
                 >
                   {t("q1_label")}
                 </Label>
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
                   <label className="flex items-center">
                     <input
                       type="radio"
@@ -142,7 +202,7 @@ const StepTwo: React.FC<StepperProps> = ({
                     {t("q1_no")}
                   </label>
                   {errors.isDonatedBefore && (
-                    <div className="text-red-500 text-sm">
+                    <div className="text-red-500 text-sm mt-1">
                       {errors.isDonatedBefore}
                     </div>
                   )}
@@ -159,7 +219,9 @@ const StepTwo: React.FC<StepperProps> = ({
                       {t("q1_1_label")}
                     </Label>
                     <input
-                      type="text"
+                      type="number"
+                      min="1"
+                      pattern="[0-9]*"
                       value={formOneData.timesOfDonation}
                       onChange={(e) =>
                         handleInputChange("timesOfDonation", e.target.value)
@@ -186,14 +248,16 @@ const StepTwo: React.FC<StepperProps> = ({
                           ? new Date(formOneData.lastDonationDate)
                           : undefined
                       }
-                      onChange={(date) => {
+                      onChange={(date: Date | null) => {
                         if (date) {
-                          handleInputChange(
-                            "lastDonationDate",
-                            date.toISOString().split("T")[0]
-                          );
+                            // Ensure date is stored as YYYY-MM-DD
+                            const formattedDate = date.toISOString().split("T")[0];
+                            handleInputChange("lastDonationDate", formattedDate);
+                        } else {
+                            handleInputChange("lastDonationDate", "");
                         }
                       }}
+                      maxDate={new Date()} // Cannot donate in the future
                     />
                     {errors.lastDonationDate && (
                       <div className="text-red-500 text-sm mt-1">
@@ -208,7 +272,7 @@ const StepTwo: React.FC<StepperProps> = ({
                     >
                       {t("q1_3_label")}
                     </Label>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
                       <label className="flex items-center">
                         <input
                           type="radio"
@@ -272,7 +336,7 @@ const StepTwo: React.FC<StepperProps> = ({
                   >
                     {t("q2_label")}
                   </Label>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
                     <label className="flex items-center">
                       <input
                         type="radio"
@@ -312,7 +376,7 @@ const StepTwo: React.FC<StepperProps> = ({
                   >
                     {t("q3_label")}
                   </Label>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
                     <label className="flex items-center">
                       <input
                         type="radio"

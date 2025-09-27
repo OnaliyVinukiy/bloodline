@@ -1,9 +1,11 @@
 {
-  "q1_label": "1.) Have you ever had Jaundice/Hepatitis in the past?",
-  "q2_label": "2.) During last 2 years, have you had Tuberculosis or Typhoid or taken treatment for them?",
+  "q1_label": "Have you ever had Jaundice or Hepatitis?",
+  "q1_error": "Please confirm your Jaundice or Hepatitis history.",
+  "q2_label": "Have you ever suffered from Typhoid or Brucellosis?",
+  "q2_error": "Please confirm your Typhoid or Brucellosis history.",
   "yes": "Yes",
   "no": "No",
+  "error_all_fields": "Please answer all mandatory medical history questions.",
   "back_button": "Back",
-  "next_button": "Next",
-  "error_message": "Please fill all required fields."
+  "next_button": "Next"
 }

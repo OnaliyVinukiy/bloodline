@@ -36,6 +36,13 @@
   "error_invalid_mobile_number": "Invalid mobile number.",
   "error_invalid_home_number": "Invalid home number.",
   "error_invalid_office_number": "Invalid office number.",
+  
+  "error_nic_format": "Invalid NIC format. Must be 9 digits + V/X or 12 digits.",
+  "error_nic_year_mismatch": "NIC year of birth does not match Date of Birth.",
+  "error_nic_invalid_day_count": "NIC day count is invalid or exceeds maximum days for the year.",
+  "error_nic_dob_mismatch": "NIC encoded day count does not match Date of Birth.",
+  "error_nic_gender_mismatch": "NIC encoded gender does not match selected Gender.",
+
   "validation_title_deferral": "Donation Restricted",
   "validation_content_deferral": "You cannot donate as your donor status is currently deferred. Please contact the blood bank for more information.",
   "validation_title_age": "Age Restriction",
