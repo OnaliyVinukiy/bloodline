@@ -18,7 +18,7 @@ type Message = {
 };
 
 const Chatbot = () => {
-  const { t } = useTranslation("chatbot");
+  const { t, i18n } = useTranslation("chatbot");
   const [isOpen, setIsOpen] = useState(false);
   const { getBasicUserInfo } = useAuthContext();
   const [messages, setMessages] = useState<Message[]>([
@@ -46,6 +46,8 @@ const Chatbot = () => {
 
     const userInfo = await getBasicUserInfo();
     const userEmail = userInfo.email;
+    const currentLang = i18n.language;
+
     // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -74,6 +76,7 @@ const Chatbot = () => {
         body: JSON.stringify({
           message: inputValue,
           email: userEmail,
+          lang: currentLang,
         }),
       });
 
