@@ -18,17 +18,25 @@ const StepEight: React.FC<StepperProps> = ({
   onFormDataChange,
   formData,
 }) => {
-  const { t } = useTranslation("donorDeclarationFinal");
+  const { t, i18n } = useTranslation("donorDeclarationFinal");
   
+  // Helper to get today's date in YYYY-MM-DD format
+  const getTodayDate = () => new Date().toISOString().split("T")[0];
+
   const [formSevenData, setFormSevenData] = useState({
-    donatingMonth: null,
+    donatingMonth: null as 'four' | 'six' | 'twelve' | null,
     donorName: "",
-    dateSigned: new Date().toISOString().split("T")[0],
+    dateSigned: getTodayDate(), // Initialize with today's date
   });
 
+  // Effect to handle initial form data and ensure dateSigned is always today
   useEffect(() => {
     if (formData?.seventhForm) {
-      setFormSevenData(formData.seventhForm);
+      setFormSevenData((prev) => ({
+        ...formData.seventhForm,
+        // Override any saved date with the current date for signing fidelity
+        dateSigned: getTodayDate(), 
+      }));
     }
   }, [formData]);
 
@@ -50,48 +58,77 @@ const StepEight: React.FC<StepperProps> = ({
   };
 
   const handleRadioChange =
-    (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    (field: keyof typeof formSevenData) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setFormSevenData((prevState) => ({
         ...prevState,
-        [field]: event.target.value,
+        [field]: event.target.value as 'four' | 'six' | 'twelve',
       }));
     };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: keyof typeof formSevenData, value: string) => {
     setFormSevenData((prevState) => ({
       ...prevState,
       [field]: value,
     }));
   };
 
+  // --- Start of Localization/Validation Fix ---
+  const performValidation = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formSevenData.donatingMonth)
+      newErrors.month = t("error_month_required");
+    if (!formSevenData.donorName) newErrors.name = t("error_name_required");
+
+    return newErrors;
+  }
+  
+  // Effect to re-translate errors when the language changes
+  useEffect(() => {
+    if (showErrorMessage || Object.keys(errors).length > 0) {
+        // Re-run validation to get errors in the current language
+        const recheckedErrors = performValidation();
+        setErrors(recheckedErrors);
+        
+        // Update general error message translation status
+        if (showErrorMessage && Object.keys(recheckedErrors).length === 0) {
+            setShowErrorMessage(false);
+        } else if (Object.keys(recheckedErrors).length > 0) {
+             setShowErrorMessage(true); // Ensure error banner updates translation
+        }
+    }
+  }, [i18n.language, formSevenData.donatingMonth, formSevenData.donorName]);
+  // --- End of Localization/Validation Fix ---
+
+
   const submitForm = async () => {
+    const newErrors = performValidation();
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setShowErrorMessage(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    setErrors({});
+    setShowErrorMessage(false);
+
     try {
       setLoading(true);
-      const newErrors: { [key: string]: string } = {};
 
-      if (!formSevenData.donatingMonth)
-        newErrors.month = t("error_month_required");
-      if (!formSevenData.donorName) newErrors.name = t("error_name_required");
-
-      if (Object.keys(newErrors).length > 0) {
-        setErrors(newErrors);
-        setShowErrorMessage(true);
-        setLoading(false);
-        return;
-      }
-
-      setErrors({});
-      setShowErrorMessage(false);
-      onFormDataChange({
+      // Ensure the final form data passed includes the current date (which is already in state)
+      const finalFormData = {
         ...formData,
-        seventhForm: formSevenData,
-      });
+        seventhForm: { ...formSevenData, dateSigned: getTodayDate() },
+      };
+      onFormDataChange(finalFormData);
 
       const token = await getAccessToken();
 
       const response = await axios.post(
         `${backendURL}/api/appointments/save-appointment`,
-        { ...formData, seventhForm: formSevenData },
+        finalFormData,
         {
           headers: {
             "Content-Type": "application/json",
@@ -230,8 +267,9 @@ const StepEight: React.FC<StepperProps> = ({
                 <input
                   type="date"
                   value={formSevenData.dateSigned}
-                  onChange={(e) => handleInputChange("dateSigned", e.target.value)}
-                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                  // Input is disabled to prevent manual changes
+                  disabled
+                  className="bg-gray-200 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 cursor-not-allowed"
                 />
               </div>
             </div>
