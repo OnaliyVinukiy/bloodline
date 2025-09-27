@@ -17,6 +17,147 @@ import {
 
 dotenv.config();
 
+const SystemResponses = {
+  // General Errors/Messages
+  error_fetching_data: {
+    en: "⚠️ Sorry, I couldn't fetch appointment data at the moment.",
+    si: "⚠️ කණගාටුයි, මේ මොහොතේ මට වරයන් පිළිබඳ දත්ත ලබාගත නොහැකි විය.",
+  },
+  internal_error: {
+    en: "🚨 Sorry, I'm having trouble connecting to the system. Please try again later.",
+    si: "🚨 කණගාටුයි, පද්ධතියට සම්බන්ධ වීමේ ගැටලුවක් ඇත. කරුණාකර පසුව නැවත උත්සාහ කරන්න.",
+  },
+  message_required: {
+    en: "⚠️ Message is required.",
+    si: "⚠️ පණිවිඩයක් අවශ්‍යයි.",
+  },
+  // Eligibility
+  eligibility: {
+    en: "To donate blood, you must be between 18-60 years old with hemoglobin above 12g/dL, in good health with no serious diseases or pregnancy, and have a valid ID. You need to wait at least 4 months between donations. You cannot donate if you engage in high-risk behaviors (like drug use or unprotected sex with multiple partners) or have certain medical conditions. Want me to check your specific eligibility? Just ask! 😊",
+    si: "රුධිරය පරිත්‍යාග කිරීම සඳහා, ඔබ වයස අවුරුදු 18-60 අතර විය යුතු අතර හිමොග්ලොබින් 12g/dL ට වැඩි විය යුතුය. බරපතල රෝග හෝ ගැබ් ගැනීම් නොමැති, හොඳ සෞඛ්‍ය තත්ත්වයෙන් සිටින, වලංගු හැඳුනුම්පතක් ඇති අයෙකු විය යුතුය. පරිත්‍යාග දෙකක් අතර අවම වශයෙන් මාස 4ක් රැඳී සිටිය යුතුය. අධි අවදානම් හැසිරීම් වල නිරත වන්නේ නම් (මත්ද්‍රව්‍ය භාවිතය හෝ බහු සහකරුවන් සමඟ අනාරක්ෂිත ලිංගික ඇසුර වැනි) හෝ ඇතැම් රෝගී තත්ත්වයන් ඇත්නම් ඔබට පරිත්‍යාග කළ නොහැක. ඔබගේ නිශ්චිත සුදුසුකම පරීක්ෂා කිරීමට අවශ්‍යද? අසන්න! 😊",
+  },
+  // General Appointment Slots
+  slots: {
+    fully_booked: {
+      en: "❌ All appointment slots are fully booked for",
+      si: "❌ සියලුම වරයන් වෙන්කරවා ගෙන ඇත",
+    },
+    available_slots_prefix: {
+      en: "✅",
+      si: "✅",
+    },
+    available_slots_suffix: {
+      en: "appointment slot(s) available on",
+      si: "වරයන් පවතී",
+    },
+    scheduled_by_others: {
+      en: "There are currently",
+      si: "දැනට වෙන්කර ඇති වරයන් සංඛ්‍යාව",
+    },
+    scheduled_by_others_suffix: {
+      en: "appointments scheduled by other donors.",
+      si: "කි.",
+    },
+    all_available: {
+      en: "🗓️ All slots are currently available on",
+      si: "🗓️ සියලුම වරයන් දැනට පවතී",
+    },
+    no_scheduled: {
+      en: "No appointments have been scheduled yet.",
+      si: "මෙතෙක් කිසිදු වරයක් වෙන්කරගෙන නැත.",
+    },
+    total_appointments: {
+      en: "📋 There are a total of",
+      si: "📋 මුළු වරයන් සංඛ්‍යාව",
+    },
+    total_appointments_suffix: {
+      en: "appointments.",
+      si: "කි.",
+    },
+  },
+  // Personalized Status Messages
+  personal_status: {
+    no_appointment: {
+      en: "You don't have any appointments scheduled yet. Would you like to book one?",
+      si: "ඔබ මෙතෙක් කිසිදු වරයක් වෙන් කර නැත. වෙන්කරවා ගැනීමට කැමතිද?",
+    },
+    login_required: {
+      en: "I need your user ID to check your personal status. Please ensure you are logged in to the application.",
+      si: "ඔබගේ පුද්ගලික තත්ත්වය පරීක්ෂා කිරීමට ඔබගේ පරිශීලක හැඳුනුම්පත අවශ්‍ය වේ. කරුණාකර ඔබ යෙදුමට පිවිස ඇති බව තහවුරු කරන්න.",
+    },
+    approved: {
+      en: "Approved",
+      si: "අනුමතයි",
+    },
+    pending: {
+      en: "Pending",
+      si: "සමාලෝචනය වෙමින් පවතී",
+    },
+    rejected: {
+      en: "Rejected",
+      si: "ප්‍රතික්ෂේපිතයි",
+    },
+    cancelled: {
+      en: "Cancelled",
+      si: "අවලංගුයි",
+    },
+    approved_suffix: {
+      en: " We look forward to seeing you! Check your email for reminders. 👍",
+      si: " ඔබ එනතුරු අපි බලා සිටිමු! මතක් කිරීම් සඳහා ඔබගේ ඊමේල් පරීක්ෂා කරන්න. 👍",
+    },
+    pending_suffix: {
+      en: " We are still reviewing your request. Please check back later. ⏳",
+      si: " ඔබගේ ඉල්ලීම තවමත් සමාලෝචනය කරමින් සිටී. කරුණාකර පසුව නැවත පරීක්ෂා කරන්න. ⏳",
+    },
+    rejected_cancelled_message: {
+      en: ". This appointment was ",
+      si: " මෙම වරය ",
+    },
+    rejected_cancelled_suffix: {
+      en: ". Please consider booking a new one!",
+      si: " කර ඇත. කරුණාකර නව වරයක් වෙන්කරවා ගන්න!",
+    },
+  },
+};
+
+// Helper function to get translated text
+type LangCode = "en" | "si";
+
+const getTranslatedText = (
+  path: string,
+  lang: string,
+  placeholders?: any
+): string => {
+  const langKey: LangCode = lang === "si" ? "si" : "en";
+  const pathParts = path.split(".");
+
+  let current: any = SystemResponses;
+  for (const part of pathParts) {
+    if (!current || !current[part]) {
+      console.error(`Missing translation path: ${path}`);
+      return `[Translation Error: ${path}]`;
+    }
+    current = current[part];
+  }
+
+  // The final object should contain language keys
+  const text = current[langKey] || current.en;
+
+  // Basic placeholder replacement
+  if (placeholders) {
+    let result = text;
+    for (const key in placeholders) {
+      result = result.replace(
+        new RegExp(`\\{\\{${key}\\}\\}`, "g"),
+        placeholders[key]
+      );
+    }
+    return result;
+  }
+
+  return text;
+};
+
 class ChatbotController {
   private static readonly openaiEndpoint = process.env.AZURE_OPENAI_ENDPOINT;
   private static readonly openaiApiKey = process.env.AZURE_OPENAI_API_KEY;
@@ -85,7 +226,10 @@ class ChatbotController {
   }
 
   // Fetch appointments from database
-  private static async fetchAppointments(query: string): Promise<string> {
+  private static async fetchAppointments(
+    query: string,
+    lang: string
+  ): Promise<string> {
     const MAX_APPOINTMENTS_PER_DAY = 10;
 
     const client = new MongoClient(
@@ -118,44 +262,67 @@ class ChatbotController {
       }
 
       if (normalizedDate) {
-        const startDate = new Date(normalizedDate);
-        startDate.setHours(0, 0, 0, 0);
-        const endDate = new Date(normalizedDate);
-        endDate.setHours(23, 59, 59, 999);
-
+        // Query database
         const appointments = await collection
           .find({
-            selectedDate: {
-              $gte: normalizedDate,
-              $lte: normalizedDate,
-            },
+            selectedDate: normalizedDate,
           })
           .toArray();
 
         const count = appointments.length;
         const remainingSlots = MAX_APPOINTMENTS_PER_DAY - count;
 
+        // Use translated messages
         if (count >= MAX_APPOINTMENTS_PER_DAY) {
-          return `❌ All appointment slots are fully booked for ${normalizedDate}.`;
+          return `${getTranslatedText(
+            "slots.fully_booked",
+            lang
+          )} ${normalizedDate}.`;
         } else if (count > 0) {
-          return `✅ ${remainingSlots} appointment slot(s) available on ${normalizedDate}. There are currently ${count} appointments scheduled by other donors.`;
+          return `${getTranslatedText(
+            "slots.available_slots_prefix",
+            lang
+          )} ${remainingSlots} ${getTranslatedText(
+            "slots.available_slots_suffix",
+            lang
+          )} ${normalizedDate}. ${getTranslatedText(
+            "slots.scheduled_by_others",
+            lang
+          )} ${count} ${getTranslatedText(
+            "slots.scheduled_by_others_suffix",
+            lang
+          )}`;
         } else {
-          return `🗓️ All slots are currently available on ${normalizedDate}. No appointments have been scheduled yet.`;
+          return `${getTranslatedText(
+            "slots.all_available",
+            lang
+          )} ${normalizedDate}. ${getTranslatedText(
+            "slots.no_scheduled",
+            lang
+          )}`;
         }
       }
 
       const totalAppointments = await collection.countDocuments();
-      return `📋 There are a total of ${totalAppointments} appointments.`;
+      return `${getTranslatedText(
+        "slots.total_appointments",
+        lang
+      )} ${totalAppointments} ${getTranslatedText(
+        "slots.total_appointments_suffix",
+        lang
+      )}`;
     } catch (error) {
       console.error("Error fetching appointments:", error);
-      return "⚠️ Sorry, I couldn't fetch appointment data at the moment.";
+      return getTranslatedText("error_fetching_data", lang);
     } finally {
       await client.close();
     }
   }
 
+  // Fetch user appointments status
   private static async fetchUserAppointmentStatus(
-    email: string
+    email: string,
+    lang: string
   ): Promise<string> {
     const client = new MongoClient(
       process.env.COSMOS_DB_CONNECTION_STRING as string
@@ -172,29 +339,45 @@ class ChatbotController {
       );
 
       if (!latestAppointment) {
-        return "You don't have any appointments scheduled yet. Would you like to book one?";
+        return getTranslatedText("personal_status.no_appointment", lang);
       }
 
       const status = latestAppointment.status;
       const date = latestAppointment.selectedDate;
       const time = latestAppointment.selectedSlot;
 
-      let response = `Your most recent appointment is on ${date} at ${time}. The current status is: **${status}**.`;
+      const statusTranslations: { [key: string]: string } = {
+        Approved: getTranslatedText("personal_status.approved", lang),
+        Pending: getTranslatedText("personal_status.pending", lang),
+        Rejected: getTranslatedText("personal_status.rejected", lang),
+        Cancelled: getTranslatedText("personal_status.cancelled", lang),
+      };
+
+      const statusText = statusTranslations[status] || status;
+
+      let response =
+        lang === "si"
+          ? `ඔබගේ නවතම වරය ${date} දින ${time} ට යි. වත්මන් තත්ත්වය: **${statusText}**`
+          : `Your most recent appointment is on ${date} at ${time}. The current status is: **${statusText}**`;
 
       if (status === "Approved") {
-        response +=
-          " We look forward to seeing you! Check your email for reminders. 👍";
+        response += getTranslatedText("personal_status.approved_suffix", lang);
       } else if (status === "Pending") {
-        response +=
-          " We are still reviewing your request. Please check back later. ⏳";
+        response += getTranslatedText("personal_status.pending_suffix", lang);
       } else if (status === "Rejected" || status === "Cancelled") {
-        response += ` This appointment was ${status.toLowerCase()}. Please consider booking a new one!`;
+        response += `${getTranslatedText(
+          "personal_status.rejected_cancelled_message",
+          lang
+        )}${statusText}${getTranslatedText(
+          "personal_status.rejected_cancelled_suffix",
+          lang
+        )}`;
       }
 
       return response;
     } catch (error) {
       console.error("Error fetching personalized status:", error);
-      return "⚠️ Sorry, I couldn't access your personal appointment data right now.";
+      return getTranslatedText("error_fetching_data", lang);
     } finally {
       await client.close();
     }
@@ -243,13 +426,15 @@ class ChatbotController {
   // Handle incoming chatbot messages
   public async handleChat(req: Request, res: Response): Promise<Response> {
     try {
-      const { message, email } = req.body;
+      const { message, email, lang = "en" } = req.body;
+
       if (!message)
-        return res.status(400).json({ reply: "⚠️ Message is required." });
+        return res
+          .status(400)
+          .json({ reply: getTranslatedText("message_required", lang) });
 
       const lowerMessage = message.toLowerCase();
 
-      // Check for eligibility related queries
       const eligibilityKeywords = [
         "eligibility",
         "eligible",
@@ -258,6 +443,10 @@ class ChatbotController {
         "who can donate",
         "blood donation rules",
         "donor requirements",
+        "සුදුසුකම්",
+        "සුදුසුද",
+        "නීති",
+        "දන්දිය හැකිද",
       ];
 
       const personalStatusKeywords = [
@@ -266,6 +455,10 @@ class ChatbotController {
         "status of my appointment",
         "check my booking",
         "next donation",
+        "මගේ වරය",
+        "මගේ තත්වය",
+        "වරය පරීක්ෂා කරන්න",
+        "ඊළඟ පරිත්‍යාගය",
       ];
 
       const appointmentKeywords = [
@@ -276,23 +469,17 @@ class ChatbotController {
         "available slots",
         "slot",
         "are there any slots available",
+        "වරය",
+        "වරයන්",
+        "වෙන්කරවා ගැනීම",
+        "තිබේද",
       ];
 
       if (
         eligibilityKeywords.some((keyword) => lowerMessage.includes(keyword))
       ) {
-        const eligibilityResponse =
-          "To donate blood, you must be between 18-60 years old with hemoglobin above 12g/dL, in good health with no serious diseases or pregnancy, and have a valid ID. You need to wait at least 4 months between donations. You cannot donate if you engage in high-risk behaviors (like drug use or unprotected sex with multiple partners) or have certain medical conditions. Want me to check your specific eligibility? Just ask! 😊";
+        const eligibilityResponse = getTranslatedText("eligibility", lang);
         return res.status(200).json({ reply: eligibilityResponse });
-      }
-
-      if (
-        appointmentKeywords.some((keyword) => lowerMessage.includes(keyword))
-      ) {
-        const appointmentResponse = await ChatbotController.fetchAppointments(
-          message
-        );
-        return res.status(200).json({ reply: appointmentResponse });
       }
 
       if (
@@ -300,20 +487,32 @@ class ChatbotController {
       ) {
         if (!email) {
           return res.status(200).json({
-            reply:
-              "I need your user ID to check your personal status. Please ensure you are logged in to the application.",
+            reply: getTranslatedText("personal_status.login_required", lang),
           });
         }
         const statusResponse =
-          await ChatbotController.fetchUserAppointmentStatus(email);
+          await ChatbotController.fetchUserAppointmentStatus(email, lang);
         return res.status(200).json({ reply: statusResponse });
       }
 
+      if (
+        appointmentKeywords.some((keyword) => lowerMessage.includes(keyword))
+      ) {
+        const appointmentResponse = await ChatbotController.fetchAppointments(
+          message,
+          lang
+        );
+        return res.status(200).json({ reply: appointmentResponse });
+      }
+
+      // Default AI response
       const aiResponse = await ChatbotController.callAzureOpenAI(message);
       return res.status(200).json({ reply: aiResponse });
     } catch (error) {
       console.error("Chat handler error:", error);
-      return res.status(500).json({ reply: "🚨 Internal server error." });
+      return res
+        .status(500)
+        .json({ reply: getTranslatedText("internal_error", "en") });
     }
   }
 }

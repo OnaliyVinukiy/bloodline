@@ -32,7 +32,7 @@ const StepEight: React.FC<StepperProps> = ({
   // Effect to handle initial form data and ensure dateSigned is always today
   useEffect(() => {
     if (formData?.seventhForm) {
-      setFormSevenData((prev) => ({
+      setFormSevenData(() => ({
         ...formData.seventhForm,
         // Override any saved date with the current date for signing fidelity
         dateSigned: getTodayDate(), 

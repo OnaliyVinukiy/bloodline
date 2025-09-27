@@ -430,7 +430,7 @@ const sendApprovalEmail = async (appointment: any) => {
   await transporter.sendMail(mailOptions);
 };
 
-const MSPACE_API_BASE_URL = "https://api.mspace.lk/sms/send"; // Replace with actual MSpace SMS endpoint
+const MSPACE_API_BASE_URL = "https://api.mspace.lk/sms/send";
 const MSPACE_API_VERSION = "1.0";
 const MSPACE_APPLICATION_ID = process.env.MSPACE_APPLICATION_ID;
 const MSPACE_PASSWORD = process.env.MSPACE_PASSWORD;
@@ -510,7 +510,6 @@ export const approveAppointment = async (req: Request, res: Response) => {
     } else {
       const approvalMessage = `Hello ${appointment.donorInfo.fullName}, your blood donation appointment on ${appointment.selectedDate} at ${appointment.selectedSlot} has been approved.`;
       await sendSMS(donor.maskedNumber, approvalMessage);
-      console.log("✅ Approval SMS sent to", donor.maskedNumber);
     }
 
     // Update the appointment status
@@ -567,6 +566,7 @@ export const rejectAppointment = async (req: Request, res: Response) => {
     const database = client.db(DATABASE_ID);
     const collection = database.collection(APPOINTMENT_COLLECTION_ID);
     const objectId = new ObjectId(id);
+    const donorCollection = database.collection(DONOR_COLLECTION_ID);
 
     const updatedAppointment = await collection.findOneAndUpdate(
       { _id: objectId },
@@ -578,6 +578,24 @@ export const rejectAppointment = async (req: Request, res: Response) => {
       },
       { returnDocument: "after" }
     );
+
+    const appointment = await collection.findOne({ _id: objectId });
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    const donor = await donorCollection.findOne({
+      email: appointment.donorInfo.email,
+    });
+    if (!donor || !donor.maskedNumber) {
+      console.warn(
+        "Donor not found or not subscribed to SMS. Skipping SMS notification."
+      );
+    } else {
+      const rejectionMessage = `Hello ${appointment.donorInfo.fullName}, unfortunately your blood donation appointment on ${appointment.selectedDate} at ${appointment.selectedSlot} has been rejected. Reason for rejection:${updatedAppointment?.reason}.`;
+
+      await sendSMS(donor.maskedNumber, rejectionMessage);
+    }
 
     // Send rejection email
     await sendRejectionEmail(updatedAppointment);
@@ -628,6 +646,25 @@ export const cancelAppointment = async (req: Request, res: Response) => {
     const database = client.db(DATABASE_ID);
     const collection = database.collection(APPOINTMENT_COLLECTION_ID);
     const objectId = new ObjectId(id);
+    const donorCollection = database.collection(DONOR_COLLECTION_ID);
+
+    const appointment = await collection.findOne({ _id: objectId });
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    const donor = await donorCollection.findOne({
+      email: appointment.donorInfo.email,
+    });
+    if (!donor || !donor.maskedNumber) {
+      console.warn(
+        "Donor not found or not subscribed to SMS. Skipping SMS notification."
+      );
+    } else {
+      const cancellationMessage = `Hello ${appointment.donorInfo.fullName}, your blood donation appointment on ${appointment.selectedDate} at ${appointment.selectedSlot} has been successfully cancelled as per your request.`;
+
+      await sendSMS(donor.maskedNumber, cancellationMessage);
+    }
 
     const updatedAppointment = await collection.findOneAndUpdate(
       { _id: objectId },
