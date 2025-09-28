@@ -12,12 +12,14 @@ import {
   DATABASE_ID,
   CAMP_COLLECTION_ID,
   DONOR_COLLECTION_ID,
+  ORGANIZATION_COLLECTION_ID,
 } from "../config/azureConfig";
 import { ObjectId } from "mongodb";
 import { CampApproval } from "../emailTemplates/CampApproval";
 import { CampRejection } from "../emailTemplates/CampRejected";
 import { CampConfirmation } from "../emailTemplates/CampConfirmation";
 import { DonorCampNotification } from "../emailTemplates/DonorCampNotification";
+import axios from "axios";
 
 const COSMOS_DB_CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION_STRING;
 
@@ -128,6 +130,12 @@ export const saveCamp = async (req: Request, res: Response) => {
 
     const database = client.db(DATABASE_ID);
     const collection = database.collection(CAMP_COLLECTION_ID);
+    const organizationCollection = database.collection(
+      ORGANIZATION_COLLECTION_ID
+    );
+    const donorCollection = database.collection(DONOR_COLLECTION_ID);
+
+    // Insert camp data
     const result = await collection.insertOne(campData);
 
     res.status(201).json({
@@ -138,6 +146,42 @@ export const saveCamp = async (req: Request, res: Response) => {
     // Send confirmation email
     await sendConfirmationEmail(campData);
 
+    // SMS sending logic based on your requirements
+    let maskedNumberToUse = null;
+
+    // First, check if the email belongs to a registered donor
+    const donor = await donorCollection.findOne({
+      email: campData.email,
+    });
+
+    if (donor) {
+      // If donor is registered, check if they have a masked number
+      if (donor.maskedNumber) {
+        maskedNumberToUse = donor.maskedNumber;
+      } else {
+        console.warn("Donor found but no masked number available.");
+      }
+    } else {
+      // If not a donor, check organization for masked number
+      const org = await organizationCollection.findOne({
+        email: campData.email,
+      });
+      
+      if (org && org.maskedNumber) {
+        maskedNumberToUse = org.maskedNumber;
+      } else {
+        console.warn("Organization not found or no masked number available.");
+      }
+    }
+
+    // Send SMS if we found a masked number
+    if (maskedNumberToUse) {
+      const requestPlacedMessage = `Hello ${campData.fullName}, your request to organize a blood donation camp on ${campData.date} at ${campData.startTime} has been sent to NBTS. NBTS will review your request. You will get an email and SMS once the camp is approved.Thank you for choosing to organize a donation camp and make a difference!`;
+      await sendSMS(maskedNumberToUse, requestPlacedMessage);
+    } else {
+      console.warn("No masked number found for SMS notification.");
+    }
+
     await client.close();
   } catch (error) {
     console.error("Error saving camp:", error);
@@ -145,6 +189,34 @@ export const saveCamp = async (req: Request, res: Response) => {
   }
 };
 
+const MSPACE_API_BASE_URL = "https://api.mspace.lk/sms/send";
+const MSPACE_API_VERSION = "1.0";
+const MSPACE_APPLICATION_ID = process.env.MSPACE_APPLICATION_ID;
+const MSPACE_PASSWORD = process.env.MSPACE_PASSWORD;
+
+export const sendSMS = async (destinationAddress: string, message: string) => {
+  try {
+    const requestBody = {
+      version: MSPACE_API_VERSION,
+      applicationId: MSPACE_APPLICATION_ID,
+      password: MSPACE_PASSWORD,
+      destinationAddresses: [destinationAddress],
+      sourceAddress: "BLAPP",
+      deliveryStatusRequest: "0",
+      encoding: "0",
+      message: message,
+    };
+
+    const response = await axios.post(MSPACE_API_BASE_URL, requestBody, {
+      headers: { "Content-Type": "application/json;charset=utf-8" },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error("Error sending SMS:", error.response?.data || error.message);
+    throw new Error("Failed to send SMS notification");
+  }
+};
 // Fetch camp data
 export const getCamps = async (req: Request, res: Response) => {
   try {
@@ -354,6 +426,7 @@ export const approveCamp = async (req: Request, res: Response) => {
     const database = client.db(DATABASE_ID);
     const campCollection = database.collection(CAMP_COLLECTION_ID);
     const donorCollection = database.collection(DONOR_COLLECTION_ID);
+    const organizationCollection = database.collection(ORGANIZATION_COLLECTION_ID);
     const objectId = new ObjectId(id);
 
     // Update camp status to Approved
@@ -370,6 +443,42 @@ export const approveCamp = async (req: Request, res: Response) => {
 
     // Send approval email to camp organizer
     await sendApprovalEmail(updatedCamp);
+
+    // SMS sending logic for camp organizer
+    let maskedNumberToUse = null;
+
+    // First, check if the email belongs to a registered donor
+    const donor = await donorCollection.findOne({
+      email: updatedCamp.email,
+    });
+
+    if (donor) {
+      // If donor is registered, check if they have a masked number
+      if (donor.maskedNumber) {
+        maskedNumberToUse = donor.maskedNumber;
+      } else {
+        console.warn("Donor found but no masked number available.");
+      }
+    } else {
+      // If not a donor, check organization for masked number
+      const org = await organizationCollection.findOne({
+        email: updatedCamp.email,
+      });
+      
+      if (org && org.maskedNumber) {
+        maskedNumberToUse = org.maskedNumber;
+      } else {
+        console.warn("Organization not found or no masked number available.");
+      }
+    }
+
+    // Send SMS if we found a masked number
+    if (maskedNumberToUse) {
+      const approvalMessage = `Hello ${updatedCamp.fullName}, your request to organize a blood donation camp on ${updatedCamp.date} at ${updatedCamp.startTime} has been approved by NBTS. Thank you for organizing a donation camp and making a difference!`;
+      await sendSMS(maskedNumberToUse, approvalMessage);
+    } else {
+      console.warn("No masked number found for SMS notification.");
+    }
 
     // Fetch donors in the same city
     const donors = await donorCollection
@@ -417,12 +526,19 @@ export const rejectCamp = async (req: Request, res: Response) => {
 
     // Connect to the database
     const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
-
     await client.connect();
 
     const database = client.db(DATABASE_ID);
     const collection = database.collection(CAMP_COLLECTION_ID);
+    const organizationCollection = database.collection(ORGANIZATION_COLLECTION_ID);
+    const donorCollection = database.collection(DONOR_COLLECTION_ID);
     const objectId = new ObjectId(id);
+    
+    const camp = await collection.findOne({ _id: objectId });
+    if (!camp) {
+      await client.close();
+      return res.status(404).json({ message: "Camp not found" });
+    }
 
     const updatedCamp = await collection.findOneAndUpdate(
       { _id: objectId },
@@ -437,6 +553,42 @@ export const rejectCamp = async (req: Request, res: Response) => {
 
     // Send rejection email
     await sendRejectionEmail(updatedCamp);
+
+    // SMS sending logic for camp organizer
+    let maskedNumberToUse = null;
+
+    // First, check if the email belongs to a registered donor
+    const donor = await donorCollection.findOne({
+      email: camp.email,
+    });
+
+    if (donor) {
+      // If donor is registered, check if they have a masked number
+      if (donor.maskedNumber) {
+        maskedNumberToUse = donor.maskedNumber;
+      } else {
+        console.warn("Donor found but no masked number available.");
+      }
+    } else {
+      // If not a donor, check organization for masked number
+      const org = await organizationCollection.findOne({
+        email: camp.email,
+      });
+      
+      if (org && org.maskedNumber) {
+        maskedNumberToUse = org.maskedNumber;
+      } else {
+        console.warn("Organization not found or no masked number available.");
+      }
+    }
+
+    // Send SMS if we found a masked number
+    if (maskedNumberToUse) {
+      const rejectionMessage = `Hello ${camp.fullName}, unfortunately your request to organize a blood donation camp on ${camp.date} has been rejected. Reason for rejection: ${reason}.`;
+      await sendSMS(maskedNumberToUse, rejectionMessage);
+    } else {
+      console.warn("No masked number found for SMS notification.");
+    }
 
     await client.close();
 
