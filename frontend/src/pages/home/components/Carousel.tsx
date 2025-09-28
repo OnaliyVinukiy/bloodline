@@ -11,16 +11,25 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button, Modal } from "flowbite-react";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+import { useUser } from "../../../contexts/UserContext";
 
 export function CarouselSlider() {
   const { t } = useTranslation(["carousel", "common"]);
   const { state, signIn } = useAuthContext();
   const navigate = useNavigate();
+  const { user } = useUser();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isDonorRegModalOpen, setIsDonorRegModalOpen] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginAction, setLoginAction] = useState<
     "appointment" | "registration" | null
   >(null);
+
+  const backendURL =
+    import.meta.env.VITE_IS_PRODUCTION === "true"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:5000";
 
   // Direct the user to relevant page based on authentication status
   const handleDonorRegistration = () => {
@@ -33,13 +42,23 @@ export function CarouselSlider() {
     }
   };
 
-  const handleAppointmentSchedule = () => {
-    if (state?.isAuthenticated) {
-      navigate("/donorDeclaration");
-    } else {
-      localStorage.setItem("postLoginRedirect", "/donorDeclaration");
-      setLoginAction("appointment");
-      setIsLoginModalOpen(true);
+  const handleAppointmentSchedule = async () => {
+    try {
+      if (!state?.isAuthenticated) {
+        setIsLoginModalOpen(true);
+        return;
+      }
+
+      const donorExists = await fetchDonorInfo();
+      console.log("Donor exists:", donorExists);
+
+      if (donorExists) {
+        navigate("/donorDeclaration");
+      } else {
+        setIsDonorRegModalOpen(true);
+      }
+    } catch (error) {
+      console.error("Error in appointment scheduling:", error);
     }
   };
 
@@ -66,6 +85,24 @@ export function CarouselSlider() {
       }
     }
   }, [state.isAuthenticated, navigate]);
+
+  const fetchDonorInfo = async () => {
+    if (!user?.email) return;
+    try {
+      const { data: donorInfo } = await axios.get(
+        `${backendURL}/api/donor/${user.email}`
+      );
+
+      if (donorInfo) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Error fetching donor:", error);
+      return false;
+    }
+  };
 
   // Determine modal message based on loginAction
   const modalMessage =
@@ -226,6 +263,56 @@ export function CarouselSlider() {
               color="failure"
               outline
               onClick={() => setIsLoginModalOpen(false)}
+              className="border-red-700 text-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300"
+            >
+              {t("cancel_button", { ns: "common" })}
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        <Modal
+          show={isDonorRegModalOpen}
+          onClose={() => setIsDonorRegModalOpen(false)}
+        >
+          <Modal.Header className="flex items-center gap-2">
+            <p className="flex items-center gap-2 text-xl text-red-600">
+              <svg
+                className="w-6 h-6 text-red-600"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                />
+              </svg>
+              {t("registration_required", { ns: "common" })}
+            </p>
+          </Modal.Header>
+          <Modal.Body>
+            <p className="text-lg text-gray-700">
+              {t("registration_required_message", { ns: "common" })}
+            </p>
+          </Modal.Body>
+          <Modal.Footer className="flex justify-end">
+            <Button
+              color="failure"
+              onClick={() => navigate("/profile")}
+              className="border-red-700 text-white hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300"
+            >
+              {t("register_button", { ns: "common" })}
+            </Button>
+            <Button
+              color="failure"
+              outline
+              onClick={() => setIsDonorRegModalOpen(false)}
               className="border-red-700 text-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300"
             >
               {t("cancel_button", { ns: "common" })}

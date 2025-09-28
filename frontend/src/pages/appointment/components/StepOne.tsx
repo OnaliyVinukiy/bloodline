@@ -12,8 +12,6 @@ import { UserIcon } from "@heroicons/react/24/solid";
 import { StepperProps } from "../../../types/stepper";
 import { BloodDonor, User } from "../../../types/users";
 import { useAuthContext } from "@asgardeo/auth-react";
-import { validatePhoneNumber, validateNIC } from "../../../utils/ValidationsUtils";
-import { ValidationModal } from "../../../components/ValidationModal";
 import { useTranslation } from "react-i18next";
 
 const StepOne: React.FC<StepperProps> = ({
@@ -25,20 +23,25 @@ const StepOne: React.FC<StepperProps> = ({
   const { t, i18n } = useTranslation("donorRegistration");
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
-  const [errors, setErrors] = useState<{ [key in keyof BloodDonor]?: string }>(
-    {}
-  );
+
   const [isNextLoading, setIsNextLoading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
-  const [showValidationModal, setShowValidationModal] = useState(false);
+
   const [province, setProvince] = useState<
-    { province_id: string; province_name_si: string; province_name_en: string }[]
+    {
+      province_id: string;
+      province_name_si: string;
+      province_name_en: string;
+    }[]
   >([]);
 
   const [district, setDistrict] = useState<
-    { district_id: string; district_name_si: string; district_name_en: string }[]
+    {
+      district_id: string;
+      district_name_si: string;
+      district_name_en: string;
+    }[]
   >([]);
 
   const [city, setCity] = useState<
@@ -55,13 +58,10 @@ const StepOne: React.FC<StepperProps> = ({
     fullName: "",
     email: user?.email || "",
     contactNumber: "",
-    contactNumberHome: "",
-    contactNumberOffice: "",
     province: "",
     district: "",
     city: "",
     address: "",
-    addressOffice: "",
     birthdate: "",
     age: 0,
     bloodGroup: "",
@@ -75,6 +75,7 @@ const StepOne: React.FC<StepperProps> = ({
     onPreviousStep();
   };
 
+  // Fetch Provinces
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
@@ -90,6 +91,7 @@ const StepOne: React.FC<StepperProps> = ({
     fetchProvinces();
   }, [backendURL]);
 
+  // Fetch Districts
   const fetchDistricts = async (provinceNameEn: string) => {
     try {
       const response = await fetch(
@@ -106,6 +108,23 @@ const StepOne: React.FC<StepperProps> = ({
     }
   };
 
+  // Fetch Cities
+  const fetchCities = async (districtNameEn: string) => {
+    try {
+      const response = await fetch(
+        `${backendURL}/api/city/district/${districtNameEn}`
+      );
+      const cities = await response.json();
+      if (response.ok) {
+        setCity(cities);
+      } else {
+        setCity([]);
+      }
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+    }
+  };
+
   const handleProvinceChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -114,7 +133,7 @@ const StepOne: React.FC<StepperProps> = ({
       ...prev,
       province: selectedProvinceEn,
       district: "",
-      city: ""
+      city: "",
     }));
     setDistrict([]);
     setCity([]);
@@ -139,37 +158,18 @@ const StepOne: React.FC<StepperProps> = ({
     setDonor((prev) => ({ ...prev, city: selectedCityEn }));
   };
 
-  const fetchCities = async (districtNameEn: string) => {
-    try {
-      const response = await fetch(
-        `${backendURL}/api/city/district/${districtNameEn}`
-      );
-      const cities = await response.json();
-      if (response.ok) {
-        setCity(cities);
-      } else {
-        setCity([]);
-      }
-    } catch (error) {
-      console.error("Error fetching districts:", error);
-    }
-  };
-
   const handleInputChange = (field: keyof BloodDonor, value: string) => {
     if (donor) {
       setDonor((prev) => ({
         ...prev!,
         [field]: value,
       }));
-      
-      if (field === "nic") {
-        setErrors((prev) => ({ ...prev, nic: "" }));
-      }
     }
   };
 
+  // Core logic: Fetch Donor Data
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    const fetchUserInfoAndDonorData = async () => {
       if (state?.isAuthenticated) {
         try {
           const accessToken = await getAccessToken();
@@ -181,11 +181,7 @@ const StepOne: React.FC<StepperProps> = ({
 
           setUser(userInfo);
 
-          setDonor((prev) => ({
-            ...prev,
-            email: userInfo.email || "",
-          }));
-
+          // Fetch donor data using the email
           const { data: donorInfo } = await axios.get(
             `${backendURL}/api/donor/${userInfo.email}`
           );
@@ -193,6 +189,7 @@ const StepOne: React.FC<StepperProps> = ({
           if (donorInfo) {
             setDonor(donorInfo);
 
+            // Fetch dependent data for display
             if (donorInfo.province) {
               fetchDistricts(donorInfo.province);
             }
@@ -201,7 +198,9 @@ const StepOne: React.FC<StepperProps> = ({
             }
           }
         } catch (error) {
-          console.error("Error fetching user info:", error);
+          console.error("Error fetching user/donor info:", error);
+          // Handle case where donor might not exist if they completed step 0 without filling data
+          // but since they are already registered, we expect data to be there or handle gracefully.
         } finally {
           setIsLoading(false);
         }
@@ -210,7 +209,7 @@ const StepOne: React.FC<StepperProps> = ({
       }
     };
 
-    fetchUserInfo();
+    fetchUserInfoAndDonorData();
   }, [state?.isAuthenticated, getAccessToken, backendURL]);
 
   const calculateAge = (birthdate: string): number => {
@@ -227,227 +226,24 @@ const StepOne: React.FC<StepperProps> = ({
     }
     return age;
   };
-  
-  const [validationModalContent, setValidationModalContent] = useState({
-    title: "",
-    content: "",
-  });
-  
-  const showValidationMessage = (title: string, content: string) => {
-    setValidationModalContent({ title, content });
-    setShowValidationModal(true);
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0];
-      setSelectedFile(file);
-
-      const imageUrl = URL.createObjectURL(file);
-      setDonor((prev) => ({ ...prev, avatar: imageUrl }));
-    }
-  };
-
-  const handlePhoneNumberFieldChange = (
-    field: keyof BloodDonor,
-    value: string
-  ) => {
-    const isValid = value === "" || validatePhoneNumber(value);
-
-    setErrors((prev) => ({
-      ...prev,
-      [field]: isValid ? "" : t(`error_invalid_${field}`),
-    }));
-
-    handleInputChange(field, value);
-  };
-
-  const handleAvatarUpdate = async () => {
-    if (!selectedFile || !user?.email) return;
-    setIsUploading(true);
-
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("email", user.email);
-
-    try {
-      const { data } = await axios.post(
-        `${backendURL}/api/upload-avatar`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-
-      setDonor((prev) => ({ ...prev, avatar: data.avatarUrl }));
-
-      alert("Avatar updated successfully!");
-    } catch (error) {
-      console.error("Error uploading avatar:", error);
-      alert("Error updating avatar.");
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
-
-  // Effect to re-translate error messages when the language changes
-  useEffect(() => {
-    // Only run this if there are existing errors
-    if (Object.keys(errors).length > 0 && !Object.values(errors).every(e => e === "")) {
-        const recheckErrors: { [key in keyof BloodDonor]?: string } = {};
-
-        // Recalculate errors using the current language
-        if (!donor.fullName) recheckErrors.fullName = t("error_full_name_required");
-        if (!donor.email) recheckErrors.email = t("error_email_required");
-        if (!donor.contactNumber) recheckErrors.contactNumber = t("error_contact_number_required");
-        if (!donor.province) recheckErrors.province = t("error_province_required");
-        if (!donor.district) recheckErrors.district = t("error_district_required");
-        if (!donor.city) recheckErrors.city = t("error_city_required");
-        if (!donor.address) recheckErrors.address = t("error_address_required");
-        if (!donor.birthdate) recheckErrors.birthdate = t("error_birthdate_required");
-        if (!donor.bloodGroup) recheckErrors.bloodGroup = t("error_blood_group_required");
-        if (!donor.gender) recheckErrors.gender = t("error_gender_required");
-
-        // Re-validate and re-translate NIC error
-        if (donor.nic) {
-            const nicValidationResult = validateNIC(donor.nic, donor.birthdate, donor.gender);
-            if (nicValidationResult !== true) {
-                recheckErrors.nic = t(nicValidationResult);
-            }
-        } else if (errors.nic) {
-            recheckErrors.nic = t("error_nic_required");
-        }
-        
-        // Re-validate and re-translate Phone Number Validations
-        if (donor.contactNumber && !validatePhoneNumber(donor.contactNumber)) {
-            recheckErrors.contactNumber = t("error_invalid_mobile_number");
-        } else if (errors.contactNumber && !donor.contactNumber) {
-            recheckErrors.contactNumber = t("error_contact_number_required");
-        }
-
-        if (donor.contactNumberHome && !validatePhoneNumber(donor.contactNumberHome)) {
-            recheckErrors.contactNumberHome = t("error_invalid_home_number");
-        } else if (errors.contactNumberHome && donor.contactNumberHome && validatePhoneNumber(donor.contactNumberHome)) {
-            recheckErrors.contactNumberHome = ""; // Clear if it was an error before but valid now (or optional)
-        }
-
-        if (donor.contactNumberOffice && !validatePhoneNumber(donor.contactNumberOffice)) {
-            recheckErrors.contactNumberOffice = t("error_invalid_office_number");
-        } else if (errors.contactNumberOffice && donor.contactNumberOffice && validatePhoneNumber(donor.contactNumberOffice)) {
-            recheckErrors.contactNumberOffice = ""; // Clear if it was an error before but valid now (or optional)
-        }
-        
-        // Ensure error message at bottom is updated
-        if (showErrorMessage) {
-            setShowErrorMessage(true); // Re-trigger for translation if needed
-        }
-
-        setErrors(recheckErrors);
-    }
-  }, [i18n.language, donor.nic, donor.birthdate, donor.gender, donor.contactNumber, donor.contactNumberHome, donor.contactNumberOffice, t]); // Add donor fields to re-evaluate NIC/Phone errors correctly
 
   const handleNext = async () => {
-    const newErrors: { [key in keyof BloodDonor]?: string } = {};
-
-    if (!donor.fullName) newErrors.fullName = t("error_full_name_required");
-    if (!donor.email) newErrors.email = t("error_email_required");
-    if (!donor.contactNumber) newErrors.contactNumber = t("error_contact_number_required");
-    if (!donor.province) newErrors.province = t("error_province_required");
-    if (!donor.district) newErrors.district = t("error_district_required");
-    if (!donor.city) newErrors.city = t("error_city_required");
-    if (!donor.address) newErrors.address = t("error_address_required");
-    if (!donor.birthdate) newErrors.birthdate = t("error_birthdate_required");
-    if (!donor.bloodGroup) newErrors.bloodGroup = t("error_blood_group_required");
-    if (!donor.gender) newErrors.gender = t("error_gender_required");
-
-    if (!donor.nic) {
-      newErrors.nic = t("error_nic_required");
-    } else {
-      const nicValidationResult = validateNIC(donor.nic, donor.birthdate, donor.gender);
-      if (nicValidationResult !== true) {
-        newErrors.nic = t(nicValidationResult);
-      }
-    }
-    
-    if (donor.contactNumber && !validatePhoneNumber(donor.contactNumber)) {
-        newErrors.contactNumber = t("error_invalid_mobile_number");
-    }
-    if (donor.contactNumberHome && !validatePhoneNumber(donor.contactNumberHome)) {
-      newErrors.contactNumberHome = t("error_invalid_home_number");
-    }
-    if (donor.contactNumberOffice && !validatePhoneNumber(donor.contactNumberOffice)) {
-      newErrors.contactNumberOffice = t("error_invalid_office_number");
-    }
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length > 0) {
-      setShowErrorMessage(true);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
-    setShowErrorMessage(false);
     setIsNextLoading(true);
 
     try {
-      try {
-        const { data: existingDonor } = await axios.get(
-          `${backendURL}/api/donor/nic/${donor.nic}`
-        );
-
-        if (existingDonor && existingDonor.status === "Deferred") {
-          showValidationMessage(
-            t("validation_title_deferral"),
-            t("validation_content_deferral")
-          );
-          setIsNextLoading(false);
-          return;
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          if (error.response?.status !== 404) {
-            throw error;
-          }
-        } else {
-          throw error;
-        }
-      }
-
       const age = calculateAge(donor.birthdate);
       const donorWithAge = { ...donor, age };
-      
-      if (age < 18) {
-        showValidationMessage(
-          t("validation_title_age"),
-          t("validation_content_age")
-        );
-        setIsNextLoading(false);
-        return;
-      }
 
-      try {
-        await axios.get(`${backendURL}/api/donor/${user?.email}`);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          if (error.response?.status === 404) {
-            await axios.post(`${backendURL}/api/update-donor`, donorWithAge);
-          } else {
-            throw error;
-          }
-        } else {
-          throw error;
-        }
-      }
-
+      // Simply pass the fetched donor data to the next step's form data
       onFormDataChange({
         ...formData,
         donorInfo: donorWithAge,
       });
+
       window.scrollTo({ top: 0, behavior: "smooth" });
       onNextStep();
     } catch (error) {
-      console.error("Error handling donor data:", error);
+      console.error("Error preparing donor data for next step:", error);
       alert(t("error_saving_data"));
     } finally {
       setIsNextLoading(false);
@@ -503,31 +299,7 @@ const StepOne: React.FC<StepperProps> = ({
                   </div>
                 )}
 
-                <input
-                  type="file"
-                  id="avatar"
-                  className="hidden"
-                  onChange={handleFileChange}
-                  accept="image/*"
-                />
-
-                <div className="ml-4">
-                  <button
-                    onClick={() => document.getElementById("avatar")?.click()}
-                    className="px-4 py-2 text-sm text-indigo-600 hover:text-indigo-800"
-                  >
-                    {t("change_avatar")}
-                  </button>
-                  {selectedFile && (
-                    <button
-                      onClick={handleAvatarUpdate}
-                      className="ml-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-                      disabled={isUploading}
-                    >
-                      {isUploading ? t("uploading_avatar") : t("upload_avatar")}
-                    </button>
-                  )}
-                </div>
+                {/* Removed Avatar input and buttons */}
               </div>
               <div className="w-full">
                 <Label
@@ -540,15 +312,15 @@ const StepOne: React.FC<StepperProps> = ({
                 <input
                   type="text"
                   value={donor?.fullName || ""}
+                  // Kept onChange for completeness but fields are disabled
                   onChange={(e) =>
                     handleInputChange("fullName", e.target.value)
                   }
-                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                  className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5 cursor-not-allowed"
                   required
+                  disabled // <--- DISABLED
                 />
-                {errors.fullName && (
-                  <p className="text-red-500 text-xs mt-1">{t(errors.fullName)}</p>
-                )}
+                {/* Removed: {errors.fullName && ...} */}
               </div>
               <div className="w-full">
                 <Label
@@ -561,12 +333,10 @@ const StepOne: React.FC<StepperProps> = ({
                 <input
                   type="email"
                   value={user.email}
-                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-                  disabled
+                  className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5 cursor-not-allowed"
+                  disabled // <--- DISABLED
                 />
-                {errors.email && (
-                  <p className="text-red-500 text-xs mt-1">{t(errors.email)}</p>
-                )}
+                {/* Removed: {errors.email && ...} */}
               </div>
 
               <div className="w-full">
@@ -581,11 +351,10 @@ const StepOne: React.FC<StepperProps> = ({
                   type="text"
                   value={donor?.nic || ""}
                   onChange={(e) => handleInputChange("nic", e.target.value)}
-                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                  className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5 cursor-not-allowed"
+                  disabled // <--- DISABLED
                 />
-                {errors.nic && (
-                  <p className="text-red-500 text-xs mt-1">{t(errors.nic)}</p>
-                )}
+                {/* Removed: {errors.nic && ...} */}
               </div>
 
               <div className="w-full">
@@ -605,12 +374,10 @@ const StepOne: React.FC<StepperProps> = ({
                     onChange={(e) =>
                       handleInputChange("gender", e.target.value)
                     }
-                    className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
+                    className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500 cursor-not-allowed"
+                    disabled // <--- DISABLED
                   />
-                  <Label
-                    htmlFor="male"
-                    className="mr-4 text-sm text-indigo-900"
-                  >
+                  <Label htmlFor="male" className="mr-4 text-sm text-gray-900">
                     {t("gender_male")}
                   </Label>
 
@@ -623,14 +390,13 @@ const StepOne: React.FC<StepperProps> = ({
                     onChange={(e) =>
                       handleInputChange("gender", e.target.value)
                     }
-                    className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500"
+                    className="form-radio mr-2 h-4 w-4 text-red-600 focus:ring-red-500 cursor-not-allowed"
+                    disabled // <--- DISABLED
                   />
-                  <Label htmlFor="female" className="text-sm text-indigo-900">
+                  <Label htmlFor="female" className="text-sm text-gray-900">
                     {t("gender_female")}
                   </Label>
-                  {errors.gender && (
-                    <p className="text-red-500 text-xs mt-1">{t(errors.gender)}</p>
-                  )}
+                  {/* Removed: {errors.gender && ...} */}
                 </div>
               </div>
               <div className="flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0 mb-6">
@@ -644,8 +410,9 @@ const StepOne: React.FC<StepperProps> = ({
                   <select
                     id="province"
                     value={donor.province}
-                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5 cursor-not-allowed"
                     onChange={handleProvinceChange}
+                    disabled // <--- DISABLED
                   >
                     <option value="">{t("select_province_placeholder")}</option>
                     {province.map((prov) => (
@@ -659,9 +426,7 @@ const StepOne: React.FC<StepperProps> = ({
                       </option>
                     ))}
                   </select>
-                  {errors.province && (
-                    <p className="text-red-500 text-xs mt-1">{t(errors.province)}</p>
-                  )}
+                  {/* Removed: {errors.province && ...} */}
                 </div>
 
                 <div className="w-full md:w-1/3">
@@ -674,9 +439,9 @@ const StepOne: React.FC<StepperProps> = ({
                   <select
                     id="district"
                     value={donor.district}
-                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5 cursor-not-allowed"
                     onChange={handleDistrictChange}
-                    disabled={!donor.province}
+                    disabled // <--- DISABLED
                   >
                     <option value="">{t("select_district_placeholder")}</option>
                     {district.length > 0 ? (
@@ -696,9 +461,7 @@ const StepOne: React.FC<StepperProps> = ({
                       </option>
                     )}
                   </select>
-                  {errors.district && (
-                    <p className="text-red-500 text-xs mt-1">{t(errors.district)}</p>
-                  )}
+                  {/* Removed: {errors.district && ...} */}
                 </div>
 
                 <div className="w-full md:w-1/3">
@@ -711,9 +474,9 @@ const StepOne: React.FC<StepperProps> = ({
                   <select
                     id="city"
                     value={donor.city}
-                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                    className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5 cursor-not-allowed"
                     onChange={handleCityChange}
-                    disabled={!donor.district}
+                    disabled // <--- DISABLED
                   >
                     <option value="">{t("select_city_placeholder")}</option>
                     {city.length > 0 ? (
@@ -733,9 +496,7 @@ const StepOne: React.FC<StepperProps> = ({
                       </option>
                     )}
                   </select>
-                  {errors.city && (
-                    <p className="text-red-500 text-xs mt-1">{t(errors.city)}</p>
-                  )}
+                  {/* Removed: {errors.city && ...} */}
                 </div>
               </div>
 
@@ -750,30 +511,10 @@ const StepOne: React.FC<StepperProps> = ({
                   type="text"
                   value={donor?.address || ""}
                   onChange={(e) => handleInputChange("address", e.target.value)}
-                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                  className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5 cursor-not-allowed"
+                  disabled // <--- DISABLED
                 />
-                {errors.address && (
-                  <p className="text-red-500 text-xs mt-1">{t(errors.address)}</p>
-                )}
-              </div>
-              <div>
-                <Label
-                  htmlFor="fullName"
-                  className="block mb-2 text-sm font-medium text-indigo-900"
-                >
-                  {t("address_office_label")}
-                </Label>
-                <input
-                  type="text"
-                  value={donor?.addressOffice || ""}
-                  onChange={(e) =>
-                    handleInputChange("addressOffice", e.target.value)
-                  }
-                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-                />
-                {errors.addressOffice && (
-                  <p className="text-red-500 text-xs mt-1">{t(errors.addressOffice)}</p>
-                )}
+                {/* Removed: {errors.address && ...} */}
               </div>
 
               <div className="w-full">
@@ -786,67 +527,14 @@ const StepOne: React.FC<StepperProps> = ({
                 <input
                   type="text"
                   value={donor?.contactNumber || ""}
+                  // Using handleInputChange instead of handlePhoneNumberFieldChange
                   onChange={(e) =>
-                    handlePhoneNumberFieldChange(
-                      "contactNumber",
-                      e.target.value
-                    )
+                    handleInputChange("contactNumber", e.target.value)
                   }
-                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                  className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5 cursor-not-allowed"
+                  disabled // <--- DISABLED
                 />
-                {errors.contactNumber && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {t(errors.contactNumber)}
-                  </p>
-                )}
-              </div>
-              <div className="w-full">
-                <Label
-                  htmlFor="first_name"
-                  className="block mb-2 text-sm font-medium text-indigo-900"
-                >
-                  {t("contact_home_label")}
-                </Label>
-                <input
-                  type="text"
-                  value={donor?.contactNumberHome || ""}
-                  onChange={(e) =>
-                    handlePhoneNumberFieldChange(
-                      "contactNumberHome",
-                      e.target.value
-                    )
-                  }
-                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-                />
-                {errors.contactNumberHome && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {t(errors.contactNumberHome)}
-                  </p>
-                )}
-              </div>
-              <div className="w-full">
-                <Label
-                  htmlFor="first_name"
-                  className="block mb-2 text-sm font-medium text-indigo-900"
-                >
-                  {t("contact_office_label")}
-                </Label>
-                <input
-                  type="text"
-                  value={donor?.contactNumberOffice || ""}
-                  onChange={(e) =>
-                    handlePhoneNumberFieldChange(
-                      "contactNumberOffice",
-                      e.target.value
-                    )
-                  }
-                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-                />
-                {errors.contactNumberOffice && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {t(errors.contactNumberOffice)}
-                  </p>
-                )}
+                {/* Removed: {errors.contactNumber && ...} */}
               </div>
 
               <div>
@@ -861,9 +549,12 @@ const StepOne: React.FC<StepperProps> = ({
                   onChange={(e) =>
                     handleInputChange("bloodGroup", e.target.value)
                   }
-                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                  className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5 cursor-not-allowed"
+                  disabled // <--- DISABLED
                 >
-                  <option value="">{t("select_blood_group_placeholder")}</option>
+                  <option value="">
+                    {t("select_blood_group_placeholder")}
+                  </option>
                   <option value="A+">A+</option>
                   <option value="A-">A-</option>
                   <option value="B+">B+</option>
@@ -873,11 +564,7 @@ const StepOne: React.FC<StepperProps> = ({
                   <option value="O+">O+</option>
                   <option value="O-">O-</option>
                 </select>
-                {errors.bloodGroup && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {t(errors.bloodGroup)}
-                  </p>
-                )}
+                {/* Removed: {errors.bloodGroup && ...} */}
               </div>
 
               <div>
@@ -904,13 +591,10 @@ const StepOne: React.FC<StepperProps> = ({
                     }
                   }}
                   maxDate={new Date()}
-                  className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                  className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5 cursor-not-allowed"
+                  disabled // <--- DISABLED
                 />
-                {errors.birthdate && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {t(errors.birthdate)}
-                  </p>
-                )}
+                {/* Removed: {errors.birthdate && ...} */}
               </div>
 
               {donor?.birthdate && (
@@ -924,8 +608,8 @@ const StepOne: React.FC<StepperProps> = ({
                   <input
                     type="text"
                     value={calculateAge(donor.birthdate)}
-                    className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-                    disabled
+                    className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5 cursor-not-allowed"
+                    disabled // <--- DISABLED
                   />
                 </div>
               )}
@@ -937,11 +621,7 @@ const StepOne: React.FC<StepperProps> = ({
                 >
                   {t("back_button")}
                 </button>
-                {showErrorMessage && (
-                  <p className="text-red-500 text-sm mt-2">
-                    {t("validation_error_fields")}
-                  </p>
-                )}
+                {/* Removed: {showErrorMessage && ...} */}
 
                 <button
                   onClick={handleNext}
@@ -976,12 +656,6 @@ const StepOne: React.FC<StepperProps> = ({
               </div>
             </div>
           </div>
-          <ValidationModal
-            show={showValidationModal}
-            onClose={() => setShowValidationModal(false)}
-            title={validationModalContent.title}
-            content={validationModalContent.content}
-          />
         </main>
       </div>
     </div>
