@@ -43,13 +43,10 @@ export interface BloodDonor {
   fullName: string;
   email: string;
   contactNumber: string;
-  contactNumberHome: string;
-  contactNumberOffice: string;
   province: string;
   district: string;
   city: string;
   address: string;
-  addressOffice: string;
   birthdate: string;
   age: number;
   bloodGroup: string;

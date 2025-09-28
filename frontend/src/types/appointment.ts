@@ -16,10 +16,7 @@ export interface Appointment {
     fullName: string;
     email: string;
     contactNumber: string;
-    contactNumberHome: string;
-    contactNumberOffice: string;
     address: string;
-    addressOffice: string;
     birthdate: string;
     age: string;
     bloodGroup: string;
