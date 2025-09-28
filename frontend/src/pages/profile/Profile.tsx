@@ -350,6 +350,7 @@ export default function Profile() {
           phone: transformedPhone,
           otp: otp,
           subscriptionId: subscriptionId,
+          email: donor.email, // Add email to the request
         }
       );
 
@@ -359,6 +360,7 @@ export default function Profile() {
         const updatedDonor = {
           ...donor,
           isSubscribed: true,
+          maskedNumber: response.data.maskedNumber, // Use the masked number from response
         };
 
         setDonor(updatedDonor);

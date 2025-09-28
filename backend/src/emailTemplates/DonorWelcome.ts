@@ -27,9 +27,9 @@ export const DonorWelcome = (donor: any): string => {
               </p>
               
               <ul style="list-style-type: disc; padding-left: 20px; color: #333333;">
-                  <li style="margin-bottom: 10px;">Book and manage your **blood donation appointments**.</li>
-                  <li style="margin-bottom: 10px;">Check your **donor eligibility** for upcoming drives.</li>
-                  <li style="margin-bottom: 10px;">Find nearby **blood donation camps** across the island.</li>
+                  <li style="margin-bottom: 10px;">Book and manage your blood donation appointments.</li>
+                  <li style="margin-bottom: 10px;">Check your donor eligibility for upcoming drives.</li>
+                  <li style="margin-bottom: 10px;">Find nearby blood donation camps across the island.</li>
               </ul>
   
               <p style="text-align: center; margin-top: 30px;">
