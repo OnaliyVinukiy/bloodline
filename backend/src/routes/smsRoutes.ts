@@ -161,14 +161,15 @@ router.post("/request-otp", async (req, res) => {
   }
 });
 
-// ✅ Verify OTP
+// Verify OTP
 router.post("/verify-otp", async (req, res) => {
+  let client = null;
   try {
-    const { phone, otp, subscriptionId } = req.body;
-    if (!phone || !otp || !subscriptionId) {
+    const { phone, otp, subscriptionId, email } = req.body; // Add email to the request
+    if (!phone || !otp || !subscriptionId || !email) {
       return res.status(400).json({
         success: false,
-        error: "Phone, OTP, and subscription ID are required",
+        error: "Phone, OTP, subscription ID, and email are required",
       });
     }
 
@@ -203,34 +204,69 @@ router.post("/verify-otp", async (req, res) => {
     const subscriptionStatus =
       verifyResponse.data.subscriptionStatus === "REGISTERED";
 
-    // ✅ Now, update the donor document in the database
-    const client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
+    // Update the donor document in the database using EMAIL as the primary key
+    client = new MongoClient(COSMOS_DB_CONNECTION_STRING);
     await client.connect();
     const database = client.db(DATABASE_ID);
     const collection = database.collection(DONOR_COLLECTION_ID);
 
-    await collection.updateOne(
-      { contactNumber: cleanPhone },
-      {
-        $set: {
-          isSubscribed: subscriptionStatus,
-          subscriptionId: subscriptionId,
-          maskedNumber: maskedNumber, // This is the masked number from MSpace
-          updatedAt: new Date().toISOString(),
-        },
-        $setOnInsert: {
-          createdAt: new Date().toISOString(),
-        },
-      },
-      { upsert: true }
-    );
+    // First, check if donor exists with this email
+    const existingDonor = await collection.findOne({ email: email });
 
-    await client.close();
+    if (existingDonor) {
+      // Update existing donor document
+      const updateResult = await collection.updateOne(
+        { email: email },
+        {
+          $set: {
+            isSubscribed: subscriptionStatus,
+            subscriptionId: subscriptionId,
+            maskedNumber: maskedNumber,
+            contactNumber: cleanPhone, // Ensure contact number is stored in clean format
+            updatedAt: new Date().toISOString(),
+          },
+        }
+      );
+
+      console.log("✅ Existing donor updated:", {
+        matched: updateResult.matchedCount,
+        modified: updateResult.modifiedCount,
+        email: email,
+      });
+    } else {
+      // If no donor found with email, try to update by contact number as fallback
+      const updateResult = await collection.updateOne(
+        { contactNumber: cleanPhone },
+        {
+          $set: {
+            isSubscribed: subscriptionStatus,
+            subscriptionId: subscriptionId,
+            maskedNumber: maskedNumber,
+            email: email, // Add email if missing
+            updatedAt: new Date().toISOString(),
+          },
+        },
+        { upsert: false } // Don't create new document if not found
+      );
+
+      if (updateResult.matchedCount === 0) {
+        console.warn("⚠️ No donor found with email or contact number:", {
+          email,
+          cleanPhone,
+        });
+        return res.status(404).json({
+          success: false,
+          error:
+            "Donor profile not found. Please complete your donor registration first.",
+        });
+      }
+    }
+
     delete otpStore[cleanPhone]; // Clean up the in-memory store
 
     console.log(
-      "OTP verified successfully and masked number saved for:",
-      cleanPhone
+      "✅ OTP verified successfully and masked number saved for:",
+      email
     );
     res.json({
       success: true,
@@ -245,6 +281,10 @@ router.post("/verify-otp", async (req, res) => {
       error: "Failed to verify OTP",
       details: error.message,
     });
+  } finally {
+    if (client) {
+      await client.close();
+    }
   }
 });
 

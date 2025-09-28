@@ -185,6 +185,7 @@ const OrganizationRegistration = () => {
           phone: transformedPhone,
           otp: otp,
           subscriptionId: subscriptionId,
+          email: organization.repEmail, // Add email to the request
         }
       );
 
@@ -194,7 +195,7 @@ const OrganizationRegistration = () => {
         const updatedOrganization = {
           ...organization,
           isSubscribed: true,
-          maskedNumber: transformedPhone, // Store the masked number
+          maskedNumber: response.data.maskedNumber, // Use the masked number from response
         };
 
         setOrganization(updatedOrganization);
