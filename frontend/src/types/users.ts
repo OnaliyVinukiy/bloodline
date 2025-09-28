@@ -66,6 +66,8 @@ export interface Organization {
   orgContactNumber: string;
   repContactNumber: string;
   avatar: string;
+  isSubscribed?: boolean;
+  maskedNumber?: string;
 }
 
 export interface Hospital {
