@@ -90,43 +90,6 @@ const OrganizationRegistration = () => {
     return phone;
   };
 
-  // Fetch donor and organization info
-  const fetchDonorInfo = async () => {
-    if (user) {
-      try {
-        setIsLoading(true);
-        // Fetch donor info using the user's email
-        const { data: donorInfo } = await axios.get(
-          `${backendURL}/api/donor/${user.email}`
-        );
-
-        if (donorInfo) {
-          // If donor exists and has a masked number, automatically set subscription
-          if (donorInfo.maskedNumber) {
-            setOrganization((prev) => ({
-              ...prev,
-              isSubscribed: true,
-              maskedNumber: donorInfo.maskedNumber,
-            }));
-          }
-        }
-
-        const { data: orgInfo } = await axios.get(
-          `${backendURL}/api/organizations/organization/${user.email}`
-        );
-
-        if (orgInfo) {
-          setOrganization(orgInfo);
-          setIsProfileComplete(true);
-        }
-      } catch (error) {
-        console.error("Error fetching donor:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-
   // Subscription functions
   const handleRequestOtp = async () => {
     if (!organization.orgContactNumber) {
@@ -185,7 +148,6 @@ const OrganizationRegistration = () => {
           phone: transformedPhone,
           otp: otp,
           subscriptionId: subscriptionId,
-          email: organization.repEmail, // Add email to the request
         }
       );
 
@@ -195,7 +157,6 @@ const OrganizationRegistration = () => {
         const updatedOrganization = {
           ...organization,
           isSubscribed: true,
-          maskedNumber: response.data.maskedNumber, // Use the masked number from response
         };
 
         setOrganization(updatedOrganization);
@@ -275,8 +236,15 @@ const OrganizationRegistration = () => {
             repEmail: userInfo.email || "",
           }));
 
-          // Fetch donor and organization info
-          await fetchDonorInfo();
+          // Fetch organization info if user exists
+          const { data: organizationInfo } = await axios.get(
+            `${backendURL}/api/organizations/organization/${userInfo.email}`
+          );
+
+          if (organizationInfo) {
+            setOrganization(organizationInfo);
+            setIsProfileComplete(true);
+          }
         } catch (error) {
           console.error("Error fetching user info:", error);
         } finally {
