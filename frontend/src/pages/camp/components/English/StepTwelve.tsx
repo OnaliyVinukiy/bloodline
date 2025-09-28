@@ -80,6 +80,7 @@ const StepTwelve: React.FC<
   const [organizationOptions, setOrganizationOptions] = useState<string[]>([]);
   const [allOrganizations, setAllOrganizations] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [isFetchingOrgData, setIsFetchingOrgData] = useState(true);
   const navigate = useNavigate();
   const { getAccessToken } = useAuthContext();
   const memoizedGetAccessToken = useCallback(
@@ -121,7 +122,47 @@ const StepTwelve: React.FC<
     team: "None",
   });
 
-  // Filter organizations based on user input
+  // NEW: Fetch organization data by user email on component mount
+  useEffect(() => {
+    const fetchOrganizationByEmail = async () => {
+      if (!user?.email) {
+        setIsFetchingOrgData(false);
+        return;
+      }
+
+      try {
+        setIsFetchingOrgData(true);
+        const response = await axios.get(
+          `${backendURL}/api/organizations/organization/${encodeURIComponent(user.email)}`
+        );
+        
+        if (response.data) {
+          const orgData = response.data;
+          setFormData((prev) => ({
+            ...prev,
+            organizationName: orgData.organizationName || prev.organizationName,
+            fullName: orgData.repFullName || prev.fullName,
+            nic: orgData.repNIC || prev.nic,
+            email: orgData.repEmail || prev.email,
+            contactNumber: orgData.repContactNumber || prev.contactNumber,
+          }));
+          
+          if (orgData.repContactNumber) {
+            setIsPhoneNumberValid(validatePhoneNumber(orgData.repContactNumber));
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching organization by email:", error);
+        // Don't show error toast as it's expected that not all users will have organizations
+      } finally {
+        setIsFetchingOrgData(false);
+      }
+    };
+
+    fetchOrganizationByEmail();
+  }, [user?.email, backendURL]);
+
+  // Filter organizations based on user input (for manual selection if needed)
   useEffect(() => {
     if (formData.organizationName.trim()) {
       const filteredOrgs = allOrganizations.filter((org) =>
@@ -171,7 +212,6 @@ const StepTwelve: React.FC<
 
   //Fetch cities list
   const fetchCities = async (districtName: string) => {
-    // Ensure 'const { i18n } = useTranslation();' is at the top of your component
     const currentLang = i18n.language;
     const langParam = currentLang === "si" ? "?lang=si" : "";
 
@@ -245,6 +285,7 @@ const StepTwelve: React.FC<
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   const fetchOrganizationData = async (orgName: string) => {
     try {
       const response = await axios.get(
@@ -455,6 +496,35 @@ const StepTwelve: React.FC<
                 {t("subtitle")}
               </div>
             </div>
+            
+            {/* Loading indicator for organization data */}
+            {isFetchingOrgData && (
+              <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+                <div className="flex items-center justify-center">
+                  <svg
+                    aria-hidden="true"
+                    className="w-4 h-4 mr-2 text-blue-600 animate-spin"
+                    viewBox="0 0 100 101"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M100 50.5c0 27.6-22.4 50-50 50S0 78.1 0 50.5 22.4.5 50 .5s50 22.4 50 50z"
+                      fill="currentColor"
+                      opacity=".2"
+                    />
+                    <path
+                      d="M93.3 50.5c0-23.9-19.4-43.3-43.3-43.3-6.3 0-12.3 1.3-17.8 3.7-1.6.7-2.2 2.6-1.5 4.2.7 1.6 2.6 2.2 4.2 1.5 4.9-2.1 10.2-3.2 15.6-3.2 21.6 0 39.3 17.7 39.3 39.3s-17.7 39.3-39.3 39.3c-21.6 0-39.3-17.7-39.3-39.3 0-6.8 1.7-13.3 5-19.1.9-1.5.4-3.4-1-4.3s-3.4-.4-4.3 1c-3.8 6.4-5.8 13.7-5.8 21.3 0 23.9 19.4 43.3 43.3 43.3s43.3-19.4 43.3-43.3z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <span className="text-blue-600 text-sm">
+                    {t("loading_organization_data") || "Loading your organization data..."}
+                  </span>
+                </div>
+              </div>
+            )}
+            
             {/* Form */}
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 shadow-sm">
               <Label
@@ -792,7 +862,7 @@ const StepTwelve: React.FC<
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={loading || isFetchingOrgData}
                 className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 disabled:bg-red-500 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-300"
               >
                 {loading ? (

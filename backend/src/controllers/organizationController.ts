@@ -52,7 +52,7 @@ const connectToCosmos = async () => {
   }
 };
 
-//Fetch camp by email
+//Fetch organization by email
 export const getOrganizationByEmail = async (req: Request, res: Response) => {
   try {
     const { collection, client } = await connectToCosmos();
