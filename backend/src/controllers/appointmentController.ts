@@ -43,8 +43,20 @@ export const saveAppointment = async (req: Request, res: Response) => {
 
     const database = client.db(DATABASE_ID);
     const collection = database.collection(APPOINTMENT_COLLECTION_ID);
+    const donorCollection = database.collection(DONOR_COLLECTION_ID);
     const result = await collection.insertOne(appointmentData);
+    const donor = await donorCollection.findOne({
+      email: appointmentData.donorInfo.email,
+    });
+    if (!donor || !donor.maskedNumber) {
+      console.warn(
+        "Donor not found or not subscribed to SMS. Skipping SMS notification."
+      );
+    } else {
+      const requestPlacedMessage = `Hello ${appointmentData.donorInfo.fullName}, your request for a blood donation appointment on ${appointmentData.selectedDate} at ${appointmentData.selectedSlot} has been sent to NBTS. NBTS will review your request. You will receive a confirmation email and SMS once your appointment is approved. Thank you for choosing to donate blood and make a difference!`;
 
+      await sendSMS(donor.maskedNumber, requestPlacedMessage);
+    }
     // Send confirmation email
     await sendConfirmationEmail(appointmentData);
 
