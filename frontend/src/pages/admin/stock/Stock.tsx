@@ -26,6 +26,20 @@ import { useUser } from "../../../contexts/UserContext";
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
+// Get expiration status for stock history
+const getExpirationStatus = (expiryDate?: string) => {
+  if (!expiryDate) return { status: "Unknown", color: "gray" };
+
+  const today = new Date();
+  const expiry = new Date(expiryDate);
+  const timeDiff = expiry.getTime() - today.getTime();
+  const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+  if (daysDiff < 0) return { status: "Expired", color: "failure" };
+  if (daysDiff <= 30) return { status: "Near Expiry", color: "warning" };
+  return { status: "Valid", color: "success" };
+};
+
 export default function BloodStockManagement() {
   const { getAccessToken, getBasicUserInfo } = useAuthContext();
   const [stocks, setStocks] = useState<BloodStock[]>([]);
@@ -55,6 +69,12 @@ export default function BloodStockManagement() {
   const navigate = useNavigate();
   const backendURL =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
+  // Create filtered stock history
+  const nonExpiredStockHistory = stockHistory.filter((entry) => {
+    const { status } = getExpirationStatus(entry.expiryDate);
+    return status !== "Expired";
+  });
 
   // Fetch stock data
   const fetchData = async () => {
@@ -299,20 +319,6 @@ export default function BloodStockManagement() {
     if (type === "issue") {
       navigate("/admin/stock/issuance-history");
     }
-  };
-
-  // Get expiration status for stock history
-  const getExpirationStatus = (expiryDate?: string) => {
-    if (!expiryDate) return { status: "Unknown", color: "gray" };
-
-    const today = new Date();
-    const expiry = new Date(expiryDate);
-    const timeDiff = expiry.getTime() - today.getTime();
-    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-    if (daysDiff < 0) return { status: "Expired", color: "failure" };
-    if (daysDiff <= 30) return { status: "Near Expiry", color: "warning" };
-    return { status: "Valid", color: "success" };
   };
 
   // Loading animation
@@ -637,8 +643,8 @@ export default function BloodStockManagement() {
                 <Table.HeadCell>Date Added</Table.HeadCell>
               </Table.Head>
               <Table.Body className="divide-y">
-                {stockHistory.length > 0 ? (
-                  stockHistory.map((entry) => {
+                {nonExpiredStockHistory.length > 0 ? (
+                  nonExpiredStockHistory.map((entry) => {
                     const { status, color } = getExpirationStatus(
                       entry.expiryDate
                     );
@@ -650,7 +656,6 @@ export default function BloodStockManagement() {
                             onChange={() =>
                               handleStockEntrySelection(entry._id)
                             }
-                            disabled={status === "Expired"}
                           />
                         </Table.Cell>
                         <Table.Cell>{entry.labelId}</Table.Cell>
@@ -674,7 +679,7 @@ export default function BloodStockManagement() {
                 ) : (
                   <Table.Row>
                     <Table.Cell colSpan={6} className="text-center py-4">
-                      No stock entries available
+                      No non-expired stock entries available
                     </Table.Cell>
                   </Table.Row>
                 )}
