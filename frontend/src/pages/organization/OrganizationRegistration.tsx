@@ -13,8 +13,10 @@ import { UserIcon } from "@heroicons/react/24/solid";
 import { User, Organization } from "../../types/users";
 import { ValidationModal } from "../../components/ValidationModal";
 import { validatePhoneNumber } from "../../utils/ValidationsUtils";
+import { useTranslation } from "react-i18next";
 
 const OrganizationRegistration = () => {
+  const { t } = useTranslation(["organization", "profilePage", "common"]);
   const { state, getAccessToken } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
@@ -23,6 +25,16 @@ const OrganizationRegistration = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
   const [isOrgPhoneNumberValid, setIsOrgPhoneNumberValid] = useState(true);
+
+  // Subscription states
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState("");
+  const [otp, setOtp] = useState("");
+  const [subscriptionId, setSubscriptionId] = useState("");
+  const [isRequestingOtp, setIsRequestingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false);
+  const [isUnsubscribing, setIsUnsubscribing] = useState(false);
 
   const [organization, setOrganization] = useState<Organization>({
     organizationName: "",
@@ -34,6 +46,8 @@ const OrganizationRegistration = () => {
     orgContactNumber: "",
     repContactNumber: "",
     avatar: "",
+    isSubscribed: false,
+    maskedNumber: "",
   });
 
   const [isProfileComplete, setIsProfileComplete] = useState(false);
@@ -69,6 +83,139 @@ const OrganizationRegistration = () => {
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
+  const transformPhoneNumber = (phone: string): string => {
+    if (phone.startsWith("0")) {
+      return "94" + phone.substring(1);
+    }
+    return phone;
+  };
+
+  // Subscription functions
+  const handleRequestOtp = async () => {
+    if (!organization.orgContactNumber) {
+      showValidationMessage(
+        t("validation_missing_phone", { ns: "profilePage" }),
+        t("validation_missing_phone_content", { ns: "profilePage" })
+      );
+      return;
+    }
+
+    if (!validatePhoneNumber(organization.orgContactNumber)) {
+      showValidationMessage(
+        t("validation_invalid_phone", { ns: "profilePage" }),
+        t("validation_invalid_phone_content", { ns: "profilePage" })
+      );
+      return;
+    }
+
+    setIsRequestingOtp(true);
+    try {
+      const transformedPhone = transformPhoneNumber(
+        organization.orgContactNumber
+      );
+
+      const response = await axios.post(
+        `${backendURL}/subscription/request-otp`,
+        {
+          phone: transformedPhone,
+        }
+      );
+
+      if (response.data.success) {
+        setSubscriptionId(response.data.subscriptionId);
+        setSubscriptionStatus("otp_sent");
+      } else {
+        setSubscriptionStatus("error");
+        console.error("Failed to send OTP:", response.data.error);
+      }
+    } catch (error) {
+      setSubscriptionStatus("error");
+      console.error("Error requesting OTP:", error);
+    } finally {
+      setIsRequestingOtp(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setIsVerifyingOtp(true);
+    try {
+      const transformedPhone = transformPhoneNumber(
+        organization.orgContactNumber
+      );
+      const response = await axios.post(
+        `${backendURL}/subscription/verify-otp`,
+        {
+          phone: transformedPhone,
+          otp: otp,
+          subscriptionId: subscriptionId,
+        }
+      );
+
+      if (response.data.success) {
+        setSubscriptionStatus("success");
+
+        const updatedOrganization = {
+          ...organization,
+          isSubscribed: true,
+        };
+
+        setOrganization(updatedOrganization);
+
+        await axios.post(
+          `${backendURL}/api/organizations/update-organization`,
+          updatedOrganization
+        );
+      } else {
+        setSubscriptionStatus("error");
+      }
+    } catch (error) {
+      setSubscriptionStatus("error");
+      console.error("Error verifying OTP:", error);
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
+  const handleUnsubscribe = async () => {
+    setIsUnsubscribing(true);
+    try {
+      const response = await axios.post(
+        `${backendURL}/subscription/unsubscribe`,
+        {
+          email: organization.repEmail,
+        }
+      );
+
+      if (response.data.success) {
+        const updatedOrganization = {
+          ...organization,
+          isSubscribed: false,
+          maskedNumber: "",
+        };
+        setOrganization(updatedOrganization);
+
+        setShowUnsubscribeModal(false);
+        showValidationMessage(
+          t("unsub_success_title", { ns: "profilePage" }),
+          t("unsub_success_content", { ns: "profilePage" })
+        );
+      } else {
+        showValidationMessage(
+          t("unsub_fail_title", { ns: "profilePage" }),
+          response.data.error
+        );
+      }
+    } catch (error) {
+      console.error("Error during unsubscription:", error);
+      showValidationMessage(
+        t("unsub_fail_title", { ns: "profilePage" }),
+        t("unsub_fail_content_generic", { ns: "profilePage" })
+      );
+    } finally {
+      setIsUnsubscribing(false);
+    }
+  };
+
   // Fetch user info from Asgardeo
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -89,7 +236,7 @@ const OrganizationRegistration = () => {
             repEmail: userInfo.email || "",
           }));
 
-          // Fetch donor info if user exists
+          // Fetch organization info if user exists
           const { data: organizationInfo } = await axios.get(
             `${backendURL}/api/organizations/organization/${userInfo.email}`
           );
@@ -143,7 +290,7 @@ const OrganizationRegistration = () => {
         { headers: { "Content-Type": "multipart/form-data" } }
       );
 
-      // Update the donor record with new avatar URL
+      // Update the organization record with new avatar URL
       setOrganization((prev) => ({ ...prev, avatar: data.avatarUrl }));
 
       alert("Logo updated successfully!");
@@ -155,7 +302,7 @@ const OrganizationRegistration = () => {
     }
   };
 
-  // Handle donor profile update
+  // Handle organization profile update
   const handleUpdate = async () => {
     if (!user || !organization) return;
 
@@ -198,7 +345,7 @@ const OrganizationRegistration = () => {
     }
   };
 
-  // Handle input changes for donor fields
+  // Handle input changes for organization fields
   const handleInputChange = (field: keyof Organization, value: string) => {
     if (organization) {
       setOrganization((prev) => ({
@@ -264,7 +411,7 @@ const OrganizationRegistration = () => {
                 <img
                   className="object-cover w-40 h-40 p-1 rounded-full ring-2 ring-red-300"
                   src={organization.avatar}
-                  alt="User Avatar"
+                  alt="Organization Logo"
                 />
               ) : (
                 <div className="w-40 h-40 p-1 rounded-full ring-2 ring-red-300 flex items-center justify-center bg-gray-300">
@@ -285,7 +432,7 @@ const OrganizationRegistration = () => {
                   onClick={() => document.getElementById("avatar")?.click()}
                   className="px-4 py-2 text-sm text-indigo-600 hover:text-indigo-800"
                 >
-                  Change Avatar
+                  Change Logo
                 </button>
                 {selectedFile && (
                   <button
@@ -469,6 +616,42 @@ const OrganizationRegistration = () => {
                 </p>
               )}
             </div>
+
+            {/* Subscription Section */}
+            <div className="mt-6 p-4 border rounded-lg">
+              <h3 className="text-lg font-medium text-indigo-900 mb-4">
+                {t("sms_notifications_title", { ns: "profilePage" })}
+              </h3>
+
+              <div className="flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  id="sms-subscription"
+                  checked={organization.isSubscribed}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setShowSubscriptionModal(true);
+                    } else {
+                      setShowUnsubscribeModal(true);
+                    }
+                  }}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                />
+                <Label
+                  htmlFor="sms-subscription"
+                  className="text-sm text-indigo-900"
+                >
+                  {t("subscription_checkbox_label_org", { ns: "profilePage" })}
+                </Label>
+              </div>
+
+              {organization.isSubscribed && organization.maskedNumber && (
+                <p className="text-sm text-green-600">
+                  {t("subscribed_message", { ns: "profilePage" })}
+                </p>
+              )}
+            </div>
+
             <div className="flex justify-end mt-6">
               <button
                 onClick={handleUpdate}
@@ -622,6 +805,126 @@ const OrganizationRegistration = () => {
         title={validationModalContent.title}
         content={validationModalContent.content}
       />
+
+      {/* Subscription Modal */}
+      <Modal
+        show={showSubscriptionModal}
+        onClose={() => setShowSubscriptionModal(false)}
+      >
+        <Modal.Header>
+          {t("subscribe_modal_title", { ns: "profilePage" })}
+        </Modal.Header>
+        <Modal.Body>
+          <div className="space-y-4">
+            {subscriptionStatus === "" && (
+              <>
+                <p className="text-gray-700">
+                  {t("subscribe_modal_phone_prefix", { ns: "profilePage" })}{" "}
+                  {organization.orgContactNumber}
+                </p>
+                <Button
+                  onClick={handleRequestOtp}
+                  disabled={isRequestingOtp}
+                  className="w-full"
+                >
+                  {isRequestingOtp
+                    ? t("sending_otp", { ns: "profilePage" })
+                    : t("request_otp_button", { ns: "profilePage" })}
+                </Button>
+              </>
+            )}
+
+            {subscriptionStatus === "otp_sent" && (
+              <>
+                <p className="text-gray-700">
+                  {t("otp_sent_message", { ns: "profilePage" })}
+                </p>
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder={t("otp_placeholder", { ns: "profilePage" })}
+                  className="w-full p-2 border rounded"
+                />
+                <Button
+                  onClick={handleVerifyOtp}
+                  disabled={isVerifyingOtp || otp.length < 4}
+                  className="w-full"
+                >
+                  {isVerifyingOtp
+                    ? t("verifying_otp", { ns: "profilePage" })
+                    : t("verify_otp_button", { ns: "profilePage" })}
+                </Button>
+              </>
+            )}
+
+            {subscriptionStatus === "success" && (
+              <div className="text-green-600 text-center">
+                <svg
+                  className="w-12 h-12 mx-auto mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                <p>
+                  {t("subscription_success_message", { ns: "profilePage" })}
+                </p>
+              </div>
+            )}
+
+            {subscriptionStatus === "error" && (
+              <div className="text-red-600 text-center">
+                <p>{t("subscription_fail_message", { ns: "profilePage" })}</p>
+              </div>
+            )}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          {subscriptionStatus === "success" && (
+            <Button onClick={() => setShowSubscriptionModal(false)}>
+              {t("close_button", { ns: "profilePage" })}
+            </Button>
+          )}
+        </Modal.Footer>
+      </Modal>
+      {/* Unsubscribe Confirmation Modal */}
+      <Modal
+        show={showUnsubscribeModal}
+        onClose={() => setShowUnsubscribeModal(false)}
+      >
+        <Modal.Header>
+          {t("unsubscribe_modal_title", { ns: "profilePage" })}
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-lg text-gray-700">
+            {t("unsubscribe_confirm_message", { ns: "profilePage" })}
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            {t("unsubscribe_warning_message", { ns: "profilePage" })}
+          </p>
+        </Modal.Body>
+        <Modal.Footer className="flex justify-end space-x-4">
+          <Button color="gray" onClick={() => setShowUnsubscribeModal(false)}>
+            {t("cancel_button", { ns: "profilePage" })}
+          </Button>
+          <Button
+            color="failure"
+            onClick={handleUnsubscribe}
+            disabled={isUnsubscribing}
+          >
+            {isUnsubscribing
+              ? t("unsubscribing", { ns: "profilePage" })
+              : t("unsubscribe_button", { ns: "profilePage" })}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

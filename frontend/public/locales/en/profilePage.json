@@ -1,6 +1,7 @@
 {
   "sms_notifications_title": "SMS Notifications",
   "subscription_checkbox_label": "Subscribe to receive SMS notifications about your blood donation appointments.(Subscription fee: Rs.30 per month)",
+  "subscription_checkbox_label_org": "Subscribe to receive SMS notifications about your blood donation camps.(Subscription fee: Rs.30 per month)",
   "subscribed_message": "Already Subscribed!",
   "subscribe_modal_title": "Subscribe to SMS Notifications",
   "subscribe_modal_phone_prefix": "You'll receive an OTP to your phone number:",
