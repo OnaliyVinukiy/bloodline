@@ -11,10 +11,11 @@ import axios from "axios";
 import { Button, Label, Modal } from "flowbite-react";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { Datepicker } from "flowbite-react";
-import { User, Donor } from "../../types/users";
-import { ValidationModal } from "../../components/ValidationModal";
-import { validatePhoneNumber } from "../../utils/ValidationsUtils";
+import { User, Donor, BloodDonor } from "../../types/users";
+import { validateNIC, validatePhoneNumber } from "../../utils/ValidationsUtils";
 import { useTranslation } from "react-i18next";
+import i18n from "../../i18n";
+import { ValidationModal } from "../../components/ValidationModal";
 
 export default function Profile() {
   const { t } = useTranslation(["profile", "profilePage", "common"]);
@@ -25,15 +26,16 @@ export default function Profile() {
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showAvatarUpdateModel, setShowAvatarUpdateModel] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
-
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [subscriptionStatus, setSubscriptionStatus] = useState("");
   const [otp, setOtp] = useState("");
   const [subscriptionId, setSubscriptionId] = useState("");
   const [isRequestingOtp, setIsRequestingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
-
+  const [errors, setErrors] = useState<{ [key in keyof BloodDonor]?: string }>(
+    {}
+  );
   const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false);
   const [isUnsubscribing, setIsUnsubscribing] = useState(false);
 
@@ -77,8 +79,30 @@ export default function Profile() {
   const [showValidationModal, setShowValidationModal] = useState(false);
 
   const handlePhoneNumberChange = (value: string) => {
-    setIsPhoneNumberValid(validatePhoneNumber(value));
+    // Also update errors for immediate feedback
+    const isValid = validatePhoneNumber(value);
+    setErrors((prev) => ({
+      ...prev,
+      contactNumber: isValid ? "" : t("error_invalid_mobile_number"),
+    }));
     handleInputChange("contactNumber", value);
+  };
+
+  // New handler for NIC input
+  const handleNICChange = (value: string) => {
+    handleInputChange("nic", value);
+    // Clear NIC error immediately on change for responsiveness
+    setErrors((prev) => ({ ...prev, nic: "" }));
+  };
+
+  // Handle input changes for donor fields
+  const handleInputChange = (field: keyof Donor, value: string) => {
+    if (donor) {
+      setDonor((prev) => ({
+        ...prev!,
+        [field]: value,
+      }));
+    }
   };
 
   const [validationModalContent, setValidationModalContent] = useState({
@@ -149,6 +173,65 @@ export default function Profile() {
     }
   }, [isLoading, isProfileComplete]);
 
+  // Effect to re-translate and re-evaluate errors when language/donor data changes
+  useEffect(() => {
+    // Only run this if there are existing errors
+    if (
+      Object.keys(errors).length > 0 &&
+      !Object.values(errors).every((e) => e === "")
+    ) {
+      const recheckErrors: { [key in keyof BloodDonor]?: string } = {};
+
+      // Recalculate required field errors
+      if (!donor.fullName)
+        recheckErrors.fullName = t("error_full_name_required");
+      // Email is from user, assumed present, but check for safety
+      if (!donor.email) recheckErrors.email = t("error_email_required");
+      if (!donor.contactNumber)
+        recheckErrors.contactNumber = t("error_contact_number_required");
+      if (!donor.province)
+        recheckErrors.province = t("error_province_required");
+      if (!donor.district)
+        recheckErrors.district = t("error_district_required");
+      if (!donor.city) recheckErrors.city = t("error_city_required");
+      if (!donor.address) recheckErrors.address = t("error_address_required");
+      if (!donor.birthdate)
+        recheckErrors.birthdate = t("error_birthdate_required");
+      if (!donor.bloodGroup)
+        recheckErrors.bloodGroup = t("error_blood_group_required");
+      if (!donor.gender) recheckErrors.gender = t("error_gender_required");
+
+      // Re-validate and re-translate NIC error
+      if (donor.nic) {
+        const nicValidationResult = validateNIC(
+          donor.nic,
+          donor.birthdate,
+          donor.gender
+        );
+        if (nicValidationResult !== true) {
+          recheckErrors.nic = t(nicValidationResult as string);
+        }
+      } else if (errors.nic) {
+        recheckErrors.nic = t("error_nic_required");
+      }
+
+      // Re-validate and re-translate Phone Number Validations
+      if (donor.contactNumber && !validatePhoneNumber(donor.contactNumber)) {
+        recheckErrors.contactNumber = t("error_invalid_mobile_number");
+      }
+      // Note: No need for an else if here, as the required check is above.
+
+      setErrors(recheckErrors);
+    }
+  }, [
+    i18n.language,
+    donor.nic,
+    donor.birthdate,
+    donor.gender,
+    donor.contactNumber,
+    t,
+  ]);
+
   //Fetch provinces list
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -186,16 +269,28 @@ export default function Profile() {
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const selectedProvince = event.target.value;
-    setDonor((prev) => ({ ...prev, province: selectedProvince }));
-    fetchDistricts(selectedProvince);
+    setDonor((prev) => ({
+      ...prev,
+      province: selectedProvince,
+      district: "",
+      city: "",
+    }));
+    setDistrict([]);
+    setCity([]);
+    if (selectedProvince) {
+      fetchDistricts(selectedProvince);
+    }
   };
 
   const handleDistrictChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const selectedDistrict = event.target.value;
-    setDonor((prev) => ({ ...prev, district: selectedDistrict }));
-    fetchCities(selectedDistrict);
+    setDonor((prev) => ({ ...prev, district: selectedDistrict, city: "" }));
+    setCity([]);
+    if (selectedDistrict) {
+      fetchCities(selectedDistrict);
+    }
   };
 
   const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -396,6 +491,52 @@ export default function Profile() {
     if (!user || !donor) return;
 
     const age = calculateAge(donor.birthdate);
+    const newErrors: { [key in keyof BloodDonor]?: string } = {};
+
+    // --- Validation Logic (Copied and adapted from StepOne) ---
+    if (!donor.fullName) newErrors.fullName = t("error_full_name_required");
+    if (!donor.email) newErrors.email = t("error_email_required");
+    if (!donor.contactNumber)
+      newErrors.contactNumber = t("error_contact_number_required");
+    if (!donor.province) newErrors.province = t("error_province_required");
+    if (!donor.district) newErrors.district = t("error_district_required");
+    if (!donor.city) newErrors.city = t("error_city_required");
+    if (!donor.address) newErrors.address = t("error_address_required");
+    if (!donor.birthdate) newErrors.birthdate = t("error_birthdate_required");
+    if (!donor.bloodGroup)
+      newErrors.bloodGroup = t("error_blood_group_required");
+    if (!donor.gender) newErrors.gender = t("error_gender_required");
+
+    if (!donor.nic) {
+      newErrors.nic = t("error_nic_required");
+    } else {
+      const nicValidationResult = validateNIC(
+        donor.nic,
+        donor.birthdate,
+        donor.gender
+      );
+      if (nicValidationResult !== true) {
+        newErrors.nic = t(nicValidationResult as string);
+      }
+    }
+
+    if (donor.contactNumber && !validatePhoneNumber(donor.contactNumber)) {
+      newErrors.contactNumber = t("error_invalid_mobile_number");
+    }
+
+    setErrors(newErrors);
+
+    // Check if there are ANY validation errors in the `newErrors` object
+    const hasErrors = Object.values(newErrors).some((error) => error);
+
+    if (hasErrors) {
+      setShowErrorMessage(true); // <--- THIS LINE WAS MISSING OR INEFFECTIVE
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    // Clear generic error message if validation passed
+    setShowErrorMessage(false);
+    // --- End Validation Logic ---
 
     if (age < 18) {
       showValidationMessage(
@@ -405,6 +546,9 @@ export default function Profile() {
       return;
     }
 
+    // The explicit phone check here is redundant if validation logic above is correct,
+    // but kept for flow consistency if the user somehow bypassed the input handler logic.
+    /*
     if (!validatePhoneNumber(donor.contactNumber)) {
       showValidationMessage(
         t("contact_number_invalid_title", { ns: "profile" }),
@@ -412,35 +556,47 @@ export default function Profile() {
       );
       return;
     }
+    */
+
     try {
       setLoading(true);
 
-      const { data: existingDonor } = await axios.get(
-        `${backendURL}/api/donor/nic/${donor.nic}`
-      );
-
-      if (existingDonor && existingDonor.email !== user.email) {
-        showValidationMessage(
-          t("already_registered_title", { ns: "profile" }),
-          t("already_registered_content", { ns: "profile" })
+      // NIC uniqueness check (adapted from StepOne)
+      try {
+        const { data: existingDonor } = await axios.get(
+          `${backendURL}/api/donor/nic/${donor.nic}`
         );
-        setLoading(false);
-        return;
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status !== 404) {
+
+        // Check if an existing donor with the NIC is found, and it's not the current user
+        if (existingDonor && existingDonor.email !== user.email) {
+          showValidationMessage(
+            t("already_registered_title", { ns: "profile" }),
+            t("already_registered_content", { ns: "profile" })
+          );
+          setLoading(false);
+          return;
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status !== 404) {
+            throw error; // Re-throw if it's not a 404 (Donor not found is expected)
+          }
+        } else {
           throw error;
         }
-      } else {
-        throw error;
       }
-    }
-    try {
+
       const { _id, ...donorData } = donor;
 
       const payload = {
         ...donorData,
+        age, // Add calculated age to payload
+        // The original code was transforming the contact number here, which might be incorrect
+        // as the number should likely be stored in the format given by the user (e.g., 0xxxxxxxxx)
+        // unless the backend explicitly requires the international format (94xxxxxxxxx).
+        // Sticking to the format from StepOne (transforming mobile number on send) for consistency.
+        // For the profile update, let's stick to the current value unless we explicitly want to transform it here.
+        // The original code transformed it, so keeping that as the intention.
         contactNumber: transformPhoneNumber(donorData.contactNumber),
       };
 
@@ -456,16 +612,6 @@ export default function Profile() {
       console.error("Error updating profile:", error);
       setLoading(false);
       setErrorModal(true);
-    }
-  };
-
-  // Handle input changes for donor fields
-  const handleInputChange = (field: keyof Donor, value: string) => {
-    if (donor) {
-      setDonor((prev) => ({
-        ...prev!,
-        [field]: value,
-      }));
     }
   };
 
@@ -626,11 +772,16 @@ export default function Profile() {
                 onChange={(e) => handleInputChange("fullName", e.target.value)}
                 className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
               />
+              {errors.fullName && (
+                <p className="text-red-500 text-xs mt-1">
+                  {t(errors.fullName, { ns: "profile" })}
+                </p>
+              )}
             </div>
             <div className="flex space-x-6 mb-6">
               <div className="w-3/4">
                 <Label
-                  htmlFor="first_name"
+                  htmlFor="nic"
                   className="block mb-2 text-sm font-medium text-indigo-900"
                 >
                   {" "}
@@ -639,9 +790,15 @@ export default function Profile() {
                 <input
                   type="text"
                   value={donor?.nic || ""}
-                  onChange={(e) => handleInputChange("nic", e.target.value)}
+                  onChange={(e) => handleNICChange(e.target.value)}
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                 />
+                {/* NIC Error Message */}
+                {errors.nic && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {t(errors.nic, { ns: "profile" })}
+                  </p>
+                )}
               </div>
 
               <div className="w-3/4">
@@ -685,6 +842,11 @@ export default function Profile() {
                     {t("gender_female", { ns: "profile" })}
                   </Label>
                 </div>
+                {errors.gender && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {t(errors.gender, { ns: "profile" })}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -715,6 +877,11 @@ export default function Profile() {
                     </option>
                   ))}
                 </select>
+                {errors.province && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {t(errors.province, { ns: "profile" })}
+                  </p>
+                )}
               </div>
 
               <div className="w-full md:w-1/3">
@@ -729,6 +896,7 @@ export default function Profile() {
                   value={donor.district}
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                   onChange={handleDistrictChange}
+                  disabled={!donor.province}
                 >
                   <option value="">
                     {t("select_district", { ns: "profile" })}
@@ -743,11 +911,16 @@ export default function Profile() {
                       </option>
                     ))
                   ) : (
-                    <option value="">
+                    <option value="" disabled>
                       {t("select_province_first", { ns: "profile" })}
                     </option>
                   )}
                 </select>
+                {errors.district && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {t(errors.district, { ns: "profile" })}
+                  </p>
+                )}
               </div>
 
               <div className="w-full md:w-1/3">
@@ -762,6 +935,7 @@ export default function Profile() {
                   value={donor.city}
                   className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
                   onChange={handleCityChange}
+                  disabled={!donor.district}
                 >
                   <option value="">
                     {t("select_city", { ns: "profile" })}
@@ -776,11 +950,16 @@ export default function Profile() {
                       </option>
                     ))
                   ) : (
-                    <option value="">
+                    <option value="" disabled>
                       {t("select_district_first", { ns: "profile" })}
                     </option>
                   )}
                 </select>
+                {errors.city && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {t(errors.city, { ns: "profile" })}
+                  </p>
+                )}
               </div>
             </div>
             <div>
@@ -796,6 +975,11 @@ export default function Profile() {
                 onChange={(e) => handleInputChange("address", e.target.value)}
                 className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
               />
+              {errors.address && (
+                <p className="text-red-500 text-xs mt-1">
+                  {t(errors.address, { ns: "profile" })}
+                </p>
+              )}
             </div>
 
             <div className="mb-2 sm:mb-6">
@@ -811,12 +995,13 @@ export default function Profile() {
                 value={donor?.contactNumber || ""}
                 onChange={(e) => handlePhoneNumberChange(e.target.value)}
                 className={`bg-indigo-50 border ${
-                  isPhoneNumberValid ? "border-indigo-300" : "border-red-500"
+                  errors.contactNumber ? "border-red-500" : "border-indigo-300"
                 } text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
               />
-              {!isPhoneNumberValid && (
-                <p className="text-sm text-red-500 mt-1">
-                  {t("contact_number_invalid", { ns: "profile" })}
+              {/* Phone Number Error Message */}
+              {errors.contactNumber && (
+                <p className="text-red-500 text-xs mt-1">
+                  {t(errors.contactNumber, { ns: "profile" })}
                 </p>
               )}
             </div>
@@ -847,6 +1032,11 @@ export default function Profile() {
                 <option value="O+">O+</option>
                 <option value="O-">O-</option>
               </select>
+              {errors.bloodGroup && (
+                <p className="text-red-500 text-xs mt-1">
+                  {t(errors.bloodGroup, { ns: "profile" })}
+                </p>
+              )}
             </div>
 
             <div>
@@ -861,16 +1051,25 @@ export default function Profile() {
                 onChange={(date) => {
                   if (date) {
                     const offsetDate = new Date(date);
+                    // Adjust for local time zone offset to get a clean 'YYYY-MM-DD' on the backend
+                    // Assuming the original '330' offset logic is correct for GMT+5:30 (Sri Lanka)
                     offsetDate.setMinutes(offsetDate.getMinutes() + 330);
 
                     const formattedDate =
-                      offsetDate.toLocaleDateString("en-CA");
+                      offsetDate.toLocaleDateString("en-CA"); // 'en-CA' gives YYYY-MM-DD
                     handleInputChange("birthdate", formattedDate);
+                  } else {
+                    handleInputChange("birthdate", "");
                   }
                 }}
                 maxDate={new Date()}
                 className="bg-indigo-50 border border-indigo-300 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
               />
+              {errors.birthdate && (
+                <p className="text-red-500 text-xs mt-1">
+                  {t(errors.birthdate, { ns: "profile" })}
+                </p>
+              )}
             </div>
 
             {donor?.birthdate && (
@@ -924,39 +1123,47 @@ export default function Profile() {
               )}
             </div>
 
-            <div className="flex justify-end mt-6">
-              <button
-                onClick={handleUpdate}
-                disabled={loading}
-                className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 disabled:bg-red-500 disabled:cursor-not-allowed flex items-center justify-center"
-              >
-                {loading ? (
-                  <>
-                    <svg
-                      aria-hidden="true"
-                      className="w-4 h-4 mr-2 text-white animate-spin"
-                      viewBox="0 0 100 101"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M100 50.5c0 27.6-22.4 50-50 50S0 78.1 0 50.5 22.4.5 50 .5s50 22.4 50 50z"
-                        fill="currentColor"
-                        opacity=".2"
-                      />
-                      <path
-                        d="M93.3 50.5c0-23.9-19.4-43.3-43.3-43.3-6.3 0-12.3 1.3-17.8 3.7-1.6.7-2.2 2.6-1.5 4.2.7 1.6 2.6 2.2 4.2 1.5 4.9-2.1 10.2-3.2 15.6-3.2 21.6 0 39.3 17.7 39.3 39.3s-17.7 39.3-39.3 39.3c-21.6 0-39.3-17.7-39.3-39.3 0-6.8 1.7-13.3 5-19.1.9-1.5.4-3.4-1-4.3s-3.4-.4-4.3 1c-3.8 6.4-5.8 13.7-5.8 21.3 0 23.9 19.4 43.3 43.3 43.3s43.3-19.4 43.3-43.3z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                    {t("updating_status", { ns: "profile" })}
-                  </>
-                ) : isProfileComplete ? (
-                  t("update_profile", { ns: "profile" })
-                ) : (
-                  t("complete_profile", { ns: "profile" })
-                )}
-              </button>
+            <div className="flex justify-between items-center mt-6">
+              {/* General Validation Error Message at the bottom */}
+              {showErrorMessage && (
+                <p className="text-red-500 text-sm mt-2">
+                  {t("validation_error_fields", { ns: "profile" })}
+                </p>
+              )}
+              <div className="flex justify-end w-full">
+                <button
+                  onClick={handleUpdate}
+                  disabled={loading}
+                  className="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 bg-red-800 hover:bg-red-700 focus:ring-4 focus:ring-red-300 disabled:bg-red-500 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  {loading ? (
+                    <>
+                      <svg
+                        aria-hidden="true"
+                        className="w-4 h-4 mr-2 text-white animate-spin"
+                        viewBox="0 0 100 101"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M100 50.5c0 27.6-22.4 50-50 50S0 78.1 0 50.5 22.4.5 50 .5s50 22.4 50 50z"
+                          fill="currentColor"
+                          opacity=".2"
+                        />
+                        <path
+                          d="M93.3 50.5c0-23.9-19.4-43.3-43.3-43.3-6.3 0-12.3 1.3-17.8 3.7-1.6.7-2.2 2.6-1.5 4.2.7 1.6 2.6 2.2 4.2 1.5 4.9-2.1 10.2-3.2 15.6-3.2 21.6 0 39.3 17.7 39.3 39.3s-17.7 39.3-39.3 39.3c-21.6 0-39.3-17.7-39.3-39.3 0-6.8 1.7-13.3 5-19.1.9-1.5.4-3.4-1-4.3s-3.4-.4-4.3 1c-3.8 6.4-5.8 13.7-5.8 21.3 0 23.9 19.4 43.3 43.3 43.3s43.3-19.4 43.3-43.3z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                      {t("updating_status", { ns: "profile" })}
+                    </>
+                  ) : isProfileComplete ? (
+                    t("update_profile", { ns: "profile" })
+                  ) : (
+                    t("complete_profile", { ns: "profile" })
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

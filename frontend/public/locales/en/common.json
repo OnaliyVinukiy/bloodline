@@ -2,6 +2,7 @@
   "login_required": "Login Required",
   "login_loading": "Loading...",
   "login_button": "Login",
+  "register_button": "Register as a Donor",
   "cancel_button": "Cancel",
   "update_button": "Update Profile",
   "complete_button": "Complete Profile",
@@ -10,5 +11,7 @@
   "find_donation_camp": "Find a Donation Camp",
   "hospital_register_button": "Register Your Hospital",
   "error_title": "Oops an Error!",
-  "error_message": "Error updating the profile. Please try again shortly."
+  "error_message": "Error updating the profile. Please try again shortly.",
+  "registration_required": "Registration Required",
+  "registration_required_message": "You are not yet registered as donor. Please register yourself to place an appointment."
 }

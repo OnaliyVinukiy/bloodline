@@ -64,5 +64,34 @@
   "ok_button": "OK",
   "upload": "Upload",
   "uploading": "Uploading...",
-  "login_message": "Please login to view profile data"
+  "login_message": "Please login to view profile data",
+  "error_nic_required": "NIC is required.",
+  "error_full_name_required": "Full Name is required.",
+  "error_email_required": "Email is required.",
+  "error_contact_number_required": "Contact number is required.",
+  "error_address_required": "Address is required.",
+  "error_birthdate_required": "Birthdate is required.",
+  "error_blood_group_required": "Blood Group is required.",
+  "error_gender_required": "Gender is required.",
+  "error_invalid_phone_number_format": "Invalid phone number format.",
+  "error_invalid_mobile_number": "Invalid mobile number.",
+  "error_invalid_home_number": "Invalid home number.",
+  "error_invalid_office_number": "Invalid office number.",
+  "error_province_required": "Province is required.",
+  "error_district_required": "District is required.",
+  "error_city_required": "City is required.",
+  
+  
+  "error_nic_format": "Invalid NIC format. Must be 9 digits + V/X or 12 digits.",
+  "error_nic_year_mismatch": "NIC year of birth does not match Date of Birth.",
+  "error_nic_invalid_day_count": "NIC day count is invalid or exceeds maximum days for the year.",
+  "error_nic_dob_mismatch": "NIC encoded day count does not match Date of Birth.",
+  "error_nic_gender_mismatch": "NIC encoded gender does not match selected Gender.",
+
+  "validation_title_deferral": "Donation Restricted",
+  "validation_content_deferral": "You cannot donate as your donor status is currently deferred. Please contact the blood bank for more information.",
+  "validation_title_age": "Age Restriction",
+  "validation_content_age": "You cannot place an appointment as a donor unless you are aged 18 or above.",
+  "validation_error_fields": "Please fill all required fields before proceeding.",
+  "error_saving_data": "Error saving donor information. Please try again."
 }

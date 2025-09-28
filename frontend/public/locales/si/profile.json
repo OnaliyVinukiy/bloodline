@@ -44,6 +44,34 @@
   "loading_message": "දත්ත පැටවීමට කරුණාකර රැඳී සිටින්න",
   "login_message": "දත්ත බැලීමට කරුණාකර ලොගින් වෙන්න",
   "update_button": "යාවත්කාලීන කරන්න",
-  "complete_button": "සම්පූර්ණ කරන්න"
+  "complete_button": "සම්පූර්ණ කරන්න",
+  "error_nic_required": "ජාතික හැඳුනුම්පත අවශ්‍යයි.",
+  "error_full_name_required": "සම්පූර්ණ නම අවශ්‍යයි.",
+  "error_email_required": "විද්‍යුත් තැපෑල අවශ්‍යයි.",
+  "error_contact_number_required": "සම්බන්ධතා අංකය අවශ්‍යයි.",
+  "error_address_required": "ලිපිනය අවශ්‍යයි.",
+  "error_birthdate_required": "උපන් දිනය අවශ්‍යයි.",
+  "error_blood_group_required": "රුධිර වර්ගය අවශ්‍යයි.",
+  "error_gender_required": "ස්ත්‍රී පුරුෂ භාවය අවශ්‍යයි.",
+  "error_invalid_phone_number_format": "වලංගු දුරකථන අංක ආකෘතියක් නොවේ.",
+  "error_invalid_mobile_number": "වලංගු ජංගම දුරකථන අංකයක් නොවේ.",
+  "error_invalid_home_number": "වලංගු නිවසේ දුරකථන අංකයක් නොවේ.",
+  "error_invalid_office_number": "වලංගු කාර්යාල දුරකථන අංකයක් නොවේ.",
+  
+  "error_nic_format": "වලංගු ජාතික හැඳුනුම්පත් ආකෘතියක් නොවේ. (9 ඉලක්කම් + V/X හෝ 12 ඉලක්කම් විය යුතුය.)",
+  "error_nic_year_mismatch": "ජාතික හැඳුනුම්පතේ උපන් වර්ෂය උපන් දිනයට නොගැළපේ.",
+  "error_nic_invalid_day_count": "ජාතික හැඳුනුම්පතේ දින ගණන වැරදි හෝ වසරේ උපරිම දින ගණන ඉක්මවයි.",
+  "error_nic_dob_mismatch": "ජාතික හැඳුනුම්පතේ කේතනය කර ඇති දින ගණන උපන් දිනයට නොගැළපේ.",
+  "error_nic_gender_mismatch": "ජාතික හැඳුනුම්පතේ කේතනය කර ඇති ස්ත්‍රී පුරුෂ භාවය තෝරාගත් ස්ත්‍රී පුරුෂ භාවයට නොගැළපේ.",
+  "error_province_required": "පළාත අවශ්‍යයි.",
+  "error_district_required": "දිස්ත්‍රික්කය අවශ්‍යයි.",
+  "error_city_required": "නගරය අවශ්‍යයි.",
+
+  "validation_title_deferral": "පරිත්‍යාගය සීමා කර ඇත",
+  "validation_content_deferral": "ඔබගේ දායක තත්ත්වය දැනට කල් දමා ඇති බැවින් ඔබට පරිත්‍යාග කළ නොහැක. වැඩි විස්තර සඳහා කරුණාකර රුධිර බැංකුව අමතන්න.",
+  "validation_title_age": "වයස් සීමාව",
+  "validation_content_age": "ඔබට වයස අවුරුදු 18 හෝ ඊට වැඩි නම් මිස දායකයෙකු ලෙස වරයක් වෙන්කරවා ගත නොහැක.",
+  "validation_error_fields": "ඉදිරියට යාමට පෙර කරුණාකර අවශ්‍ය සියලුම ක්ෂේත්‍ර පුරවන්න.",
+  "error_saving_data": "දායක තොරතුරු සුරැකීමේදී දෝෂයක්. කරුණාකර නැවත උත්සාහ කරන්න."
   
 }
