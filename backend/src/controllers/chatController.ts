@@ -424,67 +424,18 @@ class ChatbotController {
   }
 
   // Handle incoming chatbot messages
-  public async handleChat(req: Request, res: Response): Promise<Response> {
+  async handleChat(req: Request, res: Response): Promise<Response> {
+    const { message, email, lang = "en" } = req.body;
     try {
-      const { message, email, lang = "en" } = req.body;
-
       if (!message)
         return res
           .status(400)
           .json({ reply: getTranslatedText("message_required", lang) });
 
-      const lowerMessage = message.toLowerCase();
+      // Call Azure OpenAI to classify intent
+      const aiResponse = await ChatbotController.callAzureOpenAI(message);
 
-      const eligibilityKeywords = [
-        "eligibility",
-        "eligible",
-        "criteria",
-        "can i donate",
-        "who can donate",
-        "blood donation rules",
-        "donor requirements",
-        "සුදුසුකම්",
-        "සුදුසුද",
-        "නීති",
-        "දන්දිය හැකිද",
-      ];
-
-      const personalStatusKeywords = [
-        "my appointment",
-        "my status",
-        "status of my appointment",
-        "check my booking",
-        "next donation",
-        "මගේ වරය",
-        "මගේ තත්වය",
-        "වරය පරීක්ෂා කරන්න",
-        "ඊළඟ පරිත්‍යාගය",
-      ];
-
-      const appointmentKeywords = [
-        "appointment",
-        "book appointment",
-        "appointment slot",
-        "slots",
-        "available slots",
-        "slot",
-        "are there any slots available",
-        "වරය",
-        "වරයන්",
-        "වෙන්කරවා ගැනීම",
-        "තිබේද",
-      ];
-
-      if (
-        eligibilityKeywords.some((keyword) => lowerMessage.includes(keyword))
-      ) {
-        const eligibilityResponse = getTranslatedText("eligibility", lang);
-        return res.status(200).json({ reply: eligibilityResponse });
-      }
-
-      if (
-        personalStatusKeywords.some((keyword) => lowerMessage.includes(keyword))
-      ) {
+      if (aiResponse === "[CheckAppointmentStatus]") {
         if (!email) {
           return res.status(200).json({
             reply: getTranslatedText("personal_status.login_required", lang),
@@ -493,26 +444,24 @@ class ChatbotController {
         const statusResponse =
           await ChatbotController.fetchUserAppointmentStatus(email, lang);
         return res.status(200).json({ reply: statusResponse });
-      }
-
-      if (
-        appointmentKeywords.some((keyword) => lowerMessage.includes(keyword))
-      ) {
+      } else if (aiResponse === "[CheckEligibility]") {
+        const eligibilityResponse = getTranslatedText("eligibility", lang);
+        return res.status(200).json({ reply: eligibilityResponse });
+      } else if (aiResponse === "[CheckAppointmentSlots]") {
         const appointmentResponse = await ChatbotController.fetchAppointments(
           message,
           lang
         );
         return res.status(200).json({ reply: appointmentResponse });
+      } else {
+        // Handle general AI response
+        return res.status(200).json({ reply: aiResponse });
       }
-
-      // Default AI response
-      const aiResponse = await ChatbotController.callAzureOpenAI(message);
-      return res.status(200).json({ reply: aiResponse });
     } catch (error) {
       console.error("Chat handler error:", error);
       return res
         .status(500)
-        .json({ reply: getTranslatedText("internal_error", "en") });
+        .json({ reply: getTranslatedText("internal_error", lang) });
     }
   }
 }
