@@ -19,5 +19,6 @@
   "services": "Services",
   "contact_us": "Contact Us",
   "admin_hospitals": "Hospitals",
-  "blood_requests": "Blood Requests"
+  "blood_requests": "Blood Requests",
+  "admin_subscription": "SMS Subscriptions"
 }

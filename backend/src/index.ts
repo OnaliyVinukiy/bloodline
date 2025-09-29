@@ -20,6 +20,7 @@ import chatRoutes from "./routes/chatRoutes";
 import subscriptionRoutes from "./routes/subscriptionRoutes";
 import smsRoutes from "./routes/smsRoutes";
 import hospitalRoutes from "./routes/hospitalRoutes";
+import adminRoutes from "./routes/adminRoutes";
 const app = express();
 
 // CORS Configuration
@@ -68,6 +69,8 @@ app.use("/api/chatbot", chatRoutes);
 app.use("/sms", subscriptionRoutes);
 
 app.use("/subscription", smsRoutes);
+
+app.use("/api/admin", adminRoutes);
 
 // Home route
 app.get("/", (req: Request, res: Response): void => {

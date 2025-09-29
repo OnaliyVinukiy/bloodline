@@ -41,7 +41,7 @@ import HospitalRegistration from "./pages/hospital/HospitalRegistration";
 import Hospitals from "./pages/admin/hospital/Hospitals";
 import HospitalBloodRequest from "./pages/hospital/RequestBlood";
 import BloodRequests from "./pages/admin/hospital/BloodRequests";
-
+import AdminSubscription from "./pages/admin/subscription/AdminSubscription";
 function App() {
   const { state } = useAuthContext();
   const [isLoading, setIsLoading] = useState(true);
@@ -139,6 +139,10 @@ function App() {
                 element={<HospitalBloodRequest />}
               />
               <Route path="/admin/blood-requests" element={<BloodRequests />} />
+              <Route
+                path="/admin/subscription"
+                element={<AdminSubscription />}
+              />
             </Routes>
           </main>
           <FooterComponent />

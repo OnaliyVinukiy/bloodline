@@ -22,6 +22,7 @@ export const HOSPITAL_COLLECTION_ID = "hospital";
 export const BLOOD_STOCK_COLLECTION_ID = "stock";
 export const BLOOD_STOCK_ITEMS_COLLECTION_ID = "stock";
 export const BLOOD_STOCK_HISTORY_COLLECTION_ID = "bloodStockHistory";
+export const ADMIN_COLLECTION_ID = "admin";
 export const CONTAINER_NAME = "profile-pictures";
 export const BLOOD_REQUEST_COLLECTION_ID = "BloodRequests";
 export const LOGO_CONTAINER_NAME = "logos";

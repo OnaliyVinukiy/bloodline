@@ -36,7 +36,7 @@ const subscriptionStore: Record<string, SubscriptionData> = {};
 // ✅ Notification endpoint
 router.post("/notify", async (req, res) => {
   console.log(
-    "📩 Subscription notification received:",
+    "Subscription notification received:",
     JSON.stringify(req.body, null, 2)
   );
 
