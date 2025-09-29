@@ -83,4 +83,6 @@ export interface Hospital {
   avatar: string;
   status?: string;
   rejectionReason?: string;
+  isSubscribed?: boolean;
+  maskedNumber?: string;
 }

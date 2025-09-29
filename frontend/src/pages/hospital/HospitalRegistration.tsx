@@ -40,6 +40,8 @@ const HospitalRegistrationRequest = () => {
     repContactNumber: "",
     avatar: "",
     status: "pending",
+    isSubscribed: false,
+    maskedNumber: "",
   });
 
   const [isRequestSubmitted, setIsRequestSubmitted] = useState(false);
@@ -49,6 +51,16 @@ const HospitalRegistrationRequest = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showValidationModal, setShowValidationModal] = useState(false);
+
+  // Subscription states
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState("");
+  const [otp, setOtp] = useState("");
+  const [subscriptionId, setSubscriptionId] = useState("");
+  const [isRequestingOtp, setIsRequestingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false);
+  const [isUnsubscribing, setIsUnsubscribing] = useState(false);
 
   const handleRepContactNumber = (value: string) => {
     setIsPhoneNumberValid(validatePhoneNumber(value));
@@ -74,6 +86,14 @@ const HospitalRegistrationRequest = () => {
     import.meta.env.VITE_IS_PRODUCTION === "true"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
+
+  // Transform phone number for subscription
+  const transformPhoneNumber = (phone: string): string => {
+    if (phone.startsWith("0")) {
+      return "94" + phone.substring(1);
+    }
+    return phone;
+  };
 
   // Fetch user info and hospital request status
   useEffect(() => {
@@ -120,6 +140,139 @@ const HospitalRegistrationRequest = () => {
       setShowProfileIncompleteModal(true);
     }
   }, [isLoading, isRequestSubmitted]);
+
+  // Subscription handlers
+  const handleRequestOtp = async () => {
+    if (!hospital.repContactNumber) {
+      showValidationMessage(
+        "Missing Phone Number",
+        "Please provide a contact number before subscribing to notifications."
+      );
+      return;
+    }
+
+    if (!validatePhoneNumber(hospital.repContactNumber)) {
+      showValidationMessage(
+        "Invalid Phone Number",
+        "Please enter a valid 10-digit phone number starting from 0."
+      );
+      return;
+    }
+
+    setIsRequestingOtp(true);
+    try {
+      const transformedPhone = transformPhoneNumber(hospital.repContactNumber);
+
+      const response = await axios.post(
+        `${backendURL}/subscription/request-otp`,
+        {
+          phone: transformedPhone,
+        }
+      );
+
+      if (response.data.success) {
+        setSubscriptionId(response.data.subscriptionId);
+        setSubscriptionStatus("otp_sent");
+      } else {
+        setSubscriptionStatus("error");
+        console.error("Failed to send OTP:", response.data.error);
+      }
+    } catch (error) {
+      setSubscriptionStatus("error");
+      console.error("Error requesting OTP:", error);
+    } finally {
+      setIsRequestingOtp(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setIsVerifyingOtp(true);
+    try {
+      const transformedPhone = transformPhoneNumber(hospital.repContactNumber);
+      const response = await axios.post(
+        `${backendURL}/subscription/verify-otp`,
+        {
+          phone: transformedPhone,
+          otp: otp,
+          subscriptionId: subscriptionId,
+          email: hospital.repEmail,
+          isHospital: true,
+        }
+      );
+
+      if (response.data.success) {
+        setSubscriptionStatus("success");
+
+        const updatedHospital = {
+          ...hospital,
+          isSubscribed: true,
+          maskedNumber: response.data.maskedNumber,
+        };
+
+        setHospital(updatedHospital);
+
+        // Update hospital record with subscription status
+        await axios.post(
+          `${backendURL}/api/hospitals/update-hospital`,
+          updatedHospital
+        );
+      } else {
+        setSubscriptionStatus("error");
+      }
+    } catch (error) {
+      setSubscriptionStatus("error");
+      console.error("Error verifying OTP:", error);
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
+  const handleUnsubscribe = async () => {
+    setIsUnsubscribing(true);
+    try {
+      const response = await axios.post(
+        `${backendURL}/subscription/unsubscribe`,
+        {
+          email: hospital.repEmail,
+          isHospital: true,
+        }
+      );
+
+      if (response.data.success) {
+        const updatedHospital = {
+          ...hospital,
+          isSubscribed: false,
+          maskedNumber: "",
+        };
+        setHospital(updatedHospital);
+
+        // Update hospital record
+        await axios.post(
+          `${backendURL}/api/hospitals/update-hospital`,
+          updatedHospital
+        );
+
+        setShowUnsubscribeModal(false);
+        showValidationMessage(
+          "Unsubscribed Successfully",
+          "You have been unsubscribed from SMS notifications."
+        );
+      } else {
+        showValidationMessage(
+          "Unsubscribe Failed",
+          response.data.error || "Failed to unsubscribe. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("Error during unsubscription:", error);
+      showValidationMessage(
+        "Unsubscribe Failed",
+        "An error occurred while unsubscribing. Please try again."
+      );
+    } finally {
+      setIsUnsubscribing(false);
+    }
+  };
 
   // Handle file selection for avatar
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -599,6 +752,45 @@ const HospitalRegistrationRequest = () => {
                 Your hospital has been successfully registered with NBTS. You
                 can now request blood when needed.
               </p>
+
+              {hospital.status === "approved" && (
+                <div className="mt-8 p-6 border rounded-lg bg-gray-50 max-w-2xl mx-auto">
+                  <h3 className="text-lg font-medium text-indigo-900 mb-4">
+                    SMS Notifications
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Subscribe to receive SMS notifications about blood requests.
+                  </p>
+
+                  <div className="flex items-center justify-center mb-4">
+                    <input
+                      type="checkbox"
+                      id="hospital-sms-subscription"
+                      checked={hospital.isSubscribed}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setShowSubscriptionModal(true);
+                        } else {
+                          setShowUnsubscribeModal(true);
+                        }
+                      }}
+                      className="mr-2 h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                    />
+                    <Label
+                      htmlFor="hospital-sms-subscription"
+                      className="text-sm font-medium text-indigo-900"
+                    >
+                      Subscribe to SMS Notifications
+                    </Label>
+                  </div>
+
+                  {hospital.isSubscribed && hospital.maskedNumber && (
+                    <p className="text-sm text-green-600">
+                      Subscribed to notifications ({hospital.maskedNumber})
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -670,6 +862,116 @@ const HospitalRegistrationRequest = () => {
         title={validationModalContent.title}
         content={validationModalContent.content}
       />
+
+      {/* Subscription Modal */}
+      <Modal
+        show={showSubscriptionModal}
+        onClose={() => setShowSubscriptionModal(false)}
+      >
+        <Modal.Header>Subscribe to SMS Notifications</Modal.Header>
+        <Modal.Body>
+          <div className="space-y-4">
+            {subscriptionStatus === "" && (
+              <>
+                <p className="text-gray-700">
+                  We will send an OTP to your phone number:{" "}
+                  {hospital.repContactNumber}
+                </p>
+                <Button
+                  onClick={handleRequestOtp}
+                  disabled={isRequestingOtp}
+                  className="w-full"
+                >
+                  {isRequestingOtp ? "Sending OTP..." : "Request OTP"}
+                </Button>
+              </>
+            )}
+
+            {subscriptionStatus === "otp_sent" && (
+              <>
+                <p className="text-gray-700">
+                  OTP has been sent to your phone number. Please enter it below:
+                </p>
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="Enter OTP"
+                  className="w-full p-2 border rounded"
+                />
+                <Button
+                  onClick={handleVerifyOtp}
+                  disabled={isVerifyingOtp || otp.length < 4}
+                  className="w-full"
+                >
+                  {isVerifyingOtp ? "Verifying OTP..." : "Verify OTP"}
+                </Button>
+              </>
+            )}
+
+            {subscriptionStatus === "success" && (
+              <div className="text-green-600 text-center">
+                <svg
+                  className="w-12 h-12 mx-auto mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                <p>Successfully subscribed to SMS notifications!</p>
+              </div>
+            )}
+
+            {subscriptionStatus === "error" && (
+              <div className="text-red-600 text-center">
+                <p>Failed to subscribe. Please try again.</p>
+              </div>
+            )}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          {subscriptionStatus === "success" && (
+            <Button onClick={() => setShowSubscriptionModal(false)}>
+              Close
+            </Button>
+          )}
+        </Modal.Footer>
+      </Modal>
+
+      {/* Unsubscribe Confirmation Modal */}
+      <Modal
+        show={showUnsubscribeModal}
+        onClose={() => setShowUnsubscribeModal(false)}
+      >
+        <Modal.Header>Unsubscribe from SMS Notifications</Modal.Header>
+        <Modal.Body>
+          <p className="text-lg text-gray-700">
+            Are you sure you want to unsubscribe from SMS notifications?
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            You will no longer receive important updates about blood requests
+            and urgent needs.
+          </p>
+        </Modal.Body>
+        <Modal.Footer className="flex justify-end space-x-4">
+          <Button color="gray" onClick={() => setShowUnsubscribeModal(false)}>
+            Cancel
+          </Button>
+          <Button
+            color="failure"
+            onClick={handleUnsubscribe}
+            disabled={isUnsubscribing}
+          >
+            {isUnsubscribing ? "Unsubscribing..." : "Unsubscribe"}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
