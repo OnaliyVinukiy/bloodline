@@ -9,6 +9,7 @@ import { useState, useRef, useEffect } from "react";
 import { FaCommentAlt, FaTimes, FaPaperPlane } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useAuthContext } from "@asgardeo/auth-react";
+import { ValidationModal } from "../../../components/ValidationModal";
 
 type Message = {
   id: string;
@@ -20,7 +21,8 @@ type Message = {
 const Chatbot = () => {
   const { t, i18n } = useTranslation("chatbot");
   const [isOpen, setIsOpen] = useState(false);
-  const { getBasicUserInfo } = useAuthContext();
+  const [showValidationModal, setShowValidationModal] = useState(false);
+  const { state, getBasicUserInfo } = useAuthContext();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -43,8 +45,12 @@ const Chatbot = () => {
   // Handle sending message
   const handleSendMessage = async () => {
     if (inputValue.trim() === "") return;
-
+    if (!state?.isAuthenticated) {
+      setShowValidationModal(true);
+      return;
+    }
     const userInfo = await getBasicUserInfo();
+    console.log(userInfo);
     const userEmail = userInfo.email;
     const currentLang = i18n.language;
 
@@ -207,6 +213,12 @@ const Chatbot = () => {
           </div>
         </div>
       )}
+      <ValidationModal
+        show={showValidationModal}
+        onClose={() => setShowValidationModal(false)}
+        title="Login Required"
+        content="Please log in to use the chatbot feature."
+      />
     </div>
   );
 };
